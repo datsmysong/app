@@ -1,36 +1,28 @@
 @startuml Ajout d'une musique depuis une playlist personnelle sur Deezer dans une salle d'écoute lancée via Spotify
 title Ajout d'une musique depuis une playlist personnelle sur Deezer dans une salle d'écoute lancée via Spotify
 
-actor Utilisateur as User
+actor Participant as User
 participant App as "Application (frontend)"
 participant LogiqueMetier as "Logique Métier"
 participant SpotifyAPI as "API Spotify"
 participant DeezerAPI as "API Deezer"
-participant AppleMusicAPI as "API Apple Music"
 
 User -> App: Clique sur la barre de recherche
 User <- App: Affiche l'interface de recherche
 User -> App: Clique sur le bouton "Depuis une playlist"
 App -> LogiqueMetier: Récupérer les playlists de l'utilisateur sur ses différentes plateformes
+note right of LogiqueMetier: Récupère les playlists de l'utilisateur sur toutes les plateformes qu'il a lié, dans notre cas, uniquement Deezer
+LogiqueMetier -> DeezerAPI: Récupérer les playlists de l'utilisateur sur Deezer
+LogiqueMetier <- DeezerAPI: Renvoie les playlists et les musiques qu'elles contiennent
 App <- LogiqueMetier: Renvoie les playlists
 User <- App: Affiche les playlists de l'utilisateur
 User -> App: Clique sur une playlist, puis sur une musique
-
-
-alt Salle d'écoute lancée depuis Spotify
-  LogiqueMetier -> SpotifyAPI: Recherche la musique sur Spotify
-  SpotifyAPI --> LogiqueMetier: Renvoie les résultats de recherche
-
-else Salle d'écoute lancée depuis Deezer
-  LogiqueMetier -> DeezerAPI: Recherche la musique sur Deezer
-  DeezerAPI --> LogiqueMetier: Renvoie les résultats de recherche
-
-else Salle d'écoute lancée depuis Apple Music
-  LogiqueMetier -> AppleMusicAPI: Recherche la musique sur Apple Music
-  AppleMusicAPI --> LogiqueMetier: Renvoie les résultats de recherche
-end
-
-LogiqueMetier -> App: Renvoie les résultats de recherche
-App -> User: Affiche les résultats de recherche
+App -> LogiqueMetier: Ajouter la musique à la salle d'écoute
+LogiqueMetier -> SpotifyAPI: Rechercher la musique provenant de Deezer sur Spotify
+SpotifyAPI -> LogiqueMetier: Renvoie les informations sur la musique
+LogiqueMetier -> SpotifyAPI: Ajouter la musique à la salle d'écoute
+SpotifyAPI -> LogiqueMetier: Renvoie une confirmation de l'ajout, ou un message d'erreur
+App <- LogiqueMetier: Renvoie une confirmation de l'ajout, ou un message d'erreur
+User <- App: Affiche la confirmation de l'ajout, ou le message d'erreur
 
 @enduml
