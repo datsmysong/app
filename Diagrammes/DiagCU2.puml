@@ -1,0 +1,34 @@
+@startuml
+!theme aws-orange
+
+title Use Case Diagram 
+
+:Participant: as P
+:Participant anonyme: as PA
+:Hôte: as H
+
+package app{
+  usecase (Consulter la liste de lecture des musique) as CONSULT
+  usecase (Initier un vote pour passer la musique actuelle) as INITVOTE
+  usecase (Voter pour passer la musique actuelle) as VOTE
+  usecase (Quitter la salle d’écoute) as QUIT
+  usecase (Ajouter une musique) as ADD
+  usecase (Supprimer une des musiques qu’il a ajouté dans la liste d’attente) as DEL
+  usecase (Mettre un nom d’utilisateur pour la salle d’écoute courante) as USERNAME
+  
+}
+
+P <|-- PA
+
+
+P -- CONSULT
+P -- INITVOTE
+P -- VOTE
+P -- QUIT
+P -- ADD
+ADD ..> "<<extends>>" DEL
+
+PA -- USERNAME
+
+
+@enduml
