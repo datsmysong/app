@@ -1,0 +1,33 @@
+@startuml Diagramme de séquence
+title Première connexion à l'application via un compte Spotify
+!theme aws-orange
+
+actor Participant as User
+participant App as "Application (frontend)"
+participant LogiqueMetier as "Logique Métier"
+participant Spotify as "Spotify (frontend)"
+participant SpotifyAPI as "API Spotify"
+
+User -> App: Clique sur le bouton connexion avec Spotify
+activate App
+User <- App: Redirection vers Spotify
+User -> Spotify: Autorise notre application sur l'interface Spotify
+activate Spotify
+User <- Spotify: Redirection avec un code d'autorisation vers l'application
+deactivate Spotify
+User -> App: Déclare le code d'autorisation à l'application
+App->LogiqueMetier: Partage le code d'autorisation
+activate LogiqueMetier
+activate SpotifyAPI
+LogiqueMetier -> SpotifyAPI: demande un token d'accès avec le code d'autorisation
+LogiqueMetier <- SpotifyAPI: Token d'accès à l'API Spotify
+LogiqueMetier -> SpotifyAPI: Demande les informations de l'utilisateur
+LogiqueMetier <- SpotifyAPI: Informations de l'utilisateur
+deactivate SpotifyAPI
+LogiqueMetier -> LogiqueMetier: Création d'un compte utilisateur datsmysong
+LogiqueMetier -> LogiqueMetier: Liaison du compte utilisateur avec le compte Spotify
+LogiqueMetier -> App: Redirection vers l'application en tant qu'utilisateur connecté
+deactivate LogiqueMetier
+App -> User: Page d'accueil de l'application (utilisateur connecté)
+deactivate App
+@enduml
