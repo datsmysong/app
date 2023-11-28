@@ -1,0 +1,23 @@
+@startuml Diagramme d'activité
+title Diagramme d'activité du cycle de vie d'une musique X
+!theme aws-orange
+
+start
+:Ajout d'une musique X par l'utilisateur Bob dans la liste de lecture en dernière position;
+repeat
+    if(Bob supprime X ?) then (Bob enlève sa musique)
+        :supprimer musique X de la liste;
+        stop
+    else (non)
+        :lire musique tete de liste;
+        if(vote skip musique ?) then (majorité souhaite supprimer musique X)
+            :passer la musique actuelle;
+        else (non)
+            :terminer la musique;
+        endif
+        :archiver la musique en tête de la liste dans la base de donnée;
+    endif
+repeat while (musique X a été lue ?)
+stop
+
+@enduml

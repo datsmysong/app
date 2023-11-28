@@ -1,0 +1,18 @@
+@startuml Diagramme d'activité
+title Diagramme d'activité du cycle de vie d'une salle d'écoute
+!theme aws-orange
+
+start
+:Création d'une salle d'écoute;
+while (Ecoute en cours) is (true)
+    fork
+        :Ajout d'une musique;
+    fork again
+        :Vote skip d'une musique;
+    end fork
+endwhile (fin de l'écoute)
+:fermeture de la salle d'écoute;
+:archivage de la salle d'écoute dans la base de données;
+stop
+
+@enduml
