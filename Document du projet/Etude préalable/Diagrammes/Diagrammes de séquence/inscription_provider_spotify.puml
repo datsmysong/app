@@ -1,6 +1,6 @@
-@startuml Diagramme de séquence
+@startuml inscription_provider_spotify
 title Première connexion à l'application via un compte Spotify
-!theme aws-orange
+!theme plain
 
 actor Participant as User
 participant App as "Application (frontend)"
