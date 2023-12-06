@@ -1,0 +1,37 @@
+@startuml
+!theme aws-orange
+left to right direction
+
+title Diagramme général
+
+:Utilisateur (non connecté): as UNC
+:Utilisateur (connecté): as UC
+:Participant: as P
+:Participant anonyme: as PA
+:Hôte: as H
+
+package app{
+
+  usecase (Rejoindre/créer salle d'écoute) as JOINSALLE
+  usecase (Gérer/créer son compte) as ACCOUNT
+
+  usecase (Intéragir avec la salle d'écoute) as SALLE
+  usecase (Paramétrer la salle d’écoute) as PARAMETER
+
+}
+
+UNC -- JOINSALLE
+UNC -- ACCOUNT
+
+JOINSALLE -- UC
+ACCOUNT -- UC
+
+P <|-- PA
+
+P -- SALLE
+
+PA -- JOINSALLE
+
+H -- PARAMETER
+H -- SALLE
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+!theme aws-orange
+left to right direction
+
+title Gérer/créer son compte
+
+:Utilisateur (non connecté): as UNC
+:Utilisateur (connecté): as UC
+
+package app{
+
+  usecase (Lier son compte Spotify / Apple Music) as LIER
+  usecase (Consulter son profil) as PROFIL
+  usecase (Créer un  compte) as ACCOUNT
+  usecase (Regarder sa liste d’amis et ajouter un ami) as FRIENDSLIST
+  usecase (Consulter l’historique des salles d’écoutes dans lesquels il a participé) as HISTORY
+  usecase (Regarder les détails d’une salle d’écoute dans laquelle il a participé) as DETAILS
+}
+
+UNC -- ACCOUNT
+
+UC -- PROFIL
+UC -- FRIENDSLIST
+UC -- LIER
+UC -- HISTORY
+HISTORY <.. "<<extends>>" DETAILS
+@enduml

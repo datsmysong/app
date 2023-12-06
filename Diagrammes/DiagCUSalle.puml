@@ -1,0 +1,38 @@
+@startuml
+!theme aws-orange
+left to right direction
+
+title Interagir avec la salle d'écoute
+
+:Participant: as P
+:Hôte: as H
+
+package app{
+    usecase (Consulter la liste de lecture des musique) as CONSULT
+    usecase (Initier un vote ou voter pour passer la musique actuelle) as VOTE
+    usecase (Ajouter une musique) as ADD
+    usecase (Supprimer une musique) as DEL
+    usecase (Générer un lien d’invitation) as GEN
+    usecase (Gérer le lecteur audio) as AUDIO
+    usecase (Changer l'ordre des musiques) as ORDER
+
+    usecase (Fermer la salle d’écoute) as SHUT
+    usecase (Éjecter un participant de la salle d’écoute) as KICK
+    usecase (Bannir un participant de la salle d’écoute) as BAN
+
+}
+
+CONSULT --- P
+VOTE -- P
+ADD -- P
+ADD <.. "<<extends>>" DEL
+
+H -- GEN
+H -- AUDIO
+H -- ORDER
+
+H -- SHUT
+H -- KICK
+H -- BAN
+
+@enduml

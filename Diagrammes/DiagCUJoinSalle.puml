@@ -1,0 +1,22 @@
+@startuml
+!theme aws-orange
+left to right direction
+
+title Rejoindre/créer salle d'écoute
+
+:Utilisateur (connecté): as UC
+:Utilisateur (non connecté): as UNC
+
+package app{
+
+  usecase (Rejoindre une salle d’écoute via un lien) as JOIN
+  usecase (Créer une salle d’écoute) as CREATE
+  usecase (Mettre un nom d’utilisateur pour la salle d’écoute courante) as USERNAME
+}
+
+UC -- JOIN
+UC -- CREATE
+
+UNC -- JOIN
+UNC -- USERNAME
+@enduml

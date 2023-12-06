@@ -1,0 +1,22 @@
+@startuml
+!theme aws-orange
+left to right direction
+
+title Paramétrer la salle d’écoute
+
+:Hôte: as H
+
+package app{
+    usecase (Activer le vote pour passer une musique aux participants) as ACTIVATE
+    usecase (Configurer le nombre de musiques qu’un participant peut ajouter à la fois) as nbMusic
+    usecase (Nombre de musiques maximales que peut contenir la file d’attente) as nbMusicFile
+    usecase (Pourcentage de votes qu’il faut pour que la musique soit passée) as POURCENTAGE
+    usecase (Nombre maximal de participants pouvant rejoindre la salle d’écoute) as NBPARTICIPANT
+}
+
+H -- ACTIVATE
+H -- nbMusic
+H -- nbMusicFile
+H -- POURCENTAGE
+H -- NBPARTICIPANT
+@enduml
