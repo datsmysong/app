@@ -1,6 +1,6 @@
-@startuml Diagramme d'activité
+@startuml cycle_vie_d_une_musique
 title Diagramme d'activité du cycle de vie d'une musique X
-!theme aws-orange
+!theme plain
 
 start
 :Ajout d'une musique X par l'utilisateur Bob dans la liste de lecture en dernière position;

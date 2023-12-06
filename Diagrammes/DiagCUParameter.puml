@@ -1,5 +1,5 @@
 @startuml
-!theme aws-orange
+!theme plain
 left to right direction
 
 title Paramétrer la salle d’écoute

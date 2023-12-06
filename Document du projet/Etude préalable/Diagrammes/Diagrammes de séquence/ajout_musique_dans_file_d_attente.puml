@@ -1,5 +1,6 @@
-@startuml Ajout d'une musique depuis une playlist personnelle sur Deezer dans une salle d'écoute lancée via Spotify
+@startuml ajout_musique_dans_file_d_attente
 title Ajout d'une musique depuis une playlist personnelle sur Deezer dans une salle d'écoute lancée via Spotify
+!theme plain
 
 actor Participant as User
 participant App as "Application (frontend)"

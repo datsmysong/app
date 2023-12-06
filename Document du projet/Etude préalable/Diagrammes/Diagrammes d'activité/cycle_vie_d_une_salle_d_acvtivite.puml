@@ -1,6 +1,6 @@
-@startuml Diagramme d'activité
+@startuml cycle_vie_d_une_salle_d_acvtivite
 title Diagramme d'activité du cycle de vie d'une salle d'écoute
-!theme aws-orange
+!theme plain
 
 start
 :Création d'une salle d'écoute;
