@@ -4,19 +4,22 @@ left to right direction
 
 title Rejoindre/créer salle d'écoute
 
-:Utilisateur (connecté): as UC
-:Utilisateur (non connecté): as UNC
+:Utilisateur: as UC
+:Visiteur: as V
+:Participant anonyme: as PA
 
 package app{
 
   usecase (Rejoindre une salle d’écoute via un lien) as JOIN
+  usecase (Rejoindre une salle d’écoute via la fonction d'amis) as JOIN_FRIENDS
   usecase (Créer une salle d’écoute) as CREATE
   usecase (Mettre un nom d’utilisateur pour la salle d’écoute courante) as USERNAME
 }
 
 UC -- JOIN
+UC -- JOIN_FRIENDS
 UC -- CREATE
 
-UNC -- JOIN
-UNC -- USERNAME
+V -- JOIN
+PA -- USERNAME
 @enduml

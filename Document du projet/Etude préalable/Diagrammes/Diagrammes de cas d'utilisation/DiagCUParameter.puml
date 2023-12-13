@@ -7,16 +7,18 @@ title Paramétrer la salle d’écoute
 :Hôte: as H
 
 package app{
-    usecase (Activer le vote pour passer une musique aux participants) as ACTIVATE
-    usecase (Configurer le nombre de musiques qu’un participant peut ajouter à la fois) as nbMusic
-    usecase (Nombre de musiques maximales que peut contenir la file d’attente) as nbMusicFile
-    usecase (Pourcentage de votes qu’il faut pour que la musique soit passée) as POURCENTAGE
-    usecase (Nombre maximal de participants pouvant rejoindre la salle d’écoute) as NBPARTICIPANT
+	usecase (Configurer la possibilité de voter pour passer une musique) as TOGGLE_VOTE
+    usecase (Configurer le pourcentage de votes nécessaires pour passer la musique actuelle) as CONFIG_VOTE_PERCENTAGE
+	usecase (Configurer le nombre maximum de musiques qu’un seul et même participant peut ajouter à la fois) as CONFIG_NB_MUSIC
+	usecase (Configurer le nombre maximum de musiques en file d’attente à un instant T) as CONFIG_NB_MUSIC_PER_PARTICIPANT
+	usecase (Configurer le nombre maximal de participants pouvant rejoindre la salle d’écoute) as CONFIG_NB_PARTICIPANT_MAX
+	usecase (Configurer la durée maximale d’une musique pouvant être ajoutée en file d’attente) as CONFIG_MAX_DURATION_PER_MUSIC
 }
 
-H -- ACTIVATE
-H -- nbMusic
-H -- nbMusicFile
-H -- POURCENTAGE
-H -- NBPARTICIPANT
+H -- TOGGLE_VOTE
+H -- CONFIG_VOTE_PERCENTAGE
+H -- CONFIG_NB_MUSIC
+H -- CONFIG_NB_MUSIC_PER_PARTICIPANT
+H -- CONFIG_NB_PARTICIPANT_MAX
+H -- CONFIG_MAX_DURATION_PER_MUSIC
 @enduml

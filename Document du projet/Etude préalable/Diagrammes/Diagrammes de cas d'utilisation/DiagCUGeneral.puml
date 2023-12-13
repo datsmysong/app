@@ -4,33 +4,33 @@ left to right direction
 
 title Diagramme général
 
-:Utilisateur (non connecté): as UNC
-:Utilisateur (connecté): as UC
+:Visiteur: as V
+:Utilisateur: as U
 :Participant: as P
 :Participant anonyme: as PA
 :Hôte: as H
 
 package app{
 
-  usecase (Rejoindre/créer salle d'écoute) as JOINSALLE
-  usecase (Gérer/créer son compte) as ACCOUNT
+  usecase (Rejoindre une salle d'écoute) as JOIN_ROOM
+  usecase (Créer une salle d'écoute) as CREATE_ROOM
+  usecase (Gérer son compte) as MANAGE_ACCOUNT
+  usecase (Créer son compte) as CREATE_ACCOUNT
 
   usecase (Intéragir avec la salle d'écoute) as SALLE
   usecase (Paramétrer la salle d’écoute) as PARAMETER
 
 }
 
-UNC -- JOINSALLE
-UNC -- ACCOUNT
+V -- JOIN_ROOM
+V -- CREATE_ACCOUNT
 
-JOINSALLE -- UC
-ACCOUNT -- UC
+U -- MANAGE_ACCOUNT
+U -- JOIN_ROOM
+U -- CREATE_ROOM
 
 P <|-- PA
-
 P -- SALLE
-
-PA -- JOINSALLE
 
 H -- PARAMETER
 H -- SALLE

@@ -4,24 +4,25 @@ left to right direction
 
 title Gérer/créer son compte
 
-:Utilisateur (non connecté): as UNC
-:Utilisateur (connecté): as UC
+:Visiteur: as V
+:Utilisateur: as U
 
 package app{
 
-  usecase (Lier son compte Spotify / Apple Music) as LIER
-  usecase (Consulter son profil) as PROFIL
-  usecase (Créer un  compte) as ACCOUNT
-  usecase (Regarder sa liste d’amis et ajouter un ami) as FRIENDSLIST
-  usecase (Consulter l’historique des salles d’écoutes dans lesquels il a participé) as HISTORY
-  usecase (Regarder les détails d’une salle d’écoute dans laquelle il a participé) as DETAILS
+  usecase (Lier son compte de streaming) as LINK_STREAMING_ACCOUNT
+  usecase (Consulter son profil) as VIEW_PROFILE
+  usecase (Créer un compte) as CREATE_ACCOUNT
+  usecase (Regarder sa liste d’amis et la gérer) as FRIENDS
+  usecase (Consulter les salles d’écoutes dans lesquelles il a participé) as HISTORY
+  usecase (Regarder les détails d’une salle d’écoute dans laquelle il a participé) as HISTORY_DETAILS
 }
 
-UNC -- ACCOUNT
+V -- CREATE_ACCOUNT
 
-UC -- PROFIL
-UC -- FRIENDSLIST
-UC -- LIER
-UC -- HISTORY
-HISTORY <.. "<<extends>>" DETAILS
+U -- VIEW_PROFILE
+U -- FRIENDS
+U -- LINK_STREAMING_ACCOUNT
+U -- HISTORY
+
+HISTORY <.. "<<extends>>" HISTORY_DETAILS
 @enduml
