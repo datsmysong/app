@@ -12,10 +12,7 @@
 
 Table(Profile, "profile") {
     int_field(primary_key(profile_id))
-    text_field(foreign_key(user_id))
     text_field(nickname)
-    text_field(username)
-    avatar : AVATAR
 }
 
 Table(Room, "room") {
@@ -29,12 +26,12 @@ Table(Room, "room") {
     int_field(maximal_duration_of_music)
     boolean_field(can_vote)
     date_field(date)
-    int_field(host_user_id)
+    int_field(host_user_profile_id)
 }
 
 Table(RoomUsers, "room_users" ) {
     primary_key(int_field(foreign_key(room_id)))
-    primary_key(text_field(foreign_key(user_id)))
+    primary_key(text_field(foreign_key(profile_id)))
     boolean_field(banned)
 }
 
@@ -54,13 +51,13 @@ Table(Music, "music") {
 }
 
 Table(FriendList, "friends_list"){
-    primary_key(int_field(foreign_key(profile1_id)))
-    primary_key(int_field(foreign_key(profile2_id)))
+    primary_key(int_field(foreign_key(user_profile1_id)))
+    primary_key(int_field(foreign_key(user_profile2_id)))
 }
 
 Table(FriendsRequest, "friends_request"){
-    primary_key(int_field(foreign_key(profile_id)))
-    primary_key(int_field(foreign_key(friend_id)))
+    primary_key(int_field(foreign_key(asker_user_profile_id)))
+    primary_key(int_field(foreign_key(receiver_user_profile_id)))
     date_field(date_sent)
     date_field(expiration_date)
 }
@@ -72,22 +69,31 @@ Table(StreamingService, "streaming_services"){
 
 Table(BoundServices, "bound_services"){
     primary_key(int_field(foreign_key(service_id)))
-    primary_key(int_field(foreign_key(user_id)))
+    primary_key(int_field(foreign_key(user_profile_id)))
     text_field(platform_id)
     text_field(access_token)
     text_field(refresh_token)
     date_field(expires_in)
 }
 
+Table(UserProfile, "user_profile"){
+    primary_key(int_field(user_profile_id))
+    int_field(foreign_key(user_id))
+    int_field(foreign_key(profile_id))
+    text_field(username)
+    avatar : AVATAR
+}
+
+Profile "0" -- "1" UserProfile : user_profile_id
 RoomMusics "1" -- "1" Profile : profile_id
+UserProfile "1" -- "*" FriendList : user_profile_id
+UserProfile "1" -- "*" FriendsRequest : user_profile_id
 RoomMusics "*" -- "1" Room : room_id
 RoomMusics "*" -- "1" Music : music_id
 RoomUsers "*" -- "1" Room : room_id
-Profile "1" -- "*" FriendList : profile_id
-Profile "1" -- "*" FriendsRequest : profile_id
-Room "1" -- "*" Profile : "user_id"
-Profile "*" -- BoundServices
+Room "1" -- "*" UserProfile : "host_user_profile_id"
+UserProfile "*" -- BoundServices
 StreamingService "*" -- BoundServices
-RoomUsers "*" -- "1" Profile : user_id
+RoomUsers "*" -- "1" Profile : profile_id
 
 @enduml
