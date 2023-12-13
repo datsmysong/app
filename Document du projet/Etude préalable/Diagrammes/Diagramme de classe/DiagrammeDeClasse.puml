@@ -1,0 +1,45 @@
+@startuml Diagramme de classe
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b>x</b>
+!define foreign_key(x) <u>#x</u>
+!define int_field(x) x : INT
+!define text_field(x) x : TEXT
+!define bucket(x) x : BUCKET
+!define or_null(x) x : NULL
+
+Table(Profile, "profile") {
+    int_field(primary_key(profile_id))
+    text_field(foreign_key(user_id))
+    text_field(nickname)
+    text_field(username)
+    or_null(text_field(avatar))
+}
+
+Table(Room, "room") {
+    int_field(primary_key(room_id))
+    text_field(room_name)
+
+}
+
+Table(RoomMusics, "room_musics") {
+    primary_key(int_field(foreign_key(room_id)))
+    primary_key(int_field(foreign_key(music_id)))
+    primary_key(int_field(position))
+    int_field(foreign_key(profile_id))
+}
+
+Table(Music, "music") {
+    int_field(primary_key(music_id))
+    text_field(music_name)
+    text_field(music_artist)
+    bucket(artwork)
+}
+
+RoomMusics "1" -- "1" Profile : profile_id
+RoomMusics "*" -- "1" Room : list_music_listening
+RoomMusics "1" -- "1" Music : music_id
+Profile "1" -- "*" Room : room_id
+
+
+@enduml
