@@ -15,28 +15,26 @@ Table(Profile, "profile") {
     text_field(foreign_key(user_id))
     text_field(nickname)
     text_field(username)
-    or_null(text_field(avatar))
+    avatar : AVATAR
 }
 
 Table(Room, "room") {
     int_field(primary_key(room_id))
     text_field(room_name)
-    text_field(invitationLink)
     text_field(code)
     boolean_field(expired)
-    int_field(votePercentageToSkipMusic)
-    int_field(nbMusicsInWaitingList)
-    int_field(maximalUserNb)
-    int_field(maximalDurationOfMusic)
-    boolean_field(canVote)
+    int_field(vote_percentage_to_skip_music)
+    int_field(nb_musics_in_waiting_list)
+    int_field(maximal_room_participant)
+    int_field(maximal_duration_of_music)
+    boolean_field(can_vote)
     date_field(date)
+    int_field(host_user_id)
 }
 
 Table(RoomUsers, "room_users" ) {
     primary_key(int_field(foreign_key(room_id)))
     primary_key(text_field(foreign_key(user_id)))
-    text_field(status)
-    boolean_field(kicked)
     boolean_field(banned)
 }
 
@@ -51,23 +49,20 @@ Table(RoomMusics, "room_musics") {
 Table(Music, "music") {
     int_field(primary_key(music_id))
     text_field(music_name)
-    text_field(music_artist)
-    int_field(duration)
-    text_field(featuring)
-    bucket(artwork)
+    music_artist : TEXT[]
+    artwork : ARTWORK
 }
 
-Table(FriendList, "friendslist"){
-    primary_key(int_field(foreign_key(profile_id)))
-    primary_key(int_field(foreign_key(friend_id)))
+Table(FriendList, "friends_list"){
+    primary_key(int_field(foreign_key(profile1_id)))
+    primary_key(int_field(foreign_key(profile2_id)))
 }
 
 Table(FriendsRequest, "friends_request"){
     primary_key(int_field(foreign_key(profile_id)))
     primary_key(int_field(foreign_key(friend_id)))
-    boolean_field(accepted)
     date_field(date_sent)
-    boolean_field(expired)
+    date_field(expiration_date)
 }
 
 Table(StreamingService, "streaming_services"){
@@ -78,6 +73,10 @@ Table(StreamingService, "streaming_services"){
 Table(BoundServices, "bound_services"){
     primary_key(int_field(foreign_key(service_id)))
     primary_key(int_field(foreign_key(user_id)))
+    text_field(platform_id)
+    text_field(access_token)
+    text_field(refresh_token)
+    date_field(expires_in)
 }
 
 RoomMusics "1" -- "1" Profile : profile_id
@@ -86,7 +85,9 @@ RoomMusics "*" -- "1" Music : music_id
 RoomUsers "*" -- "1" Room : room_id
 Profile "1" -- "*" FriendList : profile_id
 Profile "1" -- "*" FriendsRequest : profile_id
+Room "1" -- "*" Profile : "user_id"
 Profile "*" -- BoundServices
 StreamingService "*" -- BoundServices
+RoomUsers "*" -- "1" Profile : user_id
 
 @enduml
