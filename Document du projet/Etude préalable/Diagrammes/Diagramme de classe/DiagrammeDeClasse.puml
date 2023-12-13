@@ -7,6 +7,8 @@
 !define text_field(x) x : TEXT
 !define bucket(x) x : BUCKET
 !define or_null(x) x : NULL
+!define boolean_field(x) x : BOOLEAN
+!define date_field(x) x : DATE
 
 Table(Profile, "profile") {
     int_field(primary_key(profile_id))
@@ -19,7 +21,23 @@ Table(Profile, "profile") {
 Table(Room, "room") {
     int_field(primary_key(room_id))
     text_field(room_name)
+    text_field(invitationLink)
+    text_field(code)
+    boolean_field(expired)
+    int_field(votePercentageToSkipMusic)
+    int_field(nbMusicsInWaitingList)
+    int_field(maximalUserNb)
+    int_field(maximalDurationOfMusic)
+    boolean_field(canVote)
+    date_field(date)
+}
 
+Table(RoomUsers, "room_users" ) {
+    primary_key(int_field(foreign_key(room_id)))
+    primary_key(text_field(foreign_key(user_id)))
+    text_field(status)
+    boolean_field(kicked)
+    boolean_field(banned)
 }
 
 Table(RoomMusics, "room_musics") {
@@ -27,19 +45,48 @@ Table(RoomMusics, "room_musics") {
     primary_key(int_field(foreign_key(music_id)))
     primary_key(int_field(position))
     int_field(foreign_key(profile_id))
+    int_field(down_votes)
 }
 
 Table(Music, "music") {
     int_field(primary_key(music_id))
     text_field(music_name)
     text_field(music_artist)
+    int_field(duration)
+    text_field(featuring)
     bucket(artwork)
 }
 
-RoomMusics "1" -- "1" Profile : profile_id
-RoomMusics "*" -- "1" Room : list_music_listening
-RoomMusics "1" -- "1" Music : music_id
-Profile "1" -- "*" Room : room_id
+Table(FriendList, "friendslist"){
+    primary_key(int_field(foreign_key(profile_id)))
+    primary_key(int_field(foreign_key(friend_id)))
+}
 
+Table(FriendsRequest, "friends_request"){
+    primary_key(int_field(foreign_key(profile_id)))
+    primary_key(int_field(foreign_key(friend_id)))
+    boolean_field(accepted)
+    date_field(date_sent)
+    boolean_field(expired)
+}
+
+Table(StreamingService, "streaming_services"){
+    primary_key(int_field(service_id))
+    text_field(serviceName)
+}
+
+Table(BoundServices, "bound_services"){
+    primary_key(int_field(foreign_key(service_id)))
+    primary_key(int_field(foreign_key(user_id)))
+}
+
+RoomMusics "1" -- "1" Profile : profile_id
+RoomMusics "*" -- "1" Room : room_id
+RoomMusics "*" -- "1" Music : music_id
+RoomUsers "*" -- "1" Room : room_id
+Profile "1" -- "*" FriendList : profile_id
+Profile "1" -- "*" FriendsRequest : profile_id
+Profile "*" -- BoundServices
+StreamingService "*" -- BoundServices
 
 @enduml
