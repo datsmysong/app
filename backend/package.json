@@ -1,0 +1,25 @@
+{
+  "name": "datsmysong-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --watch src src/server.ts",
+    "build": "tsc -p tsconfig.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.1",
+    "fastify": "^4.25.2",
+    "fastify-socket.io": "^5.0.0",
+    "socket.io": "^4.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "nodemon": "^3.0.2",
+    "pino-pretty": "^10.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
