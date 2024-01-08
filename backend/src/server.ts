@@ -2,6 +2,12 @@ import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import HelloGet from "./route/HelloGET";
+import RoomsGET from "./route/RoomGET";
+import { createClient } from "@supabase/supabase-js";
+import { config } from "dotenv";
+import path from "path";
+
+config({ path: path.resolve(__dirname, "../.env.local") });
 
 const server = fastify({
   logger: {
@@ -11,11 +17,18 @@ const server = fastify({
   },
 });
 
+if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
+  throw new Error("Missing SUPABASE_URL or SUPABASE_KEY environment variable");
+}
+
+export const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SERVICE_ROLE
+);
+
 server.register(fastifyIO);
 
-server.get("/", (req, reply) => {
-  reply.send({ hello: "world" });
-});
+server.get("/rooms", RoomsGET);
 
 server.get("/hello", HelloGet);
 
