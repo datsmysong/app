@@ -7,6 +7,7 @@ import AuthCallbackGET from "./route/AuthCallbackGET";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
+import { Database } from "./types/dbTypes";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -21,7 +22,7 @@ const server = fastify({
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   throw new Error("Missing SUPABASE_URL or SUPABASE_KEY environment variable");
 }
-export const adminSupabase = createClient(
+export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SERVICE_ROLE
 );
