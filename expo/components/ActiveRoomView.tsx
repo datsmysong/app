@@ -2,12 +2,13 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { SoundCloud } from "../utils/soundcloud";
 import { Spotify } from "../utils/spotify";
 import Player from "./Player";
+import { OrderedMusic, PlayingMusic, StreamingPlatform } from "../lib/types";
 
-type ActiveRoomProps = {
+type ActiveRoomViewProps = {
   roomId: string;
 };
 
-const ActiveRoom: React.FC<ActiveRoomProps> = ({ roomId }) => {
+const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ roomId }) => {
   const [currentMusic, setCurrentMusic] = useState<PlayingMusic | null>(null);
   const [queue, setQueue] = useState<OrderedMusic[]>([]);
 
@@ -78,4 +79,4 @@ const ActiveRoom: React.FC<ActiveRoomProps> = ({ roomId }) => {
   );
 };
 
-export default ActiveRoom;
+export default ActiveRoomView;
