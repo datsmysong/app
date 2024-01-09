@@ -1,4 +1,4 @@
-interface StreamingPlatform {
+export interface StreamingPlatform {
   name: String;
   imgUrl: String;
 
@@ -13,39 +13,39 @@ interface StreamingPlatform {
   seek: (position: number) => Promise<void>;
 }
 
-type Artist = {
+export type Artist = {
   name: string;
   id: string;
 };
 
-type Music = {
+export type Music = {
   title: string;
   artwork: string;
   artists: Array<Artist>;
   duration_ms: number;
 };
 
-type PlayingMusic = Music & {
+export type PlayingMusic = Music & {
   progress_ms: number;
   is_playing: boolean;
 };
 
-type OrderedMusic = Music & {
+export type OrderedMusic = Music & {
   position: number;
 };
 
-type Profile = {
+export type Profile = {
   id: string;
   nickname: string;
 }
 
-type UserProfile = Profile & {
+export type UserProfile = Profile & {
   username: string;
   avatar: string | null;
   accountId: string;
 }
 
-type ActiveRoom = {
+export type ActiveRoom = {
   id: string;
   name: string;
   createdAt: Date;
@@ -60,7 +60,23 @@ type ActiveRoom = {
   participants: Array<Profile | UserProfile>;
 }
 
-type Room = {
+export const isActiveRoom: (room: any) => room is ActiveRoom = (room) => {
+  return (
+    room.id !== undefined &&
+    room.name !== undefined &&
+    room.createdAt !== undefined &&
+    room.configuration !== undefined &&
+    room.configuration.voteSkipping !== undefined &&
+    room.configuration.voteSkippingNeededPercentage !== undefined &&
+    room.configuration.maxMusicCountInQueuePerParticipant !== undefined &&
+    room.configuration.maxMusicDuration !== undefined &&
+    room.hostUserProfileId !== undefined &&
+    room.queue !== undefined &&
+    room.participants !== undefined
+  )
+}
+
+export type Room = {
   id: string;
   name: string;
   createdAt: Date;
@@ -74,4 +90,21 @@ type Room = {
   hostUserProfileId: string;
   history: Array<OrderedMusic>;
   participants: Array<Profile | UserProfile>;
+}
+
+export const isRoom: (room: any) => room is Room = (room) => {
+  return (
+    room.id !== undefined &&
+    room.name !== undefined &&
+    room.createdAt !== undefined &&
+    room.endedAt !== undefined &&
+    room.configuration !== undefined &&
+    room.configuration.voteSkipping !== undefined &&
+    room.configuration.voteSkippingNeededPercentage !== undefined &&
+    room.configuration.maxMusicCountInQueuePerParticipant !== undefined &&
+    room.configuration.maxMusicDuration !== undefined &&
+    room.hostUserProfileId !== undefined &&
+    room.history !== undefined &&
+    room.participants !== undefined
+  )
 }
