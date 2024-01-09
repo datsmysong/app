@@ -1,3 +1,4 @@
+import { ActiveRoom, Room } from "./types";
 import useApiBaseUrl from "./useApiBaseUrl";
 import useSupabaseUser from "./useSupabaseUser";
 
