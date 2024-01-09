@@ -92,6 +92,8 @@ const createRoomSchema = {
 
 server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
+server.get("/rooms/:id", RoomsGET);
+
 server.ready().then(() => {
   // we need to wait for the server to be ready, else `server.io` is undefined
   server.io.on("connection", (socket: any) => {
