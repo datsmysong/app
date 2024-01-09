@@ -3,6 +3,7 @@ import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import HelloGet from "./route/HelloGET";
 import RoomsGET from "./route/RoomGET";
+import RoomPOST from "./route/RoomPOST";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import path from "path";
@@ -31,6 +32,8 @@ server.register(fastifyIO);
 server.get("/rooms", RoomsGET);
 
 server.get("/hello", HelloGet);
+
+server.post("/createRoom", RoomPOST);
 
 server.ready().then(() => {
   // we need to wait for the server to be ready, else `server.io` is undefined
