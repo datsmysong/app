@@ -1,25 +1,28 @@
-import { useLocalSearchParams } from "expo-router";
-import { Linking, View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Button from "../../../components/Button";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import * as Clipboard from "expo-clipboard";
 
 export default function RoomPage() {
-  const { id } = useLocalSearchParams();
-  const roomCode = "A1B2C3";
-
-  const onCopyLink = () => {
-    Linking.getInitialURL().then(async (url) => {
-      if (url) {
-        await Clipboard.setStringAsync(url);
-      } else {
-        console.log("Couldn't get the URL.");
-      }
-    });
+  const onOpenLink = async () => {
+    //WebBrowser.openBrowserAsync("https://docs.expo.io");
+    const roomCode = "A1B2C3"
+    const deepLink = Linking.createURL(`join/${roomCode}`, {scheme: "datsmysong"});
+    await Clipboard.setStringAsync(deepLink);
   };
 
   return (
-    <View>
-      <Button label="Partager" theme="filled" onPress={onCopyLink}></Button>
+    <View style={styles.shareContainer}>
+      <Button label="Partager" theme="filled" onPress={onOpenLink}></Button>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  shareContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
