@@ -3,6 +3,11 @@ import createClient from "../lib/supabase";
 import { adminSupabase } from "../server";
 import { Database } from "../types/dbTypes";
 
+enum StreamingService {
+  Spotify = "a2d17b25-d87e-42af-9e79-fd4df6b59222",
+  SoundCloud = "c99631a2-f06c-4076-80c2-13428944c3a8",
+}
+
 export default async function AuthCallbackGET(
   request: FastifyRequest,
   response: FastifyReply
@@ -16,7 +21,7 @@ export default async function AuthCallbackGET(
       code: string;
     }
   ).code;
-  let needInsert = false;
+  let needInsertBoundService = false;
   if (!code) response.code(400).send({ error: "Missing code" });
 
   const { data } = await supabase.auth.exchangeCodeForSession(code);
@@ -35,66 +40,47 @@ export default async function AuthCallbackGET(
     .eq("account_id", data.user.id)
     .single();
   if (!user.error) {
-    console.log("Auth: already account", user.data);
-
+    // Already account
     user_profile_id = user.data.user_profile_id;
-  } else {
-    console.log("Auth: new account");
-
-    request.log.info("New user", data.user.id);
-    const profile = await adminSupabase
-      .from("profile")
-      .insert({
-        nickname: data.user.user_metadata.full_name,
-      })
-      .select("*")
-      .single();
-    console.log("PROFILE INSERTED, NOW INSERTING USER_PROFILE");
-
-    if (!data) throw new Error("Missing data");
-    user_profile_id = profile.data?.id;
-
-    if (!user_profile_id) throw new Error("Missing profile_id");
-
-    const userprofile = await adminSupabase.from("user_profile").insert({
-      account_id: data.user.id,
-      user_profile_id: user_profile_id,
-      username: null, // Add the missing 'username' property
-    });
-    console.log("USER PROFILE", userprofile);
-    if (userprofile.error) throw new Error("Error inserting user profile");
-
-    needInsert = true;
-  }
-  // if not an new user, check if the user is already bound to spotify
-  if (!needInsert) {
-    const alreadyService = await adminSupabase
-      .from("bound_services")
-      .select("*")
-      .eq("user_profile_id", user_profile_id)
-      .eq("service_id", "a2d17b25-d87e-42af-9e79-fd4df6b59222");
-    if (alreadyService.error) {
-      console.error("error fetch", alreadyService.error);
-      return response.code(500).send({ error: alreadyService.error });
+    if (!needInsertBoundService) {
+      const serviceAlreadyBound = await adminSupabase
+        .from("bound_services")
+        .select("*")
+        .eq("user_profile_id", user_profile_id)
+        .eq("service_id", StreamingService.Spotify);
+      if (serviceAlreadyBound.error) {
+        console.error("error fetch", serviceAlreadyBound.error);
+        return response.code(500).send({ error: serviceAlreadyBound.error });
+      }
+      if (serviceAlreadyBound.data.length == 0) needInsertBoundService = true;
     }
-    console.log("bound_services", alreadyService);
-
-    if (alreadyService.data.length == 0) needInsert = true;
+  } else {
+    // New account
+    try {
+      user_profile_id = await createAccount({
+        full_name: data.user.user_metadata.full_name,
+        account_id: data.user.id,
+        username: null,
+      });
+      needInsertBoundService = true;
+    } catch (e) {
+      console.log("Error creating account", e);
+      return response.code(500).send({ error: e });
+    }
   }
-  // account not already bound to spotify
-  if (needInsert) {
+  const timestmap = data.session.expires_at;
+  // add time zone to timestamp
+  if (!timestmap) throw new Error("Missing timestamp");
+  const date = new Date(timestmap);
+  if (needInsertBoundService) {
+    // account not already bound to spotify
     request.log.info("New bound_service", data.user.id);
-    const timestmap = data.session.expires_at;
-    // add time zone to timestamp
-    if (!timestmap) throw new Error("Missing timestamp");
-    const date = new Date(timestmap);
-    //! TODO: This is hardcoded for now, but should be dynamic (only Spotify for now)
     const service: Database["public"]["Tables"]["bound_services"]["Row"] = {
       access_token: providerToken ?? null,
       refresh_token: providerRefreshToken ?? null,
       expires_in: date.toISOString(),
       user_profile_id: user_profile_id,
-      service_id: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
+      service_id: StreamingService.Spotify,
     };
     const { error } = await adminSupabase
       .from("bound_services")
@@ -104,7 +90,56 @@ export default async function AuthCallbackGET(
       console.log("Objet", service);
       response.code(500).send({ error: "Impossible to bound this from " });
     }
+  } else {
+    // update with new token
+    const { error } = await adminSupabase
+      .from("bound_services")
+      .update({
+        access_token: providerToken ?? null,
+        refresh_token: providerRefreshToken ?? null,
+        expires_in: date.toISOString(),
+      })
+      .eq("user_profile_id", user_profile_id)
+      .eq("service_id", "a2d17b25-d87e-42af-9e79-fd4df6b59222");
+    if (error) {
+      console.error("impossible to update bound_services", error);
+      response
+        .code(500)
+        .send({ error: "Impossible to update bounded service" });
+    }
   }
   const refresh_token = data.session.refresh_token;
   response.redirect("http://localhost:8081#refresh_token=" + refresh_token);
 }
+
+const createAccount = async ({
+  full_name,
+  account_id,
+  username,
+}: {
+  full_name: string;
+  account_id: string;
+  username: string | null;
+}): Promise<string> => {
+  const profile = await adminSupabase
+    .from("profile")
+    .insert({
+      nickname: full_name,
+    })
+    .select("*")
+    .single();
+  console.log("PROFILE INSERTED, NOW INSERTING USER_PROFILE");
+
+  const user_profile_id = profile.data?.id;
+
+  if (!user_profile_id) throw new Error("Missing profile_id");
+
+  const userprofile = await adminSupabase.from("user_profile").insert({
+    account_id: account_id,
+    user_profile_id: user_profile_id,
+    username: username, // Add the missing 'username' property
+  });
+  console.log("USER PROFILE", userprofile);
+  if (userprofile.error) throw new Error("Error inserting user profile");
+  return user_profile_id;
+};
