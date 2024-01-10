@@ -60,7 +60,7 @@ export type ActiveRoom = {
   participants: Array<Profile | UserProfile>;
 }
 
-export const isActiveRoom: (room: any) => room is ActiveRoom = (room) => {
+export const isActiveRoom = (room: any): room is ActiveRoom => {
   return (
     room.id !== undefined &&
     room.name !== undefined &&
@@ -92,7 +92,7 @@ export type Room = {
   participants: Array<Profile | UserProfile>;
 }
 
-export const isRoom: (room: any) => room is Room = (room) => {
+export const isRoom = (room: any): room is Room => {
   return (
     room.id !== undefined &&
     room.name !== undefined &&
