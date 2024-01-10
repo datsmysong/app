@@ -4,7 +4,6 @@ import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect } from "react";
 import useSupabaseUser from "../lib/useSupabaseUser";
 import { supabase } from "../lib/supabase";
-require("@expo/env").load("../.env");
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -30,17 +29,19 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
       console.log("initialRouteName", unstable_settings.initialRouteName);
       useSupabaseUser().then((user) => {
-        console.log("user", user);
         if (!user) router.replace("/(auth)");
       });
 
       supabase.auth.onAuthStateChange((_event, session) => {
-        console.log("Auth change");
-
         if (session) {
-          router.replace("/(tabs)");
+          getUserProfile(session.user.id).then((userProfile) => {
+            if (!userProfile.username) {
+              router.replace("/ask-name");
+              return;
+            }
+            router.replace("/(tabs)");
+          });
         } else {
-          console.log("no user");
           router.replace("/(auth)");
         }
       });
@@ -74,3 +75,15 @@ function RootLayoutNav() {
     </Stack>
   );
 }
+
+const getUserProfile = async (id: string) => {
+  const { data, error } = await supabase
+    .from("user_profile")
+    .select("*")
+    .eq("account_id", id)
+    .single();
+  if (error) {
+    throw error;
+  }
+  return data;
+};
