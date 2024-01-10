@@ -25,7 +25,7 @@ if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SERVICE_ROLE
+  process.env.SERVICE_ROLE,
 );
 
 server.register(fastifyIO);
@@ -39,7 +39,23 @@ server.get("/rooms", RoomsGET);
 
 server.get("/hello", HelloGet);
 
-server.post("/createRoom", RoomPOST);
+const createRoomSchema = {
+  body: {
+    type: "object",
+    required: ["name", "code", "service"],
+    properties: {
+      name: { type: "string" },
+      code: { type: "string" },
+      service: { type: "string" },
+      voteSkipping: { type: "boolean" },
+      voteSkippingNeeded: { type: "number" },
+      maxMusicPerUser: { type: "number" },
+      maxMusicPerUserDuration: { type: "number" },
+    },
+  },
+};
+
+server.post("/createRoom", { schema: createRoomSchema }, RoomPOST);
 
 server.ready().then(() => {
   // we need to wait for the server to be ready, else `server.io` is undefined
