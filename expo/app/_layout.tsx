@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSupabaseUser from "../lib/useSupabaseUser";
 import { supabase } from "../lib/supabase";
 
@@ -14,6 +14,8 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [alreadyUsernameVerification, setAlreadyUsernameVerification] =
+    useState(false);
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -27,20 +29,22 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      console.log("initialRouteName", unstable_settings.initialRouteName);
-      useSupabaseUser().then((user) => {
-        if (!user) router.replace("/(auth)");
-      });
+      useSupabaseUser().then((user) => !user && router.replace("/(auth)"));
 
       supabase.auth.onAuthStateChange((_event, session) => {
         if (session) {
+          // SIGNED_IN is fired on session refresh (like alt+tab...)
+          // we don't want to fetch the user profile again if is already done
+          if (_event === "SIGNED_IN" && alreadyUsernameVerification) return;
           getUserProfile(session.user.id).then((userProfile) => {
             if (!userProfile.username) {
+              setAlreadyUsernameVerification(true);
               router.replace("/ask-name");
               return;
             }
             router.replace("/(tabs)");
           });
+          setAlreadyUsernameVerification(true);
         } else {
           router.replace("/(auth)");
         }
@@ -58,11 +62,8 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <Stack>
-      <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      <Stack.Screen name="ask-name" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       <Stack.Screen
         name="AddMusic"
