@@ -1,104 +1,155 @@
-import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
-import Checkbox from 'expo-checkbox';
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import Checkbox from "expo-checkbox";
 import CustomTextInput from "./customTextInput";
-import {useState} from "react";
+import { useState } from "react";
+import React from "react";
 
+interface ParametersListProps {
+  percentageVoteToSkipAMusic: string;
+  setPercentageVote: (text: string) => void;
+  maxMusicPerUser: string;
+  setMaxMusicPerUser: (text: string) => void;
+  maxMusicDuration: string;
+  setMaxMusicDuration: (text: string) => void;
+  canVote: boolean;
+  setCanVote: (value: boolean) => void;
+}
 
-export default function ParametersList(){
+export default function ParametersList({
+  percentageVoteToSkipAMusic,
+  setPercentageVote,
+  maxMusicPerUser,
+  setMaxMusicPerUser,
+  maxMusicDuration,
+  setMaxMusicDuration,
+  canVote,
+  setCanVote,
+}: ParametersListProps) {
+  const [isPressed, setIsPressed] = useState(false);
+  const TriangleRight = () => {
+    return <View style={[styles.triangle, styles.triangleRight]} />;
+  };
 
-    const [isPressed, setIsPressed] = useState(false);
-    const [checked, setChecked] = useState(true);
-    const TriangleRight = () => {
-        return <View style={[styles.triangle, styles.triangleRight]}/>;
-    };
+  const TriangleDown = () => {
+    return <View style={[styles.triangle, styles.triangleDown]} />;
+  };
 
-    const TriangleDown = () => {
-        return <View style={[styles.triangle, styles.triangleDown]} />;
-    };
-
-    return(
-        <View>
-            <TouchableOpacity onPress={ () => {setIsPressed(!isPressed)}}>
-                <View style={styles.items}>
-                    {isPressed ? <TriangleDown/> : <TriangleRight/>}
-                    <Text style={styles.item}>Paramètres supplémentaires</Text>
-                </View>
-            </TouchableOpacity>
-
-            {isPressed ?
-                (<View>
-
-                    <div style={styles.checkboxContainer}>
-                        <Text>Autoriser à lancer un vote pour passer une musique</Text>
-                        <Checkbox
-                            style={styles.checkbox}
-                            disabled={false}
-                            value={checked}
-                            onValueChange={(newValue) => setChecked(newValue)}
-                        />
-                    </div>
-
-                    <CustomTextInput placeholder={"Nombre de votes pour passer une musique"} style={styles.minimizedFont} inputMode={"numeric"}/>
-                    <CustomTextInput placeholder={"Nombre maximum de musique par utilisateur"} style={styles.minimizedFont}/>
-                    <CustomTextInput placeholder={"Durée maximale d'une musique"} style={styles.minimizedFont}/>
-
-                </View>)
-                :
-                <View/>
-            }
+  return (
+    <View>
+      <TouchableOpacity
+        onPress={() => {
+          setIsPressed(!isPressed);
+        }}
+      >
+        <View style={styles.items}>
+          {isPressed ? <TriangleDown /> : <TriangleRight />}
+          <Text style={styles.item}>Paramètres supplémentaires</Text>
         </View>
-    )
- }
+      </TouchableOpacity>
 
- const styles= StyleSheet.create({
+      {isPressed ? (
+        <View>
+          <View style={styles.checkboxContainer}>
+            <Text style={styles.labelText}>
+              Autoriser à lancer un vote pour passer une musique
+            </Text>
+            <Checkbox
+              style={styles.checkbox}
+              disabled={false}
+              value={canVote}
+              onValueChange={(newValue) => setCanVote(newValue)}
+            />
+          </View>
 
-     triangle: {
-         width: 0,
-         height: 0,
-         backgroundColor: "transparent",
-         borderStyle: "solid",
-         borderLeftWidth: 8,
-         borderRightWidth: 8,
-         borderBottomWidth: 16,
-         borderLeftColor: "transparent",
-         borderRightColor: "transparent",
-         borderBottomColor: "black",
-     },
+          <Text style={styles.labelText}>
+            Pourcentage de votes pour passer une musique
+          </Text>
+          <CustomTextInput
+            style={[styles.input, !canVote && styles.inputDisabled]}
+            inputMode={"numeric"}
+            value={canVote ? percentageVoteToSkipAMusic : ""}
+            onChangeText={setPercentageVote}
+            disabled={!canVote}
+          />
+          <Text style={styles.labelText}>
+            Nombre maximum de musique par utilisateur
+          </Text>
+          <CustomTextInput
+            style={styles.input}
+            inputMode={"numeric"}
+            value={maxMusicPerUser}
+            onChangeText={setMaxMusicPerUser}
+          />
+          <Text style={styles.labelText}>Durée maximale d'une musique</Text>
+          <CustomTextInput
+            style={styles.input}
+            inputMode={"numeric"}
+            value={maxMusicDuration}
+            onChangeText={setMaxMusicDuration}
+          />
+        </View>
+      ) : (
+        <View />
+      )}
+    </View>
+  );
+}
 
-     triangleRight: {
-         transform: "rotateZ(90deg)" ,
-     },
+const styles = StyleSheet.create({
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: "transparent",
+    borderStyle: "solid",
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 16,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: "black",
+  },
 
-     triangleDown: {
-         transform: "rotateX(180deg)",
-     },
+  triangleRight: {
+    transform: "rotateZ(90deg)",
+  },
 
-     items: {
-         flexDirection: 'row',
-         paddingTop: 20,
-         paddingLeft: 10,
-     },
+  triangleDown: {
+    transform: "rotateX(180deg)",
+  },
 
-     item: {
-         paddingLeft: 10,
-     },
+  items: {
+    flexDirection: "row",
+    paddingTop: 20,
+    paddingLeft: 10,
+  },
 
-    minimizedFont: {
-        fontSize: 10,
-    },
+  item: {
+    paddingLeft: 10,
+  },
 
-     checkbox: {
-         margin: 8,
-     },
+  checkbox: {
+    margin: 8,
+  },
 
-     checkboxContainer: {
-         flexDirection: 'column',
-         justifyContent: 'center',
-         alignItems: 'center',
-         paddingLeft: 20,
-         paddingTop: 10,
+  checkboxContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
 
-     }
+  input: {
+    textAlign: "center",
+  },
 
- });
+  inputDisabled: {
+    backgroundColor: "#ddd",
+  },
 
+  labelText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
+    textAlign: "center",
+  },
+});
