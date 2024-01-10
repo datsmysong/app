@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
+import { AlertNatif } from "../../components/Alert";
 
 const directUri = makeRedirectUri();
 WebBrowser.maybeCompleteAuthSession(); // required for web only
@@ -31,7 +32,10 @@ export default function ConnectWithSpotify() {
     if (res.type === "success" && res.url) {
       const refresh_token = res.url.split("#refresh_token=")[1];
       await supabase.auth.refreshSession({ refresh_token });
+      return;
     }
+    console.error("WebBrowser a retourner ", res);
+    AlertNatif("Une erreur est survenue");
   };
 
   return (

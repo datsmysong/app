@@ -27,10 +27,8 @@ export default async function AuthCallbackGET(
   const { data } = await supabase.auth.exchangeCodeForSession(code);
   if (!data.session)
     return response.code(400).send({ error: "Missing session" });
-  // console.log("SESSION", data);
-  console.log("SESSION", data.session);
 
-  const providerToken = data.session.provider_token;
+    const providerToken = data.session.provider_token;
   const providerRefreshToken = data.session.provider_refresh_token;
 
   let user_profile_id;
