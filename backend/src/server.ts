@@ -1,5 +1,6 @@
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
+import cors from "@fastify/cors";
 import { Server } from "socket.io";
 import HelloGet from "./route/HelloGET";
 import RoomsGET from "./route/RoomGET";
@@ -28,6 +29,11 @@ export const supabase = createClient(
 );
 
 server.register(fastifyIO);
+
+server.register(cors, {
+  origin: "*", // Allow all origins
+  methods: ["GET", "POST", "OPTIONS"],
+});
 
 server.get("/rooms", RoomsGET);
 
