@@ -1,9 +1,8 @@
-import { Button, Text } from "react-native";
-import { supabase } from "../lib/supabase";
+import { Pressable, Text } from "react-native";
+import { supabase } from "../../lib/supabase";
 
-import * as WebBrowser from "expo-web-browser";
 import { makeRedirectUri } from "expo-auth-session";
-import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 
 const directUri = makeRedirectUri();
 WebBrowser.maybeCompleteAuthSession(); // required for web only
@@ -18,10 +17,9 @@ export default function ConnectWithSpotify() {
       },
     });
     if (error) {
-      console.log(error);
-      return;
+      //TODO handle error
+      console.error("error", error);
     }
-    console.log("It work ? ", data);
     //! On iOS, the modal Safari will not share cookies with the system Safari. If you need this, use openAuthSessionAsync
     const res = (await WebBrowser.openAuthSessionAsync(
       data?.url ?? "",
@@ -32,11 +30,13 @@ export default function ConnectWithSpotify() {
     };
     if (res.type === "success" && res.url) {
       const refresh_token = res.url.split("#refresh_token=")[1];
-      await supabase.auth.refreshSession({ refresh_token }).then((res) => {
-        if (res.data.session) router.push("/");
-      });
+      await supabase.auth.refreshSession({ refresh_token });
     }
   };
 
-  return <Button title="Rejoindre avec Spotify" onPress={handleSignUp} />;
+  return (
+    <Pressable onPress={handleSignUp}>
+      <Text>Rejoindre avec Spotify</Text>
+    </Pressable>
+  );
 }
