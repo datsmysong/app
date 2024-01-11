@@ -12,6 +12,12 @@ export default async function AuthCallbackGET(
   request: FastifyRequest,
   response: FastifyReply
 ) {
+  if (!request.cookies["sb-ckalsdcwrofxvgxslwiv-auth-token-code-verifier"]) {
+    return response
+      .code(400)
+      .send({ error: "Missing cookie auth-token-code-verifier " });
+  }
+
   const supabase = createClient({
     request,
     response,
@@ -28,9 +34,8 @@ export default async function AuthCallbackGET(
   if (!data.session)
     return response.code(400).send({ error: "Missing session" });
 
-    const providerToken = data.session.provider_token;
+  const providerToken = data.session.provider_token;
   const providerRefreshToken = data.session.provider_refresh_token;
-
   let user_profile_id;
   const user = await adminSupabase
     .from("user_profile")
@@ -107,7 +112,12 @@ export default async function AuthCallbackGET(
     }
   }
   const refresh_token = data.session.refresh_token;
-  response.redirect("http://localhost:8081#refresh_token=" + refresh_token);
+  const redirectUrl = decodeURIComponent(request.url).split("redirect_url=")[1];
+
+  // redirect user to the redirect url with the refresh token 
+  response.redirect(
+    redirectUrl + "#refresh_token=" + encodeURIComponent(refresh_token)
+  );
 }
 
 const createAccount = async ({
