@@ -1,7 +1,4 @@
-export interface StreamingPlatform {
-  name: String;
-  imgUrl: String;
-
+export type StreamingPlatformRemote = {
   playMusic: (musicUri: string) => Promise<void>;
   fetchCurrent: () => Promise<PlayingMusic | null>;
   fetchQueue: () => Promise<Array<OrderedMusic>>;
@@ -10,7 +7,7 @@ export interface StreamingPlatform {
   next: () => Promise<void>;
   prev: () => Promise<void>;
   setVolume: (volume: number) => Promise<void>;
-  seek: (position: number) => Promise<void>;
+  seekTo: (position: number) => Promise<void>;
 }
 
 export type Artist = {
@@ -58,6 +55,7 @@ export type ActiveRoom = {
   hostUserProfileId: string;
   queue: Array<OrderedMusic>;
   participants: Array<Profile | UserProfile>;
+  streamingService: StreamingService;
 }
 
 export const isActiveRoom = (room: any): room is ActiveRoom => {
@@ -72,7 +70,8 @@ export const isActiveRoom = (room: any): room is ActiveRoom => {
     room.configuration.maxMusicDuration !== undefined &&
     room.hostUserProfileId !== undefined &&
     room.queue !== undefined &&
-    room.participants !== undefined
+    room.participants !== undefined &&
+    room.streamingService !== undefined
   )
 }
 
@@ -90,6 +89,7 @@ export type Room = {
   hostUserProfileId: string;
   history: Array<OrderedMusic>;
   participants: Array<Profile | UserProfile>;
+  streamingService: StreamingService;
 }
 
 export const isRoom = (room: any): room is Room => {
@@ -105,6 +105,12 @@ export const isRoom = (room: any): room is Room => {
     room.configuration.maxMusicDuration !== undefined &&
     room.hostUserProfileId !== undefined &&
     room.history !== undefined &&
-    room.participants !== undefined
+    room.participants !== undefined &&
+    room.streamingService !== undefined
   )
+}
+
+export type StreamingService = {
+  serviceId: string;
+  serviceName: string;
 }
