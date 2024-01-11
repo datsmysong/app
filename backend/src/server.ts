@@ -4,6 +4,7 @@ import fastifyIO from "fastify-socket.io";
 import path from "path";
 import { Server } from "socket.io";
 import AuthCallbackGET from "./route/AuthCallbackGET";
+import AuthRedirectionGET from "./route/AuthRedirectionGET";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
@@ -35,11 +36,13 @@ server.register(require("@fastify/cookie"), {
 } as FastifyCookieOptions);
 
 server.register(fastifyCors, {
-  origin: ["http://localhost:8081"], // or true to allow all origins
+  origin: [true], // or true to allow all origins
   methods: ["*"], // or just ['*'] for all methods
 });
 
+// Auth
 server.get("/auth/callback", AuthCallbackGET);
+server.get("/auth/redirection", AuthRedirectionGET);
 
 server.ready().then(() => {
   // we need to wait for the server to be ready, else `server.io` is undefined
@@ -49,7 +52,7 @@ server.ready().then(() => {
   });
 });
 
-server.listen({ port: 3000 });
+server.listen({ port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
   interface FastifyInstance {
