@@ -1,10 +1,17 @@
-import { Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import ServiceList from "../components/servicesList";
 import ParametersList from "../components/parametersList";
 import CustomTextInput from "../components/customTextInput";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import React from "react";
+import { Link } from "expo-router";
 
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState("");
@@ -43,19 +50,24 @@ export default function CreateRoom() {
     };
 
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
-      alert("Le pourcentage doit être entre 0 et 100");
+      Alert.alert(
+        "Mauvais pourcentage",
+        "Le pourcentage doit être entre 0 et 100",
+      );
       return;
     }
 
     if (body.maxMusicPerUser <= 0) {
-      alert(
+      Alert.alert(
+        "Mauvais nombre de musique",
         "Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1",
       );
       return;
     }
 
     if (body.maxMusicPerUserDuration <= 0) {
-      alert(
+      Alert.alert(
+        "Mauvaise durée de musique",
         "La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde",
       );
       return;
@@ -108,7 +120,9 @@ export default function CreateRoom() {
         onPress={onSubmit}
         disabled={!isFormValid}
       >
-        <Text style={styles.buttonText}>Créer une salle d'écoute</Text>
+        <Link href={"/Rooms"}>
+          <Text style={styles.buttonText}>Créer une salle d'écoute</Text>
+        </Link>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -119,32 +133,14 @@ const styles = StyleSheet.create({
     height: 40,
     width: 200,
     margin: 12,
-    borderWidth: 1,
-    padding: 10,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    paddingBottom: 20,
-  },
-  image: {
-    width: 100,
-    height: 100,
-  },
-  centered: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 20,
-  },
-  text: {
-    paddingTop: 20,
-    paddingBottom: 20,
   },
   button: {
     alignItems: "center",
     backgroundColor: "#0a0a0a",
     padding: 10,
     marginTop: 20,
+    marginBottom: 20,
+    borderRadius: 10,
     width: 300,
   },
   buttonText: {

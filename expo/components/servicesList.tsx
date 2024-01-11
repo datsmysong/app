@@ -60,7 +60,7 @@ export default function ServicesList({
               style={styles.image}
               contentFit={"contain"}
               source={images.get(item)}
-              key={item}
+              alt={item}
             />
             <Text style={styles.labelText}>{item}</Text>
           </View>
@@ -72,8 +72,8 @@ export default function ServicesList({
 
 const styles = StyleSheet.create({
   image: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
   },
   items: {
     flexDirection: "column",
@@ -87,13 +87,10 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     borderWidth: 3,
     borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
   },
   labelText: {
     fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
-    textAlign: "center",
   },
 });

@@ -57,6 +57,7 @@ export default function ParametersList({
               style={styles.checkbox}
               disabled={false}
               value={canVote}
+              color={"black"}
               onValueChange={(newValue) => setCanVote(newValue)}
             />
           </View>
@@ -101,9 +102,9 @@ const styles = StyleSheet.create({
     height: 0,
     backgroundColor: "transparent",
     borderStyle: "solid",
-    borderLeftWidth: 8,
-    borderRightWidth: 8,
-    borderBottomWidth: 16,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderBottomWidth: 14,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
     borderBottomColor: "black",
@@ -119,16 +120,18 @@ const styles = StyleSheet.create({
 
   items: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: 20,
     paddingLeft: 10,
   },
 
   item: {
-    paddingLeft: 10,
+    marginLeft: 10,
   },
 
   checkbox: {
-    margin: 8,
+    margin: 10,
   },
 
   checkboxContainer: {
