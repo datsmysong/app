@@ -25,7 +25,7 @@ export default function RoomPage() {
 
   return (
     <View style={styles.shareContainer}>
-      <Button label="Partager" theme="filled" onPress={onShareLink}></Button>
+      <Button theme="filled" onPress={onShareLink}>Partager</Button>
     </View>
   );
 }
