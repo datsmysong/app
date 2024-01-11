@@ -1,37 +1,55 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "react-native";
+import {
+  ActiveRoom,
+  OrderedMusic,
+  PlayingMusic,
+  StreamingPlatformRemote,
+  StreamingService,
+} from "../lib/types";
 import { SoundCloud } from "../utils/soundcloud";
 import { Spotify } from "../utils/spotify";
-import Player from "./Player";
-import { OrderedMusic, PlayingMusic, StreamingPlatform } from "../lib/types";
+import Player, { PlayerHandle } from "./Player";
+import { Text, View } from "./Tamed";
 
 type ActiveRoomViewProps = {
-  roomId: string;
+  room: ActiveRoom;
 };
 
-const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ roomId }) => {
+const knownStreamingServices: Array<StreamingService> = [
+  {
+    serviceId: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
+    serviceName: "Spotify",
+  },
+  {
+    serviceId: "c99631a2-f06c-4076-80c2-13428944c3a8",
+    serviceName: "SoundCloud",
+  },
+];
+
+const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
+  // TODO: Connect to the backend websocket and fetch the room data once connected
+
   const [currentMusic, setCurrentMusic] = useState<PlayingMusic | null>(null);
   const [queue, setQueue] = useState<OrderedMusic[]>([]);
 
-  // connect to the backend websocket and fetch the room data once connected
   const [isSoundCloudReady, setIsSoundCloudReady] = useState(false);
 
-  useEffect(() => {
-    const scriptElement = document.querySelector(
-      "[src='https://w.soundcloud.com/player/api.js']"
-    );
-
-    if (scriptElement) {
-      scriptElement.addEventListener("load", () => {
-        setIsSoundCloudReady(true);
-      });
-    }
-  }, []);
-
-  const streamingPlatform: StreamingPlatform | null = useMemo(() => {
-    if (isSoundCloudReady) {
+  const streamingPlatform: StreamingPlatformRemote | null = useMemo(() => {
+    if (
+      room?.streamingService.serviceId ===
+      "a2d17b25-d87e-42af-9e79-fd4df6b59222"
+    ) {
       return new Spotify();
+    } else if (
+      room?.streamingService.serviceId ===
+        "c99631a2-f06c-4076-80c2-13428944c3a8" &&
+      isSoundCloudReady
+    ) {
+      return new SoundCloud();
+    } else {
+      return null;
     }
-    return null;
   }, [isSoundCloudReady]);
 
   const fetchData = useCallback(async () => {
@@ -54,27 +72,49 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ roomId }) => {
   }, [fetchData]);
 
   const playCoolSong = async () => {
+    console.log("playCoolSong");
+    console.log(player.current);
+
+    if (player.current === null) return;
+
     if (streamingPlatform instanceof Spotify) {
-      await streamingPlatform.playMusic("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
+      await player.current.playMusic("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
     } else if (streamingPlatform instanceof SoundCloud) {
-      await streamingPlatform.playMusic(
+      await player.current.playMusic(
         "https://soundcloud.com/dukeandjones/call-me-chill-mix"
       );
     }
   };
 
+  const player: React.RefObject<PlayerHandle> = useRef(null);
+
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen py-2">
-        {currentMusic && streamingPlatform && (
-          <Player music={currentMusic} api={streamingPlatform} />
+      <View>
+        {streamingPlatform && (
+          <Player ref={player} music={currentMusic} api={streamingPlatform} />
         )}
-        {!currentMusic && <p>Nothing is playing, start a song</p>}
-      </div>
+        {!streamingPlatform && (
+          <>
+            <Text>
+              {knownStreamingServices
+                .map(
+                  (service) => `[${service.serviceId} = ${service.serviceName}]`
+                )
+                .join("\n ")}
+            </Text>
+            <Text>
+              {room?.streamingService.serviceName} is not supported yet.
+              {room?.streamingService.serviceId}
+            </Text>
+          </>
+        )}
+      </View>
 
-      <button onClick={playCoolSong}>
-        play Duke & Jones - Call Me (Chill Mix)
-      </button>
+      <Button
+        onPress={playCoolSong}
+        title="play Duke & Jones - Call Me (Chill Mix)"
+      />
     </>
   );
 };
