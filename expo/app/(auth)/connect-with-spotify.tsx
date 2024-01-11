@@ -1,6 +1,9 @@
-import { Pressable, Text } from "react-native";
+import "react-native-url-polyfill/auto";
+
+import { Platform, Pressable, Text } from "react-native";
 import { supabase } from "../../lib/supabase";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { AlertNatif } from "../../components/Alert";
@@ -10,32 +13,66 @@ WebBrowser.maybeCompleteAuthSession(); // required for web only
 
 export default function ConnectWithSpotify() {
   const handleSignUp = async () => {
+    const baseUrl = directUri.includes("exp://")
+      ? "http://" + directUri.split(":8081")[0].split("//")[1]
+      : directUri.split(":8081")[0];
+
+    // Get from auth manager the url to redirect the user to Spotify
+    // and a cookie to verify the user later
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "spotify",
       options: {
         skipBrowserRedirect: true,
-        redirectTo: "http://localhost:3000/auth/callback",
+        redirectTo: encodeURI(
+          baseUrl +
+            ":3000/auth/callback?redirect_url=" +
+            directUri.split(":3000")[0]
+        ),
       },
     });
-    if (error) {
-      //TODO handle error
-      console.error("error", error);
+    if (error || !data || !data.url) {
+      console.error("error", error ? error : "No data url");
+      AlertNatif("Une erreur est survenue, impossible de contacter le serveur");
     }
-    //! On iOS, the modal Safari will not share cookies with the system Safari. If you need this, use openAuthSessionAsync
-    const res = (await WebBrowser.openAuthSessionAsync(
-      data?.url ?? "",
+
+    // Backend need verify the user, so we use it to add the cookie on the WebBrowser
+    // with the route /auth/redirection, who will redirect to the Spotify auth page with the code verifier
+    const codeVerifier: string | null = await getCookie(
+      "sb-ckalsdcwrofxvgxslwiv-auth-token-code-verifier"
+    );
+    if (!codeVerifier) throw new Error("No codeVerifier");
+    const satanizedCodeVerifier = encodeURIComponent(
+      codeVerifier.replace(/"/g, "")
+    );
+
+    const urlBackendRedirection =
+      baseUrl +
+      ":3000/auth/redirection?redirect_url=" +
+      data.url +
+      "#code_verifier=" +
+      satanizedCodeVerifier;
+    console.log("Ouverture webBrowser avec", urlBackendRedirection, directUri);
+
+    const webBrowser = await WebBrowser.openAuthSessionAsync(
+      urlBackendRedirection,
       directUri
-    )) as {
-      type: "success" | "cancel" | "dismiss";
-      url?: string;
-    };
-    if (res.type === "success" && res.url) {
-      const refresh_token = res.url.split("#refresh_token=")[1];
-      await supabase.auth.refreshSession({ refresh_token });
-      return;
+    );
+    // At end, if all is good, user come back to the app with a refresh_token to fetch new session
+    if (webBrowser.type === "success" && webBrowser.url) {
+      const refresh_token = decodeURIComponent(
+        webBrowser.url.split("#refresh_token=")[1]
+      );
+      const { error } = await supabase.auth.refreshSession({
+        refresh_token,
+      });
+      if (!error) return;
+      console.error("error", error);
+      AlertNatif(
+        "Une erreur est survenue, l'authentification est impossible pour le moment"
+      );
     }
-    console.error("WebBrowser a retourner ", res);
-    AlertNatif("Une erreur est survenue");
+    console.error("WebBrowser n'a pas retourné le bon type", webBrowser.type);
+    AlertNatif("Une erreur est survenue avec votre navigateur.");
   };
 
   return (
@@ -44,3 +81,13 @@ export default function ConnectWithSpotify() {
     </Pressable>
   );
 }
+
+const getCookie = async (key: string): Promise<string | null> => {
+  if (Platform.OS === "web") {
+    if (typeof localStorage === "undefined") {
+      return null;
+    }
+    return localStorage.getItem(key);
+  }
+  return await AsyncStorage.getItem(key);
+};
