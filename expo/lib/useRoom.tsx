@@ -36,7 +36,11 @@ export default function useRoom(roomId: string): Room | ActiveRoom {
         username: "hugo",
       },
     ],
-    queue: []
+    queue: [],
+    streamingService: {
+      serviceId: "c99631a2-f06c-4076-80c2-13428944c3a8",
+      serviceName: "SoundCloud",
+    }
   };
 
   return room;
