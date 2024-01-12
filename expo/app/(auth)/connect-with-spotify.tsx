@@ -6,7 +6,8 @@ import { supabase } from "../../lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import { AlertNatif } from "../../components/Alert";
+import Alert from "../../components/Alert";
+import { getSpotifyScopes } from "../../constants/Api";
 
 const directUri = makeRedirectUri();
 WebBrowser.maybeCompleteAuthSession(); // required for web only
@@ -28,11 +29,14 @@ export default function ConnectWithSpotify() {
             ":3000/auth/callback?redirect_url=" +
             directUri.split(":3000")[0]
         ),
+        scopes: getSpotifyScopes(),
       },
     });
     if (error || !data || !data.url) {
       console.error("error", error ? error : "No data url");
-      AlertNatif("Une erreur est survenue, impossible de contacter le serveur");
+      Alert.alert(
+        "Une erreur est survenue, impossible de contacter le serveur"
+      );
     }
 
     // Backend need verify the user, so we use it to add the cookie on the WebBrowser
@@ -51,7 +55,6 @@ export default function ConnectWithSpotify() {
       data.url +
       "#code_verifier=" +
       satanizedCodeVerifier;
-    console.log("Ouverture webBrowser avec", urlBackendRedirection, directUri);
 
     const webBrowser = await WebBrowser.openAuthSessionAsync(
       urlBackendRedirection,
@@ -67,12 +70,12 @@ export default function ConnectWithSpotify() {
       });
       if (!error) return;
       console.error("error", error);
-      AlertNatif(
+      Alert.alert(
         "Une erreur est survenue, l'authentification est impossible pour le moment"
       );
     }
     console.error("WebBrowser n'a pas retourné le bon type", webBrowser.type);
-    AlertNatif("Une erreur est survenue avec votre navigateur.");
+    Alert.alert("Une erreur est survenue avec votre navigateur.");
   };
 
   return (

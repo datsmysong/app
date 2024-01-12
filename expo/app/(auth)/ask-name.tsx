@@ -1,18 +1,16 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
 import { Screen } from "react-native-screens";
+import Alert from "../../components/Alert";
 import { supabase } from "../../lib/supabase";
 import useSupabaseUser from "../../lib/useSupabaseUser";
-import { AlertNatif } from "../../components/Alert";
-import { router } from "expo-router";
 
 export default function AskName() {
   const [username, setUsername] = useState("");
@@ -22,7 +20,7 @@ export default function AskName() {
     if (!user?.id) return;
 
     if (username.length < 5) {
-      AlertNatif("Le pseudo doit faire au moins 5 caractères");
+      Alert.alert("Le pseudo doit faire au moins 5 caractères");
       return;
     }
     const { data, error } = await supabase
@@ -31,10 +29,10 @@ export default function AskName() {
       .eq("account_id", user?.id);
     if (error) {
       if (error.code == "23505") {
-        Alert.alert("Erreur", "Ce pseudo est déjà pris");
+        Alert.alert("Attention, Ce pseudo est déjà pris");
         return;
       }
-      Alert.alert("Erreur", "Une erreur est survenue");
+      Alert.alert("Erreur, Une erreur est survenue");
     }
     router.replace("/(tabs)");
   };
