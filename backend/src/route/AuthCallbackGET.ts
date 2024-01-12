@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import createClient from "../lib/supabase";
 import { adminSupabase } from "../server";
 import { Database } from "../types/dbTypes";
+import { PostgrestError } from "@supabase/supabase-js";
 
 enum StreamingService {
   Spotify = "a2d17b25-d87e-42af-9e79-fd4df6b59222",
@@ -27,40 +28,37 @@ export default async function AuthCallbackGET(
       code: string;
     }
   ).code;
-  let needInsertBoundService = false;
   if (!code) response.code(400).send({ error: "Missing code" });
 
   const { data } = await supabase.auth.exchangeCodeForSession(code);
   if (!data.session)
     return response.code(400).send({ error: "Missing session" });
-
   const providerToken = data.session.provider_token;
   const providerRefreshToken = data.session.provider_refresh_token;
-  let user_profile_id;
-  const user = await adminSupabase
-    .from("user_profile")
-    .select("*")
-    .eq("account_id", data.user.id)
-    .single();
-  if (!user.error) {
+  if (!providerToken || !providerRefreshToken)
+    return response
+      .code(400)
+      .send({ error: "Missing provider token from Spotify" });
+
+  // verify if user already have an user_profile (if new acc, create one)
+  let userProfileId = await getUserProfile(data.user.id);
+
+  let needInsertBoundService;
+  if (userProfileId) {
     // Already account
-    user_profile_id = user.data.user_profile_id;
-    if (!needInsertBoundService) {
-      const serviceAlreadyBound = await adminSupabase
-        .from("bound_services")
-        .select("*")
-        .eq("user_profile_id", user_profile_id)
-        .eq("service_id", StreamingService.Spotify);
-      if (serviceAlreadyBound.error) {
-        console.error("error fetch", serviceAlreadyBound.error);
-        return response.code(500).send({ error: serviceAlreadyBound.error });
-      }
-      if (serviceAlreadyBound.data.length == 0) needInsertBoundService = true;
+    const { alreadyBound, error } = await alreadyBoundService({
+      service: StreamingService.Spotify,
+      user_profile_id: userProfileId,
+    });
+    if (error) {
+      console.error("error fetch", error);
+      return response.code(500).send({ error: error });
     }
+    needInsertBoundService = !alreadyBound;
   } else {
     // New account
     try {
-      user_profile_id = await createAccount({
+      userProfileId = await createAccount({
         full_name: data.user.user_metadata.full_name,
         account_id: data.user.id,
         username: null,
@@ -71,39 +69,30 @@ export default async function AuthCallbackGET(
       return response.code(500).send({ error: e });
     }
   }
-  const timestmap = data.session.expires_at;
-  // add time zone to timestamp
-  if (!timestmap) throw new Error("Missing timestamp");
-  const date = new Date(timestmap);
+  const providerTokenEnd = new Date();
+  providerTokenEnd.setHours(providerTokenEnd.getHours() + 1);
+  const timestampZProviderTokenEnd = providerTokenEnd.toISOString();
+
   if (needInsertBoundService) {
-    // account not already bound to spotify
-    request.log.info("New bound_service", data.user.id);
-    const service: Database["public"]["Tables"]["bound_services"]["Row"] = {
-      access_token: providerToken ?? null,
-      refresh_token: providerRefreshToken ?? null,
-      expires_in: date.toISOString(),
-      user_profile_id: user_profile_id,
+    const error = await insertService({
+      access_token: providerToken,
+      refresh_token: providerRefreshToken,
+      expires_in: timestampZProviderTokenEnd,
+      user_profile_id: userProfileId,
       service_id: StreamingService.Spotify,
-    };
-    const { error } = await adminSupabase
-      .from("bound_services")
-      .insert(service);
+    });
     if (error) {
       console.error("impossible to insert into bound_services", error);
-      console.log("Objet", service);
       response.code(500).send({ error: "Impossible to bound this from " });
     }
   } else {
-    // update with new token
-    const { error } = await adminSupabase
-      .from("bound_services")
-      .update({
-        access_token: providerToken ?? null,
-        refresh_token: providerRefreshToken ?? null,
-        expires_in: date.toISOString(),
-      })
-      .eq("user_profile_id", user_profile_id)
-      .eq("service_id", "a2d17b25-d87e-42af-9e79-fd4df6b59222");
+    const error = await updateService({
+      accessToken: providerToken,
+      expiresOn: timestampZProviderTokenEnd,
+      refreshToken: providerRefreshToken,
+      service: StreamingService.Spotify,
+      userProfileId: userProfileId,
+    });
     if (error) {
       console.error("impossible to update bound_services", error);
       response
@@ -111,14 +100,74 @@ export default async function AuthCallbackGET(
         .send({ error: "Impossible to update bounded service" });
     }
   }
+
   const refresh_token = data.session.refresh_token;
   const redirectUrl = decodeURIComponent(request.url).split("redirect_url=")[1];
 
-  // redirect user to the redirect url with the refresh token 
+  // redirect user to the redirect url with the refresh token
   response.redirect(
     redirectUrl + "#refresh_token=" + encodeURIComponent(refresh_token)
   );
 }
+
+const insertService = async (
+  service: Database["public"]["Tables"]["bound_services"]["Row"]
+) => {
+  const { error } = await adminSupabase.from("bound_services").insert(service);
+  return error;
+};
+
+const updateService = async ({
+  userProfileId,
+  accessToken,
+  refreshToken,
+  expiresOn,
+  service,
+}: {
+  userProfileId: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresOn: string;
+  service: StreamingService;
+}) => {
+  const { error } = await adminSupabase
+    .from("bound_services")
+    .update({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: expiresOn,
+    })
+    .eq("user_profile_id", userProfileId)
+    .eq("service_id", service);
+  return error;
+};
+
+const getUserProfile = async (userId: string): Promise<string | null> => {
+  const { data: userData } = await adminSupabase
+    .from("user_profile")
+    .select("*")
+    .eq("account_id", userId)
+    .single();
+  return userData?.user_profile_id ?? null;
+};
+
+const alreadyBoundService = async ({
+  service,
+  user_profile_id,
+}: {
+  service: StreamingService;
+  user_profile_id: string;
+}): Promise<{ alreadyBound: boolean; error: PostgrestError | null }> => {
+  const { data, error } = await adminSupabase
+    .from("bound_services")
+    .select("*")
+    .eq("user_profile_id", user_profile_id)
+    .eq("service_id", service);
+  return {
+    alreadyBound: data !== null && data.length > 0,
+    error: error,
+  };
+};
 
 const createAccount = async ({
   full_name,
