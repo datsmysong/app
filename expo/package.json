@@ -3,8 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --tunnel",
-    "android": "expo start --android --tunnel -c",
+    "start": "expo start",
+    "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll"
@@ -36,7 +36,8 @@
     "react-native-svg": "13.9.0",
     "react-native-unimodules": "^0.14.10",
     "react-native-web": "~0.19.6",
-    "expo-checkbox": "~2.4.0"
+    "expo-checkbox": "~2.4.0",
+    "expo-auth-session": "~5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

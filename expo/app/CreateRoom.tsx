@@ -9,6 +9,7 @@ import ServiceList from "../components/ServicesList";
 import ParametersList from "../components/ParametersList";
 import CustomTextInput from "../components/CustomTextInput";
 import { useEffect, useState } from "react";
+import { makeRedirectUri } from "expo-auth-session";
 import axios from "axios";
 import React from "react";
 import { router } from "expo-router";
@@ -27,9 +28,17 @@ export default function CreateRoom() {
   const [images, setImages] = useState<Map<string, any>>(new Map());
   const [servicesId, setServicesId] = useState<Map<string, string>>(new Map());
 
+  const directUri = makeRedirectUri();
+
+  const baseUrl = directUri.includes("exp://")
+    ? "http://" + directUri.split(":8081")[0].split("//")[1]
+    : directUri.split(":8081")[0];
+
+  Alert.alert("baseUrl", baseUrl);
+
   useEffect(() => {
     const fetchServices = async () => {
-      const response = await fetch("http://localhost:3000/streamingServices");
+      const response = await fetch(baseUrl + ":3000/streamingServices");
       const data = await response.json();
       const images = new Map<string, any>();
       const initialSelectedService: { [key: string]: boolean } = {};
@@ -108,12 +117,8 @@ export default function CreateRoom() {
 
     if (!body.voteSkipping) body.voteSkippingNeeded = 0;
 
-    // TODO : review
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:3000/createRoom",
-        body,
-      );
+      const response = await axios.post(baseUrl + ":3000/createRoom", body);
       console.log({ code: response.data.code, message: response.data.message });
     } catch (error) {
       return error;
