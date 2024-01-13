@@ -1,8 +1,7 @@
-import { View, StyleSheet, Text } from "react-native";
-import { useEffect, useState } from "react";
+import { View, StyleSheet, Platform } from "react-native";
+import { useEffect } from "react";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
 import * as Clipboard from "expo-clipboard";
 
 export default function RoomPage() {
@@ -11,32 +10,32 @@ export default function RoomPage() {
   //Listening to any incoming deep link
   useEffect(() => {
     const subscription = Linking.addEventListener("url", handleDeepLink);
-    return (() => {
+    return () => {
       subscription.remove();
-    })
+    };
   });
-  
-  //Handler
+
+  //Deep links handler
   const handleDeepLink = (event: any) => {};
 
   const onShareLink = async () => {
-    // For when the user click on "Open in the app" in the web browser
-    // const roomCode = "A1B2C3"
-    // const deepLink = Linking.createURL(`rooms/${roomCode}`);
-    let invitationLink: string;
-    if (process.env.NODE_ENV === "production") {
-      currentPageLink ?
-      invitationLink = currentPageLink.split("//")[1] :
-      invitationLink = "";
+    if (!currentPageLink) throw new Error("No link found.");
+    let invitationLink = "";
+    if (Platform.OS === "ios" || Platform.OS === "android") {
+      const webLink = currentPageLink.replace("exp://", "http://");
+      const roomCode = "A1B2C3";
+      invitationLink = `${webLink}/join/${roomCode}`;
     } else {
-
+      invitationLink = currentPageLink.replace("/rooms", "/join");
     }
-    //await Clipboard.setStringAsync();
+    await Clipboard.setStringAsync(invitationLink);
   };
 
   return (
     <View style={styles.shareContainer}>
-      <Button theme="filled" onPress={onShareLink}>Partager</Button>
+      <Button theme="filled" onPress={onShareLink}>
+        Partager
+      </Button>
     </View>
   );
 }
