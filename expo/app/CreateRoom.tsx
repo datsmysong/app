@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import React from "react";
 import { router } from "expo-router";
-import { string } from "prop-types";
 
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState("");
@@ -26,6 +25,7 @@ export default function CreateRoom() {
     [key: string]: boolean;
   }>({});
   const [images, setImages] = useState<Map<string, any>>(new Map());
+  const [servicesId, setServicesId] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -33,15 +33,18 @@ export default function CreateRoom() {
       const data = await response.json();
       const images = new Map<string, any>();
       const initialSelectedService: { [key: string]: boolean } = {};
+      const services = new Map<string, string>();
 
       data.forEach((service: any) => {
         images.set(service.service_name, service.image_url);
         initialSelectedService[service.service_name] = false;
+        services.set(service.service_name, service.service_id);
       });
 
       initialSelectedService["Spotify"] = true;
       setSelectedService(initialSelectedService);
       setImages(images);
+      setServicesId(services);
     };
 
     fetchServices();
@@ -87,14 +90,14 @@ export default function CreateRoom() {
   }
 
   const onSubmit = async () => {
-    const service = Object.keys(selectedService).find(
-      (key) => selectedService[key],
-    );
+    const service =
+      Object.keys(selectedService).find((key) => selectedService[key]) ||
+      "Spotify";
 
     const body = {
       name: roomName,
       code: roomCode,
-      service: service,
+      service: servicesId.get(service),
       voteSkipping: canVote,
       voteSkippingNeeded: parseInt(percentageVoteToSkipAMusic),
       maxMusicPerUser: parseInt(maxMusicPerUser),

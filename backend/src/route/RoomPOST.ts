@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { createRoom } from "../room";
+import * as repl from "repl";
 
 interface BodyParams {
   name: string;
@@ -11,25 +12,41 @@ interface BodyParams {
   maxMusicPerUserDuration: number;
 }
 
-export default function RoomPOST(req: FastifyRequest, reply: FastifyReply) {
-  const name = (req.body as BodyParams).name;
-  const code = (req.body as BodyParams).code;
-  const voteSkipping = (req.body as BodyParams).voteSkipping;
-  const voteSkippingNeeded = (req.body as BodyParams).voteSkippingNeeded;
-  const maxMusicPerUser = (req.body as BodyParams).maxMusicPerUser;
-  const maxMusicPerUserDuration = (req.body as BodyParams)
-    .maxMusicPerUserDuration;
-  const serviceName = (req.body as BodyParams).service;
-
-  createRoom(
+function extractFromRequest(req: FastifyRequest) {
+  const bodyParams = req.body as BodyParams;
+  const name = bodyParams.name;
+  const code = bodyParams.code;
+  const voteSkipping = bodyParams.voteSkipping;
+  const voteSkippingNeeded = bodyParams.voteSkippingNeeded;
+  const maxMusicPerUser = bodyParams.maxMusicPerUser;
+  const maxMusicPerUserDuration = bodyParams.maxMusicPerUserDuration;
+  const serviceId = bodyParams.service;
+  return {
     name,
     code,
     voteSkipping,
     voteSkippingNeeded,
     maxMusicPerUser,
     maxMusicPerUserDuration,
-    serviceName,
-  ).then(() => {
-    reply.send({ message: "Room created" });
-  });
+    serviceId: serviceId,
+  };
+}
+
+export default async function RoomPOST(
+  req: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const roomOptions = extractFromRequest(req);
+
+  const creationResult = await createRoom(
+    roomOptions.name,
+    roomOptions.code,
+    roomOptions.voteSkipping,
+    roomOptions.voteSkippingNeeded,
+    roomOptions.maxMusicPerUser,
+    roomOptions.maxMusicPerUserDuration,
+    roomOptions.serviceId,
+  );
+
+  reply.send(creationResult);
 }
