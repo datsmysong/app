@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 
 interface ServicesListProps {
@@ -15,17 +15,14 @@ interface ServicesListProps {
   setSelectedService: (
     value: (prevState: { [key: string]: boolean }) => any,
   ) => void;
+  images: Map<string, any>;
 }
 
 export default function ServicesList({
   selectedService,
   setSelectedService,
+  images,
 }: ServicesListProps) {
-  const images = new Map<string, any>([
-    ["Spotify", require("../assets/images/spotify.png")],
-    ["SoundCloud", require("../assets/images/soundcloud.png")],
-  ]);
-
   const toggleSelect = (item: string) => {
     if (
       !selectedService[item] &&
@@ -80,8 +77,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
-    marginRight: 20,
-    padding: 5,
+    marginRight: 15,
+    padding: 10,
   },
   selected: {
     borderColor: "grey",

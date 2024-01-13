@@ -8,6 +8,7 @@ import RoomPOST from "./route/RoomPOST";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import path from "path";
+import StreamingServicesGET from "./route/StreamingServicesGET";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -39,10 +40,20 @@ server.get("/rooms", RoomsGET);
 
 server.get("/hello", HelloGet);
 
+server.get("/streamingServices", StreamingServicesGET);
+
 const createRoomSchema = {
   body: {
     type: "object",
-    required: ["name", "code", "service"],
+    required: [
+      "name",
+      "code",
+      "service",
+      "voteSkipping",
+      "voteSkippingNeeded",
+      "maxMusicPerUser",
+      "maxMusicPerUserDuration",
+    ],
     properties: {
       name: { type: "string" },
       code: { type: "string" },
