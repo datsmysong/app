@@ -1,10 +1,12 @@
 import { View, StyleSheet, Platform } from "react-native";
 import { useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
 import * as Clipboard from "expo-clipboard";
 
 export default function RoomPage() {
+  const { roomCode } = useLocalSearchParams();
   const currentPageLink = Linking.useURL();
 
   //Listening to any incoming deep link
@@ -18,12 +20,11 @@ export default function RoomPage() {
   //Deep links handler
   const handleDeepLink = (event: any) => {};
 
-  const onShareLink = async () => {
+  const onShare = async () => {
     if (!currentPageLink) throw new Error("No link found.");
     let invitationLink = "";
     if (Platform.OS === "ios" || Platform.OS === "android") {
       const webLink = currentPageLink.replace("exp://", "http://");
-      const roomCode = "A1B2C3";
       invitationLink = `${webLink}/join/${roomCode}`;
     } else {
       invitationLink = currentPageLink.replace("/rooms", "/join");
@@ -33,7 +34,7 @@ export default function RoomPage() {
 
   return (
     <View style={styles.shareContainer}>
-      <Button theme="filled" onPress={onShareLink}>
+      <Button theme="filled" onPress={onShare}>
         Partager
       </Button>
     </View>
