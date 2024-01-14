@@ -1,14 +1,9 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "react-native-screens";
 import Alert from "../../components/Alert";
+import { SupabaseErrorCode } from "../../constants/SupabaseErrorCode";
 import { supabase } from "../../lib/supabase";
 import useSupabaseUser from "../../lib/useSupabaseUser";
 
@@ -28,7 +23,7 @@ export default function AskName() {
       .update({ username: username })
       .eq("account_id", user?.id);
     if (error) {
-      if (error.code == "23505") {
+      if (error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION) {
         Alert.alert("Attention, Ce pseudo est déjà pris");
         return;
       }

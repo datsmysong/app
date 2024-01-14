@@ -4,6 +4,7 @@ import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect, useState } from "react";
 import useSupabaseUser from "../lib/useSupabaseUser";
 import { supabase } from "../lib/supabase";
+import { getUserProfile } from "../lib/userProfile";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -14,8 +15,7 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [alreadyUsernameVerification, setAlreadyUsernameVerification] =
-    useState(false);
+  const [userNameFind, setSetUserNameFind] = useState(false);
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -35,16 +35,16 @@ export default function RootLayout() {
         if (session) {
           // SIGNED_IN is fired on session refresh (like alt+tab...)
           // we don't want to fetch the user profile again if is already done
-          if (_event === "SIGNED_IN" && alreadyUsernameVerification) return;
+          if (_event === "SIGNED_IN" && userNameFind) return;
           getUserProfile(session.user.id).then((userProfile) => {
             if (!userProfile.username) {
-              setAlreadyUsernameVerification(true);
+              setSetUserNameFind(true);
               router.replace("/ask-name");
               return;
             }
             router.replace("/(tabs)");
           });
-          setAlreadyUsernameVerification(true);
+          setSetUserNameFind(true);
         } else {
           router.replace("/(auth)");
         }
@@ -76,15 +76,3 @@ function RootLayoutNav() {
     </Stack>
   );
 }
-
-const getUserProfile = async (id: string) => {
-  const { data, error } = await supabase
-    .from("user_profile")
-    .select("*")
-    .eq("account_id", id)
-    .single();
-  if (error) {
-    throw error;
-  }
-  return data;
-};

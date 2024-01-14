@@ -4,7 +4,7 @@ import { Screen } from "react-native-screens";
 import ConnectWithSpotify from "./connect-with-spotify";
 import { Divider } from "react-native-elements";
 
-export default function OnBoarding() {
+export default function Onboarding() {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>

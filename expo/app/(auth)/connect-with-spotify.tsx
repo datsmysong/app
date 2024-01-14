@@ -41,8 +41,12 @@ export default function ConnectWithSpotify() {
 
     // Backend need verify the user, so we use it to add the cookie on the WebBrowser
     // with the route /auth/redirection, who will redirect to the Spotify auth page with the code verifier
+    const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl) throw new Error("No supabaseUrl");
+    const supabaseProjectId = supabaseUrl.split(".")[0].split("//")[1];
+
     const codeVerifier: string | null = await getCookie(
-      "sb-ckalsdcwrofxvgxslwiv-auth-token-code-verifier"
+      "sb-" + supabaseProjectId + "-auth-token-code-verifier"
     );
     if (!codeVerifier) throw new Error("No codeVerifier");
     const satanizedCodeVerifier = encodeURIComponent(
@@ -62,11 +66,11 @@ export default function ConnectWithSpotify() {
     );
     // At end, if all is good, user come back to the app with a refresh_token to fetch new session
     if (webBrowser.type === "success" && webBrowser.url) {
-      const refresh_token = decodeURIComponent(
+      const refreshToken = decodeURIComponent(
         webBrowser.url.split("#refresh_token=")[1]
       );
       const { error } = await supabase.auth.refreshSession({
-        refresh_token,
+        refresh_token: refreshToken,
       });
       if (!error) return;
       console.error("error", error);
