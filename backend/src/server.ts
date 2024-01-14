@@ -21,7 +21,9 @@ const server = fastify({
 });
 
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
-  throw new Error("Missing SUPABASE_URL or SUPABASE_KEY environment variable");
+  throw new Error(
+    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable"
+  );
 }
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
@@ -30,7 +32,7 @@ export const adminSupabase = createClient<Database>(
 
 server.register(fastifyIO);
 server.register(require("@fastify/cookie"), {
-  secret: "my-secret", // for cookies signature
+  secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
   hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);

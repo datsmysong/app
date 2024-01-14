@@ -13,7 +13,12 @@ export default async function AuthCallbackGET(
   request: FastifyRequest,
   response: FastifyReply
 ) {
-  if (!request.cookies["sb-ckalsdcwrofxvgxslwiv-auth-token-code-verifier"]) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  if (!supabaseUrl)
+    return response.code(400).send({ error: "Missing SUPABASE_URL" });
+  const supabaseId = supabaseUrl.split(".")[0].split("//")[1];
+
+  if (!request.cookies["sb-" + supabaseId + "-auth-token-code-verifier"]) {
     return response
       .code(400)
       .send({ error: "Missing cookie auth-token-code-verifier " });
@@ -35,10 +40,12 @@ export default async function AuthCallbackGET(
     return response.code(400).send({ error: "Missing session" });
   const providerToken = data.session.provider_token;
   const providerRefreshToken = data.session.provider_refresh_token;
+  const providerName = data.session.user.app_metadata.provider;
+
   if (!providerToken || !providerRefreshToken)
     return response
       .code(400)
-      .send({ error: "Missing provider token from Spotify" });
+      .send({ error: "Missing provider token from " + providerName });
 
   // verify if user already have an user_profile (if new acc, create one)
   let userProfileId = await getUserProfile(data.user.id);
@@ -51,54 +58,42 @@ export default async function AuthCallbackGET(
       user_profile_id: userProfileId,
     });
     if (error) {
-      console.error("error fetch", error);
+      request.log.error("Impossible to fetch already bound services", error);
       return response.code(500).send({ error: error });
     }
     needInsertBoundService = !alreadyBound;
   } else {
     // New account
-    try {
-      userProfileId = await createAccount({
-        full_name: data.user.user_metadata.full_name,
-        account_id: data.user.id,
-        username: null,
-      });
-      needInsertBoundService = true;
-    } catch (e) {
-      console.log("Error creating account", e);
-      return response.code(500).send({ error: e });
+    const { userProfileId: newUserProfileId, error } = await createAccount({
+      full_name: data.user.user_metadata.full_name,
+      account_id: data.user.id,
+      username: null,
+    });
+    needInsertBoundService = true;
+    if (error || !newUserProfileId) {
+      request.log.error("Impossible to create account: " + error);
+      return response.code(500).send({ error: error });
     }
+    userProfileId = newUserProfileId;
   }
   const providerTokenEnd = new Date();
   providerTokenEnd.setHours(providerTokenEnd.getHours() + 1);
   const timestampZProviderTokenEnd = providerTokenEnd.toISOString();
 
-  if (needInsertBoundService) {
-    const error = await insertService({
-      access_token: providerToken,
-      refresh_token: providerRefreshToken,
-      expires_in: timestampZProviderTokenEnd,
-      user_profile_id: userProfileId,
-      service_id: StreamingService.Spotify,
-    });
-    if (error) {
-      console.error("impossible to insert into bound_services", error);
-      response.code(500).send({ error: "Impossible to bound this from " });
-    }
-  } else {
-    const error = await updateService({
-      accessToken: providerToken,
-      expiresOn: timestampZProviderTokenEnd,
-      refreshToken: providerRefreshToken,
-      service: StreamingService.Spotify,
-      userProfileId: userProfileId,
-    });
-    if (error) {
-      console.error("impossible to update bound_services", error);
-      response
-        .code(500)
-        .send({ error: "Impossible to update bounded service" });
-    }
+  const error = await upsertService({
+    access_token: providerToken,
+    refresh_token: providerRefreshToken,
+    expires_in: timestampZProviderTokenEnd,
+    user_profile_id: userProfileId,
+    service_id: StreamingService.Spotify,
+  });
+
+  if (error) {
+    const messageError = needInsertBoundService
+      ? "Impossible to insert the new services."
+      : "Impossible to update service.";
+    request.log.error(messageError, error);
+    return response.code(500).send({ error: messageError });
   }
 
   const refresh_token = data.session.refresh_token;
@@ -109,38 +104,6 @@ export default async function AuthCallbackGET(
     redirectUrl + "#refresh_token=" + encodeURIComponent(refresh_token)
   );
 }
-
-const insertService = async (
-  service: Database["public"]["Tables"]["bound_services"]["Row"]
-) => {
-  const { error } = await adminSupabase.from("bound_services").insert(service);
-  return error;
-};
-
-const updateService = async ({
-  userProfileId,
-  accessToken,
-  refreshToken,
-  expiresOn,
-  service,
-}: {
-  userProfileId: string;
-  accessToken: string;
-  refreshToken: string;
-  expiresOn: string;
-  service: StreamingService;
-}) => {
-  const { error } = await adminSupabase
-    .from("bound_services")
-    .update({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: expiresOn,
-    })
-    .eq("user_profile_id", userProfileId)
-    .eq("service_id", service);
-  return error;
-};
 
 const getUserProfile = async (userId: string): Promise<string | null> => {
   const { data: userData } = await adminSupabase
@@ -177,26 +140,44 @@ const createAccount = async ({
   full_name: string;
   account_id: string;
   username: string | null;
-}): Promise<string> => {
-  const profile = await adminSupabase
+}): Promise<{ userProfileId: string | null; error: PostgrestError | null }> => {
+  const { data, error } = await adminSupabase
     .from("profile")
     .insert({
       nickname: full_name,
     })
     .select("*")
     .single();
-  console.log("PROFILE INSERTED, NOW INSERTING USER_PROFILE");
 
-  const user_profile_id = profile.data?.id;
+  const user_profile_id = data?.id;
 
-  if (!user_profile_id) throw new Error("Missing profile_id");
+  if (!user_profile_id)
+    return {
+      userProfileId: null,
+      error: error,
+    };
 
-  const userprofile = await adminSupabase.from("user_profile").insert({
-    account_id: account_id,
-    user_profile_id: user_profile_id,
-    username: username, // Add the missing 'username' property
-  });
-  console.log("USER PROFILE", userprofile);
-  if (userprofile.error) throw new Error("Error inserting user profile");
-  return user_profile_id;
+  const { data: dataUserProfile, error: errorUserprofile } = await adminSupabase
+    .from("user_profile")
+    .insert({
+      account_id: account_id,
+      user_profile_id: user_profile_id,
+      username: username, // Add the missing 'username' property
+    });
+  if (errorUserprofile)
+    return {
+      userProfileId: null,
+      error: errorUserprofile,
+    };
+  return {
+    userProfileId: user_profile_id,
+    error: null,
+  };
+};
+
+const upsertService = async (
+  service: Database["public"]["Tables"]["bound_services"]["Row"]
+): Promise<PostgrestError | null> => {
+  const { error } = await adminSupabase.from("bound_services").upsert(service);
+  return error;
 };
