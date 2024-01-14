@@ -1,11 +1,16 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { TouchableOpacity, StyleSheet } from "react-native";
-import { Text } from "./Tamed";
 import { router } from "expo-router";
+import {
+  Pressable,
+  PressableStateCallbackType,
+  StyleSheet,
+} from "react-native";
+import { Text } from "./Tamed";
 
 type ButtonProps = {
   children: React.ReactNode;
   onPress?: () => void;
+  onLongPress?: () => void;
   href?: string;
   disabled?: boolean;
   type?: "filled" | "outline";
@@ -24,25 +29,43 @@ const Button: React.FC<ButtonProps> = ({
   href,
   icon,
   onPress,
+  onLongPress,
   prependIcon,
 }) => {
   const buttonStyles = [
     styles.button,
     icon && (size === "small" ? styles.iconSmall : styles.iconNormal),
     !icon && (size === "small" ? styles.small : styles.normal),
-    prependIcon && (size === "small" ? styles.smallPrependIconPadding : styles.normalPrependIconPadding),
-    !prependIcon && !icon && (size === "small" ? styles.smallPadding : styles.normalPadding),
-    appendIcon && (size === "small" ? styles.smallAppendIconPadding : styles.normalAppendIconPadding),
-    !appendIcon && !icon && (size === "small" ? styles.smallPadding : styles.normalPadding),
+    prependIcon &&
+      (size === "small"
+        ? styles.smallPrependIconPadding
+        : styles.normalPrependIconPadding),
+    !prependIcon &&
+      !icon &&
+      (size === "small" ? styles.smallPadding : styles.normalPadding),
+    appendIcon &&
+      (size === "small"
+        ? styles.smallAppendIconPadding
+        : styles.normalAppendIconPadding),
+    !appendIcon &&
+      !icon &&
+      (size === "small" ? styles.smallPadding : styles.normalPadding),
     type === "filled" ? styles.filled : styles.outline,
     disabled && styles.disabled,
   ];
 
   if (icon) {
     return (
-      <TouchableOpacity
-        style={buttonStyles}
+      <Pressable
+        style={(state: PressableStateCallbackType) => {
+          return [
+            buttonStyles,
+            state.hovered && styles.hovered,
+            state.pressed && styles.pressed,
+          ];
+        }}
         onPress={href ? () => router.push(href as any) : onPress}
+        onLongPress={onLongPress}
         disabled={disabled}
         accessibilityLabel={children as string}
       >
@@ -51,13 +74,20 @@ const Button: React.FC<ButtonProps> = ({
           size={size === "small" ? 20 : 32}
           color={type === "filled" ? "white" : "#1A1A1A"}
         />
-      </TouchableOpacity>
+      </Pressable>
     );
   } else {
     return (
-      <TouchableOpacity
-        style={buttonStyles}
+      <Pressable
+        style={(state: PressableStateCallbackType) => {
+          return [
+            buttonStyles,
+            state.hovered && styles.hovered,
+            state.pressed && styles.pressed,
+          ];
+        }}
         onPress={href ? () => router.push(href as any) : onPress}
+        onLongPress={onLongPress}
         disabled={disabled}
       >
         {prependIcon && (
@@ -84,7 +114,7 @@ const Button: React.FC<ButtonProps> = ({
             color={type === "filled" ? "white" : "#1A1A1A"}
           />
         )}
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 };
@@ -153,6 +183,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     textAlign: "center",
+  },
+  hovered: {
+    opacity: 0.8,
+  },
+  pressed: {
+    opacity: 0.5,
   },
 });
 
