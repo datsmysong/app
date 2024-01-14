@@ -58,9 +58,9 @@
     "react-native-svg": "13.9.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
-    "socket.io-client": "^4.7.4",
     "expo-document-picker": "~11.5.4",
-    "react-native-webview": "13.2.2"
+    "react-native-webview": "13.2.2",
+    "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
