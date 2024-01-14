@@ -1,7 +1,5 @@
 export type StreamingPlatformRemote = {
   playMusic: (musicUri: string) => Promise<void>;
-  fetchCurrent: () => Promise<PlayingMusic | null>;
-  fetchQueue: () => Promise<Array<OrderedMusic>>;
   pause: () => Promise<void>;
   play: () => Promise<void>;
   next: () => Promise<void>;
@@ -20,11 +18,6 @@ export type Music = {
   artwork: string;
   artists: Array<Artist>;
   duration_ms: number;
-};
-
-export type PlayingMusic = Music & {
-  progress_ms: number;
-  is_playing: boolean;
 };
 
 export type OrderedMusic = Music & {
@@ -113,4 +106,11 @@ export const isRoom = (room: any): room is Room => {
 export type StreamingService = {
   serviceId: string;
   serviceName: string;
+}
+
+export type PlaybackState = {
+  isPlaying: boolean;
+  progressMs: number;
+  volume: number;
+  currentMusic: Music | null;
 }
