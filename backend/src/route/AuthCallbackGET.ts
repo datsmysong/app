@@ -50,26 +50,13 @@ export default async function AuthCallbackGET(
   // verify if user already have an user_profile (if new acc, create one)
   let userProfileId = await getUserProfile(data.user.id);
 
-  let needInsertBoundService;
-  if (userProfileId) {
-    // Already account
-    const { alreadyBound, error } = await alreadyBoundService({
-      service: StreamingService.Spotify,
-      user_profile_id: userProfileId,
-    });
-    if (error) {
-      request.log.error("Impossible to fetch already bound services", error);
-      return response.code(500).send({ error: error });
-    }
-    needInsertBoundService = !alreadyBound;
-  } else {
+  if (!userProfileId) {
     // New account
     const { userProfileId: newUserProfileId, error } = await createAccount({
       full_name: data.user.user_metadata.full_name,
       account_id: data.user.id,
       username: null,
     });
-    needInsertBoundService = true;
     if (error || !newUserProfileId) {
       request.log.error("Impossible to create account: " + error);
       return response.code(500).send({ error: error });
@@ -89,11 +76,8 @@ export default async function AuthCallbackGET(
   });
 
   if (error) {
-    const messageError = needInsertBoundService
-      ? "Impossible to insert the new services."
-      : "Impossible to update service.";
-    request.log.error(messageError, error);
-    return response.code(500).send({ error: messageError });
+    request.log.error("Upsert impossible, ", error);
+    return response.code(500).send({ error: "Server error." });
   }
 
   const refresh_token = data.session.refresh_token;

@@ -49,7 +49,7 @@ export default function ConnectWithSpotify() {
       "sb-" + supabaseProjectId + "-auth-token-code-verifier"
     );
     if (!codeVerifier) throw new Error("No codeVerifier");
-    const satanizedCodeVerifier = encodeURIComponent(
+    const urlEncodedCodeVerifier = encodeURIComponent(
       codeVerifier.replace(/"/g, "")
     );
 
@@ -58,7 +58,7 @@ export default function ConnectWithSpotify() {
       ":3000/auth/redirection?redirect_url=" +
       data.url +
       "#code_verifier=" +
-      satanizedCodeVerifier;
+      urlEncodedCodeVerifier;
 
     const webBrowser = await WebBrowser.openAuthSessionAsync(
       urlBackendRedirection,
