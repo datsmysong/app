@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "react-native";
 import {
   ActiveRoom,
   OrderedMusic,
-  PlayingMusic,
+  PlaybackState,
   StreamingPlatformRemote,
   StreamingService,
 } from "../lib/types";
-import { SoundCloud } from "../utils/soundcloud";
-import { Spotify } from "../utils/spotify";
-import Player, { PlayerHandle } from "./Player";
-import { Text, View } from "./Tamed";
+import AudioRemote from "./AudioRemote";
+import Player from "./Player";
+import PlayerControls from "./PlayerControls";
+import { View } from "./Tamed";
+import { Socket, io } from "socket.io-client";
 
 type ActiveRoomViewProps = {
   room: ActiveRoom;
@@ -28,87 +29,67 @@ const knownStreamingServices: Array<StreamingService> = [
 ];
 
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
-  // TODO: Connect to the backend websocket and fetch the room data once connected
+  const isHost = true;
+  const remote = useRef<StreamingPlatformRemote>(null);
 
-  const [currentMusic, setCurrentMusic] = useState<PlayingMusic | null>(null);
+  const [playbackState, setCurrentPlaybackState] = useState<PlaybackState>({
+    currentMusic: null,
+    isPlaying: false,
+    progressMs: 0,
+    volume: 0,
+  });
   const [queue, setQueue] = useState<OrderedMusic[]>([]);
 
-  const [isSoundCloudReady, setIsSoundCloudReady] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-  const streamingPlatform: StreamingPlatformRemote | null = useMemo(() => {
-    if (
-      room?.streamingService.serviceId ===
-      "a2d17b25-d87e-42af-9e79-fd4df6b59222"
-    ) {
-      return new Spotify();
-    } else if (
-      room?.streamingService.serviceId ===
-        "c99631a2-f06c-4076-80c2-13428944c3a8" &&
-      isSoundCloudReady
-    ) {
-      return new SoundCloud();
-    } else {
-      return null;
+  useEffect(() => {
+    setSocket(io('http://localhost:3000'));
+
+    socket?.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    socket?.on('stateUpdated', (message: any) => {
+      onWebSocketMessage(message);
+    });
+
+    return () => {
+      socket?.disconnect();
+    };
+  }, []);
+
+  const onWebSocketMessage = useCallback((message: any) => {
+    if (message.type === 'playbackState') {
+      setCurrentPlaybackState(message.data);
     }
-  }, [isSoundCloudReady]);
-
-  const fetchData = useCallback(async () => {
-    if (!streamingPlatform) return;
-
-    const currentMusicData = await streamingPlatform.fetchCurrent();
-    const queueData = await streamingPlatform.fetchQueue();
-    setCurrentMusic(currentMusicData);
-    setQueue(queueData);
-  }, [streamingPlatform]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  // Fetch the current music and queue every second
-  useEffect(() => {
-    const interval = setInterval(fetchData, 1000);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+  }, []);
 
   const playCoolSong = async () => {
     console.log("playCoolSong");
-    console.log(player.current);
+    console.log(remote.current);
 
-    if (player.current === null) return;
+    if (remote.current === null) return;
 
-    if (streamingPlatform instanceof Spotify) {
-      await player.current.playMusic("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
-    } else if (streamingPlatform instanceof SoundCloud) {
-      await player.current.playMusic(
+    if (room.streamingService.serviceName === "Spotify") {
+      await remote.current.playMusic("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
+    } else if (room.streamingService.serviceName === "SoundCloud") {
+      await remote.current.playMusic(
         "https://soundcloud.com/dukeandjones/call-me-chill-mix"
       );
     }
   };
 
-  const player: React.RefObject<PlayerHandle> = useRef(null);
-
   return (
     <>
       <View>
-        {streamingPlatform && (
-          <Player ref={player} music={currentMusic} api={streamingPlatform} />
+        {isHost && (
+          <AudioRemote ref={remote} streamingService={room.streamingService} />
         )}
-        {!streamingPlatform && (
-          <>
-            <Text>
-              {knownStreamingServices
-                .map(
-                  (service) => `[${service.serviceId} = ${service.serviceName}]`
-                )
-                .join("\n ")}
-            </Text>
-            <Text>
-              {room?.streamingService.serviceName} is not supported yet.
-              {room?.streamingService.serviceId}
-            </Text>
-          </>
-        )}
+        <Player state={playbackState}>
+          {isHost && remote.current && (
+            <PlayerControls state={playbackState} remote={remote.current} />
+          )}
+        </Player>
       </View>
 
       <Button
