@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { supabase } from "../server";
+import createClient from "../lib/supabase";
 
-interface QueryParams {
+export interface QueryParams {
   id: string;
 }
 
@@ -10,6 +10,10 @@ export default function RoomGET(req: FastifyRequest, reply: FastifyReply) {
   if (!id) {
     reply.code(400).send({ error: "Missing id" });
   }
+  const supabase = createClient({
+    request: req,
+    response: reply,
+  });
   supabase
     .from("rooms")
     .select("*")
