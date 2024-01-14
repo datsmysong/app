@@ -1,47 +1,26 @@
-import React, {
-  useState,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-} from "react";
 import { Image } from "expo-image";
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
+import { PlaybackState } from "../lib/types";
 import { Text, View } from "./Tamed";
-import { Button } from "react-native";
-import { PlayingMusic, StreamingPlatformRemote } from "../lib/types";
-import { SoundCloud } from "../utils/soundcloud";
-import SoundCloudPlayer from "./SoundCloudPlayer";
 
 type PlayerProps = {
-  music: PlayingMusic | null;
-  api: StreamingPlatformRemote;
+  state: PlaybackState;
+  children?: React.ReactNode;
 };
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-const Player = forwardRef<StreamingPlatformRemote, PlayerProps>(({ music, api }, ref) => {
-  const soundCloudRef: React.RefObject<StreamingPlatformRemote> = useRef(null);
-
-  useImperativeHandle(ref, () => ({
-    ...api,
-  }));
-
-  useEffect(() => {
-    if (soundCloudRef.current) {
-      soundCloudRef.current.play();
-    }
-  }, [soundCloudRef.current]);
-
-  const [isSoundCloudReady, setIsSoundCloudReady] = useState(false);
-  const [progress, setProgress] = useState(music?.progress_ms ?? 0);
-  const [isPlaying, setIsPlaying] = useState(music?.is_playing ?? false);
+const Player: React.FC<PlayerProps> = ({ state, children }) => {
+  const [progress, setProgress] = useState(state.progressMs ?? 0);
+  const [isPlaying, setIsPlaying] = useState(state.isPlaying ?? false);
 
   // Synchronize progress and isPlaying with the music prop
   useEffect(() => {
-    setProgress(music?.progress_ms ?? 0);
-    setIsPlaying(music?.is_playing ?? false);
-  }, [music]);
+    setProgress(state.progressMs ?? 0);
+    setIsPlaying(state.isPlaying ?? false);
+  }, [state]);
 
   const formatDuration = (durationMs: number) => {
     const minutes = Math.floor(durationMs / 60000);
@@ -49,69 +28,88 @@ const Player = forwardRef<StreamingPlatformRemote, PlayerProps>(({ music, api },
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handlePlayPause = () => {
-    isPlaying ? api.pause() : api.play();
-    setIsPlaying(!isPlaying);
-  };
-
-  const handlePreviousTrack = () => {
-    api.prev();
-  };
-
-  const handleNextTrack = () => {
-    api.next();
-  };
-
   return (
-    <View className="flex items-center space-x-4">
-      {api instanceof SoundCloud && (
-        <SoundCloudPlayer
-          ref={soundCloudRef}
-          onReady={() => setIsSoundCloudReady(true)}
-        />
-      )}
-      {music && (
+    <View style={styles.container}>
+      {state.currentMusic && (
         <>
           <Image
-            source={music.artwork}
+            source={state.currentMusic.artwork}
             placeholder={blurhash}
-            alt={music.title}
-            className="w-32 h-32"
+            alt={state.currentMusic.title}
+            style={styles.image}
           />
           <View>
-            <Text className="text-lg font-semibold">{music.title}</Text>
-            <View className="flex items-center">
-              {music.artists.map((artist, index) => (
+            <Text style={styles.title}>{state.currentMusic.title}</Text>
+            <View style={styles.artistContainer}>
+              {state.currentMusic.artists.map((artist, index) => (
                 <React.Fragment key={artist.id}>
                   <Text>{artist.name}</Text>
-                  {index !== music.artists.length - 1 && <Text>,</Text>}
+                  {index !== (state.currentMusic?.artists.length ?? 1) - 1 && (
+                    <Text>,</Text>
+                  )}
                 </React.Fragment>
               ))}
             </View>
-            <View className="flex items-center space-x-2">
+            <View style={styles.progressContainer}>
               <Text>{formatDuration(progress)}</Text>
-              <View className="flex-grow h-2 bg-gray-200 rounded-full">
+              <View style={styles.progressBar}>
                 <View
-                  className="h-full bg-black rounded-full transition-all duration-1000 ease-linear"
-                  style={{ width: `${(progress / music.duration_ms) * 100}%` }}
+                  style={[
+                    styles.progress,
+                    {
+                      width: `${
+                        (progress / state.currentMusic.duration_ms) * 100
+                      }%`,
+                    },
+                  ]}
                 ></View>
               </View>
-              <Text>{formatDuration(music.duration_ms)}</Text>
+              <Text>{formatDuration(state.currentMusic.duration_ms)}</Text>
             </View>
-            <View className="flex items-center space-x-2">
-              <Button onPress={handlePreviousTrack} title="Previous" />
-              <Button
-                onPress={handlePlayPause}
-                title={isPlaying ? "Pause" : "Play"}
-              />
-              <Button onPress={handleNextTrack} title="Next" />
-            </View>
+            {children}
           </View>
         </>
       )}
-      {!music && <Text>Nothing is playing, start a song</Text>}
+      {!state.currentMusic && <Text>Nothing is playing, start a song</Text>}
     </View>
   );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  image: {
+    width: 128,
+    height: 128,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  artistContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  progressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  progressBar: {
+    flex: 1,
+    height: 4,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 9999,
+  },
+  progress: {
+    height: "100%",
+    backgroundColor: "#000000",
+    borderRadius: 9999,
+    transition: "all 1s linear",
+  },
 });
 
 export default Player;
