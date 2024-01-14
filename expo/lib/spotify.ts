@@ -1,20 +1,41 @@
-import { PlaybackState, Queue, SpotifyApi } from "@spotify/web-api-ts-sdk";
+import {
+  AccessToken,
+  Queue,
+  SpotifyApi,
+  PlaybackState as SpotifyPlaybackState,
+} from "@spotify/web-api-ts-sdk";
+import { OrderedMusic, StreamingPlatformRemote, PlaybackState } from "./types";
 
 const SPOTIFY_CLIENT_ID = "d4ea0d1deac542c69fca5816009152ba";
 const SPOTIFY_CLIENT_SECRET = "171703fb8b454ee684fefd69508de931";
 const SPOTIFY_BASE_URL = "https://api.spotify.com/v1";
+const SPOTIFY_SERVICE_ID = "a2d17b25-d87e-42af-9e79-fd4df6b59222";
 
-export class Spotify implements StreamingPlatform {
+const extractTokenFromDatabase = (userProfileId: string): AccessToken => {
+  const supabase = useSupabase();
+  const { data, error } = supabase
+    .from("bound_services")
+    .select("*")
+    .eq("user_profile_id", userProfileId)
+    .eq("service_id", SPOTIFY_SERVICE_ID)
+    .single();
+
+  return {
+    access_token: data.access_token,
+    expires_in: data.expires_in,
+    refresh_token: data.refresh_token,
+    token_type: "Bearer",
+  };
+};
+
+export class Spotify implements StreamingPlatformRemote {
   name = "Spotify";
   imgUrl = "https://via.placeholder.com/256";
   sdk: SpotifyApi;
 
-  constructor() {
-    this.sdk = SpotifyApi.withUserAuthorization(
-      SPOTIFY_CLIENT_ID,
-      "http://localhost:3000",
-      ["user-read-playback-state", "user-modify-playback-state"]
-    );
+  constructor(userProfileId: string) {
+    const accessToken: AccessToken = extractTokenFromDatabase(userProfileId);
+    this.sdk = SpotifyApi.withAccessToken(SPOTIFY_CLIENT_ID, accessToken);
   }
   async playMusic(musicUri: string) {
     const state = await this.getCachedPlaybackState(10000);
@@ -42,26 +63,29 @@ export class Spotify implements StreamingPlatform {
     }));
   }
 
-  async fetchCurrent(): Promise<PlayingMusic | null> {
+  async fetchCurrent(): Promise<PlaybackState | null> {
     const state = await this.getCachedPlaybackState(10000);
     if (state === null) return null;
 
     return {
-      title: state.item.name,
-      artwork: state.item.album.images[0].url,
-      artists: state.item.album.artists,
-      duration_ms: state.item.duration_ms,
-      progress_ms: state.progress_ms,
-      is_playing: state.is_playing,
+      currentMusic: {
+        title: state.item.name,
+        artwork: state.item.album.images[0].url,
+        artists: state.item.album.artists,
+        duration_ms: state.item.duration_ms,
+      },
+      progressMs: state.progress_ms,
+      isPlaying: state.is_playing,
+      volume: state.device.volume_percent ?? 0,
     };
   }
 
   private cachedQueue: Queue | null = null;
-  private cachedPlaybackState: PlaybackState | null = null;
+  private cachedPlaybackState: SpotifyPlaybackState | null = null;
   private playbackStateCacheTime: number = 0;
   private queueCacheTime: number = 0;
 
-  private async getPlaybackState(): Promise<PlaybackState | null> {
+  private async getPlaybackState(): Promise<SpotifyPlaybackState | null> {
     return await this.sdk.player.getPlaybackState();
   }
 
@@ -82,7 +106,7 @@ export class Spotify implements StreamingPlatform {
 
   private async getCachedPlaybackState(
     cacheDuration: number
-  ): Promise<PlaybackState | null> {
+  ): Promise<SpotifyPlaybackState | null> {
     const currentTime = Date.now();
     // If we have a cached state and it's not expired, return it
     if (
@@ -151,7 +175,7 @@ export class Spotify implements StreamingPlatform {
   async setVolume(volume: number): Promise<void> {
     await this.sdk.player.setPlaybackVolume(volume);
   }
-  async seek(position: number): Promise<void> {
+  async seekTo(position: number): Promise<void> {
     const state = await this.getCachedPlaybackState(10000);
     if (state === null || state.device.id === null) return;
 
