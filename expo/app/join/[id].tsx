@@ -1,17 +1,28 @@
 import { Text, View, StyleSheet } from "react-native";
 import Button from "../../components/Button";
-import { Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
+import * as Linking from "expo-linking";
 
 export default function JoinPage() {
+  const { roomCode } = useLocalSearchParams();
+
+  const onOpenApp = () => {
+    const deepLink = Linking.createURL(`rooms/${roomCode}`);
+    alert(deepLink);
+    Linking.openURL(deepLink);
+  };
+
   // When the user is logged in
   return (
     <View style={styles.choiceContainer}>
       <Text style={styles.title}>
         Vous êtes sur le point de rejoindre une salle d'écoute...
       </Text>
-      <Button theme="filled">Ouvrir dans l'application</Button>
-      <Link style={styles.link} href="/rooms/A1B2C3">
-        Ouvrir dans le navigateur
+      <Button theme="filled" onPress={onOpenApp}>
+        Ouvrir dans l'application
+      </Button>
+      <Link style={styles.link} href={`rooms/${roomCode}`}>
+        Continuer sur le site
       </Link>
     </View>
   );
