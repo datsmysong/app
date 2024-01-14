@@ -1,24 +1,24 @@
+import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
-import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
-import { Server } from "socket.io";
-import authRoutes from "./authRoutes";
 import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
 import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import BoundServicesGET from "./route/BoundServicesGET";
-import RoomIdGET from "./route/RoomIdGET";
-import StreamingServicesGET from "./route/StreamingServicesGET";
 import UnbindServicePOST from "./route/UnbindServicePOST";
 import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
-import RoomIO from "./socketio/RoomIO";
+import { Server } from "socket.io";
+import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
+import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
 import RoomEndGET from "./route/RoomEndGET";
 import { RoomJSON } from "commons/backend-types";
+import StreamingServicesGET from "./route/StreamingServicesGET";
+import RoomIO from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
 
