@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Checkbox from "expo-checkbox";
-import CustomTextInput from "./customTextInput";
+import CustomTextInput from "./CustomTextInput";
 import { useState } from "react";
 import React from "react";
 
@@ -47,7 +47,7 @@ export default function ParametersList({
         </View>
       </TouchableOpacity>
 
-      {isPressed ? (
+      {isPressed && (
         <View>
           <View style={styles.checkboxContainer}>
             <Text style={styles.labelText}>
@@ -89,9 +89,8 @@ export default function ParametersList({
             onChangeText={setMaxMusicDuration}
           />
         </View>
-      ) : (
-        <View />
       )}
+      {!isPressed && <View />}
     </View>
   );
 }
