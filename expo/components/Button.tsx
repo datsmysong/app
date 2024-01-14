@@ -20,6 +20,11 @@ type ButtonProps = {
   size?: "small" | "normal";
 };
 
+const ICON_SIZE_SMALL = 20;
+const ICON_SIZE_NORMAL = 30;
+const ICON_COLOR_FILLED = "white";
+const ICON_COLOR_OUTLINE = "#1A1A1A";
+
 const Button: React.FC<ButtonProps> = ({
   children,
   type = "filled",
@@ -32,91 +37,70 @@ const Button: React.FC<ButtonProps> = ({
   onLongPress,
   prependIcon,
 }) => {
+  const isSmall = size === "small";
+  const isFilled = type === "filled";
+  const iconSize = isSmall ? ICON_SIZE_SMALL : ICON_SIZE_NORMAL;
+  const iconColor = isFilled ? ICON_COLOR_FILLED : ICON_COLOR_OUTLINE;
+
   const buttonStyles = [
     styles.button,
-    icon && (size === "small" ? styles.iconSmall : styles.iconNormal),
-    !icon && (size === "small" ? styles.small : styles.normal),
+    icon && (isSmall ? styles.iconSmall : styles.iconNormal),
+    !icon && (isSmall ? styles.small : styles.normal),
     prependIcon &&
-      (size === "small"
+      (isSmall
         ? styles.smallPrependIconPadding
         : styles.normalPrependIconPadding),
     !prependIcon &&
       !icon &&
-      (size === "small" ? styles.smallPadding : styles.normalPadding),
+      (isSmall ? styles.smallPadding : styles.normalPadding),
     appendIcon &&
-      (size === "small"
+      (isSmall
         ? styles.smallAppendIconPadding
         : styles.normalAppendIconPadding),
     !appendIcon &&
       !icon &&
-      (size === "small" ? styles.smallPadding : styles.normalPadding),
-    type === "filled" ? styles.filled : styles.outline,
+      (isSmall ? styles.smallPadding : styles.normalPadding),
+    isFilled ? styles.filled : styles.outline,
     disabled && styles.disabled,
   ];
 
-  if (icon) {
-    return (
-      <Pressable
-        style={(state: PressableStateCallbackType) => {
-          return [
-            buttonStyles,
-            state.hovered && styles.hovered,
-            state.pressed && styles.pressed,
-          ];
-        }}
-        onPress={href ? () => router.push(href as any) : onPress}
-        onLongPress={onLongPress}
-        disabled={disabled}
-        accessibilityLabel={children as string}
-      >
-        <MaterialIcons
-          name={icon}
-          size={size === "small" ? 20 : 32}
-          color={type === "filled" ? "white" : "#1A1A1A"}
-        />
-      </Pressable>
-    );
-  } else {
-    return (
-      <Pressable
-        style={(state: PressableStateCallbackType) => {
-          return [
-            buttonStyles,
-            state.hovered && styles.hovered,
-            state.pressed && styles.pressed,
-          ];
-        }}
-        onPress={href ? () => router.push(href as any) : onPress}
-        onLongPress={onLongPress}
-        disabled={disabled}
-      >
-        {prependIcon && (
-          <MaterialIcons
-            name={prependIcon}
-            size={size === "small" ? 20 : 32}
-            color={type === "filled" ? "white" : "#1A1A1A"}
-          />
-        )}
+  const pressableStyle = (state: PressableStateCallbackType) => [
+    buttonStyles,
+    state.hovered && styles.hovered,
+    state.pressed && styles.pressed,
+  ];
+
+  const handlePress = href ? () => router.push(href as any) : onPress;
+
+  return (
+    <Pressable
+      style={pressableStyle}
+      onPress={handlePress}
+      onLongPress={onLongPress}
+      disabled={disabled}
+      accessibilityLabel={children as string}
+    >
+      {prependIcon && (
+        <MaterialIcons name={prependIcon} size={iconSize} color={iconColor} />
+      )}
+      {icon && <MaterialIcons name={icon} size={iconSize} color={iconColor} />}
+      {!icon && (
         <Text
           style={{
             ...styles.buttonText,
-            fontSize: size === "small" ? 16 : 24,
-            color: type === "filled" ? "white" : "#1A1A1A",
-            fontFamily: size === "small" ? "Outfit-Regular" : "Outfit-Bold",
+            fontSize: isSmall ? 16 : 24,
+            color: iconColor,
+            fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
           }}
         >
           {children}
         </Text>
-        {appendIcon && (
-          <MaterialIcons
-            name={appendIcon}
-            size={size === "small" ? 20 : 32}
-            color={type === "filled" ? "white" : "#1A1A1A"}
-          />
-        )}
-      </Pressable>
-    );
-  }
+      )}
+      {appendIcon && (
+        <MaterialIcons name={appendIcon} size={iconSize} color={iconColor} />
+      )}
+    </Pressable>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -124,6 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "flex-start",
     gap: 8,
     borderCurve: "continuous",
   },
