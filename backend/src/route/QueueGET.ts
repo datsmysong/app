@@ -1,30 +1,32 @@
 import {FastifyReply, FastifyRequest} from "fastify";
+import Queue from "../Queue";
+import MusicStorage from "../MusicStorage";
 
 interface QueryParams {
     id: string
 }
 
-// c'est une Map qui regroupe pour chaque salle d'écoute active (id), une liste de lien spotify
-const MUSIC_STORAGE: Map<string, string[]> = new Map()
+export default async function QueueGET(req: FastifyRequest, reply: FastifyReply) {
+    const {id: active_room_id} = req.params as QueryParams;
 
-export default function QueueGET(req: FastifyRequest, reply: FastifyReply) {
-    const {id: active_room_id} = req.query as QueryParams;
+    // TODO DEBUG
+    let musicStorage = MusicStorage.getMusicStorage();
+    console.log(MusicStorage.getMusicStorage())
 
-    let tracks = MUSIC_STORAGE.get(active_room_id)
-    if (Array.isArray(tracks)) {
-        reply.send({current_active_room: active_room_id, tracks: tracks})
-    } else {
-        reply.code(404).send({"error": "the given id is not active room"})
+    // TODO MOCK
+    let mock;
+    if (active_room_id === "mock") {
+        mock = Queue.newQueue(musicStorage);
+
+        await mock.add("https://open.spotify.com/intl-fr/track/4OUTQBwLBaTIUcgdI5PPt7?si=3aac1a9bcf3d4eac");
+        await mock.add("https://open.spotify.com/intl-fr/track/5b8HD1dJDuPawgS5FjSC2q?si=1c2499f5cb334ca9");
+
+        await mock.add("https://open.spotify.com/intl-fr/track/42CJLS5WkK6jckfYvJ8ULb?si=22b524f4d60643ce");
     }
 
-    // MUSIC_STORAGE.set(id, tracks)
-
-
-    // supabase
-    //     .from("active_rooms")
-    //     .select("*")
-    //     .eq("id", id)
-    //     .then(res => {
-    //         reply.send(res.data)
-    //     })
+    let queue = mock === undefined ? musicStorage.get_queue(active_room_id) : mock
+    if (queue === null) {
+        reply.code(404);
+    }
+    return reply.send(Queue.toJSON(queue));
 }

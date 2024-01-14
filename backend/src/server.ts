@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
-import path from "path";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
@@ -12,8 +11,9 @@ import StreamingServicesGET from "./route/StreamingServicesGET";
 import fastifyCookie from "@fastify/cookie";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { Database } from "commons/database-types";
+import QueueGET from "./route/QueueGET";
 
-config({ path: path.resolve(__dirname, "../.env.local") });
+config({path: ".env.local"});
 
 const server = fastify({
   logger: {
@@ -39,9 +39,12 @@ export const adminSupabase = createClient<Database>(
   process.env.SERVICE_ROLE
 );
 
-server.register(fastifyIO);
-
-server.register(fastifyCookie, {
+server.register(fastifyIO, {
+  cors: {
+    origin: "*"
+  }
+});
+server.register(require("@fastify/cookie"), {
   secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
   hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
   parseOptions: {}, // options for parsing cookies
@@ -92,17 +95,26 @@ const createRoomSchema = {
 
 server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
-server.get("/rooms/:id", RoomsGET);
+server.get("/room/:id", QueueGET);
 
 server.ready().then(() => {
-  // we need to wait for the server to be ready, else `server.io` is undefined
-  server.io.on("connection", (socket: any) => {
-    console.info("Socket connected!", socket.id);
-    socket.emit("hello", "world");
-  });
+
+
+    server.io.of(/^\/queue\/.*$/i).on("connection", QueueIO)
+
+    // we need to wait for the server to be ready, else `server.io` is undefined
+    // server.io.of(/.*/).on("connection", (socket: Socket) => {
+    //   console.info("Socket connected!", socket.id);
+    //   socket.emit("socketio-client", "world");
+    // });
+
+    // server.io.of(/^\/queue/i).on("connection", (socket: Socket) => {
+    //   console.info("Socket connected!", socket.id);
+    //   console.log(socket.nsp.name)
+    // })
 });
 
-server.listen({ port: 3000, host: "0.0.0.0" });
+server.listen({port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
   interface FastifyInstance {
