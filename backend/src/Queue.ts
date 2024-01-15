@@ -10,12 +10,13 @@ interface QueueJSON {
 }
 
 interface Error {
-    error: {message: string}
+    error: { message: string }
 }
 
 export default class Queue {
     public readonly uuid: string;
     private readonly tracks: Set<JSONTrack>;
+
     private constructor() {
         this.uuid = randomUUID()
         this.tracks = new Set()
@@ -25,6 +26,14 @@ export default class Queue {
         let queue = new Queue();
         musicStorage.addQueue(queue);
         return queue;
+    }
+
+    static toJSON(queue: Queue | null | undefined): QueueJSON | Error {
+        if (queue instanceof Queue) {
+            return {currentActiveRoom: queue.uuid, tracks: queue.getTracks()}
+        } else {
+            return {error: {message: "the given id is not active room"}}
+        }
     }
 
     async add(rawUrl: string | URL) {
@@ -56,13 +65,5 @@ export default class Queue {
 
     getTracks(): JSONTrack[] {
         return [...this.tracks]
-    }
-
-    static toJSON(queue: Queue | null | undefined): QueueJSON | Error {
-        if (queue instanceof Queue) {
-            return {currentActiveRoom: queue.uuid, tracks: queue.getTracks()}
-        } else {
-            return {error: {message: "the given id is not active room"}}
-        }
     }
 }

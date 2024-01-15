@@ -1,10 +1,10 @@
 import MusicPlatform, {JSONTrack} from "./MusicPlatform";
 
 
-
 export default class Track {
     private readonly platform: MusicPlatform;
     private readonly id: string;
+
     constructor(platform: MusicPlatform, query: { url?: string, id?: string }) {
         let {url, id} = query;
         if (typeof id !== "string") {

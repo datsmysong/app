@@ -7,6 +7,7 @@ export default class TrackFabrique {
     constructor(...musicPlatformList: MusicPlatform[]) {
         this.musicPlatformsList = musicPlatformList
     }
+
     fromUrl(url: URL): Track | undefined {
         for (let musicPlatform of this.musicPlatformsList) {
             let trackId = musicPlatform.trackIdFromUrl(url);

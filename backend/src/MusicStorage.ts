@@ -1,8 +1,8 @@
 import Queue from "./Queue";
 
 export default class MusicStorage {
-    private readonly data: Map<string, Queue>;
     private static singleton: MusicStorage;
+    private readonly data: Map<string, Queue>;
 
     private constructor() {
         this.data = new Map();

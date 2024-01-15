@@ -48,6 +48,7 @@ export default function MusicQueue({activeRoomId= "1629a562-288b-4218-be45-fc8e6
 
         SocketIo.getInstance().getSocket(url.pathname)
             .on("socketio-client"/*"playlist"*/, /*(data: any) => console.log(data))*/ (data: ActiveRoomSkeleton) => setData(data));
+
     }, []);
 
     return (
