@@ -1,67 +1,66 @@
+import { Image } from "expo-image";
+import React, { useState } from "react";
 import {
-  Text,
-  View,
-  StyleSheet,
   FlatList,
   Platform,
-  TouchableOpacity,
+  Pressable,
+  StyleSheet,
+  Text
 } from "react-native";
-import { Image } from "expo-image";
-import { useEffect, useState } from "react";
-import React from "react";
+import { StreamingService } from "../app/(tabs)/rooms/create";
 
 interface ServicesListProps {
-  selectedService: { [key: string]: boolean };
-  setSelectedService: (
-    value: (prevState: { [key: string]: boolean }) => any,
-  ) => void;
-  images: Map<string, any>;
+  availableServices: Array<StreamingService>;
+  handleServiceChange: (serviceId: string) => void;
 }
 
 export default function ServicesList({
-  selectedService,
-  setSelectedService,
-  images,
+  availableServices,
+  handleServiceChange,
 }: ServicesListProps) {
-  const toggleSelect = (item: string) => {
-    if (
-      !selectedService[item] &&
-      Object.values(selectedService).includes(true)
-    ) {
-      for (const elem in selectedService) {
-        if (elem !== item)
-          setSelectedService((prevState) => ({
-            ...prevState,
-            [elem]: !prevState[elem],
-          }));
-      }
-    }
+  const [selectedService, setSelectedService] =
+    useState<StreamingService["service_id"]>();
 
-    setSelectedService((prevState) => ({
-      ...prevState,
-      [item]: !prevState[item],
-    }));
+  const toggleSelect = (item: StreamingService) => {
+    if (item.service_id === selectedService) {
+      setSelectedService(undefined);
+      handleServiceChange("");
+    } else {
+      setSelectedService(item.service_id);
+      handleServiceChange(item.service_id);
+    }
   };
 
   return (
     <FlatList
-      horizontal
       showsHorizontalScrollIndicator={Platform.OS === "web"}
-      data={Array.from(images.keys())}
+      data={availableServices}
+      columnWrapperStyle={styles.list}
+      numColumns={2}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => toggleSelect(item)}>
-          <View
-            style={[styles.items, selectedService[item] ? styles.selected : {}]}
+        <Pressable
+          onPress={() => toggleSelect(item)}
+          style={[
+            styles.items,
+            item.service_id === selectedService ? styles.selected : {},
+          ]}
+        >
+          <Image
+            style={styles.image}
+            contentFit={"contain"}
+            source={item.image_url}
+            alt={item.service_name}
+          />
+          <Text
+            style={{
+              ...styles.labelText,
+              color:
+                item.service_id === selectedService ? "#FFFFFF" : "#1A1A1A",
+            }}
           >
-            <Image
-              style={styles.image}
-              contentFit={"contain"}
-              source={images.get(item)}
-              alt={item}
-            />
-            <Text style={styles.labelText}>{item}</Text>
-          </View>
-        </TouchableOpacity>
+            {item.service_name}
+          </Text>
+        </Pressable>
       )}
     />
   );
@@ -69,25 +68,32 @@ export default function ServicesList({
 
 const styles = StyleSheet.create({
   image: {
-    width: 110,
-    height: 110,
+    width: 70,
+    height: 70,
+  },
+  list: {
+    gap: 10,
   },
   items: {
+    borderColor: "#1A1A1A",
+    borderWidth: 1,
+    borderStyle: "solid",
+    width: 138,
+    height: 138,
+    borderCurve: "continuous",
+    borderRadius: 36,
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    marginRight: 15,
-    padding: 10,
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+    paddingVertical: 18,
   },
   selected: {
-    borderColor: "grey",
-    borderWidth: 3,
-    borderRadius: 20,
+    backgroundColor: "#1A1A1A",
   },
   labelText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    fontFamily: "Outfit-Bold",
   },
 });
