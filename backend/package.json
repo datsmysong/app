@@ -18,7 +18,7 @@
     "dotenv": "^16.3.1",
     "fastify": "^4.25.2",
     "fastify-socket.io": "^5.0.0",
-    "socket.io": "^4.7.3",
+    "socket.io": "^4.7.4",
     "supabase": "^1.131.3"
   },
   "devDependencies": {
