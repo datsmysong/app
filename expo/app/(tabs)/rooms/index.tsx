@@ -17,6 +17,7 @@ export default function RoomsPage() {
         Créer une salle
       </Button>
       <Button type="outline">Rejoindre une salle</Button>
+      <Link href={"/join/235"}>Rejoindre la salle 235</Link>
     </View>
   );
 }

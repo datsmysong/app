@@ -1,4 +1,4 @@
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet, Platform, Text } from "react-native";
 import { useEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
@@ -34,6 +34,7 @@ export default function RoomPage() {
 
   return (
     <View style={styles.shareContainer}>
+      <Text>Salle {roomCode}</Text>
       <Button theme="filled" onPress={onShare}>
         Partager
       </Button>
