@@ -1,4 +1,17 @@
 import { supabase } from "./server";
+import { createClient } from "@supabase/supabase-js";
+
+export async function getUserFromRequest(req: any) {
+  if (!process.env.SUPABASE_URL) {
+    throw new Error("Missing SUPABASE_URL environment variable");
+  }
+
+  const accesToken = req.cookies.accessToken;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabase = createClient(supabaseUrl, accesToken);
+
+  return await supabase.auth.getUser();
+}
 
 export async function createRoom(
   name: string,
@@ -8,21 +21,32 @@ export async function createRoom(
   maxMusicPerUser: number,
   maxMusicPerUserDuration: number,
   serviceId: string,
+  req: any,
 ) {
   let configurationId: string | null = null;
   let hostUserProfileId: string | null = null;
 
-  // TODO : review
-  const userProfileRes = await supabase
-    .from("user_profile")
-    .select("user_profile_id");
+  getUserFromRequest(req).then((user) => {
+    if (user) {
+      if (user.data.user) hostUserProfileId = user.data.user.id;
+      else return { code: 500, message: "User not found" };
+    } else {
+      return { code: 500, message: "User not found" };
+    }
+  });
 
-  if (userProfileRes.error) {
-    return { code: code, message: userProfileRes.error };
-  } else {
-    hostUserProfileId = userProfileRes.data[0].user_profile_id;
-    console.log("Host user profile id retrieved");
-  }
+  // TODO : review
+  /*
+    const userProfileRes = await supabase
+      .from("user_profile")
+      .select("user_profile_id");
+  
+    if (userProfileRes.error) {
+      return { code: code, message: userProfileRes.error };
+    } else {
+      hostUserProfileId = userProfileRes.data[0].user_profile_id;
+      console.log("Host user profile id retrieved");
+    }*/
 
   const roomConfigRes = await supabase
     .from("active_room_configurations")
@@ -37,7 +61,7 @@ export async function createRoom(
     .select("id");
 
   if (roomConfigRes.error) {
-    return { code: code, message: roomConfigRes.error };
+    return { code: roomConfigRes.status, message: roomConfigRes.error };
   } else {
     configurationId = roomConfigRes.data[0].id;
     console.log("Room configurations created");
@@ -57,9 +81,9 @@ export async function createRoom(
     .select("id");
 
   if (roomRes.error) {
-    return { code: code, message: roomRes.error };
+    return { code: roomRes.status, message: roomRes.error };
   } else {
-    return { code: code, message: "Room created" };
+    return { code: roomRes.status, message: "Room created" };
   }
 }
 
