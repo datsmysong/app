@@ -76,7 +76,7 @@ const createRoomSchema = {
   },
 };
 
-server.post("/createRoom", { schema: createRoomSchema }, RoomPOST);
+server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
 server.ready().then(() => {
   // we need to wait for the server to be ready, else `server.io` is undefined
