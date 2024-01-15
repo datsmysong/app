@@ -1,11 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { supabase } from "../server";
+import { adminSupabase } from "../server";
 
 export default function StreamingServicesGET(
   req: FastifyRequest,
   reply: FastifyReply
 ) {
-  supabase
+  adminSupabase
     .from("streaming_services")
     .select("*")
     .then((res) => {
