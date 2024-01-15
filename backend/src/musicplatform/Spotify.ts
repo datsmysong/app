@@ -98,10 +98,10 @@ export default class Spotify extends MusicPlatform {
         return {
             url: new URL(data.external_urls.spotify),
             title: data.name,
-            duration: new Date(data.duration_ms),
-            artist_name: data.artists[0].name,
-            album_name: data.album.name,
-            imgUrl: new URL(data.album.images[0].url)
+            duration: data.duration_ms,
+            artistName: data.artists[0].name,
+            albumName: data.album.name,
+            imgUrl: new URL(data.album.images[0].url).toJSON()
         }
 
     }

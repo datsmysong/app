@@ -5,7 +5,7 @@ import Spotify from "./musicplatform/Spotify";
 import TrackFabrique from "./musicplatform/TrackFabrique";
 
 interface QueueJSON {
-    current_active_room: string,
+    currentActiveRoom: string,
     tracks: JSONTrack[]
 }
 
@@ -23,22 +23,25 @@ export default class Queue {
 
     static newQueue(musicStorage: MusicStorage): Queue {
         let queue = new Queue();
-        musicStorage.add_queue(queue);
+        musicStorage.addQueue(queue);
         return queue;
     }
 
-    async add(raw_url: string | URL) {
-        // let track = new URL(raw_url).toString();
-        let track_metadata = new TrackFabrique(new Spotify()/*, new SoundCloud(), new AppleMusic()*/).fromUrl(new URL(raw_url));
-        let track = await track_metadata?.toJSON();
+    async add(rawUrl: string | URL) {
+        // let track = new URL(rawUrl).toString();
+        let trackMetadata = new TrackFabrique()
+            .register(new Spotify())/*, new SoundCloud(), new AppleMusic()*/
+            ?.fromUrl(new URL(rawUrl));
+        let track = await trackMetadata?.toJSON();
         if (track !== undefined)
             this.tracks.add(track);
     }
 
-    remove(raw_url: string | URL) {
+    remove(rawUrl: string | URL) {
         let track;
         for (track of this.tracks) {
-            if (track.url === new URL(raw_url)) {
+            // replace by TrackFabrique to improve this like add
+            if (track.url === new URL(rawUrl).toString()) {
                 break;
             }
         }
@@ -47,17 +50,17 @@ export default class Queue {
         return false
     }
 
-    get_tracks_string(): string[] {
+    getTracksString(): string[] {
         return [...JSON.stringify(this.tracks)]
     }
 
-    get_tracks(): JSONTrack[] {
+    getTracks(): JSONTrack[] {
         return [...this.tracks]
     }
 
     static toJSON(queue: Queue | null | undefined): QueueJSON | Error {
         if (queue instanceof Queue) {
-            return {current_active_room: queue.uuid, tracks: queue.get_tracks()}
+            return {currentActiveRoom: queue.uuid, tracks: queue.getTracks()}
         } else {
             return {error: {message: "the given id is not active room"}}
         }

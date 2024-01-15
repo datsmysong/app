@@ -7,7 +7,7 @@ interface QueryParams {
 }
 
 export default async function QueueGET(req: FastifyRequest, reply: FastifyReply) {
-    const {id: active_room_id} = req.params as QueryParams;
+    const {id: activeRoomId} = req.params as QueryParams;
 
     // TODO DEBUG
     let musicStorage = MusicStorage.getMusicStorage();
@@ -15,7 +15,7 @@ export default async function QueueGET(req: FastifyRequest, reply: FastifyReply)
 
     // TODO MOCK
     let mock;
-    if (active_room_id === "mock") {
+    if (activeRoomId === "mock") {
         mock = Queue.newQueue(musicStorage);
 
         await mock.add("https://open.spotify.com/intl-fr/track/4OUTQBwLBaTIUcgdI5PPt7?si=3aac1a9bcf3d4eac");
@@ -24,7 +24,7 @@ export default async function QueueGET(req: FastifyRequest, reply: FastifyReply)
         await mock.add("https://open.spotify.com/intl-fr/track/42CJLS5WkK6jckfYvJ8ULb?si=22b524f4d60643ce");
     }
 
-    let queue = mock === undefined ? musicStorage.get_queue(active_room_id) : mock
+    let queue = mock === undefined ? musicStorage.getQueue(activeRoomId) : mock
     if (queue === null) {
         reply.code(404);
     }

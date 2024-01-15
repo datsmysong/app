@@ -16,14 +16,14 @@ export default function QueueIO(socket: Socket/*, next: (err?: ExtendedError) =>
 
     // remove first element which contains the whole tested string, then get the first group (surround with parenthesis)
 
-    let raw_url_match_groups = pattern.exec(namespace.name);
-    if (raw_url_match_groups === null) {
+    let rawUrlMatchGroups = pattern.exec(namespace.name);
+    if (rawUrlMatchGroups === null) {
         socket.disconnect()
         return
     }
-    let active_room_id= raw_url_match_groups.slice(1)[0] as string
+    let activeRoomId = rawUrlMatchGroups.slice(1)[0] as string
 
-    let queue = MusicStorage.getMusicStorage().get_queue(active_room_id)
+    let queue = MusicStorage.getMusicStorage().getQueue(activeRoomId)
     if (queue === null) {
         socket.disconnect()
         return;
@@ -31,13 +31,13 @@ export default function QueueIO(socket: Socket/*, next: (err?: ExtendedError) =>
 
     socket.emit("socketio-client"/*"playlist"*/, Queue.toJSON(queue));
 
-    socket.onAny(async (event: string, url_raw: string/*, callback: (arg0: any) => void*/) => {
+    socket.onAny(async (event: string, urlRaw: string/*, callback: (arg0: any) => void*/) => {
         switch (event) {
             case "add":
-                await queue?.add(url_raw)
+                await queue?.add(urlRaw)
                 break;
             case "remove":
-                queue?.remove(url_raw)
+                queue?.remove(urlRaw)
                 break;
         }
 

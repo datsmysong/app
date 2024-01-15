@@ -6,26 +6,26 @@ import SocketIo from "./socketio";
 interface JSONTrack {
     url: string,
     title: string,
-    duration: number,
-    artist_name: string,
-    album_name: string,
+    duration: string,
+    artistName: string,
+    albumName: string,
     imgUrl: string
 }
 
 interface ActiveRoomSkeleton {
-    current_active_room: string,
+    currentActiveRoom: string,
     tracks: JSONTrack[]
 }
 
 const ENDPOINT = "http://localhost:3000";
 
 const TrackItem = (prop: {track: JSONTrack}) => {
-    const { title, artist_name: artist, album_name: album, imgUrl: raw_image_url } = prop.track;
-    let image_src = new URL(raw_image_url).toString()
+    const { title, artistName: artist, albumName: album, imgUrl: rawImageUrl } = prop.track;
+    let imageSrc = new URL(rawImageUrl).toString()
 
     return (
     <View style={styles.container} >
-        <Image source={image_src} style={styles.image} />
+        <Image source={imageSrc} style={styles.image} />
         <View style={styles.textContainer}>
             <Text style={[styles.text, {fontSize: 20}]}>{title}</Text>
             <Text style={styles.text}>{artist} - {album}</Text>
@@ -35,9 +35,9 @@ const TrackItem = (prop: {track: JSONTrack}) => {
 
 
 // TODO socket io which refresh playlist on live
-export default function MusicQueue({active_room_id= "e81ca40e-9cfc-4436-89b7-76998f220f19"}) {
+export default function MusicQueue({activeRoomId= "1629a562-288b-4218-be45-fc8e64f4f6d9"}) {
 
-    let url: URL = new URL("/queue/"+active_room_id, ENDPOINT);
+    let url: URL = new URL("/queue/"+activeRoomId, ENDPOINT);
 
     const [data, setData] = useState<ActiveRoomSkeleton>()
 
@@ -52,7 +52,7 @@ export default function MusicQueue({active_room_id= "e81ca40e-9cfc-4436-89b7-769
 
     return (
         <View>
-            <Text>{data?.current_active_room}</Text>
+            <Text>{data?.currentActiveRoom}</Text>
             <FlatList
                 data={data?.tracks}
                 renderItem={({item}) => <TrackItem track={item}/>}

@@ -15,19 +15,19 @@ export default class MusicStorage {
         return this.singleton;
     }
 
-    add_queue(queue: Queue) {
+    addQueue(queue: Queue) {
         this.data.set(queue.uuid, queue);
     }
 
-    remove_queue_by_uuid(uuid: string) {
+    removeQueueByUuid(uuid: string) {
         this.data.delete(uuid)
     }
 
-    remove_queue(queue: Queue) {
+    removeQueue(queue: Queue) {
         this.data.delete(queue.uuid)
     }
 
-    get_queue(active_room_id: string): Queue | null {
-        return this.data.get(active_room_id) ?? null
+    getQueue(activeRoomId: string): Queue | null {
+        return this.data.get(activeRoomId) ?? null
     }
 }

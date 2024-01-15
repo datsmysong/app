@@ -10,7 +10,7 @@ export default class Track {
         if (typeof id !== "string") {
             if (typeof url !== "string")
                 throw new Error("Donner au moins une url du morceau ou son identifiant auprès d'une plateforme donnée directement")
-            id = platform.track_id_from_url(new URL(url))
+            id = platform.trackIdFromUrl(new URL(url))
         }
 
         this.platform = platform;
