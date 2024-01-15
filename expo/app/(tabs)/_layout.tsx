@@ -71,7 +71,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="Rooms"
+        name="rooms"
         options={{
           title: "Salles",
           tabBarLabel: ({ color, focused, children }) => (

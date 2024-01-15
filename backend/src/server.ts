@@ -1,3 +1,6 @@
+import type { FastifyCookieOptions } from "@fastify/cookie";
+import fastifyCors from "@fastify/cors";
+import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
@@ -5,9 +8,8 @@ import path from "path";
 import { Server } from "socket.io";
 import AuthCallbackGET from "./route/AuthCallbackGET";
 import AuthRedirectionGET from "./route/AuthRedirectionGET";
-import type { FastifyCookieOptions } from "@fastify/cookie";
-import fastifyCors from "@fastify/cors";
-import { createClient } from "@supabase/supabase-js";
+import RoomsGET from "./route/RoomGET";
+import StreamingServicesGET from "./route/StreamingServicesGET";
 import { Database } from "./types/dbTypes";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
@@ -37,6 +39,7 @@ server.register(require("@fastify/cookie"), {
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);
 
+server.get("/rooms", RoomsGET);
 server.register(fastifyCors, {
   origin: [true], // or true to allow all origins
   methods: ["*"], // or just ['*'] for all methods
@@ -45,6 +48,34 @@ server.register(fastifyCors, {
 // Auth
 server.get("/auth/callback", AuthCallbackGET);
 server.get("/auth/redirection", AuthRedirectionGET);
+
+server.get("/streaming-services", StreamingServicesGET);
+
+const createRoomSchema = {
+  body: {
+    type: "object",
+    required: [
+      "name",
+      "code",
+      "service",
+      "voteSkipping",
+      "voteSkippingNeeded",
+      "maxMusicPerUser",
+      "maxMusicPerUserDuration",
+    ],
+    properties: {
+      name: { type: "string" },
+      code: { type: "string" },
+      service: { type: "string" },
+      voteSkipping: { type: "boolean" },
+      voteSkippingNeeded: { type: "number" },
+      maxMusicPerUser: { type: "number" },
+      maxMusicPerUserDuration: { type: "number" },
+    },
+  },
+};
+
+server.post("/createRoom", { schema: createRoomSchema }, RoomPOST);
 
 server.ready().then(() => {
   // we need to wait for the server to be ready, else `server.io` is undefined

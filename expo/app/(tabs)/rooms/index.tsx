@@ -11,6 +11,7 @@ export default function TabsRooms() {
       <Link href="/AddMusic" asChild>
         Add Music
       </Link>
+      <Link href="/rooms/create">Create Room</Link>
     </View>
   );
 }
