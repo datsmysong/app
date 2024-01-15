@@ -1,9 +1,9 @@
-import { Text } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Button from "../../components/Button";
 
 export default function ButtonsMania() {
   return (
-    <>
+    <ScrollView>
       <Text>Index</Text>
       <Button>Accueil</Button>
       <Button type="outline">Accueil</Button>
@@ -41,6 +41,10 @@ export default function ButtonsMania() {
       <Button size="small" appendIcon="arrow-forward" type="outline">
         Suivant
       </Button>
-    </>
+      <Button block>Créer une salle</Button>
+      <Button block type="outline">
+        Rejoindre une salle
+      </Button>
+    </ScrollView>
   );
 }
