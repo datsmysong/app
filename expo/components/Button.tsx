@@ -18,6 +18,7 @@ type ButtonProps = {
   prependIcon?: keyof typeof MaterialIcons.glyphMap;
   appendIcon?: keyof typeof MaterialIcons.glyphMap;
   size?: "small" | "normal";
+  block?: boolean;
 };
 
 const ICON_SIZE_SMALL = 20;
@@ -36,6 +37,7 @@ const Button: React.FC<ButtonProps> = ({
   onPress,
   onLongPress,
   prependIcon,
+  block,
 }) => {
   const isSmall = size === "small";
   const isFilled = type === "filled";
@@ -62,6 +64,7 @@ const Button: React.FC<ButtonProps> = ({
       (isSmall ? styles.smallPadding : styles.normalPadding),
     isFilled ? styles.filled : styles.outline,
     disabled && styles.disabled,
+    block && styles.block,
   ];
 
   const pressableStyle = (state: PressableStateCallbackType) => [
@@ -104,6 +107,9 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
+  block: {
+    alignSelf: "auto",
+  },
   button: {
     flexDirection: "row",
     alignItems: "center",
