@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/cookie": "^9.2.0",
+    "@fastify/cookie": "^9.3.0",
     "@fastify/cors": "^8.5.0",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/ssr": "^0.0.10",
