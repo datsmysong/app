@@ -12,7 +12,7 @@ interface BodyParams {
   maxMusicPerUserDuration: number;
 }
 
-function extractFromRequest(req: FastifyRequest) {
+function extractFromRequest(req: FastifyRequest): BodyParams {
   const bodyParams = req.body as BodyParams;
   const name = bodyParams.name;
   const code = bodyParams.code;
@@ -28,13 +28,13 @@ function extractFromRequest(req: FastifyRequest) {
     voteSkippingNeeded,
     maxMusicPerUser,
     maxMusicPerUserDuration,
-    serviceId: serviceId,
+    service: serviceId,
   };
 }
 
 export default async function RoomPOST(
   req: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const roomOptions = extractFromRequest(req);
 
@@ -45,8 +45,8 @@ export default async function RoomPOST(
     roomOptions.voteSkippingNeeded,
     roomOptions.maxMusicPerUser,
     roomOptions.maxMusicPerUserDuration,
-    roomOptions.serviceId,
-    req,
+    roomOptions.service,
+    req
   );
 
   reply.send(creationResult);
