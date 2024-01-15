@@ -1,3 +1,4 @@
+import { FastifyRequest } from "fastify";
 import { supabase } from "./server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -21,7 +22,7 @@ export async function createRoom(
   maxMusicPerUser: number,
   maxMusicPerUserDuration: number,
   serviceId: string,
-  req: any,
+  req: FastifyRequest,
 ) {
   let configurationId: string | null = null;
   let hostUserProfileId: string | null = null;
