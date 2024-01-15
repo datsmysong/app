@@ -40,7 +40,7 @@ server.get("/rooms", RoomsGET);
 
 server.get("/hello", HelloGet);
 
-server.get("/streamingServices", StreamingServicesGET);
+server.get("/streaming-services", StreamingServicesGET);
 
 const createRoomSchema = {
   body: {

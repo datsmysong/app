@@ -3,7 +3,7 @@ import { supabase } from "../server";
 
 export default function StreamingServicesGET(
   req: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   supabase
     .from("streaming_services")
