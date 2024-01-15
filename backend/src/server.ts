@@ -8,7 +8,8 @@ import path from "path";
 import { Server } from "socket.io";
 import AuthCallbackGET from "./route/AuthCallbackGET";
 import AuthRedirectionGET from "./route/AuthRedirectionGET";
-import RoomsGET from "./route/RoomGET";
+import RoomGET from "./route/RoomGET";
+import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import { Database } from "./types/dbTypes";
 
@@ -39,7 +40,7 @@ server.register(require("@fastify/cookie"), {
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);
 
-server.get("/rooms", RoomsGET);
+server.get("/rooms", RoomGET);
 server.register(fastifyCors, {
   origin: [true], // or true to allow all origins
   methods: ["*"], // or just ['*'] for all methods
