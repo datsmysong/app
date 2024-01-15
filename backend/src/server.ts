@@ -1,14 +1,16 @@
-import fastify from "fastify";
-import fastifyIO from "fastify-socket.io";
-import cors from "@fastify/cors";
-import { Server } from "socket.io";
-import HelloGet from "./route/HelloGET";
-import RoomsGET from "./route/RoomGET";
-import RoomPOST from "./route/RoomPOST";
+import type { FastifyCookieOptions } from "@fastify/cookie";
+import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
+import fastify from "fastify";
+import fastifyIO from "fastify-socket.io";
 import path from "path";
+import { Server } from "socket.io";
+import AuthCallbackGET from "./route/AuthCallbackGET";
+import AuthRedirectionGET from "./route/AuthRedirectionGET";
+import RoomsGET from "./route/RoomGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
+import { Database } from "./types/dbTypes";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -21,24 +23,31 @@ const server = fastify({
 });
 
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
-  throw new Error("Missing SUPABASE_URL or SUPABASE_KEY environment variable");
+  throw new Error(
+    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable"
+  );
 }
-
-export const supabase = createClient(
+export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
-  process.env.SERVICE_ROLE,
+  process.env.SERVICE_ROLE
 );
 
 server.register(fastifyIO);
-
-server.register(cors, {
-  origin: "*", // Allow all origins
-  methods: ["GET", "POST", "OPTIONS"],
-});
+server.register(require("@fastify/cookie"), {
+  secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
+  hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
+  parseOptions: {}, // options for parsing cookies
+} as FastifyCookieOptions);
 
 server.get("/rooms", RoomsGET);
+server.register(fastifyCors, {
+  origin: [true], // or true to allow all origins
+  methods: ["*"], // or just ['*'] for all methods
+});
 
-server.get("/hello", HelloGet);
+// Auth
+server.get("/auth/callback", AuthCallbackGET);
+server.get("/auth/redirection", AuthRedirectionGET);
 
 server.get("/streaming-services", StreamingServicesGET);
 
@@ -76,7 +85,7 @@ server.ready().then(() => {
   });
 });
 
-server.listen({ port: 3000 });
+server.listen({ port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
   interface FastifyInstance {

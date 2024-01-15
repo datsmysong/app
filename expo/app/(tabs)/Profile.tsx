@@ -1,5 +1,23 @@
-import { Text } from "react-native";
+import { Button, Text } from "react-native";
+import { supabase } from "../../lib/supabase";
+import useSupabaseUser from "../../lib/useSupabaseUser";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 export default function TabsProfile() {
-  return <Text>Profile</Text>;
+  const [user, setUser] = useState<User | null>();
+  useEffect(() => {
+    useSupabaseUser().then((res) => {
+      setUser(res);
+    });
+  }, []);
+  
+  return (
+    <>
+      <Text>Profile</Text>
+      {user && (
+        <Button title="Signout" onPress={() => supabase.auth.signOut()} />
+      )}
+    </>
+  );
 }
