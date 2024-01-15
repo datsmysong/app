@@ -1,5 +1,5 @@
 import { FastifyRequest } from "fastify";
-import { supabase } from "./server";
+import { adminSupabase } from "./server";
 import { createClient } from "@supabase/supabase-js";
 
 export async function getUserFromRequest(req: any) {
@@ -7,9 +7,9 @@ export async function getUserFromRequest(req: any) {
     throw new Error("Missing SUPABASE_URL environment variable");
   }
 
-  const accesToken = req.cookies.accessToken;
+  const accessToken = req.cookies.accessToken;
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabase = createClient(supabaseUrl, accesToken);
+  const supabase = createClient(supabaseUrl, accessToken);
 
   return await supabase.auth.getUser();
 }
@@ -22,10 +22,12 @@ export async function createRoom(
   maxMusicPerUser: number,
   maxMusicPerUserDuration: number,
   serviceId: string,
-  req: FastifyRequest,
+  req: FastifyRequest
 ) {
   let configurationId: string | null = null;
   let hostUserProfileId: string | null = null;
+
+  const supabase = adminSupabase;
 
   getUserFromRequest(req).then((user) => {
     if (user) {
@@ -89,9 +91,8 @@ export async function createRoom(
 }
 
 export function endRoom(roomId: string) {
-  let createdAt: Date | null = null;
-  let configurationId: string | null = null;
-  let hostUserProfileId: string | null = null;
+  let room: any = null;
+  const supabase = adminSupabase;
 
   supabase
     .from("active_rooms")
@@ -102,9 +103,7 @@ export function endRoom(roomId: string) {
       if (res.error) {
         return res.error;
       } else {
-        createdAt = res.data[0].created_at;
-        configurationId = res.data[0].configuration_id;
-        hostUserProfileId = res.data[0].host_user_profile_id;
+        room = res.data[0];
         console.log("Room ended");
       }
     });
@@ -113,9 +112,8 @@ export function endRoom(roomId: string) {
     .from("rooms")
     .insert([
       {
-        created_at: createdAt,
-        configuration_id: configurationId,
-        host_user_profile_id: hostUserProfileId,
+        ...room,
+        ended_at: new Date(),
       },
     ])
     .then((res) => {
