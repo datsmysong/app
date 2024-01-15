@@ -57,6 +57,21 @@ export default function RootLayout() {
         // user session is automatically refresh, but middlewares are called only on page refresh/change
         if (_event === "SIGNED_OUT") {
           router.replace("/auth");
+        if (session) {
+          // SIGNED_IN is fired on session refresh (like alt+tab...)
+          // we don't want to fetch the user profile again if is already done
+          if (_event === "SIGNED_IN" && userNameFind) return;
+          getUserProfile(session.user.id).then((userProfile) => {
+            if (!userProfile.username) {
+              setUserNameFind(true);
+              router.replace("/ask-name");
+              return;
+            }
+            router.replace("/(tabs)");
+          });
+          setUserNameFind(true);
+        } else {
+          router.replace("/(auth)");
         }
       });
     }
