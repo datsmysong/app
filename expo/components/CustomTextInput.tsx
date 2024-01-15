@@ -1,5 +1,5 @@
-import React from "react";
-import { TextInput, InputModeOptions } from "react-native";
+import React, { useState } from "react";
+import { TextInput, InputModeOptions, StyleSheet } from "react-native";
 
 interface CustomTextInputProps {
   placeholder?: string;
@@ -18,10 +18,14 @@ export default function CustomTextInput({
   onChangeText,
   disabled,
 }: CustomTextInputProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <TextInput
       value={value}
-      style={[styles.input, style]}
+      style={[styles.input, style, isFocused && styles.inputFocused]}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
       placeholder={placeholder}
       placeholderTextColor={"#949494"}
       inputMode={inputMode}
@@ -31,14 +35,15 @@ export default function CustomTextInput({
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   input: {
-    height: 40,
-    width: 300,
-    margin: 12,
-    borderWidth: 2,
-    padding: 10,
-    borderRadius: 10,
-    borderColor: "#949494",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 11,
+    backgroundColor: "#CCCCCC",
+    color: "#1A1A1A",
   },
-};
+  inputFocused: {
+    borderStyle: "solid",
+  }
+});
