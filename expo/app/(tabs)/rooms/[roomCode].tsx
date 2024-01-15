@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
 import * as Clipboard from "expo-clipboard";
+import useSupabaseUser from "../../../lib/useSupabaseUser";
 
 export default function RoomPage() {
   const { roomCode } = useLocalSearchParams();
@@ -34,8 +35,8 @@ export default function RoomPage() {
 
   return (
     <View style={styles.shareContainer}>
-      <Text>Salle {roomCode}</Text>
-      <Button theme="filled" onPress={onShare}>
+      <Text style={styles.title}>Salle "{roomCode}"</Text>
+      <Button type="filled" onPress={onShare}>
         Partager
       </Button>
     </View>
@@ -48,4 +49,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  title: {
+    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
 });
+
+//useSupabaseUser();
