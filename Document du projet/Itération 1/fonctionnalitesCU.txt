@@ -1,0 +1,10 @@
+Fonctionnalités développées dans cette itération :
+
+- Créer un compte à partir d'un compte Spotify (Gaspard)
+- Créer une salle d'écoute (Thomas)
+- Générer un lien d'invitation vers une salle d'écoute (Noam)
+- Rejoindre une salle d'écoute via un lien d'invitation (Noam)
+- Ajouter une musique à la file d'attente via un lien Spotify (Thomas)
+- Consulter la file d'attente (Hugo)
+- Pouvoir gérer le flux de lecture (gestion du volume, play/pause, suivant/précédent) (Maxence)
+- Pouvoir gérer le flux de lecture de différentes manières (Widget intégré ou lecteur externe) (Maxence)
