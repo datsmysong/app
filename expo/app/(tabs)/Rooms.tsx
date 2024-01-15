@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 
+// TODO : review
 export default function TabsRooms() {
   return (
     <View>
@@ -11,9 +12,7 @@ export default function TabsRooms() {
       <Link href="/AddMusic" asChild>
         Add Music
       </Link>
-        <Link href="/CreateRoom" >
-            Create Room
-        </Link>
+      <Link href="/rooms/create">Create Room</Link>
     </View>
   );
 }

@@ -34,8 +34,6 @@ export default function CreateRoom() {
     ? "http://" + directUri.split(":8081")[0].split("//")[1]
     : directUri.split(":8081")[0];
 
-  Alert.alert("baseUrl", baseUrl);
-
   useEffect(() => {
     const fetchServices = async () => {
       const response = await fetch(baseUrl + ":3000/streamingServices");
