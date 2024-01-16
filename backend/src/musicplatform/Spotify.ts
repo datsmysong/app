@@ -1,5 +1,4 @@
 import MusicPlatform, {JSONTrack} from "./MusicPlatform";
-import fetch, {RequestInit} from "node-fetch";
 
 namespace SpotifyApi {
     export interface Track {
