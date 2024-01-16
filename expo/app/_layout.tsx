@@ -1,10 +1,16 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { User } from "@supabase/supabase-js";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
-import { useEffect, useState } from "react";
-import useSupabaseUser from "../lib/useSupabaseUser";
+import {
+  SplashScreen,
+  Stack,
+  router,
+  useNavigation,
+  useRootNavigationState,
+} from "expo-router";
+import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
-import { getUserProfile } from "../lib/userProfile";
+import useSupabaseUser from "../lib/useSupabaseUser";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -13,9 +19,10 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+const requiredAuthPaths = ["(tabs)"];
+const authRoutes = ["auth"];
 
 export default function RootLayout() {
-  const [userNameFind, setSetUserNameFind] = useState(false);
   const [loaded, error] = useFonts({
     "Outfit-Thin": require("../assets/fonts/outfit/Outfit-Thin.ttf"),
     "Outfit-ExtraLight": require("../assets/fonts/outfit/Outfit-ExtraLight.ttf"),
@@ -34,27 +41,35 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
+  const navigation = useNavigation();
+  const rootNavigation = useRootNavigationState();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("state", async (e) => {
+      // To solved the bug of the first render (we can try to push user to other page but rooter is not ready)
+      if (!rootNavigation) return;
+
+      const user = await useSupabaseUser();
+      const currentPage = e.data.state.routes[e.data.state.routes.length - 1];
+      authVerification({ user, currentRoute: currentPage.name });
+    });
+    return unsubscribe;
+  }, []);
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      useSupabaseUser().then((user) => !user && router.replace("/(auth)"));
-
+      useSupabaseUser().then((user) => {
+        authVerification({
+          user,
+          currentRoute:
+            rootNavigation.routes[rootNavigation.routes.length - 1].name,
+        });
+      });
       supabase.auth.onAuthStateChange((_event, session) => {
-        if (session) {
-          // SIGNED_IN is fired on session refresh (like alt+tab...)
-          // we don't want to fetch the user profile again if is already done
-          if (_event === "SIGNED_IN" && userNameFind) return;
-          getUserProfile(session.user.id).then((userProfile) => {
-            if (!userProfile.username) {
-              setSetUserNameFind(true);
-              router.replace("/ask-name");
-              return;
-            }
-            router.replace("/(tabs)");
-          });
-          setSetUserNameFind(true);
-        } else {
-          router.replace("/(auth)");
+        // user session is automatically refresh, but middlewares are called only on page refresh/change
+        if (_event === "SIGNED_OUT") {
+          router.replace("/auth");
         }
       });
     }
@@ -71,16 +86,23 @@ function RootLayoutNav() {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      <Stack.Screen
-        name="AddMusic"
-        options={{ presentation: "modal", title: "Ajouter une musique" }}
-      />
-      <Stack.Screen
-        name="CreateRoom"
-        options={{ presentation: "modal", title: "Nouvelle salle" }}
-      />
     </Stack>
   );
 }
+
+const authVerification = async ({
+  user,
+  currentRoute,
+}: {
+  user: User | null;
+  currentRoute: string;
+}) => {
+  if (requiredAuthPaths.includes(currentRoute) && !user) {
+    router.replace("/auth");
+  }
+  if (authRoutes.includes(currentRoute) && user) {
+    router.replace("/(tabs)");
+  }
+};
