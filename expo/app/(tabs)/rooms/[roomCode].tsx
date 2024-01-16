@@ -34,27 +34,32 @@ export default function RoomPage() {
   };
 
   return (
-    <View style={styles.shareContainer}>
-      <Text style={styles.title}>Salle "{roomCode}"</Text>
-      <Button type="filled" onPress={onShare}>
-        Partager
-      </Button>
+    <View>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Salle "{roomCode}"</Text>
+        <View style={styles.buttonContainer}>
+          <Button block type="filled" onPress={onShare}>
+            Partager
+          </Button>
+        </View>
+      </View>
+      <View></View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  shareContainer: {
+  headerContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    marginHorizontal: 24,
+    marginVertical: 14,
+    gap: 10,
+  },
+  buttonContainer: {
+    gap: 8,
   },
   title: {
-    marginBottom: 20,
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: "bold",
-    textAlign: "center",
   },
 });
-
-//useSupabaseUser();
