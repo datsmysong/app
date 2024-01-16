@@ -1,17 +1,28 @@
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
-import { createClient } from "@supabase/supabase-js";
+import createClient from "./lib/supabase";
 
-export async function getUserFromRequest(req: any) {
-  if (!process.env.SUPABASE_URL) {
-    throw new Error("Missing SUPABASE_URL environment variable");
-  }
-
-  const accessToken = req.cookies.accessToken;
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabase = createClient(supabaseUrl, accessToken);
+export async function getUserFromRequest(
+  request: FastifyRequest,
+  response: FastifyReply,
+) {
+  const supabase = createClient({ request, response });
 
   return await supabase.auth.getUser();
+}
+
+export async function getUserProfileIdFromAccountId(accId: string) {
+  return await adminSupabase
+    .from("user_profile")
+    .select("user_profile_id")
+    .eq("account_id", accId)
+    .then((res) => {
+      if (res.error) {
+        return { code: res.status, message: res.error.message };
+      } else {
+        return res.data[0].user_profile_id;
+      }
+    });
 }
 
 export async function createRoom(
@@ -22,37 +33,23 @@ export async function createRoom(
   maxMusicPerUser: number,
   maxMusicPerUserDuration: number,
   serviceId: string,
-  req: FastifyRequest
+  req: FastifyRequest,
+  rep: FastifyReply,
 ) {
   let configurationId: string | null = null;
-  let hostUserProfileId: string | null = null;
+  let hostUserProfileId: any = null;
 
   const supabase = adminSupabase;
 
-  getUserFromRequest(req).then((user) => {
-    if (user) {
-      if (user.data.user) hostUserProfileId = user.data.user.id;
-      else return { code: 500, message: "User not found" };
-    } else {
-      return { code: 500, message: "User not found" };
-    }
-  });
-
-  // TODO : review
-  /*
-    const userProfileRes = await supabase
-      .from("user_profile")
-      .select("user_profile_id");
-  
-    if (userProfileRes.error) {
-      return { code: code, message: userProfileRes.error };
-    } else {
-      hostUserProfileId = userProfileRes.data[0].user_profile_id;
-      console.log("Host user profile id retrieved");
-    }*/
+  const user = await getUserFromRequest(req, rep);
+  if (!user.data.user) {
+    return { code: 401, message: "User not authenticated" };
+  }
+  hostUserProfileId =
+    (await getUserProfileIdFromAccountId(user.data.user.id)) || null;
 
   const roomConfigRes = await supabase
-    .from("active_room_configurations")
+    .from("room_configurations")
     .insert([
       {
         vote_skipping: voteSkipping,
