@@ -5,11 +5,13 @@ import {
   SplashScreen,
   Stack,
   router,
-  useRootNavigationState
+  useRootNavigationState,
 } from "expo-router";
 import { useEffect } from "react";
+import Alert from "../components/Alert";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
+import { getUserProfile } from "../lib/userProfile";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -44,17 +46,29 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      useSupabaseUser().then(async (user) => {
-        await authVerificationFetchUser({
-          currentRoute:
-            rootNavigation.routes[rootNavigation.routes.length - 1].name,
-        });
+      authVerificationFetchUser({
+        currentRoute:
+          rootNavigation.routes[rootNavigation.routes.length - 1].name,
+      }).then(() => {
         SplashScreen.hideAsync();
       });
-      supabase.auth.onAuthStateChange((_event, session) => {
+
+      supabase.auth.onAuthStateChange(async (_event, session) => {
         // user session is automatically refresh, but middlewares are called only on page refresh/change
         if (_event === "SIGNED_OUT") {
           router.replace("/auth");
+        }
+        // Verify if user has a username
+        if (_event === "TOKEN_REFRESHED" || _event === "INITIAL_SESSION") {
+          if (!session) return;
+          const profile = await getUserProfile(session.user.id);
+          if (!profile) {
+            Alert.alert("Erreur, Une erreur est survenue");
+            return;
+          }
+          if (!profile.username) {
+            router.replace("/ask-name");
+          }
         }
       });
     }
@@ -82,6 +96,7 @@ function RootLayoutNav() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+      <Stack.Screen name="ask-name" options={{ headerShown: false }} />
     </Stack>
   );
 }

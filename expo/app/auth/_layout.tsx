@@ -8,7 +8,6 @@ export default function TabLayout() {
         name="login"
         options={{ presentation: "modal", title: "Connexion" }}
       />
-      <Stack.Screen name="ask-name" options={{ headerShown: false }} />
     </Stack>
   );
 }

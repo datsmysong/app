@@ -1,14 +1,26 @@
-import { router } from "expo-router";
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { router, useNavigation } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "react-native-screens";
-import Alert from "../../components/Alert";
-import { SupabaseErrorCode } from "../../constants/SupabaseErrorCode";
-import { supabase } from "../../lib/supabase";
-import useSupabaseUser from "../../lib/useSupabaseUser";
+import Alert from "../components/Alert";
+import Button from "../components/Button";
+import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
+import { supabase } from "../lib/supabase";
+import useSupabaseUser from "../lib/useSupabaseUser";
+import { verifyUsername } from "../lib/userProfile";
 
 export default function AskName() {
   const [username, setUsername] = useState("");
+  const navigation = useNavigation();
+  useEffect(() => {
+    // In cleanup function, we check if user has a username
+    return () => {
+      verifyUsername().then((username) => {
+        if (!username) router.replace("/ask-name");
+        else router.replace("/(tabs)");
+      });
+    };
+  }, [navigation]);
 
   const handleSubmitUsername = async () => {
     const user = await useSupabaseUser();
@@ -18,7 +30,7 @@ export default function AskName() {
       Alert.alert("Le pseudo doit faire au moins 5 caractères");
       return;
     }
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("user_profile")
       .update({ username: username })
       .eq("account_id", user?.id);
@@ -50,9 +62,7 @@ export default function AskName() {
             padding: 10,
           }}
         />
-        <Pressable onPress={() => handleSubmitUsername()}>
-          <Text>Valider</Text>
-        </Pressable>
+        <Button onPress={handleSubmitUsername}>Valider</Button>
       </View>
     </Screen>
   );
