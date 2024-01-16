@@ -11,6 +11,7 @@ import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
+import SoundcloudBoundGET from "./route/SoundcloudBoundGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
 
@@ -81,6 +82,12 @@ server.register(import("@fastify/rate-limit"), {
   max: 50,
   timeWindow: "1 minute",
 });
+
+// Auth
+server.get("/", SoundcloudBoundGET);
+server.register(authRoutes, { prefix: "/auth" });
+
+server.get("/streaming-services", StreamingServicesGET);
 
 const createRoomSchema = {
   body: {
