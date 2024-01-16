@@ -12,6 +12,8 @@ import fastifyCookie from "@fastify/cookie";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { Database } from "commons/database-types";
 import QueueGET from "./route/QueueGET";
+import { SpotifyApi } from "@spotify/web-api-ts-sdk";
+import QueueIO from "./socketio/QueueIO";
 
 config({path: ".env.local"});
 
@@ -39,6 +41,11 @@ export const adminSupabase = createClient<Database>(
   process.env.SERVICE_ROLE
 );
 
+if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
+  throw new Error("Missing Spotify credentials");
+}
+
+export const spotify = SpotifyApi.withClientCredentials(process.env.SPOTIFY_CLIENT_ID, process.env.SPOTIFY_CLIENT_SECRET)
 server.register(fastifyIO, {
   cors: {
     origin: "*"
