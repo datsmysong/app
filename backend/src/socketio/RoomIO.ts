@@ -29,14 +29,14 @@ export default function RoomIO(socket: Socket/*, next: (err?: ExtendedError) => 
     return;
   }
 
-  socket.emit("socketio-client"/*"playlist"*/, Room.toJSON(room));
+  socket.emit("queue:update"/*"playlist"*/, Room.toJSON(room));
 
   socket.onAny(async (event: string, urlRaw: string/*, callback: (arg0: any) => void*/) => {
     switch (event) {
-      case "add":
+      case "queue:add":
         await room?.add(urlRaw)
         break;
-      case "remove":
+      case "queue:remove":
         room?.remove(urlRaw)
         break;
     }
@@ -45,7 +45,7 @@ export default function RoomIO(socket: Socket/*, next: (err?: ExtendedError) => 
     // TODO replace "socketio-client" by "playlist"
 
     // TODO ferbach : actionReducer pattern
-    socket.nsp.emit("socketio-client"/*"playlist"*/, Room.toJSON(room));
+    socket.nsp.emit("queue:update", Room.toJSON(room));
     // callback(Room.toJSON(room))
   })
 }

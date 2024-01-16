@@ -59,7 +59,7 @@ export default function musicRoom(/*{activeRoomId= "1629a562-288b-4218-be45-fc8e
     //     .then((data: ActiveRoomSkeleton) => setData(data))
 
     SocketIo.getInstance().getSocket(url.pathname)
-      .on("socketio-client"/*"playlist"*/, /*(data: any) => console.log(data))*/ (data: ActiveRoomSkeleton) => setData(data));
+      .on("queue:update", (data: ActiveRoomSkeleton) => setData(data));
 
   }, []);
 
