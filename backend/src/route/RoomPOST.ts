@@ -9,7 +9,7 @@ interface BodyParams {
   voteSkipping: boolean;
   voteSkippingNeeded: number;
   maxMusicPerUser: number;
-  maxMusicPerUserDuration: number;
+  maxMusicDuration: number;
 }
 
 function extractFromRequest(req: FastifyRequest): BodyParams {
@@ -19,7 +19,7 @@ function extractFromRequest(req: FastifyRequest): BodyParams {
   const voteSkipping = bodyParams.voteSkipping;
   const voteSkippingNeeded = bodyParams.voteSkippingNeeded;
   const maxMusicPerUser = bodyParams.maxMusicPerUser;
-  const maxMusicPerUserDuration = bodyParams.maxMusicPerUserDuration;
+  const maxMusicDuration = bodyParams.maxMusicDuration;
   const serviceId = bodyParams.service;
   return {
     name,
@@ -27,14 +27,14 @@ function extractFromRequest(req: FastifyRequest): BodyParams {
     voteSkipping,
     voteSkippingNeeded,
     maxMusicPerUser,
-    maxMusicPerUserDuration,
+    maxMusicDuration,
     service: serviceId,
   };
 }
 
 export default async function RoomPOST(
   req: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) {
   const roomOptions = extractFromRequest(req);
 
@@ -44,9 +44,10 @@ export default async function RoomPOST(
     roomOptions.voteSkipping,
     roomOptions.voteSkippingNeeded,
     roomOptions.maxMusicPerUser,
-    roomOptions.maxMusicPerUserDuration,
+    roomOptions.maxMusicDuration,
     roomOptions.service,
-    req
+    req,
+    reply,
   );
 
   reply.send(creationResult);

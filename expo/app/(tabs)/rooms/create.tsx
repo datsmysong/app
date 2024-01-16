@@ -52,7 +52,6 @@ export default function CreateRoom() {
     const fetchServices = async () => {
       const response = await fetch(baseUrl + ":3000/streaming-services");
       const data = await response.json();
-      console.log(data);
 
       const services: Array<StreamingService> = [];
 
@@ -77,7 +76,7 @@ export default function CreateRoom() {
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
       Alert.alert(
         "Mauvais pourcentage",
-        "Le pourcentage doit être entre 0 et 100"
+        "Le pourcentage doit être entre 0 et 100",
       );
       return { error: true };
     }
@@ -85,7 +84,7 @@ export default function CreateRoom() {
     if (body.maxMusicPerUser <= 0) {
       Alert.alert(
         "Mauvais nombre de musique",
-        "Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
+        "Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1",
       );
       return { error: true };
     }
@@ -93,7 +92,7 @@ export default function CreateRoom() {
     if (body.maxMusicDuration <= 0) {
       Alert.alert(
         "Mauvaise durée de musique",
-        "La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
+        "La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde",
       );
       return { error: true };
     }
@@ -121,7 +120,11 @@ export default function CreateRoom() {
     try {
       const response = await fetch(baseUrl + ":3000/rooms/create", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(body),
+        credentials: "include",
       });
       const data = await response.json();
 
@@ -201,9 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 20,
   },
-  form: {
-    
-  },
+  form: {},
   labelText: {
     fontSize: 14,
     fontWeight: "bold",
