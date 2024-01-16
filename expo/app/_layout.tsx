@@ -11,6 +11,7 @@ import {
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
+import { NavigationState } from "@react-navigation/native";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -41,30 +42,16 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  const navigation = useNavigation();
   const rootNavigation = useRootNavigationState();
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("state", async (e) => {
-      // To solved the bug of the first render (we can try to push user to other page but rooter is not ready)
-      if (!rootNavigation) return;
-
-      const user = await useSupabaseUser();
-      const currentPage = e.data.state.routes[e.data.state.routes.length - 1];
-      authVerification({ user, currentRoute: currentPage.name });
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
-      useSupabaseUser().then((user) => {
-        authVerification({
-          user,
+      useSupabaseUser().then(async (user) => {
+        await authVerificationFetchUser({
           currentRoute:
             rootNavigation.routes[rootNavigation.routes.length - 1].name,
         });
+        SplashScreen.hideAsync();
       });
       supabase.auth.onAuthStateChange((_event, session) => {
         // user session is automatically refresh, but middlewares are called only on page refresh/change
@@ -84,7 +71,22 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <Stack>
+    <Stack
+      screenListeners={({ navigation }) => ({
+        state: (e) => {
+          // Do something with the state
+          console.log("state", e.data);
+          if (!e.data) return;
+          const state = (e.data as { state: NavigationState }).state;
+
+          const currentPage = state.routes[state.routes.length - 1];
+          console.log("currentPage", currentPage.name);
+          authVerificationFetchUser({ currentRoute: currentPage.name });
+
+          // Do something with the `navigation` object
+        },
+      })}
+    >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
@@ -92,13 +94,12 @@ function RootLayoutNav() {
   );
 }
 
-const authVerification = async ({
-  user,
+const authVerificationFetchUser = async ({
   currentRoute,
 }: {
-  user: User | null;
   currentRoute: string;
 }) => {
+  const user = await useSupabaseUser();
   if (requiredAuthPaths.includes(currentRoute) && !user) {
     router.replace("/auth");
   }
