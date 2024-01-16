@@ -8,34 +8,37 @@ export interface JSONTrack {
 }
 
 export default abstract class MusicPlatform {
-    // private static singleton: any;
-    private static readonly musicPlatformsList = new Map<string, MusicPlatform>();
-    type: string | undefined
-    private readonly urlPattern: RegExp
+  // private static singleton: any;
+  private static readonly musicPlatformsList = new Map<string, MusicPlatform>();
+  private readonly urlPattern: RegExp
 
-    protected constructor(urlPattern: RegExp) {
-        this.urlPattern = new RegExp(urlPattern, "i");
-        // let checkRegex = /^\/(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\([^?](?:[^(]|[^\\]\\\(|[^\\]\(\?)*\)(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\/.*$/
-        let resultRegex = new RegExp(this.urlPattern.toString() + "|").exec("")?.slice(1).length
-        if (resultRegex !== 1) {
-            throw new Error("il y a plusieurs groupe de capture\n" +
-                "seul un groupe doit se trouver dans le pattern, et doit retourner l'identifiant unique de l'élément");
-        }
-
-        MusicPlatform.musicPlatformsList.set(MusicPlatform.constructor.name, this)
+  protected constructor(urlPattern: RegExp) {
+    this.urlPattern = new RegExp(urlPattern, "i");
+    // let checkRegex = /^\/(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\([^?](?:[^(]|[^\\]\\\(|[^\\]\(\?)*\)(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\/.*$/
+    let resultRegex = new RegExp(this.urlPattern.toString() + "|").exec("")?.slice(1).length
+    if (resultRegex !== 1) {
+      throw new Error("il y a plusieurs groupe de capture\n" +
+        "seul un groupe doit se trouver dans le pattern, et doit retourner l'identifiant unique de l'élément");
     }
 
-    static getMusicPlatform(key: string): MusicPlatform | undefined {
-        return this.musicPlatformsList.get(key);
-    }
+    MusicPlatform.musicPlatformsList.set(MusicPlatform.constructor.name, this)
+  }
 
-    trackIdFromUrl(url: URL): string | undefined {
-        return this.getUrlPattern().exec(url.href)?.slice(1)[0];
-    }
+  static getMusicPlatform(key: string): MusicPlatform | undefined {
+    return this.musicPlatformsList.get(key);
+  }
 
-    getUrlPattern(): RegExp {
-        return new RegExp(this.urlPattern);
-    }
+  trackIdFromUrl(url: URL): string | undefined {
+    return this.getUrlPattern().exec(url.href)?.slice(1)[0];
+  }
 
-    abstract getJsonTrack(id: string): Promise<JSONTrack>;
+  getUrlPattern(): RegExp {
+    return new RegExp(this.urlPattern);
+  }
+
+  getClass(): Function {
+    return this.constructor
+  }
+
+  abstract getJsonTrack(id: string): Promise<JSONTrack>;
 }

@@ -36,15 +36,15 @@ export default class Queue {
         }
     }
 
-    async add(rawUrl: string | URL) {
-        // let track = new URL(rawUrl).toString();
-        let trackMetadata = new TrackFabrique()
-            .register(new Spotify())/*, new SoundCloud(), new AppleMusic()*/
-            ?.fromUrl(new URL(rawUrl));
-        let track = await trackMetadata?.toJSON();
-        if (track !== undefined)
-            this.tracks.add(track);
-    }
+  async add(rawUrl: string | URL) {
+    // let track = new URL(rawUrl).toString();
+    let trackMetadata = new TrackFabrique();
+    trackMetadata.register(new Spotify())/*, new SoundCloud(), new AppleMusic()*/;
+
+    let track = await trackMetadata.fromUrl(new URL(rawUrl))?.toJSON();
+    if (track !== undefined)
+      this.tracks.add(track);
+  }
 
     remove(rawUrl: string | URL) {
         let track;
