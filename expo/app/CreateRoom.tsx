@@ -3,7 +3,7 @@ import {Text, View} from "react-native";
 export default function AddMusic() {
   return (
     <View>
-      <Text>Ajouter une musique</Text>
+      <Text>Créer une salle</Text>
     </View>
   );
 }

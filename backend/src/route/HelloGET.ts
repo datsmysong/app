@@ -1,5 +1,5 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 
 export default function HelloGET(req: FastifyRequest, reply: FastifyReply) {
-    reply.send({hello: "world"});
+  reply.send({hello: "world"});
 }

@@ -1,8 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
-import { useColorScheme } from "react-native";
-
-import { Text } from "../../components/Tamed";
+import {Tabs} from "expo-router";
+import {useColorScheme} from "react-native";
+import {Text} from "../../components/Tamed";
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -58,13 +57,13 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Accueil",
-          tabBarLabel: ({ color, focused, children }) => (
+          tabBarLabel: ({color, focused, children}) => (
             <TabBarLabel color={color} focused={focused}>
               {children}
             </TabBarLabel>
           ),
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "home" : "sun-o"} color={color} />
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon name={focused ? "home" : "sun-o"} color={color}/>
           ),
         }}
       />
@@ -73,13 +72,13 @@ export default function TabLayout() {
         options={{
           title: "Salles",
           headerShown: false,
-          tabBarLabel: ({ color, focused, children }) => (
+          tabBarLabel: ({color, focused, children}) => (
             <TabBarLabel color={color} focused={focused}>
               {children}
             </TabBarLabel>
           ),
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "music" : "moon-o"} color={color} />
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon name={focused ? "music" : "moon-o"} color={color}/>
           ),
         }}
       />
@@ -87,13 +86,13 @@ export default function TabLayout() {
         name="Friends"
         options={{
           title: "Amis",
-          tabBarLabel: ({ color, focused, children }) => (
+          tabBarLabel: ({color, focused, children}) => (
             <TabBarLabel color={color} focused={focused}>
               {children}
             </TabBarLabel>
           ),
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "users" : "star-o"} color={color} />
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon name={focused ? "users" : "star-o"} color={color}/>
           ),
         }}
       />
@@ -101,13 +100,13 @@ export default function TabLayout() {
         name="Profile"
         options={{
           title: "Profil",
-          tabBarLabel: ({ color, focused, children }) => (
+          tabBarLabel: ({color, focused, children}) => (
             <TabBarLabel color={color} focused={focused}>
               {children}
             </TabBarLabel>
           ),
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "user" : "star-o"} color={color} />
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon name={focused ? "user" : "star-o"} color={color}/>
           ),
         }}
       />

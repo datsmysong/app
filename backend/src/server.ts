@@ -107,18 +107,18 @@ server.get("/room/:id", QueueGET);
 server.ready().then(() => {
 
 
-    server.io.of(/^\/queue\/.*$/i).on("connection", QueueIO)
+  server.io.of(/^\/queue\/.*$/i).on("connection", QueueIO)
 
-    // we need to wait for the server to be ready, else `server.io` is undefined
-    // server.io.of(/.*/).on("connection", (socket: Socket) => {
-    //   console.info("Socket connected!", socket.id);
-    //   socket.emit("socketio-client", "world");
-    // });
+  // we need to wait for the server to be ready, else `server.io` is undefined
+  // server.io.of(/.*/).on("connection", (socket: Socket) => {
+  //   console.info("Socket connected!", socket.id);
+  //   socket.emit("socketio-client", "world");
+  // });
 
-    // server.io.of(/^\/queue/i).on("connection", (socket: Socket) => {
-    //   console.info("Socket connected!", socket.id);
-    //   console.log(socket.nsp.name)
-    // })
+  // server.io.of(/^\/queue/i).on("connection", (socket: Socket) => {
+  //   console.info("Socket connected!", socket.id);
+  //   console.log(socket.nsp.name)
+  // })
 });
 
 server.listen({port: 3000, host: "0.0.0.0" });

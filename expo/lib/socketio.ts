@@ -7,20 +7,21 @@ if (!ENDPOINT) {
 }
 
 export default class SocketIo {
-    private static singleton: SocketIo;
-    private readonly iomanager: Manager;
-    private constructor() {
-        this.iomanager = new Manager(new URL(ENDPOINT));
-    }
+  private static singleton: SocketIo;
+  private readonly iomanager: Manager;
 
-    static getInstance(): SocketIo {
-        if (this.singleton === undefined) {
-            this.singleton = new SocketIo();
-        }
-        return this.singleton;
-    }
+  private constructor() {
+    this.iomanager = new Manager(new URL(ENDPOINT));
+  }
 
-    getSocket(namespace: string): Socket {
-        return this.iomanager.socket(namespace);
-    };
+  static getInstance(): SocketIo {
+    if (this.singleton === undefined) {
+      this.singleton = new SocketIo();
+    }
+    return this.singleton;
+  }
+
+  getSocket(namespace: string): Socket {
+    return this.iomanager.socket(namespace);
+  };
 }

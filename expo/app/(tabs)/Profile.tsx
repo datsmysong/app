@@ -1,5 +1,4 @@
-import { Text } from "react-native";
-import { supabase } from "../../lib/supabase";
+import {Text} from "react-native";import { supabase } from "../../lib/supabase";
 import useSupabaseUser from "../../lib/useSupabaseUser";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
