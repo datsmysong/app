@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {Image} from "expo-image";
 import SocketIo from "../../lib/socketio";
 import {useLocalSearchParams} from "expo-router";
+import { useFonts } from "expo-font";
 
 interface JSONTrack {
   url: string,
@@ -11,6 +12,10 @@ interface JSONTrack {
   artistName: string,
   albumName: string,
   imgUrl: string
+}
+
+export interface MusicRoomParams {
+  id: string
 }
 
 interface ActiveRoomSkeleton {
@@ -39,11 +44,6 @@ const TrackItem = (prop: { track: JSONTrack }) => {
   )
 };
 
-
-export interface MusicRoomParams {
-  id: string
-}
-
 // TODO socket io which refresh playlist on live
 export default function musicRoom(/*{activeRoomId= "1629a562-288b-4218-be45-fc8e64f4f6d9"}*/) {
   // TODO In future, active room if will be retrieved from user data
@@ -52,6 +52,10 @@ export default function musicRoom(/*{activeRoomId= "1629a562-288b-4218-be45-fc8e
   let url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
 
   const [data, setData] = useState<ActiveRoomSkeleton>()
+
+  const [fontLoaded] = useFonts({
+    "Outfit": require("../../assets/fonts/Outfit-VariableFont_wght.ttf"),
+  })
 
   useEffect(() => {
     // fetch(url)
