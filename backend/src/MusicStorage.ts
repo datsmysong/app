@@ -1,8 +1,8 @@
-import Queue from "./Queue";
+import Room from "./room";
 
 export default class MusicStorage {
   private static singleton: MusicStorage;
-  private readonly data: Map<string, Queue>;
+  private readonly data: Map<string, Room>;
 
   private constructor() {
     this.data = new Map();
@@ -15,19 +15,19 @@ export default class MusicStorage {
     return this.singleton;
   }
 
-  addQueue(queue: Queue) {
-    this.data.set(queue.uuid, queue);
+  addRoom(room: Room) {
+    this.data.set(room.uuid, room);
   }
 
-  removeQueueByUuid(uuid: string) {
+  removeRoomByUuid(uuid: string) {
     this.data.delete(uuid)
   }
 
-  removeQueue(queue: Queue) {
-    this.data.delete(queue.uuid)
+  removeRoom(room: Room) {
+    this.data.delete(room.uuid)
   }
 
-  getQueue(activeRoomId: string): Queue | null {
+  getRoom(activeRoomId: string): Room | null {
     return this.data.get(activeRoomId) ?? null
   }
 }

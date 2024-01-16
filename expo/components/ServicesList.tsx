@@ -1,13 +1,7 @@
-import { Image } from "expo-image";
-import React, { useState } from "react";
-import {
-  FlatList,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text
-} from "react-native";
-import { StreamingService } from "../app/(tabs)/rooms/create";
+import {Image} from "expo-image";
+import React, {useState} from "react";
+import {FlatList, Platform, Pressable, StyleSheet, Text} from "react-native";
+import {StreamingService} from "../app/(tabs)/rooms/create";
 
 interface ServicesListProps {
   availableServices: Array<StreamingService>;
@@ -15,9 +9,9 @@ interface ServicesListProps {
 }
 
 export default function ServicesList({
-  availableServices,
-  handleServiceChange,
-}: ServicesListProps) {
+                                       availableServices,
+                                       handleServiceChange,
+                                     }: ServicesListProps) {
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
 
@@ -37,7 +31,7 @@ export default function ServicesList({
       data={availableServices}
       columnWrapperStyle={styles.list}
       numColumns={2}
-      renderItem={({ item }) => (
+      renderItem={({item}) => (
         <Pressable
           onPress={() => toggleSelect(item)}
           style={[

@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Checkbox from "expo-checkbox";
 import CustomTextInput from "./CustomTextInput";
-import { useState } from "react";
-import React from "react";
+import React, {useState} from "react";
 
 interface ParametersListProps {
   percentageVoteToSkipAMusic: string;
@@ -16,22 +15,22 @@ interface ParametersListProps {
 }
 
 export default function ParametersList({
-  percentageVoteToSkipAMusic,
-  setPercentageVote,
-  maxMusicPerUser,
-  setMaxMusicPerUser,
-  maxMusicDuration,
-  setMaxMusicDuration,
-  canVote,
-  setCanVote,
-}: ParametersListProps) {
+                                         percentageVoteToSkipAMusic,
+                                         setPercentageVote,
+                                         maxMusicPerUser,
+                                         setMaxMusicPerUser,
+                                         maxMusicDuration,
+                                         setMaxMusicDuration,
+                                         canVote,
+                                         setCanVote,
+                                       }: ParametersListProps) {
   const [isPressed, setIsPressed] = useState(false);
   const TriangleRight = () => {
-    return <View style={[styles.triangle, styles.triangleRight]} />;
+    return <View style={[styles.triangle, styles.triangleRight]}/>;
   };
 
   const TriangleDown = () => {
-    return <View style={[styles.triangle, styles.triangleDown]} />;
+    return <View style={[styles.triangle, styles.triangleDown]}/>;
   };
 
   return (
@@ -42,7 +41,7 @@ export default function ParametersList({
         }}
       >
         <View style={styles.items}>
-          {isPressed ? <TriangleDown /> : <TriangleRight />}
+          {isPressed ? <TriangleDown/> : <TriangleRight/>}
           <Text style={styles.item}>Paramètres supplémentaires</Text>
         </View>
       </TouchableOpacity>
@@ -90,7 +89,7 @@ export default function ParametersList({
           />
         </View>
       )}
-      {!isPressed && <View />}
+      {!isPressed && <View/>}
     </View>
   );
 }
