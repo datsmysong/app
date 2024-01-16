@@ -5,12 +5,12 @@ import SocketIo from "../../lib/socketio";
 import {useLocalSearchParams} from "expo-router";
 
 interface JSONTrack {
-    url: string,
-    title: string,
-    duration: string,
-    artistName: string,
-    albumName: string,
-    imgUrl: string
+  url: string,
+  title: string,
+  duration: number,
+  artistName: string,
+  albumName: string,
+  imgUrl: string
 }
 
 interface ActiveRoomSkeleton {
