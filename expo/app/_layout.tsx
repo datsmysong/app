@@ -110,6 +110,10 @@ function RootLayoutNav() {
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       <Stack.Screen name="ask-name" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="musicQueue/[id]"
+        options={{presentation: "modal", title: "File d'attente"}}
+      />
     </Stack>
   );
 }

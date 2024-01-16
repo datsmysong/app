@@ -15,6 +15,10 @@ export default function RoomsPage() {
         <Button block type="outline" href={`/rooms/${roomId}`}>
           Rejoindre une salle
         </Button>
+        <Button
+          href={"/musicQueue/mock"}>
+          Current active room
+        </Button>
       </View>
     </View>
   );

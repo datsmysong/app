@@ -1,7 +1,8 @@
 import {FlatList, Text, View, StyleSheet} from "react-native";
 import {useEffect, useState} from "react";
 import {Image} from "expo-image";
-import SocketIo from "./socketio";
+import SocketIo from "../../lib/socketio";
+import {useLocalSearchParams} from "expo-router";
 
 interface JSONTrack {
     url: string,
@@ -17,7 +18,11 @@ interface ActiveRoomSkeleton {
     tracks: JSONTrack[]
 }
 
-const ENDPOINT = "http://localhost:3000";
+// https://docs.expo.dev/guides/environment-variables/
+const ENDPOINT = process.env.EXPO_PUBLIC_API_ENDPOINT;
+if (!ENDPOINT) {
+  throw new Error("le endpoint de l'API REST n'est pas défini")
+}
 
 const TrackItem = (prop: {track: JSONTrack}) => {
     const { title, artistName: artist, albumName: album, imgUrl: rawImageUrl } = prop.track;
@@ -34,8 +39,13 @@ const TrackItem = (prop: {track: JSONTrack}) => {
 )};
 
 
+export interface MusicQueueParams {
+  id: string
+}
+
 // TODO socket io which refresh playlist on live
-export default function MusicQueue({activeRoomId= "1629a562-288b-4218-be45-fc8e64f4f6d9"}) {
+export default function musicQueue(/*{activeRoomId= "1629a562-288b-4218-be45-fc8e64f4f6d9"}*/) {
+  const {id: activeRoomId} = useLocalSearchParams() as MusicQueueParams;
 
     let url: URL = new URL("/queue/"+activeRoomId, ENDPOINT);
 
