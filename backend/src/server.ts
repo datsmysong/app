@@ -8,6 +8,7 @@ import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
+import BoundServicePOST from "./route/BoundServicePOST";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
@@ -86,6 +87,7 @@ server.register(import("@fastify/rate-limit"), {
 // Auth
 server.get("/", SoundcloudBoundGET);
 server.register(authRoutes, { prefix: "/auth" });
+server.post("/soundcloud/bound", BoundServicePOST);
 
 server.get("/streaming-services", StreamingServicesGET);
 
