@@ -38,14 +38,9 @@ export default async function AuthCallbackGET(
   const { data } = await supabase.auth.exchangeCodeForSession(code);
   if (!data.session)
     return response.code(400).send({ error: "Missing session" });
-  const providerToken = data.session.provider_token;
-  const providerRefreshToken = data.session.provider_refresh_token;
   const providerName = data.session.user.app_metadata.provider;
-
-  if (!providerToken || !providerRefreshToken)
-    return response
-      .code(400)
-      .send({ error: "Missing provider token from " + providerName });
+  if (!providerName)
+    return response.code(400).send({ error: "Missing provider name" });
 
   // verify if user already have an user_profile (if new acc, create one)
   let userProfileId = await getUserProfile(data.user.id);
@@ -63,25 +58,36 @@ export default async function AuthCallbackGET(
     }
     userProfileId = newUserProfileId;
   }
-  const providerTokenEnd = new Date();
-  providerTokenEnd.setHours(providerTokenEnd.getHours() + 1);
-  const timestampZProviderTokenEnd = providerTokenEnd.toISOString();
 
-  const error = await upsertService({
-    access_token: providerToken,
-    refresh_token: providerRefreshToken,
-    expires_in: timestampZProviderTokenEnd,
-    user_profile_id: userProfileId,
-    service_id: StreamingService.Spotify,
-  });
+  if (providerName === "spotify") {
+    const providerToken = data.session.provider_token;
+    const providerRefreshToken = data.session.provider_refresh_token;
 
-  if (error) {
-    request.log.error("Upsert impossible, ", error);
-    return response.code(500).send({ error: "Server error." });
+    if (!providerToken || !providerRefreshToken)
+      return response
+        .code(400)
+        .send({ error: "Missing provider token from " + providerName });
+    const providerTokenEnd = new Date();
+    providerTokenEnd.setHours(providerTokenEnd.getHours() + 1);
+    const timestampZProviderTokenEnd = providerTokenEnd.toISOString();
+
+    const error = await upsertService({
+      access_token: providerToken,
+      refresh_token: providerRefreshToken,
+      expires_in: timestampZProviderTokenEnd,
+      user_profile_id: userProfileId,
+      service_id: StreamingService.Spotify,
+    });
+
+    if (error) {
+      request.log.error("Upsert impossible, ", error);
+      return response.code(500).send({ error: "Server error." });
+    }
   }
 
   const refresh_token = data.session.refresh_token;
   const redirectUrl = decodeURIComponent(request.url).split("redirect_url=")[1];
+  console.log("redirectUrl", redirectUrl);
 
   // redirect user to the redirect url with the refresh token
   response.redirect(
