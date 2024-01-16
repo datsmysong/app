@@ -52,9 +52,9 @@ export default function musicQueue(/*{activeRoomId= "1629a562-288b-4218-be45-fc8
     const [data, setData] = useState<ActiveRoomSkeleton>()
 
     useEffect(() => {
-        fetch(url)
-            .then(res => res.json())
-            .then((data: ActiveRoomSkeleton) => setData(data))
+        // fetch(url)
+        //     .then(res => res.json())
+        //     .then((data: ActiveRoomSkeleton) => setData(data))
 
         SocketIo.getInstance().getSocket(url.pathname)
             .on("socketio-client"/*"playlist"*/, /*(data: any) => console.log(data))*/ (data: ActiveRoomSkeleton) => setData(data));
