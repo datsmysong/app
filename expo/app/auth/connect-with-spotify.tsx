@@ -8,6 +8,8 @@ import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import Alert from "../../components/Alert";
 import { getSpotifyScopes } from "../../constants/Api";
+import { router } from "expo-router";
+import Button from "../../components/Button";
 
 const directUri = makeRedirectUri();
 WebBrowser.maybeCompleteAuthSession(); // required for web only
@@ -72,20 +74,21 @@ export default function ConnectWithSpotify() {
       const { error } = await supabase.auth.refreshSession({
         refresh_token: refreshToken,
       });
-      if (!error) return;
-      console.error("error", error);
+      if (!error) {
+        router.replace("/(tabs)");
+        return;
+      }
       Alert.alert(
         "Une erreur est survenue, l'authentification est impossible pour le moment"
       );
     }
-    console.error("WebBrowser n'a pas retourné le bon type", webBrowser.type);
     Alert.alert("Une erreur est survenue avec votre navigateur.");
   };
 
   return (
-    <Pressable onPress={handleSignUp}>
-      <Text>Rejoindre avec Spotify</Text>
-    </Pressable>
+    <Button prependIcon="music-note" onPress={handleSignUp}>
+      Rejoindre avec Spotify
+    </Button>
   );
 }
 

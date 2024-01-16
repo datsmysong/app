@@ -1,8 +1,8 @@
-import { Link, router } from "expo-router";
-import { Button, Text, View, StyleSheet, Pressable } from "react-native";
-import { Screen } from "react-native-screens";
-import ConnectWithSpotify from "./connect-with-spotify";
+import { Link } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Divider } from "react-native-elements";
+import Button from "../../components/Button";
+import ConnectWithSpotify from "./connect-with-spotify";
 
 export default function Onboarding() {
   return (
@@ -11,20 +11,18 @@ export default function Onboarding() {
         <Text style={styles.title}>Datsmysong</Text>
       </View>
       <View style={styles.container}>
+        <Button prependIcon="home" type="outline">
+          Rejoindre avec Google
+        </Button>
         <ConnectWithSpotify />
-        <Pressable onPress={() => router.push("/ask-name")}>
-          <Text>Rejoindre avec Google </Text>
-        </Pressable>
         <View style={styles.containerWithDivider}>
           <Divider style={{ width: "80%", margin: 20 }} />
           <Text>ou</Text>
           <Divider style={{ width: "80%", margin: 20 }} />
         </View>
-        <Link href={"/(auth)/login"} asChild>
-          <Pressable>
-            <Text>Rejoindre avec une adresse email</Text>
-          </Pressable>
-        </Link>
+        <Button prependIcon="mail" type="outline" href="/auth/login">
+          Rejoindre avec une adresse email
+        </Button>
       </View>
     </View>
   );
@@ -33,7 +31,6 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
     alignItems: "center",
     gap: 20,
     width: "100%",
