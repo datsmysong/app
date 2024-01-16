@@ -1,36 +1,61 @@
 import * as Linking from "expo-linking";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Button from "../../components/Button";
+import * as Device from "expo-device";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [hasChoicePlatform, setHasChoicePlatform] = useState<boolean>(false);
+  const [isParticipant, setIsParticipant] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!roomCode) console.error("Aucun code");
+    if (!roomCode) throw new Error("No room code provided");
 
-    const userConnected = false;
-    setIsConnected(userConnected);
-    if (userConnected) {
-      // Verification if participant
-      const particpant = false;
-      if (particpant) {
-        // Already in the room, redirect to the active room
-        onOpenApp(`rooms/${roomCode}`);
-      }
+    const subscription = Linking.addEventListener("url", handleIncomingLinks);
+
+    setIsMobile(Device.deviceType === Device.DeviceType.PHONE);
+
+    setIsConnected(true); // to replace based on what useSupabaseUser returns
+    if (isConnected) {
+      // ... do something
     }
+
+    setIsParticipant(true); // to replace based on what Supabase returns
+    if (isParticipant) {
+      // ... do something
+    }
+
+    return () => {
+      subscription.remove();
+    };
   }, [roomCode]);
 
+  const handleIncomingLinks = () => {
+    if (!isMobile) {
+      const path = isConnected ? `/rooms/${roomCode}` : `(auth)`;
+      router.replace(path as any);
+    }
+  };
+
   const onOpenApp = (path: string) => {
-    const deepLink = Linking.createURL(path);
+    const deepLink = Linking.createURL(path).replace("http://", "exp://");
+
+    // ...add the user in the room_users table in supabase if the user isn't already participant
+
     Linking.openURL(deepLink);
   };
 
-  if (Platform.OS === "web" && !hasChoicePlatform) {
+  const onContinueWebsite = (path: string) => {
+    // ...add the user in the room_users table in supabase if the user isn't already participant
+
+    router.replace(path as any);
+  };
+
+  if (isConnected) {
     return (
       <View style={styles.choiceContainer}>
         <Text style={styles.title}>
@@ -40,56 +65,38 @@ export default function JoinPage() {
           <Button
             block
             type="filled"
-            onPress={() => onOpenApp(`join/${roomCode}`)}
+            onPress={() => onOpenApp(`rooms/${roomCode}`)}
           >
             Ouvrir dans l'application
           </Button>
           <Button
             block
             type="outline"
-            onPress={() => setHasChoicePlatform(true)}
+            onPress={() => onContinueWebsite(`rooms/${roomCode}`)}
           >
             Continuer sur le site
           </Button>
         </View>
       </View>
     );
-  }
-
-  if (isConnected)
+  } else {
     return (
       <View style={styles.choiceContainer}>
         <Text style={styles.title}>
-          Voulez vous rejoindre la salle d'écoute {roomCode} ?
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Button
-            block
-            type="filled"
-            onPress={() => onOpenApp(`rooms/${roomCode}`)}
-          >
-            Rejoindre
-          </Button>
-        </View>
-      </View>
-    );
-  else
-    return (
-      <View style={styles.choiceContainer}>
-        <Text style={styles.title}>
-          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}", mais
-          vous n'êtes pas connecté
+          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}",
+          mais vous n'êtes pas connecté
         </Text>
         <View style={styles.buttonContainer}>
           <Button block type="filled" href={`(auth)`}>
             Se connecter
           </Button>
-          <Button block type="outline" onPress={() => setIsConnected(true)}>
+          <Button block type="outline" href="(auth)/ask-name">
             Continuer en tant qu'invité
           </Button>
         </View>
       </View>
     );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -104,7 +111,7 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 20,
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
   },
