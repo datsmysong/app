@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Button from "../../../components/Button";
-import { Link } from "expo-router";
 
 export default function RoomsPage() {
   const roomCode = "A1B2C3";

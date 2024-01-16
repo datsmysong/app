@@ -4,7 +4,6 @@ import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
 import * as Clipboard from "expo-clipboard";
-import useSupabaseUser from "../../../lib/useSupabaseUser";
 
 export default function RoomPage() {
   const { roomCode } = useLocalSearchParams();
