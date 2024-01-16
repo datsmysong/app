@@ -25,8 +25,8 @@ export default function JoinPage() {
     }
   }, [roomCode]);
 
-  const onOpenApp = (url: string) => {
-    const deepLink = Linking.createURL(url);
+  const onOpenApp = (path: string) => {
+    const deepLink = Linking.createURL(path);
     Linking.openURL(deepLink);
   };
 
@@ -34,22 +34,27 @@ export default function JoinPage() {
     return (
       <View style={styles.choiceContainer}>
         <Text style={styles.title}>
-          Vous êtes sur le point de rejoindre la salle d'écoute {roomCode}
+          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}"...
         </Text>
-        <Button theme="filled" onPress={() => onOpenApp(`join/${roomCode}`)}>
-          Ouvrir dans l'application
-        </Button>
-        <Button theme="outlined" onPress={() => setHasChoicePlatform(true)}>
-          Continuer sur le site
-        </Button>
+        <View style={styles.buttonContainer}>
+          <Button
+            block
+            type="filled"
+            onPress={() => onOpenApp(`join/${roomCode}`)}
+          >
+            Ouvrir dans l'application
+          </Button>
+          <Button
+            block
+            type="outline"
+            onPress={() => setHasChoicePlatform(true)}
+          >
+            Continuer sur le site
+          </Button>
+        </View>
       </View>
     );
   }
-
-  const handleJoinRoom = () => {
-    //logic to add user to the
-    onOpenApp(`rooms/${roomCode}`);
-  };
 
   if (isConnected)
     return (
@@ -57,24 +62,32 @@ export default function JoinPage() {
         <Text style={styles.title}>
           Voulez vous rejoindre la salle d'écoute {roomCode} ?
         </Text>
-        <Button theme="filled" onPress={handleJoinRoom}>
-          Rejoindre
-        </Button>
+        <View style={styles.buttonContainer}>
+          <Button
+            block
+            type="filled"
+            onPress={() => onOpenApp(`rooms/${roomCode}`)}
+          >
+            Rejoindre
+          </Button>
+        </View>
       </View>
     );
   else
     return (
       <View style={styles.choiceContainer}>
         <Text style={styles.title}>
-          Vous êtes sur le point de rejoindre la salle d'écoute {roomCode}, mais
+          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}", mais
           vous n'êtes pas connecté
         </Text>
-        <Button theme="filled" href={`(auth)`}>
-          Se connecter
-        </Button>
-        <Button theme={"outlined"} onPress={() => setIsConnected(true)}>
-          Continuer en tant qu'invité (dev: setConnected)
-        </Button>
+        <View style={styles.buttonContainer}>
+          <Button block type="filled" href={`(auth)`}>
+            Se connecter
+          </Button>
+          <Button block type="outline" onPress={() => setIsConnected(true)}>
+            Continuer en tant qu'invité
+          </Button>
+        </View>
       </View>
     );
 }
@@ -83,18 +96,16 @@ const styles = StyleSheet.create({
   choiceContainer: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    marginHorizontal: 24,
+    gap: 10,
+  },
+  buttonContainer: {
+    gap: 8,
   },
   title: {
     marginBottom: 20,
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-  },
-  link: {
-    marginTop: 5,
-    fontSize: 16,
-    color: "#1a1a1a",
-    textDecorationLine: "underline",
   },
 });
