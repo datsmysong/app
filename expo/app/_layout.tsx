@@ -1,17 +1,15 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { User } from "@supabase/supabase-js";
+import { NavigationState } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import {
   SplashScreen,
   Stack,
   router,
-  useNavigation,
-  useRootNavigationState,
+  useRootNavigationState
 } from "expo-router";
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
-import { NavigationState } from "@react-navigation/native";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -74,16 +72,10 @@ function RootLayoutNav() {
     <Stack
       screenListeners={({ navigation }) => ({
         state: (e) => {
-          // Do something with the state
-          console.log("state", e.data);
           if (!e.data) return;
           const state = (e.data as { state: NavigationState }).state;
-
           const currentPage = state.routes[state.routes.length - 1];
-          console.log("currentPage", currentPage.name);
           authVerificationFetchUser({ currentRoute: currentPage.name });
-
-          // Do something with the `navigation` object
         },
       })}
     >

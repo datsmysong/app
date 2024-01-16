@@ -1,17 +1,12 @@
-import { Link } from "expo-router";
 
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import Button from "../../../components/Button";
 
 export default function TabsRooms() {
   return (
     <View>
-      <Text>Room</Text>
-      <Link href="/modal">Modal</Link>
-      <Link href="/AddMusic" asChild>
-        Add Music
-      </Link>
-      <Link href="/rooms/create">Create Room</Link>
+      <Button href="/rooms/create">Créer une salle</Button>
     </View>
   );
 }
