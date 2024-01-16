@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TextInput } from "react-native";
 import Button from "../../../components/Button";
 
 export default function RoomsPage() {
+  const [value, setValue] = useState("")
   const roomId = "956992d0-f039-47d1-9475-ccacf10104d7";
 
   return (
@@ -15,8 +16,9 @@ export default function RoomsPage() {
         <Button block type="outline" href={`/rooms/${roomId}`}>
           Rejoindre une salle
         </Button>
+        <TextInput onChangeText={setValue} style={{borderWidth: 1, width: "25%", minWidth: 300}} />
         <Button
-          href={"/musicQueue/mock"}>
+          href={`/musicQueue/${encodeURIComponent(value)}`}>
           Current active room
         </Button>
       </View>
