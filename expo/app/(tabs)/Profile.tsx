@@ -18,7 +18,7 @@ export default function TabsProfile() {
       <Text>Profile</Text>
       {user && (
         <Button prependIcon="logout" onPress={() => supabase.auth.signOut()}>
-          Se deconnecter
+          Se déconnecter
         </Button>
       )}
     </>

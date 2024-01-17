@@ -8,11 +8,12 @@ import {
   useRootNavigationState,
 } from "expo-router";
 import { useEffect } from "react";
-import { Linking } from "react-native";
 import Alert from "../components/Alert";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
-import { verifyUsername } from "../lib/userProfile";
+import { getUsernameFromUser } from "../lib/userProfile";
+
+import * as Linking from "expo-linking";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -47,10 +48,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      authVerificationFetchUser({
-        currentRoute:
-          rootNavigation.routes[rootNavigation.routes.length - 1].name,
-      }).then(() => {
+      enforceRouteAccessControl(
+        rootNavigation.routes[rootNavigation.routes.length - 1].name
+      ).then(() => {
         SplashScreen.hideAsync();
       });
 
@@ -61,7 +61,9 @@ export default function RootLayout() {
         }
         // If user is logged in, we check if he has the obligatory username
         if (_event === "TOKEN_REFRESHED" || _event === "INITIAL_SESSION") {
-          verifyUsername().then((username) => {
+          getUsernameFromUser().then(({ username, error }) => {
+            if (error)
+              Alert.alert("Erreur, impossible de récupérer votre username");
             if (!username) router.replace("/ask-name");
           });
         }
@@ -77,45 +79,34 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const url = Linking.useURL();
+
   return (
     <Stack
-      screenListeners={({ navigation }) => ({
-        state: (e) => {
+      screenListeners={() => ({
+        state: async (e) => {
           if (!e.data) return;
-          Linking.getInitialURL().then(async (url) => {
-            const state = (e.data as { state: NavigationState }).state;
-            const currentPage = state.routes[state.routes.length - 1];
+          const state = (e.data as { state: NavigationState }).state;
+          const currentPage = state.routes[state.routes.length - 1];
 
-            if (!url) return;
-            useSupabaseUser().then(async (res) => {
-              if (res) {
-                authVerificationFetchUser({
-                  currentRoute: currentPage.name,
-                });
-              } else {
-                const refresh_token = url.split("#refresh_token=")[1];
-                if (!refresh_token) {
-                  authVerificationFetchUser({
-                    currentRoute: currentPage.name,
-                  });
-                } else {
-                  const { error } = await supabase.auth.refreshSession({
-                    refresh_token: refresh_token,
-                  });
-                  // Clear refresh_token from url
-                  window.location.href = "/";
-                  if (error) {
-                    Alert.alert(
-                      "Une erreur est survenue, impossible de refresh la session"
-                    );
-                    router.replace("/auth");
-                    return;
-                  }
-                  router.replace("/");
-                }
-              }
-            });
+          if (!url) return;
+
+          const user = await useSupabaseUser();
+          if (user) return enforceRouteAccessControl(currentPage.name);
+
+          const refresh_token = url.split("#refresh_token=")[1];
+          if (!refresh_token)
+            return enforceRouteAccessControl(currentPage.name);
+
+          const { error } = await supabase.auth.refreshSession({
+            refresh_token: refresh_token,
           });
+          if (!error) return router.replace("/");
+
+          Alert.alert(
+            "Une erreur est survenue, impossible de refresh la session"
+          );
+          return router.replace("/auth");
         },
       })}
     >
@@ -127,11 +118,7 @@ function RootLayoutNav() {
   );
 }
 
-const authVerificationFetchUser = async ({
-  currentRoute,
-}: {
-  currentRoute: string;
-}) => {
+const enforceRouteAccessControl = async (currentRoute: string) => {
   const user = await useSupabaseUser();
   if (requiredAuthPaths.includes(currentRoute) && !user) {
     router.replace("/auth");

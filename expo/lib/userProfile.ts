@@ -1,3 +1,4 @@
+import { PostgrestError } from "@supabase/supabase-js";
 import Alert from "../components/Alert";
 import { supabase } from "./supabase";
 import useSupabaseUser from "./useSupabaseUser";
@@ -21,17 +22,29 @@ export async function useUserProfile() {
   return profile;
 }
 
-export const verifyUsername = async () => {
+export const getUsernameFromUser = async (): Promise<{
+  username: string | null;
+  error: PostgrestError | null;
+}> => {
   const user = await useSupabaseUser();
-  if (!user?.id) return;
+  if (!user?.id)
+    return {
+      username: null,
+      error: null,
+    };
   const { data, error } = await supabase
     .from("user_profile")
     .select("username")
     .eq("account_id", user?.id)
     .single();
   if (error) {
-    Alert.alert("Erreur, Une erreur est survenue");
-    return;
+    return {
+      username: null,
+      error: error,
+    };
   }
-  return data.username;
+  return {
+    username: data?.username ?? null,
+    error: null,
+  };
 };
