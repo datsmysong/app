@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
+import { PostgrestError } from "@supabase/supabase-js";
 
 export async function getUserFromRequest(
   request: FastifyRequest,
@@ -12,17 +13,14 @@ export async function getUserFromRequest(
 }
 
 export async function getUserProfileIdFromAccountId(accId: string) {
-  return await adminSupabase
+  const { data, error } = await adminSupabase
     .from("user_profile")
     .select("user_profile_id")
     .eq("account_id", accId)
-    .then((res) => {
-      if (res.error) {
-        return { code: res.status, message: res.error.message };
-      } else {
-        return res.data[0].user_profile_id;
-      }
-    });
+    .single();
+
+  if (error) return { data: null, error };
+  return { data: data.user_profile_id, error: null };
 }
 
 export async function createRoom(
@@ -37,16 +35,16 @@ export async function createRoom(
   rep: FastifyReply,
 ) {
   let configurationId: string | null = null;
-  let hostUserProfileId: any = null;
+  let hostUserProfileId: string | null = null;
 
   const supabase = adminSupabase;
 
   const user = await getUserFromRequest(req, rep);
   if (!user.data.user) {
-    return { code: 401, message: "User not authenticated" };
+    return rep.code(401).send("User not logged in");
   }
   hostUserProfileId =
-    (await getUserProfileIdFromAccountId(user.data.user.id)) || null;
+    (await getUserProfileIdFromAccountId(user.data.user.id)).data || null;
 
   const roomConfigRes = await supabase
     .from("room_configurations")
@@ -61,10 +59,9 @@ export async function createRoom(
     .select("id");
 
   if (roomConfigRes.error) {
-    return { code: roomConfigRes.status, message: roomConfigRes.error };
+    return rep.code(roomConfigRes.status).send(roomConfigRes.error);
   } else {
     configurationId = roomConfigRes.data[0].id;
-    console.log("Room configurations created");
   }
 
   const roomRes = await supabase
@@ -81,9 +78,9 @@ export async function createRoom(
     .select("id");
 
   if (roomRes.error) {
-    return { code: roomRes.status, message: roomRes.error };
+    return rep.code(roomRes.status).send(roomRes.error);
   } else {
-    return { code: roomRes.status, message: "Room created" };
+    return rep.code(200).send("Room created");
   }
 }
 

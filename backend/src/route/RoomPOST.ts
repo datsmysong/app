@@ -38,7 +38,7 @@ export default async function RoomPOST(
 ) {
   const roomOptions = extractFromRequest(req);
 
-  const creationResult = await createRoom(
+  await createRoom(
     roomOptions.name,
     roomOptions.code,
     roomOptions.voteSkipping,
@@ -49,6 +49,4 @@ export default async function RoomPOST(
     req,
     reply,
   );
-
-  reply.send(creationResult);
 }
