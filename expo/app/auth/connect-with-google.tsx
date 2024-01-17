@@ -9,5 +9,9 @@ export default function ConnectWithGoogle() {
     signInWithProvider({ provider: "google" });
   };
 
-  return <Button onPress={handleSignUp}>Rejoindre avec Google</Button>;
+  return (
+    <Button type="outline" onPress={handleSignUp} block>
+      Rejoindre avec Google
+    </Button>
+  );
 }

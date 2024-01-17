@@ -1,20 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { makeRedirectUri } from "expo-auth-session";
-import { Platform } from "react-native";
-import { supabase } from "./supabase";
-import Alert from "../components/Alert";
-import * as WebBrowser from "expo-web-browser";
-import { router } from "expo-router";
 import { Provider } from "@supabase/supabase-js";
+import { makeRedirectUri } from "expo-auth-session";
+import { router } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import { Platform } from "react-native";
+import Alert from "../components/Alert";
+import { supabase } from "./supabase";
+import * as Device from "expo-device";
+
+WebBrowser.maybeCompleteAuthSession(); // required for web only
 
 const directUri = makeRedirectUri();
 
 export const signInWithProvider = async ({
   provider,
-  scope,
+  scopes,
 }: {
   provider: Provider;
-  scope?: string;
+  scopes?: string;
 }) => {
   const baseUrl = directUri.includes("exp://")
     ? "http://" + directUri.split(":8081")[0].split("//")[1]
@@ -31,7 +34,7 @@ export const signInWithProvider = async ({
           ":3000/auth/callback?redirect_url=" +
           directUri.split(":3000")[0]
       ),
-      scopes: scope,
+      scopes: scopes,
     },
   });
   if (error || !data || !data.url) {
@@ -59,6 +62,14 @@ export const signInWithProvider = async ({
     data.url +
     "#code_verifier=" +
     urlEncodedCodeVerifier;
+  if (Platform.OS === "web" && Device.osName !== "Windows") {
+    // if (Platform.OS === "web" ) {
+    // Second implementation for web browser on mobile:
+    // WebBrowser.openAuthSessionAsync doesn't work on mobile web browser (bug, open new tab and not redirect to app at the end of the auth process)
+    // So we redirect the user to the backend, and the middleware will support the refresh_token retourned and allowing the session to be refreshed
+    window.location.href = urlBackendRedirection;
+    return;
+  }
 
   const webBrowser = await WebBrowser.openAuthSessionAsync(
     urlBackendRedirection,
