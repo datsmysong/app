@@ -15,7 +15,7 @@ export default function Onboarding() {
         style={[styles.container, { maxWidth: 400, alignItems: "stretch" }]}
       >
         <ConnectWithGoogle />
-        <ConnectWithSpotify />
+        <ConnectWithSpotify title={"Rejoindre avec Spotify"}/>
         <View style={styles.containerWithDivider}>
           <Divider style={{ width: "80%", margin: 20 }} />
           <Text>ou</Text>

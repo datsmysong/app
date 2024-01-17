@@ -29,22 +29,15 @@ export default function ConnectWithSoundcloud({ title }: params) {
     return url.toString();
   }
   const handleConnect = async () => {
-    const clientId = "7soDeFdgGCKJeOtiMTw7Xc0Qn6bFqRNx";
+    if (!process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID) {
+      throw new Error("Missing EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID env variable");
+    }
+
+    const clientId = process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID;
     const redirectUri = "http://localhost:3000";
     const authUrl = getSoundCloudAuthorizationUrl(clientId, redirectUri);
 
-    const result = await WebBrowser.openAuthSessionAsync(authUrl);
-    if (result.type === "cancel") {
-      // The user cancelled the authorization process
-      Alert.alert("The user cancelled the authorization process");
-    } else if (result.type === "dismiss") {
-      // The authorization process was dismissed
-      Alert.alert("The authorization process was dismissed");
-    } else {
-      // The authorization process was successful
-      // You can now exchange the authorization code for an access token
-      console.log(result);
-    }
+    await WebBrowser.openAuthSessionAsync(authUrl);
   };
 
   return (
