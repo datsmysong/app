@@ -15,6 +15,7 @@ import RoomPOST from "./route/RoomPOST";
 import SoundcloudBoundGET from "./route/SoundcloudBoundGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
+import CurrentUserGET from "./route/CurrentUserGET";
 
 config({ path: ".env.local" });
 
@@ -104,6 +105,7 @@ server.post("/soundcloud/bound", BoundServicePOST);
 server.post("/bound", { schema: BoundServicePOSTSchema }, BoundServicePOST);
 
 server.get("/streaming-services", StreamingServicesGET);
+server.get("/user/current", CurrentUserGET);
 
 const createRoomSchema = {
   body: {

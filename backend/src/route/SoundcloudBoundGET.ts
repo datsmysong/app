@@ -1,9 +1,32 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "../server";
-import { getUserFromRequest, getUserProfileIdFromAccountId } from "../room";
+import createClient from "../lib/supabase";
 
 export interface QueryParams {
   code: string;
+}
+
+export async function getUserFromRequest(
+  request: FastifyRequest,
+  response: FastifyReply,
+) {
+  const supabase = createClient({ request, response });
+
+  return await supabase.auth.getUser();
+}
+
+export async function getUserProfileIdFromAccountId(accId: string) {
+  return await adminSupabase
+    .from("user_profile")
+    .select("user_profile_id")
+    .eq("account_id", accId)
+    .then((res) => {
+      if (res.error) {
+        return { code: res.status, message: res.error.message };
+      } else {
+        return res.data[0].user_profile_id;
+      }
+    });
 }
 
 export async function getStreamingServiceIdByName(serviceName: string) {
