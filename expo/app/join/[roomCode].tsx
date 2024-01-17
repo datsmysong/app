@@ -1,8 +1,10 @@
-import * as Linking from "expo-linking";
-import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
+import { supabase } from "../../lib/supabase";
 import Button from "../../components/Button";
+import useSupabaseUser from "../../lib/useSupabaseUser";
+import * as Linking from "expo-linking";
 import * as Device from "expo-device";
 
 export default function JoinPage() {
@@ -19,15 +21,33 @@ export default function JoinPage() {
 
     setIsMobile(Device.deviceType === Device.DeviceType.PHONE);
 
-    setIsConnected(true); // to replace based on what useSupabaseUser returns
-    if (isConnected) {
-      // ... do something
-    }
+    useSupabaseUser().then(async (user) => {
+      if (user) {
+        setIsConnected(true);
+        
+        const { data: roomId, error: activeRoomError } = await supabase
+        .from("active_rooms")
+        .select("id")
+        .eq("code", roomCode)
+        .single();
+        
+        if (activeRoomError) throw new Error("Error while fetching data from supabase");
 
-    setIsParticipant(true); // to replace based on what Supabase returns
-    if (isParticipant) {
-      // ... do something
-    }
+        const { data: participant, error: roomUsersError } = await supabase
+        .from("room_users")
+        .select("profile_id")
+        .eq("profile_id", user.id)
+        .eq("room_id", roomId)
+        .single();
+
+        if (roomUsersError) throw new Error("Error while fetching data from supabase");
+
+        setIsParticipant(participant ? true : false);
+      } else {
+        setIsConnected(false);
+        // ... when it is implemented, verifiy if the user is a participant or not
+      }
+    });
 
     return () => {
       subscription.remove();
@@ -42,7 +62,7 @@ export default function JoinPage() {
   };
 
   const onOpenApp = (path: string) => {
-    const deepLink = Linking.createURL(path).replace("http://", "exp://");
+    const deepLink = Linking.createURL(path);
 
     // ...add the user in the room_users table in supabase if the user isn't already participant
 
