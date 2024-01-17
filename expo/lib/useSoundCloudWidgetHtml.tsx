@@ -73,7 +73,7 @@ export default function useSoundCloudWidgetHtml() {
             });
           });
 
-          window.parent.postMessage(
+          window.postMessage(
             {
               command: "currentMusic",
               data: {
