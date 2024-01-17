@@ -5,6 +5,8 @@ import CustomTextInput from "../../components/CustomTextInput";
 import Button from "../../components/Button";
 import { supabase } from "../../lib/supabase";
 import { Link } from "expo-router";
+import Alert from "../../components/Alert";
+import ControledInput from "./ControledInput";
 
 type LoginForm = {
   email: string;
@@ -16,58 +18,68 @@ export default function Login() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>();
+  } = useForm<LoginForm>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const onSubmit = ({ email, password }: LoginForm) => {
-    supabase.auth.signInWithPassword({
+  const onSubmit = async ({ email, password }: LoginForm) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    if (error) {
+      Alert.alert("Erreur" + error.message);
+      return;
+    }
   };
 
   return (
     <View style={styles.page}>
       <View style={styles.form}>
-        <Text style={styles.label}>Adresse email*</Text>
-        <Controller
+        <ControledInput
           control={control}
+          label={"Adresse email"}
+          name={"email"}
           rules={{
-            required: true,
+            required: "Veuillez saisir votre adresse email",
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: "Veuillez saisir une adresse email valide",
+            },
           }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CustomTextInput
-              placeholder="votre@adresse.email"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              autoComplete="email"
-            />
-          )}
-          name="email"
+          placeholder={"votre@adresse.email"}
+          errorMessage={errors.email && errors.email.message}
+          autoComplete="email"
         />
-        {errors.email && <Text>This is required.</Text>}
-
-        <Text style={styles.label}>Mot de passe*</Text>
-        <Controller
+        <ControledInput
           control={control}
+          label={"Mot de passe"}
+          name={"password"}
           rules={{
-            maxLength: 100,
-            minLength: 6,
-            required: true,
+            required: "Veuillez saisir votre mot de passe",
+            minLength: {
+              value: 6,
+              message: "Le mot de passe doit contenir au moins 6 caractères",
+            },
+            validate: {
+              hasNumber: (value) =>
+                /\d/.test(value) || "Le mot de passe doit contenir un chiffre",
+              hasUppercase: (value) =>
+                /[A-Z]/.test(value) ||
+                "Le mot de passe doit contenir une majuscule",
+              hasLowercase: (value) =>
+                /[a-z]/.test(value) ||
+                "Le mot de passe doit contenir une minuscule",
+            },
           }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CustomTextInput
-              placeholder="Mon mot de passe robuste"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              autoComplete="password"
-              secureTextEntry
-            />
-          )}
-          name="password"
+          placeholder={"Mon mot de passe robuste"}
+          errorMessage={errors.password && errors.password.message}
+          autoComplete="password"
+          secureTextEntry
         />
-        {errors.password && <Text>This is required.</Text>}
         <Text style={{ ...styles.text, textAlign: "right" }}>
           Mot de passe oublié ?
         </Text>
@@ -92,7 +104,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 11,
     flex: 1,
-    gap: 12,
+    gap: 13,
     width: "100%",
     // alignItems: "center",
   },

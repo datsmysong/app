@@ -34,12 +34,7 @@ export default function CustomTextInput({
   return (
     <TextInput
       value={value}
-      style={[
-        styles.input,
-        style,
-        isFocused && styles.inputFocused,
-
-      ]}
+      style={[styles.input, style, isFocused && styles.inputFocused]}
       onFocus={() => setIsFocused(true)}
       onBlur={() => {
         onBlur ? onBlur() : setIsFocused(false);
@@ -57,11 +52,16 @@ export default function CustomTextInput({
 
 const styles = StyleSheet.create({
   input: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 11,
-    backgroundColor: "#CCCCCC",
+    paddingHorizontal: 17,
+    paddingVertical: 10,
+    backgroundColor: "#FFF",
     color: "#1A1A1A",
+    fontFamily: "Outfit",
+    fontSize: 18,
+    borderColor: "#DFDFDF",
+    borderStyle: "solid",
+    borderWidth: 3,
+    borderRadius: 11,
   },
   inputFocused: {
     borderStyle: "solid",
