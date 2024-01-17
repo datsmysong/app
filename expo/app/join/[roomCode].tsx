@@ -6,6 +6,7 @@ import Button from "../../components/Button";
 import useSupabaseUser from "../../lib/useSupabaseUser";
 import * as Linking from "expo-linking";
 import * as Device from "expo-device";
+import { User } from "@supabase/supabase-js";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
@@ -13,6 +14,7 @@ export default function JoinPage() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (!roomCode) throw new Error("No room code provided");
@@ -23,6 +25,7 @@ export default function JoinPage() {
 
     useSupabaseUser().then(async (user) => {
       if (user) {
+        setUser(user);
         setIsConnected(true);
 
         const { data: participant, error: roomUsersError } = await supabase
@@ -47,42 +50,42 @@ export default function JoinPage() {
     };
   }, [roomCode]);
 
-  const handleIncomingLinks = () => {
-    if (!isMobile) {
-      const path = isConnected ? `/rooms/${roomCode}` : `(auth)`;
-      router.replace(path as any);
+  const handleIncomingLinks = async () => {
+    if (!isMobile && isConnected) {
+      if (!isParticipant) await addUserToRoom();
+      router.replace(`/rooms/${roomCode}`);
     }
   };
 
   const onOpenApp = async (path: string) => {
     const deepLink = Linking.createURL(path);
-    await addUserToRoom();
+    if (!isParticipant) await addUserToRoom();
     Linking.openURL(deepLink);
   };
 
   const onContinueWebsite = async (path: string) => {
-    await addUserToRoom();
+    if (!isParticipant) await addUserToRoom();
     router.replace(path as any);
   };
 
   const addUserToRoom = async () => {
     const { error: roomUsersError } = await supabase.from("room_users").insert({
       room_id: await getRoomId(),
-      profile_id: user.id,
+      profile_id: user!.id, // Change when anonymous users are implemented
     });
     if (roomUsersError)
       throw new Error("Error while inserting data in supabase");
   };
 
   const getRoomId = async () => {
-    const { data: roomId, error: activeRoomError } = await supabase
+    const { data: room, error: activeRoomError } = await supabase
       .from("active_rooms")
       .select("id")
       .eq("code", roomCode)
       .single();
     if (activeRoomError)
       throw new Error("Error while fetching data from supabase");
-    return roomId;
+    return room.id;
   };
 
   if (isConnected) {
@@ -120,7 +123,7 @@ export default function JoinPage() {
           <Button block type="filled" href={`(auth)`}>
             Se connecter
           </Button>
-          <Button block type="outline" href="(auth)/ask-name">
+          <Button block type="outline">
             Continuer en tant qu'invité
           </Button>
         </View>
