@@ -2,7 +2,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import { useColorScheme } from "react-native";
 
-import Colors from "../../constants/Colors";
 import { Text } from "../../components/Tamed";
 
 /**
@@ -69,11 +68,11 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="rooms"
         options={{
           title: "Salles",
+          headerShown: false,
           tabBarLabel: ({ color, focused, children }) => (
             <TabBarLabel color={color} focused={focused}>
               {children}

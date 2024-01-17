@@ -1,10 +1,19 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { NavigationState } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
-import { useEffect, useState } from "react";
-import useSupabaseUser from "../lib/useSupabaseUser";
+import {
+  SplashScreen,
+  Stack,
+  router,
+  useRootNavigationState,
+} from "expo-router";
+import { useEffect } from "react";
+import Alert from "../components/Alert";
 import { supabase } from "../lib/supabase";
-import { getUserProfile } from "../lib/userProfile";
+import useSupabaseUser from "../lib/useSupabaseUser";
+import { getUsernameFromUser } from "../lib/userProfile";
+
+import * as Linking from "expo-linking";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -13,9 +22,10 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+const requiredAuthPaths = ["(tabs)"];
+const authRoutes = ["auth"];
 
 export default function RootLayout() {
-  const [userNameFind, setSetUserNameFind] = useState(false);
   const [loaded, error] = useFonts({
     "Outfit-Thin": require("../assets/fonts/outfit/Outfit-Thin.ttf"),
     "Outfit-ExtraLight": require("../assets/fonts/outfit/Outfit-ExtraLight.ttf"),
@@ -34,27 +44,28 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
+  const rootNavigation = useRootNavigationState();
+
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
-      useSupabaseUser().then((user) => !user && router.replace("/(auth)"));
+      enforceRouteAccessControl(
+        rootNavigation.routes[rootNavigation.routes.length - 1].name
+      ).then(() => {
+        SplashScreen.hideAsync();
+      });
 
       supabase.auth.onAuthStateChange((_event, session) => {
-        if (session) {
-          // SIGNED_IN is fired on session refresh (like alt+tab...)
-          // we don't want to fetch the user profile again if is already done
-          if (_event === "SIGNED_IN" && userNameFind) return;
-          getUserProfile(session.user.id).then((userProfile) => {
-            if (!userProfile.username) {
-              setSetUserNameFind(true);
-              router.replace("/ask-name");
-              return;
-            }
-            router.replace("/(tabs)");
+        // user session is automatically refresh, but middlewares are called only on page refresh/change
+        if (_event === "SIGNED_OUT") {
+          router.replace("/auth");
+        }
+        // If user is logged in, we check if he has the obligatory username
+        if (_event === "TOKEN_REFRESHED" || _event === "INITIAL_SESSION") {
+          getUsernameFromUser().then(({ username, error }) => {
+            if (error)
+              Alert.alert("Erreur, impossible de récupérer votre username");
+            if (!username) router.replace("/ask-name");
           });
-          setSetUserNameFind(true);
-        } else {
-          router.replace("/(auth)");
         }
       });
     }
@@ -68,19 +79,51 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const url = Linking.useURL();
+
   return (
-    <Stack>
+    <Stack
+      screenListeners={() => ({
+        state: async (e) => {
+          if (!e.data) return;
+          const state = (e.data as { state: NavigationState }).state;
+          const currentPage = state.routes[state.routes.length - 1];
+
+          if (!url) return;
+
+          const user = await useSupabaseUser();
+          if (user) return enforceRouteAccessControl(currentPage.name);
+
+          const refresh_token = url.split("#refresh_token=")[1];
+          if (!refresh_token)
+            return enforceRouteAccessControl(currentPage.name);
+
+          const { error } = await supabase.auth.refreshSession({
+            refresh_token: refresh_token,
+          });
+          if (!error) return router.replace("/");
+
+          Alert.alert(
+            "Une erreur est survenue, impossible de refresh la session"
+          );
+          return router.replace("/auth");
+        },
+      })}
+    >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      <Stack.Screen
-        name="AddMusic"
-        options={{ presentation: "modal", title: "Ajouter une musique" }}
-      />
-      <Stack.Screen
-        name="CreateRoom"
-        options={{ presentation: "modal", title: "Nouvelle salle" }}
-      />
+      <Stack.Screen name="ask-name" options={{ headerShown: false }} />
     </Stack>
   );
 }
+
+const enforceRouteAccessControl = async (currentRoute: string) => {
+  const user = await useSupabaseUser();
+  if (requiredAuthPaths.includes(currentRoute) && !user) {
+    router.replace("/auth");
+  }
+  if (authRoutes.includes(currentRoute) && user) {
+    router.replace("/(tabs)");
+  }
+};

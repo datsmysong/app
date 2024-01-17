@@ -1,6 +1,6 @@
 import "react-native-url-polyfill/auto";
 
-import { Platform, Pressable, Text } from "react-native";
+import { Linking, Platform, Pressable, Text } from "react-native";
 import { supabase } from "../../lib/supabase";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,6 +8,9 @@ import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import Alert from "../../components/Alert";
 import { getSpotifyScopes } from "../../constants/Api";
+import { router } from "expo-router";
+import Button from "../../components/Button";
+import * as Device from "expo-device";
 
 const directUri = makeRedirectUri();
 WebBrowser.maybeCompleteAuthSession(); // required for web only
@@ -59,11 +62,19 @@ export default function ConnectWithSpotify() {
       data.url +
       "#code_verifier=" +
       urlEncodedCodeVerifier;
+    if (Platform.OS === "web" && Device.osName !== "Windows") {
+      // Second implementation for web browser on mobile:
+      // WebBrowser.openAuthSessionAsync doesn't work on mobile web browser (bug, open new tab and not redirect to app at the end of the auth process)
+      // So we redirect the user to the backend, and the middleware will support the refresh_token retourned and allowing the session to be refreshed
+      window.location.href = urlBackendRedirection;
+      return;
+    }
 
     const webBrowser = await WebBrowser.openAuthSessionAsync(
       urlBackendRedirection,
       directUri
     );
+
     // At end, if all is good, user come back to the app with a refresh_token to fetch new session
     if (webBrowser.type === "success" && webBrowser.url) {
       const refreshToken = decodeURIComponent(
@@ -72,20 +83,21 @@ export default function ConnectWithSpotify() {
       const { error } = await supabase.auth.refreshSession({
         refresh_token: refreshToken,
       });
-      if (!error) return;
-      console.error("error", error);
+      if (!error) {
+        router.replace("/(tabs)");
+        return;
+      }
       Alert.alert(
         "Une erreur est survenue, l'authentification est impossible pour le moment"
       );
     }
-    console.error("WebBrowser n'a pas retourné le bon type", webBrowser.type);
     Alert.alert("Une erreur est survenue avec votre navigateur.");
   };
 
   return (
-    <Pressable onPress={handleSignUp}>
-      <Text>Rejoindre avec Spotify</Text>
-    </Pressable>
+    <Button prependIcon="music-note" onPress={handleSignUp}>
+      Rejoindre avec Spotify
+    </Button>
   );
 }
 

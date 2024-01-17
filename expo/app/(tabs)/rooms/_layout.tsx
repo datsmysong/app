@@ -1,5 +1,13 @@
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function RoomsTabLayout() {
-  return <Slot />;
+  return (
+    <Stack>
+      <Stack.Screen name="index" options={{ title: "Salle" }} />
+      <Stack.Screen
+        name="create"
+        options={{ presentation: "modal", title: "Création d'une salle" }}
+      />
+    </Stack>
+  );
 }
