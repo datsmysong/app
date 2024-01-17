@@ -49,7 +49,16 @@ export default async function SoundcloudBoundGET(
   const refreshToken = json.refresh_token;
   const expires_in = json.expires_in;
   const serviceId = await getStreamingServiceIdByName("SoundCloud");
-  await fetch("http://localhost:3000/soundcloud/bound", {
+
+  let userProfileId: any = "";
+  const user = await getUserFromRequest(request, response);
+  if (!user.data.user) {
+    return { code: 401, message: "User not authenticated" };
+  }
+  userProfileId =
+    (await getUserProfileIdFromAccountId(user.data.user.id)) || null;
+
+  const res = await fetch("http://localhost:3000/bound", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
