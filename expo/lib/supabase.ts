@@ -19,15 +19,12 @@ class SupabaseStorage {
     return AsyncStorage.getItem(key);
   }
   async removeItem(key: string) {
-    // console.log("remove item", key);
-
     if (Platform.OS === "web") {
       return localStorage.removeItem(key);
     }
     return AsyncStorage.removeItem(key);
   }
   async setItem(key: string, value: string) {
-    // console.log("set item", key, value);
     if (Platform.OS === "web") {
       document.cookie = `${key}=${value}`;
       return localStorage.setItem(key, value);
