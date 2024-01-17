@@ -7,3 +7,9 @@ web-build/
 expo-env.d.ts
 # @end expo-cli
 .env
+
+# android compilation folder
+android/
+
+# android compilation folder
+ios/
