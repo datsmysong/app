@@ -12,6 +12,7 @@ import { Linking } from "react-native";
 import Alert from "../components/Alert";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
+import { verifyUsername } from "../lib/userProfile";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -57,6 +58,12 @@ export default function RootLayout() {
         // user session is automatically refresh, but middlewares are called only on page refresh/change
         if (_event === "SIGNED_OUT") {
           router.replace("/auth");
+        }
+        // If user is logged in, we check if he has the obligatory username
+        if (_event === "TOKEN_REFRESHED" || _event === "INITIAL_SESSION") {
+          verifyUsername().then((username) => {
+            if (!username) router.replace("/ask-name");
+          });
         }
       });
     }
