@@ -11,7 +11,6 @@ import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
-import { getUsernameFromUser } from "../lib/userProfile";
 
 import * as Linking from "expo-linking";
 
@@ -59,14 +58,6 @@ export default function RootLayout() {
         if (_event === "SIGNED_OUT") {
           router.replace("/auth");
         }
-        // If user is logged in, we check if he has the obligatory username
-        if (_event === "TOKEN_REFRESHED" || _event === "INITIAL_SESSION") {
-          getUsernameFromUser().then(({ username, error }) => {
-            if (error)
-              Alert.alert("Erreur, impossible de récupérer votre username");
-            if (!username) router.replace("/ask-name");
-          });
-        }
       });
     }
   }, [loaded]);
@@ -79,34 +70,34 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const url = Linking.useURL();
+  const url = Linking.getInitialURL();
 
   return (
     <Stack
-      screenListeners={() => ({
+      screenListeners={(navigation) => ({
         state: async (e) => {
           if (!e.data) return;
           const state = (e.data as { state: NavigationState }).state;
           const currentPage = state.routes[state.routes.length - 1];
+          url.then(async (url) => {
+            if (!url) return;
+            const user = await useSupabaseUser();
+            if (user) return enforceRouteAccessControl(currentPage.name);
 
-          if (!url) return;
-
-          const user = await useSupabaseUser();
-          if (user) return enforceRouteAccessControl(currentPage.name);
-
-          const refresh_token = url.split("#refresh_token=")[1];
-          if (!refresh_token)
-            return enforceRouteAccessControl(currentPage.name);
-
-          const { error } = await supabase.auth.refreshSession({
-            refresh_token: refresh_token,
+            const refresh_token = url.split("#refresh_token=")[1];
+            if (!refresh_token)
+              return enforceRouteAccessControl(currentPage.name);
+            const { error } = await supabase.auth.refreshSession({
+              refresh_token: refresh_token,
+            });
+            if (!error) {
+              return navigation.navigation.navigate("(tabs)");
+            }
+            Alert.alert(
+              "Une erreur est survenue, impossible de refresh la session"
+            );
+            return router.replace("/auth");
           });
-          if (!error) return router.replace("/");
-
-          Alert.alert(
-            "Une erreur est survenue, impossible de refresh la session"
-          );
-          return router.replace("/auth");
         },
       })}
     >

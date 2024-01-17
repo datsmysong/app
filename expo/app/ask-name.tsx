@@ -7,20 +7,9 @@ import Button from "../components/Button";
 import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
-import { getUsernameFromUser } from "../lib/userProfile";
 
 export default function AskName() {
   const [username, setUsername] = useState("");
-  const navigation = useNavigation();
-  useEffect(() => {
-    // In cleanup function, we check if user has a username
-    return () => {
-      getUsernameFromUser().then((username) => {
-        if (!username) router.replace("/ask-name");
-        else router.replace("/(tabs)");
-      });
-    };
-  }, [navigation]);
 
   const handleSubmitUsername = async () => {
     const user = await useSupabaseUser();
