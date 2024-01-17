@@ -16,6 +16,7 @@ import SoundcloudBoundGET from "./route/SoundcloudBoundGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
 import CurrentUserGET from "./route/CurrentUserGET";
+import BoundServicesGET from "./route/BoundServicesGET";
 
 config({ path: ".env.local" });
 
@@ -102,7 +103,9 @@ const BoundServicePOSTSchema = {
 server.get("/", SoundcloudBoundGET);
 server.register(authRoutes, { prefix: "/auth" });
 server.post("/soundcloud/bound", BoundServicePOST);
+
 server.post("/bound", { schema: BoundServicePOSTSchema }, BoundServicePOST);
+server.get("/bounded", BoundServicesGET);
 
 server.get("/streaming-services", StreamingServicesGET);
 server.get("/user/current", CurrentUserGET);
