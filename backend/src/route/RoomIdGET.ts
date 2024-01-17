@@ -1,7 +1,6 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import Room from "../room";
-import MusicStorage from "../musicStorage";
-import createClient from "../lib/supabase";
+import MusicStorage from "../MusicStorage";
 
 export interface QueryParams {
   id: string

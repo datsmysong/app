@@ -1,4 +1,4 @@
-import {FastifyRequest, FastifyReply} from "fastify";
+import {FastifyReply, FastifyRequest} from "fastify";
 
 export default function AuthRedirectionGET(
   req: FastifyRequest,

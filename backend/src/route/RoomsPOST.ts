@@ -31,7 +31,7 @@ function extractFromRequest(req: FastifyRequest): BodyParams {
   };
 }
 
-export default async function RoomPOST(
+export default async function RoomsPOST(
   req: FastifyRequest,
   reply: FastifyReply
 ) {

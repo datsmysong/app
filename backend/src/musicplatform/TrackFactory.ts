@@ -17,7 +17,7 @@ export default class TrackFactory {
   }
 
   fromUrl(url: URL): Track | undefined {
-    for (let [_, musicPlatform] of this.musicPlatformsList) {
+    for (let musicPlatform of this.musicPlatformsList.values()) {
       let trackId = musicPlatform.trackIdFromUrl(url);
       if (trackId) {
         return new Track(musicPlatform, {id: trackId})

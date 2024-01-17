@@ -7,13 +7,13 @@ import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
+import RoomIdGET from "./route/RoomIdGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import fastifyCookie from "@fastify/cookie";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { Database } from "commons/database-types";
-import QueueGET from "./route/QueueGET";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
-import QueueIO from "./socketio/QueueIO";
+import RoomIO from "./socketio/RoomIO";
 
 config({path: ".env.local"});
 
@@ -31,11 +31,6 @@ if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   );
 }
 
-if (!process.env.FRONTEND_URL) {
-  throw new Error(
-    "Missing FRONTEND_URL environment variable, check .env.local.example file"
-  );
-}
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SERVICE_ROLE
@@ -102,12 +97,12 @@ const createRoomSchema = {
 
 server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
-server.get("/room/:id", QueueGET);
+server.get("/room/:id", RoomIdGET);
 
 server.ready().then(() => {
 
 
-  server.io.of(/^\/queue\/.*$/i).on("connection", QueueIO)
+  server.io.of(/^\/room\/.*$/i).on("connection", RoomIO)
 
   // we need to wait for the server to be ready, else `server.io` is undefined
   // server.io.of(/.*/).on("connection", (socket: Socket) => {
@@ -115,7 +110,7 @@ server.ready().then(() => {
   //   socket.emit("socketio-client", "world");
   // });
 
-  // server.io.of(/^\/queue/i).on("connection", (socket: Socket) => {
+  // server.io.of(/^\/room/i).on("connection", (socket: Socket) => {
   //   console.info("Socket connected!", socket.id);
   //   console.log(socket.nsp.name)
   // })
