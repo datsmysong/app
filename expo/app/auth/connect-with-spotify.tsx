@@ -64,7 +64,7 @@ export default function ConnectWithSpotify() {
       urlEncodedCodeVerifier;
     if (Platform.OS === "web" && Device.osName !== "Windows") {
       // Second implementation for web browser on mobile:
-      // WebBrowser.openAuthSessionAsync doesn't work on mobile web browser (bug)
+      // WebBrowser.openAuthSessionAsync doesn't work on mobile web browser (bug, open new tab and not redirect to app at the end of the auth process)
       // So we redirect the user to the backend, and the middleware will support the refresh_token retourned and allowing the session to be refreshed
       window.location.href = urlBackendRedirection;
       return;
