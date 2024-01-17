@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "../server";
+import { getUserFromRequest, getUserProfileIdFromAccountId } from "../room";
 
 export interface QueryParams {
   code: string;
@@ -25,12 +26,21 @@ export default async function SoundcloudBoundGET(
 ) {
   const code = (request.query as QueryParams).code;
   if (!code) {
-    response.code(400).send({ error: "Missing code" });
+    return response.code(400).send({ error: "Missing code" });
+  }
+
+  if (
+    !process.env.SOUNDCLOUD_CLIENT_ID ||
+    !process.env.SOUNDCLOUD_CLIENT_SECRET
+  ) {
+    throw new Error(
+      "Missing SOUNDCLOUD_CLIENT_ID or SOUNDCLOUD_CLIENT_SECRET environment variable",
+    );
   }
 
   const bodyParams = new URLSearchParams();
-  bodyParams.append("client_id", "7soDeFdgGCKJeOtiMTw7Xc0Qn6bFqRNx");
-  bodyParams.append("client_secret", "PjMxuBxkoeYfJSSYrvFGSjthhValvcmu");
+  bodyParams.append("client_id", process.env.SOUNDCLOUD_CLIENT_ID);
+  bodyParams.append("client_secret", process.env.SOUNDCLOUD_CLIENT_SECRET);
   bodyParams.append("grant_type", "authorization_code");
   bodyParams.append("redirect_uri", "http://localhost:3000");
   bodyParams.append("code", code);
@@ -47,7 +57,6 @@ export default async function SoundcloudBoundGET(
 
   const accessToken = json.access_token;
   const refreshToken = json.refresh_token;
-  const expires_in = json.expires_in;
   const serviceId = await getStreamingServiceIdByName("SoundCloud");
 
   let userProfileId: any = "";
@@ -64,12 +73,16 @@ export default async function SoundcloudBoundGET(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      accessToken,
-      refreshToken,
-      service: serviceId,
-      expires_in,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      serviceId: serviceId,
+      userProfileId: userProfileId,
     }),
   });
 
-  response.send({ code: 200, message: "Soundcloud bound" });
+  if (res.status === 200) {
+    return response.type("text/html").send("<script>window.close();</script>");
+  } else {
+    return response.send({ code: 500, message: "Soundcloud not bound" });
+  }
 }

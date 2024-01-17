@@ -84,10 +84,24 @@ server.register(import("@fastify/rate-limit"), {
   timeWindow: "1 minute",
 });
 
+const BoundServicePOSTSchema = {
+  body: {
+    type: "object",
+    required: ["accessToken", "refreshToken", "serviceId", "userProfileId"],
+    properties: {
+      accessToken: { type: "string" },
+      refreshToken: { type: "string" },
+      serviceId: { type: "string" },
+      userProfileId: { type: "string" },
+    },
+  },
+};
+
 // Auth
 server.get("/", SoundcloudBoundGET);
 server.register(authRoutes, { prefix: "/auth" });
 server.post("/soundcloud/bound", BoundServicePOST);
+server.post("/bound", { schema: BoundServicePOSTSchema }, BoundServicePOST);
 
 server.get("/streaming-services", StreamingServicesGET);
 
