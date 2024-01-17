@@ -1,10 +1,10 @@
-import { adminSupabase } from "./server";
-import { FastifyReply, FastifyRequest } from "fastify";
 import { getCurrentUser, unauthorizedResponse } from "./lib/auth-utils";
-import Spotify from "./musicplatform/Spotify";
-import TrackFactory from "./musicplatform/TrackFactory";
 import { JSONTrack, RoomJSON } from "commons/backend-types";
+import { FastifyReply, FastifyRequest } from "fastify";
 import RoomStorage from "./RoomStorage";
+import MusicPlatform from "./musicplatform/MusicPlatform";
+import TrackFactory from "./musicplatform/TrackFactory";
+import { adminSupabase } from "./server";
 
 interface Error {
   error: { message: string };
@@ -87,22 +87,26 @@ export default class Room {
   public readonly uuid: string;
   private readonly queue: JSONTrack[];
   private readonly trackFactory: TrackFactory;
+  private readonly streamingService: MusicPlatform;
 
-  private constructor(uuid: string /*...platforms*/) {
+  private constructor(uuid: string, streamingService: MusicPlatform) {
     this.uuid = uuid;
     this.queue = [];
+    this.streamingService = streamingService;
 
     this.trackFactory = new TrackFactory();
-    this.trackFactory.register(
-      new Spotify()
-    ) /*, new SoundCloud(), new AppleMusic()*/;
+    this.trackFactory.register(this.streamingService);
   }
 
-  static getOrCreate(roomStorage: RoomStorage, uuid: string): Room {
+  static getOrCreate(
+    roomStorage: RoomStorage,
+    uuid: string,
+    streamingService: MusicPlatform
+  ): Room {
     let room = roomStorage.getRoom(uuid);
 
     if (room === null) {
-      room = new Room(uuid);
+      room = new Room(uuid, streamingService);
       roomStorage.addRoom(room);
     }
 
@@ -159,6 +163,10 @@ export default class Room {
 
   getQueue(): JSONTrack[] {
     return [...this.queue];
+  }
+
+  getStreamingService(): MusicPlatform {
+    return this.streamingService;
   }
 
   size(): number {

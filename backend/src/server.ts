@@ -11,6 +11,7 @@ import UnbindServicePOST from "./route/UnbindServicePOST";
 import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { Server } from "socket.io";
+import RoomStorage from "./RoomStorage";
 import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
@@ -77,7 +78,9 @@ export const spotify = SpotifyApi.withClientCredentials(
 );
 server.register(fastifyIO, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:8081",
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 server.register(fastifyCookie, {
@@ -162,6 +165,17 @@ server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
 });
 
+setInterval(async () => {
+  const allRooms = await RoomStorage.getRoomStorage().getRooms();
+  allRooms.forEach((room) => {
+    // If the active room is using a widget thats running client-side, we need to send a message to the client to update the room
+    if (room.getStreamingService().isClientSide()) {
+      const { uuid } = room;
+      server.io.of(`/room/${uuid}`).emit("player:stateRequest");
+    }
+  });
+}, 10000);
+
 server.listen({ port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
@@ -169,6 +183,7 @@ declare module "fastify" {
     io: Server<{
       "queue:update": (room: RoomJSON) => void;
       "queue:deleted": () => void;
+      "player:stateRequest": () => void;
     }>;
   }
 }

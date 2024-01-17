@@ -29,6 +29,7 @@ export default abstract class MusicPlatform {
   }
 
   abstract getJsonTrack(id: string): Promise<JSONTrack | null>;
+  abstract isClientSide(): boolean;
 }
 
 function getNbCapturingGroupRegex(regex: RegExp) {

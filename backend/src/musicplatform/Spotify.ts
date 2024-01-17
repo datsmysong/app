@@ -32,4 +32,8 @@ export default class Spotify extends MusicPlatform {
       imgUrl: new URL(image.url).toString(),
     };
   }
+
+  isClientSide(): boolean {
+    return false;
+  }
 }
