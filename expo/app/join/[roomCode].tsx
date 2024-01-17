@@ -24,28 +24,21 @@ export default function JoinPage() {
     useSupabaseUser().then(async (user) => {
       if (user) {
         setIsConnected(true);
-        
-        const { data: roomId, error: activeRoomError } = await supabase
-        .from("active_rooms")
-        .select("id")
-        .eq("code", roomCode)
-        .single();
-        
-        if (activeRoomError) throw new Error("Error while fetching data from supabase");
 
         const { data: participant, error: roomUsersError } = await supabase
-        .from("room_users")
-        .select("profile_id")
-        .eq("profile_id", user.id)
-        .eq("room_id", roomId)
-        .single();
+          .from("room_users")
+          .select("profile_id")
+          .eq("profile_id", user.id)
+          .eq("room_id", await getRoomId())
+          .single();
 
-        if (roomUsersError) throw new Error("Error while fetching data from supabase");
+        if (roomUsersError)
+          throw new Error("Error while fetching data from supabase");
 
         setIsParticipant(participant ? true : false);
       } else {
         setIsConnected(false);
-        // ... when it is implemented, verifiy if the user is a participant or not
+        // ... when anonymous users are implemented, verifiy if the user is a participant or not
       }
     });
 
@@ -61,18 +54,35 @@ export default function JoinPage() {
     }
   };
 
-  const onOpenApp = (path: string) => {
+  const onOpenApp = async (path: string) => {
     const deepLink = Linking.createURL(path);
-
-    // ...add the user in the room_users table in supabase if the user isn't already participant
-
+    await addUserToRoom();
     Linking.openURL(deepLink);
   };
 
-  const onContinueWebsite = (path: string) => {
-    // ...add the user in the room_users table in supabase if the user isn't already participant
-
+  const onContinueWebsite = async (path: string) => {
+    await addUserToRoom();
     router.replace(path as any);
+  };
+
+  const addUserToRoom = async () => {
+    const { error: roomUsersError } = await supabase.from("room_users").insert({
+      room_id: await getRoomId(),
+      profile_id: user.id,
+    });
+    if (roomUsersError)
+      throw new Error("Error while inserting data in supabase");
+  };
+
+  const getRoomId = async () => {
+    const { data: roomId, error: activeRoomError } = await supabase
+      .from("active_rooms")
+      .select("id")
+      .eq("code", roomCode)
+      .single();
+    if (activeRoomError)
+      throw new Error("Error while fetching data from supabase");
+    return roomId;
   };
 
   if (isConnected) {
@@ -85,14 +95,14 @@ export default function JoinPage() {
           <Button
             block
             type="filled"
-            onPress={() => onOpenApp(`rooms/${roomCode}`)}
+            onPress={async () => await onOpenApp(`rooms/${roomCode}`)}
           >
             Ouvrir dans l'application
           </Button>
           <Button
             block
             type="outline"
-            onPress={() => onContinueWebsite(`rooms/${roomCode}`)}
+            onPress={async () => await onContinueWebsite(`rooms/${roomCode}`)}
           >
             Continuer sur le site
           </Button>
