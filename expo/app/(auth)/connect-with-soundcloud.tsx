@@ -1,16 +1,21 @@
 import * as WebBrowser from "expo-web-browser";
 import React from "react";
-import { Pressable, Text } from "react-native";
-import Alert from "../../components/Alert";
 import { makeRedirectUri } from "expo-auth-session";
+import { Pressable, Text } from "react-native";
 //import { URL } from "react-native-url-polyfill";
 
 interface params {
   title: string;
+  buttonStyle?: object;
+  textStyle?: object;
 }
 
 const directUri = makeRedirectUri();
-export default function ConnectWithSoundcloud({ title }: params) {
+export default function ConnectWithSoundcloud({
+  title,
+  buttonStyle = {},
+  textStyle = {},
+}: params) {
   const baseUrl = directUri.includes("exp://")
     ? "http://" + directUri.split(":8081")[0].split("//")[1]
     : directUri.split(":8081")[0];
@@ -41,8 +46,8 @@ export default function ConnectWithSoundcloud({ title }: params) {
   };
 
   return (
-    <Pressable onPress={handleConnect}>
-      <Text>{title}</Text>
+    <Pressable onPress={handleConnect} style={buttonStyle}>
+      <Text style={textStyle}>{title}</Text>
     </Pressable>
   );
 }
