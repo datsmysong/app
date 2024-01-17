@@ -11,9 +11,18 @@ import { PlaybackState, StreamingPlatformRemote } from "../lib/types";
 import useSoundCloudWidgetHtml from "../lib/useSoundCloudWidgetHtml";
 
 type SoundCloudPlayerProps = {};
+export interface SoundCloudPlayerRemote extends StreamingPlatformRemote {
+  fetchCurrent: () => Promise<PlaybackState>;
+}
+
+export function isSoundCloudPlayerRemote(
+  remote: any
+): remote is SoundCloudPlayerRemote {
+  return remote?.fetchCurrent !== undefined;
+}
 
 const SoundCloudPlayer = forwardRef<
-  StreamingPlatformRemote,
+  SoundCloudPlayerRemote,
   SoundCloudPlayerProps
 >((props, ref) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -21,12 +30,13 @@ const SoundCloudPlayer = forwardRef<
 
   useEffect(() => {
     if (iframeRef.current) {
-      window.addEventListener("message", handleIframeMessage);
-      iframeRef.current.addEventListener("message", handleIframeMessage);
+      const contentWindow = iframeRef.current.contentWindow as Window;
+      contentWindow.addEventListener("message", handleIframeMessage);
     }
     return () => {
       if (iframeRef.current) {
-        iframeRef.current.removeEventListener("message", handleIframeMessage);
+        const contentWindow = iframeRef.current.contentWindow as Window;
+        contentWindow.removeEventListener("message", handleIframeMessage);
       }
     };
   }, [iframeRef.current]);
@@ -38,14 +48,11 @@ const SoundCloudPlayer = forwardRef<
     setVolume,
     seekTo,
     fetchCurrent,
-    fetchQueue,
     next,
     prev,
   }));
 
   const playMusic = async (url: string) => {
-    console.log("playMusic");
-
     if (Platform.OS !== "web") {
       webViewRef.current?.postMessage("{command: 'playMusic'}");
     } else {
@@ -127,9 +134,7 @@ const SoundCloudPlayer = forwardRef<
     }
   };
 
-  const [resolveCurrentState, setResolveCurrentState] = useState<
-    (() => void) | null
-  >(null);
+  const [resolveCurrentState, setResolveCurrentState] = useState<null | (() => void)>(null);
 
   const handleWebViewMessage = (event: WebViewMessageEvent) => {
     const { data } = JSON.parse(event.nativeEvent.data);
@@ -141,14 +146,20 @@ const SoundCloudPlayer = forwardRef<
     }
   };
 
-  const handleIframeMessage = (event: Event) => {
-    if (!(event instanceof MessageEvent)) return;
+  const resolveCurrentStateRef = useRef<null | ((data: any) => void)>(null);
 
-    const { data } = event;
+  useEffect(() => {
+    resolveCurrentStateRef.current = resolveCurrentState;
+  }, [resolveCurrentState]);
+  
+  const handleIframeMessage = (event: Event) => {
+    //if (!(event instanceof MessageEvent)) return;
+
+    const { data } = event as MessageEvent;
 
     if (data.command === "currentMusic") {
-      if (resolveCurrentState) {
-        resolveCurrentState();
+      if (resolveCurrentStateRef.current) {
+        resolveCurrentStateRef.current(data.data);
         setResolveCurrentState(null);
       }
     }
@@ -167,28 +178,6 @@ const SoundCloudPlayer = forwardRef<
       }
     });
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchCurrent().then((currentState) => {
-        const queue = fetchQueue();
-        const stateAndQueue = {
-          currentState,
-          queue,
-        };
-        // Send stateAndQueue through socket.io websocket
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  const fetchQueue = async () => {
-    return [];
-  };
-
   const next = async () => {};
 
   const prev = async () => {};
