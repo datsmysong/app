@@ -1,4 +1,4 @@
-export type StreamingPlatformRemote = {
+export interface StreamingPlatformRemote {
   playMusic: (musicUri: string) => Promise<void>;
   pause: () => Promise<void>;
   play: () => Promise<void>;
