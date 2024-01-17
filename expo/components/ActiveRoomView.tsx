@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { Socket, io } from "socket.io-client";
 import {
   ActiveRoom,
   OrderedMusic,
@@ -8,10 +9,13 @@ import {
   StreamingService,
 } from "../lib/types";
 import AudioRemote from "./AudioRemote";
+import Button from "./Button";
 import Player from "./Player";
 import PlayerControls from "./PlayerControls";
-import { View } from "./Tamed";
-import { Socket, io } from "socket.io-client";
+import {
+  SoundCloudPlayerRemote,
+  isSoundCloudPlayerRemote,
+} from "./SoundCloudPlayer";
 
 type ActiveRoomViewProps = {
   room: ActiveRoom;
@@ -28,6 +32,15 @@ const knownStreamingServices: Array<StreamingService> = [
   },
 ];
 
+type StateUpdatedMessage = {
+  type: "stateUpdated";
+  data: PlaybackState;
+};
+
+type StateRequestMessage = {
+  type: "stateRequest";
+};
+
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const isHost = true;
   const remote = useRef<StreamingPlatformRemote>(null);
@@ -42,26 +55,66 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const onStateUpdated = (
+    socket: Socket,
+    message: StateUpdatedMessage
+  ): void => {
+    console.log("message = ", message);
+    setCurrentPlaybackState(message.data);
+  };
+
+  const onStateRequest = async (
+    socket: Socket,
+    message: StateRequestMessage
+  ) => {
+    if (!isHost) return;
+    // This should never happen because the server should only send that message when the room
+    // is using SoundCloud
+    if (room.streamingService.serviceName !== "SoundCloud") return;
+    if (!isSoundCloudPlayerRemote(remote.current)) return;
+
+    console.log("[WS] Fetching current playback state");
+    
+    const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
+    console.log("Found remote!");
+    const currentPlaybackState = await soundCloudRemote.fetchCurrent();
+    console.log("currentPlaybackState", currentPlaybackState);
+
+    socket.emit("stateUpdated", {
+      type: "stateUpdated",
+      data: currentPlaybackState,
+    });
+  };
   useEffect(() => {
-    setSocket(io('http://localhost:3000'));
+    if (socket == null) return;
+    console.log("[WS] Setting up event listeners");
 
-    socket?.on('connect', () => {
-      console.log('Connected to WebSocket server');
+    socket.on("connect", () => {
+      console.log("[WS] Connected to room server");
     });
 
-    socket?.on('stateUpdated', (message: any) => {
-      onWebSocketMessage(message);
+    socket.on("stateUpdated", (message: any) => {
+      console.log("[WS] Received stateUpdated message");
+      onStateUpdated(socket, message);
     });
+
+    socket.on("stateRequest", (message: any) => {
+      console.log("[WS] Server is requesting playback state");
+      onStateRequest(socket, message as StateRequestMessage);
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    setSocket(
+      io("http://localhost:3000", {
+        withCredentials: true,
+      })
+    );
 
     return () => {
+      console.log("[WS] Disconnecting from room server");
       socket?.disconnect();
     };
-  }, []);
-
-  const onWebSocketMessage = useCallback((message: any) => {
-    if (message.type === 'playbackState') {
-      setCurrentPlaybackState(message.data);
-    }
   }, []);
 
   const playCoolSong = async () => {
@@ -79,6 +132,12 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     }
   };
 
+  const fetchCurrent = async () => {
+    const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
+    const currentPlaybackState = await soundCloudRemote.fetchCurrent();
+    console.log("currentPlaybackState", currentPlaybackState);
+  };
+
   return (
     <>
       <View>
@@ -92,10 +151,10 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
         </Player>
       </View>
 
-      <Button
-        onPress={playCoolSong}
-        title="play Duke & Jones - Call Me (Chill Mix)"
-      />
+      <Button type="outline" onPress={playCoolSong}>
+        play Duke & Jones - Call Me (Chill Mix)
+      </Button>
+      <Button type="filled" onPress={fetchCurrent}>Fetch!</Button>
     </>
   );
 };
