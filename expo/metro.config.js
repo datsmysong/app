@@ -9,6 +9,16 @@ const config = getDefaultConfig(__dirname, {
 
 // Add support for importing files with the extension '.mjs' and '.cjs' for compatibility with
 //  - react-hook-form
-config.resolver.sourceExts = [...config.resolver.sourceExts, "mjs", "cjs"];
+module.exports = async () => {
+  const {
+    resolver: { sourceExts },
+  } = config;
 
-module.exports = config;
+  return {
+    ...config,
+    resolver: {
+      ...config.resolver,
+      sourceExts: [...sourceExts, "mjs", "cjs"],
+    },
+  };
+};
