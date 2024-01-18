@@ -52,7 +52,6 @@ server.register(require("@fastify/cookie"), {
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);
 
-server.get("/rooms", RoomGET);
 server.register(fastifyCors, {
   origin: [true], // or true to allow all origins
   methods: ["*"], // or just ['*'] for all methods
@@ -65,13 +64,6 @@ server.register(import("@fastify/rate-limit"), {
   max: 50,
   timeWindow: "1 minute",
 });
-
-server.get("/rooms", RoomsGET);
-
-// Auth
-server.register(authRoutes, { prefix: "/auth" });
-
-server.get("/streaming-services", StreamingServicesGET);
 
 const createRoomSchema = {
   body: {
@@ -97,9 +89,18 @@ const createRoomSchema = {
   },
 };
 
+// Auth
+server.register(authRoutes, { prefix: "/auth" });
+
+server.get("/streaming-services", StreamingServicesGET);
+
 server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
 server.get("/room/:id", RoomIdGET);
+
+server.get("/rooms", RoomsGET);
+
+// server.get("/track/spotify/:id", SpotifyGET);
 
 server.ready().then(() => {
 
