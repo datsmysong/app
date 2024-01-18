@@ -36,7 +36,7 @@ export async function getStreamingServiceIdByName(serviceName: string) {
     .eq("service_name", serviceName)
     .then((res) => {
       if (res.error) {
-        console.log({ code: res.status, message: res.error });
+        return { code: res.status, message: res.error.message };
       } else {
         return res.data[0].service_id;
       }
@@ -106,6 +106,6 @@ export default async function SoundcloudBoundGET(
   if (res.status === 200) {
     return response.type("text/html").send("<script>window.close();</script>");
   } else {
-    return response.send({ code: 500, message: "Soundcloud not bound" });
+    return response.code(res.status).send(res.statusText);
   }
 }

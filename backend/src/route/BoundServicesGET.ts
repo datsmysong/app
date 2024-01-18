@@ -23,7 +23,6 @@ export default async function BoundServicesGET(
     if (res.error) {
       return reply.code(res.status).send({ message: res.error.message });
     } else {
-      console.log(res.data);
       return reply.send(res.data);
     }
   } catch (error) {
