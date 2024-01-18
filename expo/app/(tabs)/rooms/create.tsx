@@ -126,14 +126,12 @@ export default function CreateRoom() {
         body: JSON.stringify(body),
         credentials: "include",
       });
-      const data = await response.json();
-
-      console.log({ code: data.code, message: data.message });
+      if (response.ok) {
+        router.push("/rooms");
+      }
     } catch (error) {
       return error;
     }
-
-    router.push("/rooms");
   };
 
   return (
