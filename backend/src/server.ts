@@ -25,12 +25,12 @@ const server = fastify({
 
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   throw new Error(
-    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable"
+    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable",
   );
 }
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
-  process.env.SERVICE_ROLE
+  process.env.SERVICE_ROLE,
 );
 
 server.register(fastifyIO);
@@ -44,6 +44,7 @@ server.get("/rooms", RoomGET);
 server.register(fastifyCors, {
   origin: [true], // or true to allow all origins
   methods: ["*"], // or just ['*'] for all methods
+  credentials: true, // or true to reflect origin
 });
 
 // Auth
@@ -62,7 +63,7 @@ const createRoomSchema = {
       "voteSkipping",
       "voteSkippingNeeded",
       "maxMusicPerUser",
-      "maxMusicPerUserDuration",
+      "maxMusicDuration",
     ],
     properties: {
       name: { type: "string" },
@@ -71,7 +72,7 @@ const createRoomSchema = {
       voteSkipping: { type: "boolean" },
       voteSkippingNeeded: { type: "number" },
       maxMusicPerUser: { type: "number" },
-      maxMusicPerUserDuration: { type: "number" },
+      maxMusicDuration: { type: "number" },
     },
   },
 };
