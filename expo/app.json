@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "stan-app",
-    "slug": "stan-app",
+    "name": "datsmysong",
+    "slug": "datsmysong",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

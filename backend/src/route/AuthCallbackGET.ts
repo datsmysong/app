@@ -1,12 +1,23 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { PostgrestError } from "@supabase/supabase-js";
+import { FastifyReply, FastifyRequest } from "fastify";
 import createClient from "../lib/supabase";
 import { adminSupabase } from "../server";
 import { Database } from "../types/dbTypes";
-import { PostgrestError } from "@supabase/supabase-js";
 
-enum StreamingService {
-  Spotify = "a2d17b25-d87e-42af-9e79-fd4df6b59222",
-  SoundCloud = "c99631a2-f06c-4076-80c2-13428944c3a8",
+class StreamingService {
+  static readonly Spotify = new StreamingService(
+    "a2d17b25-d87e-42af-9e79-fd4df6b59222",
+    "spotify"
+  );
+  static readonly SoundCloud = new StreamingService(
+    "c99631a2-f06c-4076-80c2-13428944c3a8",
+    "soundcloud"
+  );
+
+  private constructor(
+    public readonly id: string,
+    public readonly providerName: string
+  ) {}
 }
 
 export default async function AuthCallbackGET(
@@ -23,7 +34,6 @@ export default async function AuthCallbackGET(
       .code(400)
       .send({ error: "Missing cookie auth-token-code-verifier " });
   }
-
   const supabase = createClient({
     request,
     response,
@@ -38,14 +48,9 @@ export default async function AuthCallbackGET(
   const { data } = await supabase.auth.exchangeCodeForSession(code);
   if (!data.session)
     return response.code(400).send({ error: "Missing session" });
-  const providerToken = data.session.provider_token;
-  const providerRefreshToken = data.session.provider_refresh_token;
   const providerName = data.session.user.app_metadata.provider;
-
-  if (!providerToken || !providerRefreshToken)
-    return response
-      .code(400)
-      .send({ error: "Missing provider token from " + providerName });
+  if (!providerName)
+    return response.code(400).send({ error: "Missing provider name" });
 
   // verify if user already have an user_profile (if new acc, create one)
   let userProfileId = await getUserProfile(data.user.id);
@@ -63,21 +68,31 @@ export default async function AuthCallbackGET(
     }
     userProfileId = newUserProfileId;
   }
-  const providerTokenEnd = new Date();
-  providerTokenEnd.setHours(providerTokenEnd.getHours() + 1);
-  const timestampZProviderTokenEnd = providerTokenEnd.toISOString();
 
-  const error = await upsertService({
-    access_token: providerToken,
-    refresh_token: providerRefreshToken,
-    expires_in: timestampZProviderTokenEnd,
-    user_profile_id: userProfileId,
-    service_id: StreamingService.Spotify,
-  });
+  if (shouldStoreTokens(providerName)) {
+    const providerToken = data.session.provider_token;
+    const providerRefreshToken = data.session.provider_refresh_token;
 
-  if (error) {
-    request.log.error("Upsert impossible, ", error);
-    return response.code(500).send({ error: "Server error." });
+    if (!providerToken || !providerRefreshToken)
+      return response
+        .code(400)
+        .send({ error: "Missing provider token from " + providerName });
+    const providerTokenEnd = new Date();
+    providerTokenEnd.setHours(providerTokenEnd.getHours() + 1);
+    const timestampZProviderTokenEnd = providerTokenEnd.toISOString();
+
+    const error = await upsertService({
+      access_token: providerToken,
+      refresh_token: providerRefreshToken,
+      expires_in: timestampZProviderTokenEnd,
+      user_profile_id: userProfileId,
+      service_id: StreamingService.Spotify.id,
+    });
+
+    if (error) {
+      request.log.error("Upsert impossible, ", error);
+      return response.code(500).send({ error: "Server error." });
+    }
   }
 
   const refresh_token = data.session.refresh_token;
@@ -164,4 +179,10 @@ const upsertService = async (
 ): Promise<PostgrestError | null> => {
   const { error } = await adminSupabase.from("bound_services").upsert(service);
   return error;
+};
+
+const shouldStoreTokens = (providerName: string): boolean => {
+  return Object.values(StreamingService).find(
+    (service) => service.providerName === providerName
+  );
 };

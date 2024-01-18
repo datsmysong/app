@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Divider } from "react-native-elements";
 import Button from "../../components/Button";
 import ConnectWithSpotify from "./connect-with-spotify";
+import ConnectWithGoogle from "./connect-with-google";
 
 export default function Onboarding() {
   return (
@@ -11,9 +12,7 @@ export default function Onboarding() {
         <Text style={styles.title}>Datsmysong</Text>
       </View>
       <View style={styles.container}>
-        <Button prependIcon="home" type="outline">
-          Rejoindre avec Google
-        </Button>
+        <ConnectWithGoogle />
         <ConnectWithSpotify />
         <View style={styles.containerWithDivider}>
           <Divider style={{ width: "80%", margin: 20 }} />
