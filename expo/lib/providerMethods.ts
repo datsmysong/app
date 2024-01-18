@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Provider } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
+import * as Device from "expo-device";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 import Alert from "../components/Alert";
 import { supabase } from "./supabase";
-import * as Device from "expo-device";
 
 WebBrowser.maybeCompleteAuthSession(); // required for web only
 
@@ -62,6 +62,7 @@ export const signInWithProvider = async ({
     data.url +
     "#code_verifier=" +
     urlEncodedCodeVerifier;
+
   if (Platform.OS === "web" && Device.osName !== "Windows") {
     // if (Platform.OS === "web" ) {
     // Second implementation for web browser on mobile:

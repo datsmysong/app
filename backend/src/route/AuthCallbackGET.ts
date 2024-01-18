@@ -1,12 +1,23 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { PostgrestError } from "@supabase/supabase-js";
+import { FastifyReply, FastifyRequest } from "fastify";
 import createClient from "../lib/supabase";
 import { adminSupabase } from "../server";
 import { Database } from "../types/dbTypes";
-import { PostgrestError } from "@supabase/supabase-js";
 
-enum StreamingService {
-  Spotify = "a2d17b25-d87e-42af-9e79-fd4df6b59222",
-  SoundCloud = "c99631a2-f06c-4076-80c2-13428944c3a8",
+class StreamingService {
+  static readonly Spotify = new StreamingService(
+    "a2d17b25-d87e-42af-9e79-fd4df6b59222",
+    "spotify"
+  );
+  static readonly SoundCloud = new StreamingService(
+    "c99631a2-f06c-4076-80c2-13428944c3a8",
+    "soundcloud"
+  );
+
+  private constructor(
+    public readonly id: string,
+    public readonly providerName: string
+  ) {}
 }
 
 export default async function AuthCallbackGET(
@@ -23,7 +34,6 @@ export default async function AuthCallbackGET(
       .code(400)
       .send({ error: "Missing cookie auth-token-code-verifier " });
   }
-
   const supabase = createClient({
     request,
     response,
@@ -59,7 +69,7 @@ export default async function AuthCallbackGET(
     userProfileId = newUserProfileId;
   }
 
-  if (providerName === "spotify") {
+  if (needToBeInsertOnDatabase(providerName)) {
     const providerToken = data.session.provider_token;
     const providerRefreshToken = data.session.provider_refresh_token;
 
@@ -76,7 +86,7 @@ export default async function AuthCallbackGET(
       refresh_token: providerRefreshToken,
       expires_in: timestampZProviderTokenEnd,
       user_profile_id: userProfileId,
-      service_id: StreamingService.Spotify,
+      service_id: StreamingService.Spotify.id,
     });
 
     if (error) {
@@ -87,7 +97,6 @@ export default async function AuthCallbackGET(
 
   const refresh_token = data.session.refresh_token;
   const redirectUrl = decodeURIComponent(request.url).split("redirect_url=")[1];
-  console.log("redirectUrl", redirectUrl);
 
   // redirect user to the redirect url with the refresh token
   response.redirect(
@@ -170,4 +179,10 @@ const upsertService = async (
 ): Promise<PostgrestError | null> => {
   const { error } = await adminSupabase.from("bound_services").upsert(service);
   return error;
+};
+
+const needToBeInsertOnDatabase = (providerName: string): boolean => {
+  return Object.values(StreamingService).find(
+    (service) => service.providerName === providerName
+  );
 };

@@ -1,5 +1,3 @@
-import "react-native-url-polyfill/auto";
-
 import Button from "../../components/Button";
 import { signInWithProvider } from "../../lib/providerMethods";
 
