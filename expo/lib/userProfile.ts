@@ -1,4 +1,4 @@
-import { PostgrestError } from "@supabase /supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 import useSupabaseUser from "./useSupabaseUser";
 

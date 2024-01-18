@@ -18,7 +18,7 @@ export default function RoomsPage() {
         </Button>
         <TextInput onChangeText={setValue} style={{borderWidth: 1, width: "25%", minWidth: 300}} />
         <Button
-          href={`/musicRoom/${encodeURIComponent(value)}`}>
+          href={`/rooms/${encodeURIComponent(value)}`}>
           Current active room
         </Button>
       </View>

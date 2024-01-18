@@ -3,8 +3,18 @@ import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
 import Spotify from "./musicplatform/Spotify";
 import { randomUUID } from "node:crypto";
-import { JSONTrack } from "./musicplatform/MusicPlatform";
 import MusicStorage from "./MusicStorage";
+import { JSONTrack } from "./musicplatform/MusicPlatform";
+import TrackFactory from "./musicplatform/TrackFactory";
+
+interface RoomJSON {
+  currentActiveRoom: string;
+  tracks: JSONTrack[];
+}
+
+interface Error {
+  error: { message: string };
+}
 
 export async function getUserFromRequest(
   request: FastifyRequest,
@@ -143,7 +153,7 @@ export default class Room {
     if (track !== undefined) this.tracks.add(track);
   }
 
-  remove(rawUrl: string | URL) {
+  async remove(rawUrl: string | URL) {
     let track;
     for (track of this.tracks) {
       // replace by TrackFabrique to improve this like add

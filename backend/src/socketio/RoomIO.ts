@@ -1,9 +1,9 @@
 import { Socket } from "socket.io";
-import Room from "../Room";
+import Room from "../room";
 import MusicStorage from "../MusicStorage";
 
 export default function RoomIO(
-  socket: Socket /*, next: (err?: ExtendedError) => void*/,
+  socket: Socket /*, next: (err?: ExtendedError) => void*/
 ) {
   let namespace = socket.nsp;
   /*regex uuid [0-9a-f]{8}-([0-9a-f]{4}){3}-[0-9a-f]{12}*/
@@ -36,14 +36,14 @@ export default function RoomIO(
   socket.onAny(
     async (
       event: string,
-      urlRaw: string /*, callback: (arg0: any) => void*/,
+      urlRaw: string /*, callback: (arg0: any) => void*/
     ) => {
       switch (event) {
         case "queue:add":
           await room?.add(urlRaw);
           break;
         case "queue:remove":
-          room?.remove(urlRaw);
+          await room?.remove(urlRaw);
           break;
       }
 
@@ -53,6 +53,6 @@ export default function RoomIO(
       // TODO ferbach : actionReducer pattern
       socket.nsp.emit("queue:update", Room.toJSON(room));
       // callback(Room.toJSON(room))
-    },
+    }
   );
 }

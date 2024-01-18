@@ -6,4 +6,4 @@ function alert(content: string) {
     : ReactNativeAlert.alert(content);
 }
 
-export default { alert };
+export default {alert};

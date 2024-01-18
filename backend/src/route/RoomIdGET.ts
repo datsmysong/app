@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import Room from "../Room";
+import Room from "../room";
 import MusicStorage from "../MusicStorage";
 
 export interface QueryParams {
@@ -8,7 +8,7 @@ export interface QueryParams {
 
 export default async function RoomIdGET(
   req: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const { id: activeRoomId } = req.params as QueryParams;
 
@@ -22,14 +22,14 @@ export default async function RoomIdGET(
     mock = Room.newRoom(musicStorage);
 
     await mock.add(
-      "https://open.spotify.com/intl-fr/track/4OUTQBwLBaTIUcgdI5PPt7?si=3aac1a9bcf3d4eac",
+      "https://open.spotify.com/intl-fr/track/4OUTQBwLBaTIUcgdI5PPt7?si=3aac1a9bcf3d4eac"
     );
     await mock.add(
-      "https://open.spotify.com/intl-fr/track/5b8HD1dJDuPawgS5FjSC2q?si=1c2499f5cb334ca9",
+      "https://open.spotify.com/intl-fr/track/5b8HD1dJDuPawgS5FjSC2q?si=1c2499f5cb334ca9"
     );
 
     await mock.add(
-      "https://open.spotify.com/intl-fr/track/42CJLS5WkK6jckfYvJ8ULb?si=22b524f4d60643ce",
+      "https://open.spotify.com/intl-fr/track/42CJLS5WkK6jckfYvJ8ULb?si=22b524f4d60643ce"
     );
   }
 

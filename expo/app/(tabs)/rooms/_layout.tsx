@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import {Stack} from "expo-router";
 
 export default function RoomsTabLayout() {
   return (
@@ -7,6 +7,10 @@ export default function RoomsTabLayout() {
       <Stack.Screen
         name="create"
         options={{ presentation: "modal", title: "Création d'une salle" }}
+      />
+      <Stack.Screen
+        name="[id]"
+        options={{ presentation: "modal", title: "File d'attente" }}
       />
     </Stack>
   );

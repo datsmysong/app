@@ -1,4 +1,4 @@
-import Room from "./Room";
+import Room from "./room";
 
 export default class MusicStorage {
   private static singleton: MusicStorage;
@@ -20,14 +20,14 @@ export default class MusicStorage {
   }
 
   removeRoomByUuid(uuid: string) {
-    this.data.delete(uuid);
+    this.data.delete(uuid)
   }
 
   removeRoom(room: Room) {
-    this.data.delete(room.uuid);
+    this.data.delete(room.uuid)
   }
 
   getRoom(activeRoomId: string): Room | null {
-    return this.data.get(activeRoomId) ?? null;
+    return this.data.get(activeRoomId) ?? null
   }
 }
