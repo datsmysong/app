@@ -66,6 +66,8 @@ server.register(import("@fastify/rate-limit"), {
   timeWindow: "1 minute",
 });
 
+server.get("/rooms", RoomsGET);
+
 // Auth
 server.register(authRoutes, { prefix: "/auth" });
 
