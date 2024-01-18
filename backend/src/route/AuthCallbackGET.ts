@@ -1,8 +1,8 @@
 import { PostgrestError } from "@supabase/supabase-js";
+import { BoundService } from "commons/database-types-utils";
 import { FastifyReply, FastifyRequest } from "fastify";
 import createClient from "../lib/supabase";
 import { adminSupabase } from "../server";
-import { Database } from "../types/dbTypes";
 
 class StreamingService {
   static readonly Spotify = new StreamingService(
@@ -175,7 +175,7 @@ const createAccount = async ({
 };
 
 const upsertService = async (
-  service: Database["public"]["Tables"]["bound_services"]["Row"]
+  service: BoundService
 ): Promise<PostgrestError | null> => {
   const { error } = await adminSupabase.from("bound_services").upsert(service);
   return error;
