@@ -1,18 +1,15 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "../server";
 
-export default function StreamingServicesGET(
+export default async function StreamingServicesGET(
   req: FastifyRequest,
   reply: FastifyReply,
 ) {
-  adminSupabase
-    .from("streaming_services")
-    .select("*")
-    .then((res) => {
-      if (res.error) {
-        reply.code(res.status).send(res.error);
-      } else {
-        reply.send(res.data);
-      }
-    });
+  const {
+    data: streamingServices,
+    status,
+    error,
+  } = await adminSupabase.from("streaming_services").select("*");
+
+  reply.code(status).send(error ?? streamingServices);
 }

@@ -34,35 +34,30 @@ export async function createRoom(
   req: FastifyRequest,
   rep: FastifyReply,
 ) {
-  let configurationId: string | null = null;
-  let hostUserProfileId: string | null = null;
-
   const supabase = adminSupabase;
 
   const user = await getUserFromRequest(req, rep);
   if (!user.data.user) {
     return rep.code(401).send("User not logged in");
   }
-  hostUserProfileId =
+  const hostUserProfileId =
     (await getUserProfileIdFromAccountId(user.data.user.id)).data || null;
 
   const roomConfigRes = await supabase
     .from("room_configurations")
-    .insert([
-      {
-        vote_skipping: voteSkipping,
-        vote_skipping_needed_percentage: voteSkippingNeeded,
-        max_music_count_in_queue_per_participant: maxMusicPerUser,
-        max_music_duration: maxMusicPerUserDuration,
-      },
-    ])
-    .select("id");
+    .insert({
+      vote_skipping: voteSkipping,
+      vote_skipping_needed_percentage: voteSkippingNeeded,
+      max_music_count_in_queue_per_participant: maxMusicPerUser,
+      max_music_duration: maxMusicPerUserDuration,
+    })
+    .select("id")
+    .single();
 
   if (roomConfigRes.error) {
     return rep.code(roomConfigRes.status).send(roomConfigRes.error);
-  } else {
-    configurationId = roomConfigRes.data[0].id;
   }
+  const configurationId = roomConfigRes.data.id;
 
   const roomRes = await supabase
     .from("active_rooms")
@@ -80,7 +75,8 @@ export async function createRoom(
   if (roomRes.error) {
     return rep.code(roomRes.status).send(roomRes.error);
   } else {
-    return rep.code(200).send("Room created");
+    // TODO use roomid here (send)
+    return rep.code(201).send("Room created");
   }
 }
 
