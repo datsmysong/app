@@ -6,11 +6,11 @@ import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 import Alert from "../components/Alert";
-import { getApiUrl } from "./apiURL";
+import { getApiUrl } from "./apiUrl";
 import { supabase } from "./supabase";
 
 WebBrowser.maybeCompleteAuthSession(); // required for web only
-const directUri = makeRedirectUri();
+const redirectUrl = makeRedirectUri();
 
 export const signInWithProvider = async ({
   provider,
@@ -29,7 +29,7 @@ export const signInWithProvider = async ({
     options: {
       skipBrowserRedirect: true,
       redirectTo: encodeURI(
-        baseUrl + "/auth/callback?redirect_url=" + directUri.split(":3000")[0]
+        baseUrl + "/auth/callback?redirect_url=" + redirectUrl
       ),
       scopes: scopes,
     },
@@ -71,7 +71,7 @@ export const signInWithProvider = async ({
 
   const webBrowser = await WebBrowser.openAuthSessionAsync(
     urlBackendRedirection,
-    directUri
+    redirectUrl
   );
 
   // At end, if all is good, user come back to the app with a refresh_token to fetch new session
