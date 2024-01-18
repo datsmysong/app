@@ -3,10 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import Button from "../../components/Button";
-import useSupabaseUser from "../../lib/useSupabaseUser";
 import * as Linking from "expo-linking";
 import * as Device from "expo-device";
-import { User } from "@supabase/supabase-js";
+import Alert from "../../components/Alert";
+import { useUserProfile } from "../../lib/userProfile";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
@@ -14,37 +14,34 @@ export default function JoinPage() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [userProfileId, setUserProfileId] = useState<string>("");
 
   useEffect(() => {
     if (!roomCode) throw new Error("No room code provided");
-
-    const subscription = Linking.addEventListener("url", handleIncomingLinks);
-
     setIsMobile(Device.deviceType === Device.DeviceType.PHONE);
-
-    useSupabaseUser().then(async (user) => {
+    useUserProfile().then(async (user) => {
       if (user) {
-        setUser(user);
+        setUserProfileId(user.user_profile_id);
         setIsConnected(true);
-
+        const { data: roomId, error: errorRoomId } = await getRoomId();
+        if (errorRoomId) {
+          Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
+          return;
+        }
         const { data: participant, error: roomUsersError } = await supabase
           .from("room_users")
           .select("profile_id")
-          .eq("profile_id", user.id)
-          .eq("room_id", await getRoomId())
+          .eq("profile_id", user.user_profile_id)
+          .eq("room_id", roomId)
           .single();
-
-        if (roomUsersError)
-          throw new Error("Error while fetching data from supabase");
-
+        if (roomUsersError) return { data: null, error: roomUsersError };
         setIsParticipant(participant ? true : false);
       } else {
         setIsConnected(false);
         // ... when anonymous users are implemented, verifiy if the user is a participant or not
       }
     });
-
+    const subscription = Linking.addEventListener("url", handleIncomingLinks);
     return () => {
       subscription.remove();
     };
@@ -69,12 +66,17 @@ export default function JoinPage() {
   };
 
   const addUserToRoom = async () => {
+    const { data: roomId, error: errorRoomId } = await getRoomId();
+    if (errorRoomId) {
+      Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
+      return;
+    }
     const { error: roomUsersError } = await supabase.from("room_users").insert({
-      room_id: await getRoomId(),
-      profile_id: user!.id, // Change when anonymous users are implemented
+      room_id: roomId,
+      profile_id: userProfileId,
+      banned: false,
     });
-    if (roomUsersError)
-      throw new Error("Error while inserting data in supabase");
+    if (roomUsersError) return { error: roomUsersError };
   };
 
   const getRoomId = async () => {
@@ -83,9 +85,8 @@ export default function JoinPage() {
       .select("id")
       .eq("code", roomCode)
       .single();
-    if (activeRoomError)
-      throw new Error("Error while fetching data from supabase");
-    return room.id;
+    if (activeRoomError) return { data: null, error: activeRoomError };
+    return { data: room.id, error: null };
   };
 
   if (isConnected) {
@@ -120,7 +121,7 @@ export default function JoinPage() {
           mais vous n'êtes pas connecté
         </Text>
         <View style={styles.buttonContainer}>
-          <Button block type="filled" href={`(auth)`}>
+          <Button block type="filled" href={`auth`}>
             Se connecter
           </Button>
           <Button block type="outline">
