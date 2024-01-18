@@ -174,7 +174,7 @@ setInterval(async () => {
       server.io.of(`/room/${uuid}`).emit("player:stateRequest");
     }
   });
-}, 10000);
+}, 1000);
 
 server.listen({ port: 3000, host: "0.0.0.0" });
 
