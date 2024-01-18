@@ -1,5 +1,4 @@
 import { PostgrestError } from "@supabase /supabase-js";
-import Alert from "../components/Alert";
 import { supabase } from "./supabase";
 import useSupabaseUser from "./useSupabaseUser";
 

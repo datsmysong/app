@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import Room from "../room";
+import Room from "../Room";
 import MusicStorage from "../MusicStorage";
 
 export interface QueryParams {

@@ -1,4 +1,4 @@
-import {  Text } from "react-native";
+import { Text } from "react-native";
 import { supabase } from "../../lib/supabase";
 import useSupabaseUser from "../../lib/useSupabaseUser";
 import { useEffect, useState } from "react";
@@ -17,7 +17,7 @@ export default function TabsProfile() {
     <>
       <Text>Profile</Text>
       {user && (
-        <Button prependIcon="logout" onPress={() => supabase.auth.signOut()} >
+        <Button prependIcon="logout" onPress={() => supabase.auth.signOut()}>
           Se déconnecter
         </Button>
       )}

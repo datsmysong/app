@@ -1,6 +1,6 @@
-import { router , useNavigation} from "expo-router";
-import { useEffect,useState } from "react";
-import {  StyleSheet, Text, TextInput, View } from "react-native";
+import { router } from "expo-router";
+import { useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "react-native-screens";
 import Alert from "../components/Alert";
 import Button from "../components/Button";
@@ -19,7 +19,7 @@ export default function AskName() {
       Alert.alert("Le pseudo doit faire au moins 5 caractères");
       return;
     }
-    const {  error } = await supabase
+    const { error } = await supabase
       .from("user_profile")
       .update({ username: username })
       .eq("account_id", user?.id);

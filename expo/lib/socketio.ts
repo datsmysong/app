@@ -1,4 +1,4 @@
-import { Manager, Socket } from "socket.io-client";
+import { Manager, Socket } from "socket.io-client"; // https://docs.expo.dev/guides/environment-variables/
 
 // https://docs.expo.dev/guides/environment-variables/
 const ENDPOINT = process.env.EXPO_PUBLIC_API_ENDPOINT ?? "";
