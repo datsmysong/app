@@ -69,7 +69,7 @@ export default async function AuthCallbackGET(
     userProfileId = newUserProfileId;
   }
 
-  if (needToBeInsertOnDatabase(providerName)) {
+  if (shouldStoreTokens(providerName)) {
     const providerToken = data.session.provider_token;
     const providerRefreshToken = data.session.provider_refresh_token;
 
@@ -181,7 +181,7 @@ const upsertService = async (
   return error;
 };
 
-const needToBeInsertOnDatabase = (providerName: string): boolean => {
+const shouldStoreTokens = (providerName: string): boolean => {
   return Object.values(StreamingService).find(
     (service) => service.providerName === providerName
   );

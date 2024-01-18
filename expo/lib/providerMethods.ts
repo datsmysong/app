@@ -6,10 +6,10 @@ import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 import Alert from "../components/Alert";
+import { getApiUrl } from "./apiURL";
 import { supabase } from "./supabase";
 
 WebBrowser.maybeCompleteAuthSession(); // required for web only
-
 const directUri = makeRedirectUri();
 
 export const signInWithProvider = async ({
@@ -19,9 +19,8 @@ export const signInWithProvider = async ({
   provider: Provider;
   scopes?: string;
 }) => {
-  const baseUrl = directUri.includes("exp://")
-    ? "http://" + directUri.split(":8081")[0].split("//")[1]
-    : directUri.split(":8081")[0];
+  // verify if dev or prod
+  const baseUrl = getApiUrl();
 
   // Get from auth manager the url to redirect the user to Spotify
   // and a cookie to verify the user later
@@ -30,9 +29,7 @@ export const signInWithProvider = async ({
     options: {
       skipBrowserRedirect: true,
       redirectTo: encodeURI(
-        baseUrl +
-          ":3000/auth/callback?redirect_url=" +
-          directUri.split(":3000")[0]
+        baseUrl + "/auth/callback?redirect_url=" + directUri.split(":3000")[0]
       ),
       scopes: scopes,
     },
@@ -58,7 +55,7 @@ export const signInWithProvider = async ({
 
   const urlBackendRedirection =
     baseUrl +
-    ":3000/auth/redirection?redirect_url=" +
+    "/auth/redirection?redirect_url=" +
     data.url +
     "#code_verifier=" +
     urlEncodedCodeVerifier;
@@ -89,12 +86,10 @@ export const signInWithProvider = async ({
       router.replace("/(tabs)");
       return;
     }
-    console.error("error", error);
     Alert.alert(
       "Une erreur est survenue, l'authentification est impossible pour le moment"
     );
   }
-  console.error("WebBrowser n'a pas retourné le bon type", webBrowser.type);
   Alert.alert("Une erreur est survenue avec votre navigateur.");
 };
 
