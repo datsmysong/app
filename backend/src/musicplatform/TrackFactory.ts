@@ -2,17 +2,21 @@ import Track from "./Track";
 import MusicPlatform from "./MusicPlatform";
 
 export default class TrackFactory {
-  private readonly musicPlatformsList: Map<Function, MusicPlatform>
+  private readonly musicPlatformsList: Map<Function, MusicPlatform>;
 
   constructor() {
     this.musicPlatformsList = new Map<Function, MusicPlatform>();
   }
 
   register(newPlatform: MusicPlatform): boolean {
-    if (Array.from(this.musicPlatformsList.keys()).includes(newPlatform.getClass())) {
-      return false
+    if (
+      Array.from(this.musicPlatformsList.keys()).includes(
+        newPlatform.getClass(),
+      )
+    ) {
+      return false;
     }
-    this.musicPlatformsList.set(newPlatform.getClass(), newPlatform)
+    this.musicPlatformsList.set(newPlatform.getClass(), newPlatform);
     return true;
   }
 
@@ -20,7 +24,7 @@ export default class TrackFactory {
     for (let musicPlatform of this.musicPlatformsList.values()) {
       let trackId = musicPlatform.trackIdFromUrl(url);
       if (trackId) {
-        return new Track(musicPlatform, {id: trackId})
+        return new Track(musicPlatform, { id: trackId });
       }
     }
   }

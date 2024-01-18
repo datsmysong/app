@@ -1,9 +1,9 @@
-import {Manager, Socket} from "socket.io-client";
+import { Manager, Socket } from "socket.io-client";
 
 // https://docs.expo.dev/guides/environment-variables/
 const ENDPOINT = process.env.EXPO_PUBLIC_API_ENDPOINT ?? "";
 if (!ENDPOINT) {
-  throw new Error("le endpoint de communication socket.io n'est pas défini")
+  throw new Error("le endpoint de communication socket.io n'est pas défini");
 }
 
 export default class SocketIo {
@@ -23,5 +23,5 @@ export default class SocketIo {
 
   getSocket(namespace: string): Socket {
     return this.iomanager.socket(namespace);
-  };
+  }
 }

@@ -1,11 +1,11 @@
-import {router, useNavigation} from "expo-router";
-import {useEffect,useState} from "react";
-import { StyleSheet, Text, TextInput, View} from "react-native";
-import {Screen} from "react-native-screens";
+import { router , useNavigation} from "expo-router";
+import { useEffect,useState } from "react";
+import {  StyleSheet, Text, TextInput, View } from "react-native";
+import { Screen } from "react-native-screens";
 import Alert from "../components/Alert";
 import Button from "../components/Button";
-import {SupabaseErrorCode} from "../constants/SupabaseErrorCode";
-import {supabase} from "../lib/supabase";
+import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
+import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
 
 export default function AskName() {
@@ -19,9 +19,9 @@ export default function AskName() {
       Alert.alert("Le pseudo doit faire au moins 5 caractères");
       return;
     }
-    const { error} = await supabase
+    const {  error } = await supabase
       .from("user_profile")
-      .update({username: username})
+      .update({ username: username })
       .eq("account_id", user?.id);
     if (error) {
       if (error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION) {

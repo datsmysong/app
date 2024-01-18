@@ -14,6 +14,7 @@ import { FastifyCookieOptions } from "@fastify/cookie";
 import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import RoomIO from "./socketio/RoomIO";
+import HelloGet from "./route/HelloGET";
 
 config({path: ".env.local"});
 
@@ -103,9 +104,7 @@ server.get("/rooms", RoomsGET);
 // server.get("/track/spotify/:id", SpotifyGET);
 
 server.ready().then(() => {
-
-
-  server.io.of(/^\/room\/.*$/i).on("connection", RoomIO)
+  server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
 
   // we need to wait for the server to be ready, else `server.io` is undefined
   // server.io.of(/.*/).on("connection", (socket: Socket) => {
@@ -119,7 +118,7 @@ server.ready().then(() => {
   // })
 });
 
-server.listen({port: 3000, host: "0.0.0.0" });
+server.listen({ port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
   interface FastifyInstance {

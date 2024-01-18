@@ -1,10 +1,10 @@
-import {PostgrestError } from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase /supabase-js";
 import Alert from "../components/Alert";
 import { supabase } from "./supabase";
 import useSupabaseUser from "./useSupabaseUser";
 
 export const getUserProfile = async (id: string) => {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("user_profile")
     .select("*")
     .eq("account_id", id)

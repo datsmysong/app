@@ -1,6 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
+import Spotify from "./musicplatform/Spotify";
+import { randomUUID } from "node:crypto";
+import { JSONTrack } from "./musicplatform/MusicPlatform";
+import MusicStorage from "./MusicStorage";
 
 export async function getUserFromRequest(
   request: FastifyRequest,
@@ -103,4 +107,59 @@ export async function createRoom(
 export function endRoom(roomId: string) {
   // TODO: Properly end room
   // This will set the join code of this room to null, and set is_active to false
+}
+
+export default class Room {
+  public readonly uuid: string;
+  private readonly tracks: Set<JSONTrack>;
+
+  private constructor() {
+    this.uuid = randomUUID();
+    this.tracks = new Set();
+  }
+
+  static newRoom(musicStorage: MusicStorage): Room {
+    let room = new Room();
+    musicStorage.addRoom(room);
+    return room;
+  }
+
+  static toJSON(room: Room | null | undefined): RoomJSON | Error {
+    if (room instanceof Room) {
+      return { currentActiveRoom: room.uuid, tracks: room.getTracks() };
+    } else {
+      return { error: { message: "the given id is not active room" } };
+    }
+  }
+
+  async add(rawUrl: string | URL) {
+    // let track = new URL(rawUrl).toString();
+    let trackMetadata = new TrackFactory();
+    trackMetadata.register(
+      new Spotify()
+    ) /*, new SoundCloud(), new AppleMusic()*/;
+
+    let track = await trackMetadata.fromUrl(new URL(rawUrl))?.toJSON();
+    if (track !== undefined) this.tracks.add(track);
+  }
+
+  remove(rawUrl: string | URL) {
+    let track;
+    for (track of this.tracks) {
+      // replace by TrackFabrique to improve this like add
+      if (track.url === new URL(rawUrl).toString()) {
+        break;
+      }
+    }
+    if (track !== undefined) return this.tracks.delete(track);
+    return false;
+  }
+
+  getTracksString(): string[] {
+    return [...JSON.stringify(this.tracks)];
+  }
+
+  getTracks(): JSONTrack[] {
+    return [...this.tracks];
+  }
 }

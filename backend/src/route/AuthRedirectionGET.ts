@@ -1,8 +1,8 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 
 export default function AuthRedirectionGET(
   req: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) {
   reply.header("Content-Type", "text/html");
   reply.code(200).send(getReponseHTML());

@@ -1,4 +1,4 @@
-import {Alert as ReactNativeAlert, Platform} from "react-native";
+import { Alert as ReactNativeAlert, Platform } from "react-native";
 
 function alert(content: string) {
   Platform.OS === "web"
@@ -6,4 +6,4 @@ function alert(content: string) {
     : ReactNativeAlert.alert(content);
 }
 
-export default {alert};
+export default { alert };
