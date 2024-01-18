@@ -1,6 +1,6 @@
-import { Button, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { PlaybackState, StreamingPlatformRemote } from "../lib/types";
-import { View } from "./Tamed";
+import Button from "./Button";
 
 type PlayerControlsProps = {
   state: PlaybackState;
@@ -22,12 +22,19 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
 
   return (
     <View style={styles.controls}>
-      <Button onPress={handlePreviousTrack} title="Previous" />
+      <Button onPress={handlePreviousTrack} type="outline" icon="skip-previous">
+        Previous
+      </Button>
       <Button
         onPress={handlePlayPause}
-        title={state.isPlaying ? "Pause" : "Play"}
-      />
-      <Button onPress={handleNextTrack} title="Next" />P
+        icon={state.isPlaying ? "pause" : "play-arrow"}
+        type={state.isPlaying ? "outline" : "filled"}
+      >
+        {state.isPlaying ? "Pause" : "Play"}
+      </Button>
+      <Button onPress={handleNextTrack} type="outline" icon="skip-next">
+        Next
+      </Button>
     </View>
   );
 };
@@ -37,6 +44,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 3,
   },
 });
 
