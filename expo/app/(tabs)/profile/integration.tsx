@@ -5,6 +5,7 @@ import { Text, View } from "../../../components/Tamed";
 import { Image } from "expo-image";
 import ConnectWithSpotify from "../../(auth)/connect-with-spotify";
 import ConnectWithSoundcloud from "../../(auth)/connect-with-soundcloud";
+import { router } from "expo-router";
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([]);
@@ -71,6 +72,31 @@ export default function ProfileIntegration() {
 
   const isBound = (serviceId: string) => {
     return serviceIds.includes(serviceId);
+  };
+
+  const unboundService = (serviceId: string) => {
+    const body = {
+      userId: userId,
+      serviceId: serviceId,
+    };
+
+    fetch(baseUrl + ":3000/unbound", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((resUnbound) => {
+        if (!resUnbound.ok) {
+          console.error("Error while unbinding service");
+        } else {
+          router.push("/profile");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -160,6 +186,8 @@ export default function ProfileIntegration() {
                       ? styles.disableButtonText
                       : styles.enableButtonText,
                   ]}
+                  isBound={isBound(service.service_id)}
+                  onPress={() => unboundService(service.service_id)}
                 />
               )}
             </View>
@@ -225,7 +253,7 @@ const styles = StyleSheet.create({
   title: {
     color: "#000",
     textAlign: "center",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Regular",
     fontSize: 18,
     fontStyle: "normal",
     fontWeight: "700",
@@ -233,7 +261,7 @@ const styles = StyleSheet.create({
 
   description: {
     color: "#808080",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Regular",
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "400",
@@ -247,7 +275,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 10,
     textAlign: "center",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Regular",
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "500",
@@ -285,7 +313,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     textAlign: "center",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Regular",
     fontSize: 24,
     fontStyle: "normal",
     fontWeight: "700",

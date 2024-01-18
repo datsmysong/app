@@ -2,12 +2,15 @@ import * as WebBrowser from "expo-web-browser";
 import React from "react";
 import { makeRedirectUri } from "expo-auth-session";
 import { Pressable, Text } from "react-native";
+import { router } from "expo-router";
 //import { URL } from "react-native-url-polyfill";
 
 interface params {
   title: string;
   buttonStyle?: object;
   textStyle?: object;
+  onPress?: void | (() => void) | undefined;
+  isBound?: boolean;
 }
 
 const directUri = makeRedirectUri();
@@ -15,10 +18,9 @@ export default function ConnectWithSoundcloud({
   title,
   buttonStyle = {},
   textStyle = {},
+  onPress = () => {},
+  isBound = false,
 }: params) {
-  const baseUrl = directUri.includes("exp://")
-    ? "http://" + directUri.split(":8081")[0].split("//")[1]
-    : directUri.split(":8081")[0];
   function getSoundCloudAuthorizationUrl(
     clientId: string,
     redirectUri: string,
@@ -43,10 +45,12 @@ export default function ConnectWithSoundcloud({
     const authUrl = getSoundCloudAuthorizationUrl(clientId, redirectUri);
 
     await WebBrowser.openAuthSessionAsync(authUrl);
+
+    router.push("/profile");
   };
 
   return (
-    <Pressable onPress={handleConnect} style={buttonStyle}>
+    <Pressable onPress={isBound ? onPress : handleConnect} style={buttonStyle}>
       <Text style={textStyle}>{title}</Text>
     </Pressable>
   );
