@@ -1,0 +1,22 @@
+@startuml playback_state_pulling
+title Mise à jour de l'état de la lecture
+!theme plain
+
+participant App as "Application (frontend)"
+collections iframe as "iframe (ou webview)"
+collections SoundCloud as "iframe SoundCloud"
+participant Server as "Serveur WebSocket"
+
+Server -> App: Demande une mise à jour de l'état de la lecture
+App -> iframe: Envoie d'un message de requête de l'état
+iframe -> iframe: Reçoit le message de requête de l'état
+iframe -> SoundCloud: Exécute le code JavaScript du Widget SDK SoundCloud pour récupérer l'état
+iframe <- SoundCloud: Renvoie l'état
+App <- iframe: Envoie un message avec l'état de la lecture obtenue
+App -> App: Reçoit l'événement de mise à jour de l'état de la lecture
+App -> Server: Envoie l'état de la lecture
+alt Envoie à tout les clients connectés dans la salle active
+  Server -> App: Envoie le nouvel état reçu
+end
+
+@enduml
