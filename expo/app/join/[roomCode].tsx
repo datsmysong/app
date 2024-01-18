@@ -13,12 +13,11 @@ export default function JoinPage() {
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string>("");
 
   useEffect(() => {
     if (!roomCode) throw new Error("No room code provided");
-    setIsMobile(Device.deviceType === Device.DeviceType.PHONE);
+    const isMobile = Device.deviceType === Device.DeviceType.PHONE;
     useUserProfile().then(async (user) => {
       if (user) {
         setUserProfileId(user.user_profile_id);
@@ -36,21 +35,17 @@ export default function JoinPage() {
           .single();
         if (roomUsersError) return { data: null, error: roomUsersError };
         setIsParticipant(participant ? true : false);
+        handleIncomingLinks(isMobile);
       } else {
         setIsConnected(false);
         // ... when anonymous users are implemented, verifiy if the user is a participant or not
       }
     });
-    const subscription = Linking.addEventListener("url", handleIncomingLinks);
-    return () => {
-      subscription.remove();
-    };
   }, [roomCode]);
 
-  const handleIncomingLinks = async () => {
-    if (!isMobile && isConnected) {
-      if (!isParticipant) await addUserToRoom();
-      router.replace(`/rooms/${roomCode}`);
+  const handleIncomingLinks = async (isMobile: boolean) => {
+    if (!isMobile) {
+      await onContinueWebsite(`rooms/${roomCode}`);
     }
   };
 
