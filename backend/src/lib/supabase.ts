@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { Database } from "commons/database-types";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export default function createClient(context: {
@@ -10,7 +11,8 @@ export default function createClient(context: {
       "Missing SUPABASE_URL or SUPABASE_ANON_KEY environment variable"
     );
   }
-  return createServerClient(
+
+  return createServerClient<Database>(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_ANON_KEY,
     {

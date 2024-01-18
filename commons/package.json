@@ -1,0 +1,8 @@
+{
+  "name": "commons",
+  "version": "1.0.0",
+  "description": "shared file for all datsmysong project",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC"
+}

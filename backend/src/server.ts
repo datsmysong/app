@@ -1,6 +1,7 @@
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
+import { Database } from "commons/database-types";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
@@ -11,7 +12,6 @@ import AuthRedirectionGET from "./route/AuthRedirectionGET";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
-import { Database } from "./types/dbTypes";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
