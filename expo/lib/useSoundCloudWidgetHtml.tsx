@@ -55,18 +55,21 @@ export default function useSoundCloudWidgetHtml() {
               if (!currentSound) return resolve(null);
       
               const playingMusic = {
-                title: currentSound.title.split(" - ")[1],
-                artwork: currentSound.artwork_url.replace("large", "t500x500"),
-                artists: currentSound.title
-                  .split(" - ")[0]
-                  .split(", ")
-                  .map((name) => ({
-                    name,
-                    id: name,
-                  })),
-                duration_ms: currentSound.duration,
-                progress_ms: position,
-                is_playing: isCurrentlyPlaying,
+                currentMusic: {
+                  title: currentSound.title.split(" - ")[1],
+                  artwork: currentSound.artwork_url.replace("large", "t500x500"),
+                  artists: currentSound.title
+                    .split(" - ")[0]
+                    .split(", ")
+                    .map((name) => ({
+                      name,
+                      id: name,
+                    })),
+                  durationMs: currentSound.duration,
+                },
+                progressMs: position,
+                isPlaying: isCurrentlyPlaying,
+                volume: 100,
               };
       
               resolve(playingMusic);

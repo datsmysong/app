@@ -1,8 +1,7 @@
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { PlaybackState } from "../lib/types";
-import { Text, View } from "./Tamed";
 
 type PlayerProps = {
   state: PlaybackState;
@@ -13,11 +12,13 @@ const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 const Player: React.FC<PlayerProps> = ({ state, children }) => {
-  const [progress, setProgress] = useState(state.progressMs ?? 0);
-  const [isPlaying, setIsPlaying] = useState(state.isPlaying ?? false);
+  const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Synchronize progress and isPlaying with the music prop
   useEffect(() => {
+    if(!state) return;
+
     setProgress(state.progressMs ?? 0);
     setIsPlaying(state.isPlaying ?? false);
   }, [state]);
@@ -58,13 +59,13 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
                     styles.progress,
                     {
                       width: `${
-                        (progress / state.currentMusic.duration_ms) * 100
+                        (progress / state.currentMusic.durationMs) * 100
                       }%`,
                     },
                   ]}
                 ></View>
               </View>
-              <Text>{formatDuration(state.currentMusic.duration_ms)}</Text>
+              <Text>{formatDuration(state.currentMusic.durationMs)}</Text>
             </View>
             {children}
           </View>
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    maxWidth: 500,
   },
   image: {
     width: 128,

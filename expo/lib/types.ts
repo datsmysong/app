@@ -17,7 +17,7 @@ export type Music = {
   title: string;
   artwork: string;
   artists: Array<Artist>;
-  duration_ms: number;
+  durationMs: number;
 };
 
 export type OrderedMusic = Music & {

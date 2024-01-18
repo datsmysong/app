@@ -55,12 +55,8 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  const onStateUpdated = (
-    socket: Socket,
-    message: StateUpdatedMessage
-  ): void => {
-    console.log("message = ", message);
-    setCurrentPlaybackState(message.data);
+  const onStateUpdated = (socket: Socket, message: PlaybackState): void => {
+    setCurrentPlaybackState(message);
   };
 
   const onStateRequest = async (
@@ -73,12 +69,8 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     if (room.streamingService.serviceName !== "SoundCloud") return;
     if (!isSoundCloudPlayerRemote(remote.current)) return;
 
-    console.log("[WS] Fetching current playback state");
-    
     const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
-    console.log("Found remote!");
     const currentPlaybackState = await soundCloudRemote.fetchCurrent();
-    console.log("currentPlaybackState", currentPlaybackState);
 
     socket.emit("stateUpdated", {
       type: "stateUpdated",
@@ -118,7 +110,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   }, []);
 
   const playCoolSong = async () => {
-    console.log("playCoolSong");
     console.log(remote.current);
 
     if (remote.current === null) return;
@@ -135,7 +126,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const fetchCurrent = async () => {
     const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
     const currentPlaybackState = await soundCloudRemote.fetchCurrent();
-    console.log("currentPlaybackState", currentPlaybackState);
   };
 
   return (
@@ -154,7 +144,9 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       <Button type="outline" onPress={playCoolSong}>
         play Duke & Jones - Call Me (Chill Mix)
       </Button>
-      <Button type="filled" onPress={fetchCurrent}>Fetch!</Button>
+      <Button type="filled" onPress={fetchCurrent}>
+        Fetch!
+      </Button>
     </>
   );
 };
