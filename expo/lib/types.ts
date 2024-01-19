@@ -16,7 +16,9 @@ export type Artist = {
 export type Music = {
   title: string;
   artwork: string;
-  artists: Array<Artist>;
+  /* This could be an array of Artist, but due to SoundCloud's API only returning a formatted
+   string, this has to be a string for now. */
+  artists: string;
   durationMs: number;
 };
 
@@ -27,13 +29,13 @@ export type OrderedMusic = Music & {
 export type Profile = {
   id: string;
   nickname: string;
-}
+};
 
 export type UserProfile = Profile & {
   username: string;
   avatar: string | null;
   accountId: string;
-}
+};
 
 export type ActiveRoom = {
   id: string;
@@ -49,7 +51,7 @@ export type ActiveRoom = {
   queue: Array<OrderedMusic>;
   participants: Array<Profile | UserProfile>;
   streamingService: StreamingService;
-}
+};
 
 export const isActiveRoom = (room: any): room is ActiveRoom => {
   return (
@@ -65,8 +67,8 @@ export const isActiveRoom = (room: any): room is ActiveRoom => {
     room.queue !== undefined &&
     room.participants !== undefined &&
     room.streamingService !== undefined
-  )
-}
+  );
+};
 
 export type Room = {
   id: string;
@@ -83,7 +85,7 @@ export type Room = {
   history: Array<OrderedMusic>;
   participants: Array<Profile | UserProfile>;
   streamingService: StreamingService;
-}
+};
 
 export const isRoom = (room: any): room is Room => {
   return (
@@ -100,17 +102,17 @@ export const isRoom = (room: any): room is Room => {
     room.history !== undefined &&
     room.participants !== undefined &&
     room.streamingService !== undefined
-  )
-}
+  );
+};
 
 export type StreamingService = {
   serviceId: string;
   serviceName: string;
-}
+};
 
 export type PlaybackState = {
   isPlaying: boolean;
   progressMs: number;
   volume: number;
   currentMusic: Music | null;
-}
+};

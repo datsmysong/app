@@ -56,15 +56,9 @@ export default function useSoundCloudWidgetHtml() {
       
               const playingMusic = {
                 currentMusic: {
-                  title: currentSound.title.split(" - ")[1],
+                  title: currentSound.publisher_metadata.release_title,
                   artwork: currentSound.artwork_url.replace("large", "t500x500"),
-                  artists: currentSound.title
-                    .split(" - ")[0]
-                    .split(", ")
-                    .map((name) => ({
-                      name,
-                      id: name,
-                    })),
+                  artists: currentSound.publisher_metadata.artist,
                   durationMs: currentSound.duration,
                 },
                 progressMs: position,
