@@ -17,7 +17,7 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
 
   // Synchronize progress and isPlaying with the music prop
   useEffect(() => {
-    if(!state) return;
+    if (!state) return;
 
     setProgress(state.progressMs ?? 0);
     setIsPlaying(state.isPlaying ?? false);
@@ -31,7 +31,7 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
 
   return (
     <View style={styles.container}>
-      {state.currentMusic && (
+      {state && state.currentMusic && (
         <>
           <Image
             source={state.currentMusic.artwork}
@@ -42,14 +42,7 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
           <View>
             <Text style={styles.title}>{state.currentMusic.title}</Text>
             <View style={styles.artistContainer}>
-              {state.currentMusic.artists.map((artist, index) => (
-                <React.Fragment key={artist.id}>
-                  <Text>{artist.name}</Text>
-                  {index !== (state.currentMusic?.artists.length ?? 1) - 1 && (
-                    <Text>,</Text>
-                  )}
-                </React.Fragment>
-              ))}
+              <Text>{state.currentMusic.artists}</Text>
             </View>
             <View style={styles.progressContainer}>
               <Text>{formatDuration(progress)}</Text>
@@ -71,7 +64,9 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
           </View>
         </>
       )}
-      {!state.currentMusic && <Text>Nothing is playing, start a song</Text>}
+      {(!state || !state.currentMusic) && (
+        <Text>Nothing is playing, start a song</Text>
+      )}
     </View>
   );
 };
