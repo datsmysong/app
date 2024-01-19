@@ -2,18 +2,15 @@ Fonctionnalités et taches développées dans cette itération :
 
 Terminée
 - S’authentifier à l’aide de Google (Gaspard)
-- Consulter la file d'attente d'une salle d'écoute avec une écoute en utilisant un websocket (Maxence)
 - Suppression des bugs liés à l’authentification (Gaspard)
 - Créer les maquettes nécessaires pour la page des intégrations (Maxence)
-- Créer la logique des interactions avec les plateformes de musique (Maxence)
-- Consulter la file d'attente d'une salle d'écoute (Hugo)
 - Suppression d'un bug sur le backend pour la route permettant la création de room (Thomas)
 
 Non achevé lors de cette itération
-- Créer un compte utilisateur à partir d’un identifiant et un mot de passe (Gaspard)
-- Créer le menu des intégrations des plateformes de streaming (Thomas)
-- Implémenter la logique pour chaque plateforme de streaming (Thomas)
-- Implémenter la logique liée à l’ajout de l’authentification pour les liens d’invitations (Noam)
-
-
-
+- Consulter la file d'attente d'une salle d'écoute (Hugo)
+- Contrôle du flux de lecture via un Widget intégré ou un lecteur externe (Maxence)
+- Authentification à l’aide d’un identifiant et mot de passe (Gaspard)
+- Créer la structure logique des interactions avec les plateformes de musique (Maxence)
+- Implémenter la logique pour chaque plateforme de streaming (Maxence)
+- Consulter la file d'attente d'une salle d'écoute (Hugo)
+- Gérer ses intégrations avec les plateformes de streaming (Thomas)
