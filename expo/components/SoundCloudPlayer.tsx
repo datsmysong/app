@@ -9,6 +9,7 @@ import { Platform, StyleSheet } from "react-native";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 import { PlaybackState, StreamingPlatformRemote } from "../lib/types";
 import useSoundCloudWidgetHtml from "../lib/useSoundCloudWidgetHtml";
+import { Text, View } from "./Tamed";
 
 type SoundCloudPlayerProps = {};
 export interface SoundCloudPlayerRemote extends StreamingPlatformRemote {
@@ -25,6 +26,14 @@ const SoundCloudPlayer = forwardRef<
   SoundCloudPlayerRemote,
   SoundCloudPlayerProps
 >((props, ref) => {
+  const sendMessage = (message: object) => {
+    if (Platform.OS !== "web") {
+      webViewRef.current?.postMessage(JSON.stringify(message));
+    } else {
+      iframeRef.current?.contentWindow?.postMessage(message, "*");
+    }
+  };
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const webViewRef = useRef<WebView>(null);
 
@@ -53,88 +62,56 @@ const SoundCloudPlayer = forwardRef<
   }));
 
   const playMusic = async (url: string) => {
-    if (Platform.OS !== "web") {
-      webViewRef.current?.postMessage("{command: 'playMusic'}");
-    } else {
-      iframeRef.current?.contentWindow?.postMessage(
-        {
-          command: "playMusic",
-          data: {
-            options: {
-              auto_play: true,
-              show_artwork: false,
-            },
-            url,
-          },
+    const command = {
+      command: "playMusic",
+      data: {
+        options: {
+          auto_play: true,
+          show_artwork: false,
         },
-        "*"
-      );
-    }
+        url,
+      },
+    };
+    sendMessage(command);
   };
 
   const play = async () => {
-    if (Platform.OS !== "web") {
-      webViewRef.current?.postMessage("{command: 'play'}");
-    } else {
-      iframeRef.current?.contentWindow?.postMessage(
-        {
-          command: "play",
-        },
-        "*"
-      );
-    }
+    const command = {
+      command: "play",
+    };
+    sendMessage(command);
   };
 
   const pause = async () => {
-    if (Platform.OS !== "web") {
-      webViewRef.current?.postMessage("{command: 'pause'}");
-    } else {
-      iframeRef.current?.contentWindow?.postMessage(
-        {
-          command: "pause",
-        },
-        "*"
-      );
-    }
+    const command = {
+      command: "pause",
+    };
+    sendMessage(command);
   };
 
   const setVolume = async (volume: number) => {
-    if (Platform.OS !== "web") {
-      webViewRef.current?.postMessage(
-        `{command: 'setVolume', data: {volume: ${volume}}}`
-      );
-    } else {
-      iframeRef.current?.contentWindow?.postMessage(
-        {
-          command: "setVolume",
-          data: {
-            volume,
-          },
-        },
-        "*"
-      );
-    }
+    const command = {
+      command: "setVolume",
+      data: {
+        volume,
+      },
+    };
+    sendMessage(command);
   };
 
   const seekTo = async (position: number) => {
-    if (Platform.OS !== "web") {
-      webViewRef.current?.postMessage(
-        `{command: 'seekTo', data: {position: ${position}}}`
-      );
-    } else {
-      iframeRef.current?.contentWindow?.postMessage(
-        {
-          command: "seekTo",
-          data: {
-            position,
-          },
-        },
-        "*"
-      );
-    }
+    const command = {
+      command: "seekTo",
+      data: {
+        position,
+      },
+    };
+    sendMessage(command);
   };
 
-  const [resolveCurrentState, setResolveCurrentState] = useState<null | (() => void)>(null);
+  const [resolveCurrentState, setResolveCurrentState] = useState<
+    null | (() => void)
+  >(null);
 
   const handleWebViewMessage = (event: WebViewMessageEvent) => {
     const { data } = JSON.parse(event.nativeEvent.data);
@@ -151,7 +128,7 @@ const SoundCloudPlayer = forwardRef<
   useEffect(() => {
     resolveCurrentStateRef.current = resolveCurrentState;
   }, [resolveCurrentState]);
-  
+
   const handleIframeMessage = (event: Event) => {
     //if (!(event instanceof MessageEvent)) return;
 
@@ -168,14 +145,10 @@ const SoundCloudPlayer = forwardRef<
   const fetchCurrent = (): Promise<PlaybackState> => {
     return new Promise((resolve) => {
       setResolveCurrentState(() => resolve);
-      if (Platform.OS !== "web") {
-        webViewRef.current?.postMessage(`{ command: 'fetchCurrent' }`);
-      } else {
-        iframeRef.current?.contentWindow?.postMessage(
-          { command: "fetchCurrent" },
-          "*"
-        );
-      }
+      const command = {
+        command: "fetchCurrent",
+      };
+      sendMessage(command);
     });
   };
   const next = async () => {};
@@ -191,8 +164,8 @@ const SoundCloudPlayer = forwardRef<
       javaScriptEnabled={true}
       domStorageEnabled={true}
       ref={webViewRef}
+      originWhitelist={["*"]}
       source={{ html }}
-      style={styles.hidden}
       onMessage={handleWebViewMessage}
     />
   );
