@@ -110,8 +110,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   }, []);
 
   const playCoolSong = async () => {
-    console.log(remote.current);
-
     if (remote.current === null) return;
 
     if (room.streamingService.serviceName === "Spotify") {
@@ -121,11 +119,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
         "https://soundcloud.com/dukeandjones/call-me-chill-mix"
       );
     }
-  };
-
-  const fetchCurrent = async () => {
-    const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
-    const currentPlaybackState = await soundCloudRemote.fetchCurrent();
   };
 
   return (
@@ -143,9 +136,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
       <Button type="outline" onPress={playCoolSong}>
         play Duke & Jones - Call Me (Chill Mix)
-      </Button>
-      <Button type="filled" onPress={fetchCurrent}>
-        Fetch!
       </Button>
     </>
   );

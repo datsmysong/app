@@ -10,10 +10,6 @@ export default function RoomView() {
   const roomId = search.id as string;
   const room = useRoom(roomId);
 
-  console.log("room", room);
-  console.log("isActiveRoom(room)", isActiveRoom(room));
-  console.log("isRoom(room)", isRoom(room));
-
   return (
     <View>
       {isActiveRoom(room) && <ActiveRoomView room={room} />}
