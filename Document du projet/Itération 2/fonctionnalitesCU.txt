@@ -14,3 +14,4 @@ Non achevé lors de cette itération
 - Implémenter la logique pour chaque plateforme de streaming (Maxence)
 - Consulter la file d'attente d'une salle d'écoute (Hugo)
 - Gérer ses intégrations avec les plateformes de streaming (Thomas)
+- Générer un lien vers la salle d'écoute et rejoindre une salle d'écoute grâce à un lien (Noam)

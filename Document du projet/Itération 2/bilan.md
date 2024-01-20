@@ -2,18 +2,13 @@
 
 ## Ce que permet notre application à ce stade
 
-- Créer un compte / se connecter à l'aide de Spotify
+- Créer un compte / se connecter à l'aide de Spotify ou Google
 - Créer une salle d'écoute dans la base de données depuis un formulaire
-- Générer un lien vers une salle d'écoute
-- Rejoindre une salle d'écoute via un lien (seulement en tant qu'utilisateur connecté)
-- Ajouter une musique à la file d'attente (backend)
-- S’authentifier à l’aide de deux providers (Google & Spotify)
 
 ## Bugs
 
 - Résolution d’un bug sur notre vérification des droits des utilisateurs dans la navigation
 - Résolution d’un bug sur notre backend sur la route de création d’une salle
-- L’application ne redirige pas automatiquement l’utilisateur PC sur la page de la salle d’écoute
 
 ## Validation
 
