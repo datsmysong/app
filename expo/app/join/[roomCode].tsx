@@ -13,29 +13,33 @@ export default function JoinPage() {
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
-  const [userProfileId, setUserProfileId] = useState<string>("");
+
+  let userProfileId: string = "";
+  let isMobile: boolean = false;
 
   useEffect(() => {
-    if (!roomCode) throw new Error("No room code provided");
-    const isMobile = Device.deviceType === Device.DeviceType.PHONE;
-    useUserProfile().then(async (user) => {
-      if (user) {
-        setUserProfileId(user.user_profile_id);
+    if (!roomCode) {
+      Alert.alert("Aucun code n'a été retourné");
+      return;
+    }
+    isMobile = Device.deviceType === Device.DeviceType.PHONE;
+    useUserProfile().then((userProfile) => {
+      if (userProfile) {
+        userProfileId = userProfile.user_profile_id;
         setIsConnected(true);
-        const { data: roomId, error: errorRoomId } = await getRoomId();
-        if (errorRoomId) {
-          Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
-          return;
-        }
-        const { data: participant, error: roomUsersError } = await supabase
-          .from("room_users")
-          .select("profile_id")
-          .eq("profile_id", user.user_profile_id)
-          .eq("room_id", roomId)
-          .single();
-        if (roomUsersError) return { data: null, error: roomUsersError };
-        setIsParticipant(participant ? true : false);
-        handleIncomingLinks(isMobile);
+        getParticipant().then((result) => {
+          if (!result) {
+            return;
+          }
+          if (result.error) {
+            Alert.alert(
+              "Aucun participant n'a été trouvé avec ce compte dans cette salle d'écoute."
+            );
+            return;
+          }
+          setIsParticipant(true);
+        });
+        handleIncomingLinks();
       } else {
         setIsConnected(false);
         // ... when anonymous users are implemented, verifiy if the user is a participant or not
@@ -43,20 +47,24 @@ export default function JoinPage() {
     });
   }, [roomCode]);
 
-  const handleIncomingLinks = async (isMobile: boolean) => {
+  const handleIncomingLinks = async () => {
     if (!isMobile) {
       await onContinueWebsite(`rooms/${roomCode}`);
     }
   };
 
   const onOpenApp = async (path: string) => {
+    if (!isParticipant) {
+      await addUserToRoom();
+    }
     const deepLink = Linking.createURL(path);
-    if (!isParticipant) await addUserToRoom();
     Linking.openURL(deepLink);
   };
 
   const onContinueWebsite = async (path: string) => {
-    if (!isParticipant) await addUserToRoom();
+    if (!isParticipant) {
+      await addUserToRoom();
+    }
     router.replace(path as any);
   };
 
@@ -69,9 +77,10 @@ export default function JoinPage() {
     const { error: roomUsersError } = await supabase.from("room_users").insert({
       room_id: roomId,
       profile_id: userProfileId,
-      banned: false,
     });
-    if (roomUsersError) return { error: roomUsersError };
+    if (roomUsersError) {
+      return { error: roomUsersError };
+    }
   };
 
   const getRoomId = async () => {
@@ -80,15 +89,35 @@ export default function JoinPage() {
       .select("id")
       .eq("code", roomCode)
       .single();
-    if (activeRoomError) return { data: null, error: activeRoomError };
+    if (activeRoomError) {
+      return { data: null, error: activeRoomError };
+    }
     return { data: room.id, error: null };
+  };
+
+  const getParticipant = async () => {
+    const { data: roomId, error: errorRoomId } = await getRoomId();
+    if (errorRoomId) {
+      Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
+      return;
+    }
+    const { data: participant, error: roomUsersError } = await supabase
+      .from("room_users")
+      .select("profile_id")
+      .eq("profile_id", userProfileId)
+      .eq("room_id", roomId)
+      .single();
+    if (roomUsersError) {
+      return { data: null, error: roomUsersError };
+    }
+    return { data: participant, error: null };
   };
 
   if (isConnected) {
     return (
       <View style={styles.choiceContainer}>
         <Text style={styles.title}>
-          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}"...
+          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}"
         </Text>
         <View style={styles.buttonContainer}>
           <Button
