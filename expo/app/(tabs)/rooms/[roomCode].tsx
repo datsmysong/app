@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
 import * as Clipboard from "expo-clipboard";
+import Alert from "../../../components/Alert";
 
 export default function RoomPage() {
   const { roomCode } = useLocalSearchParams();
@@ -12,7 +13,10 @@ export default function RoomPage() {
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const onShare = async () => {
-    if (!currentPageLink) throw new Error("No link found.");
+    if (!currentPageLink) {
+      Alert.alert("Aucun lien n'a été retourné")
+      return;
+    }
     let invitationLink = "";
     if (Platform.OS === "ios" || Platform.OS === "android") {
       const webLink = currentPageLink.replace("exp://", "http://");

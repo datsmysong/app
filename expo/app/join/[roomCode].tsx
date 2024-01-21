@@ -32,7 +32,7 @@ export default function JoinPage() {
             return;
           }
           if (result.error) {
-            Alert.alert(
+            console.log(
               "Aucun participant n'a été trouvé avec ce compte dans cette salle d'écoute."
             );
             return;
