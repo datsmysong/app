@@ -33,16 +33,13 @@ export default function RoomPage() {
   };
 
   return (
-    <View>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>Salle "{roomCode}"</Text>
-        <View style={styles.buttonContainer}>
-          <Button block type="filled" onPress={onShare}>
-            Partager
-          </Button>
-        </View>
+    <View style={styles.headerContainer}>
+      <Text style={styles.title}>Salle "{roomCode}"</Text>
+      <View style={styles.buttonContainer}>
+        <Button block type="filled" onPress={onShare}>
+          Partager
+        </Button>
       </View>
-      <View></View>
     </View>
   );
 }

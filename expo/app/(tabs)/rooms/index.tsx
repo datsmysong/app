@@ -6,17 +6,15 @@ export default function RoomsPage() {
   const roomCode = "A1B2C3";
 
   return (
-    <View>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>Salles d'écoute</Text>
-        <View style={styles.buttonContainer}>
-          <Button block href={"/rooms/create"}>
-            Créer une salle
-          </Button>
-          <Button block type="outline" href={`/rooms/${roomCode}`}>
-            Rejoindre une salle
-          </Button>
-        </View>
+    <View style={styles.headerContainer}>
+      <Text style={styles.title}>Salles d'écoute</Text>
+      <View style={styles.buttonContainer}>
+        <Button block href={"/rooms/create"}>
+          Créer une salle
+        </Button>
+        <Button block type="outline" href={`/rooms/${roomCode}`}>
+          Rejoindre une salle
+        </Button>
       </View>
     </View>
   );
