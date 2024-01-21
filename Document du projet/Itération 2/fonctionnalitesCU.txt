@@ -1,0 +1,17 @@
+Fonctionnalités et taches développées dans cette itération :
+
+Terminée
+- S’authentifier à l’aide de Google (Gaspard)
+- Suppression des bugs liés à l’authentification (Gaspard)
+- Créer les maquettes nécessaires pour la page des intégrations (Maxence)
+- Suppression d'un bug sur le backend pour la route permettant la création de room (Thomas)
+
+Non achevé lors de cette itération
+- Consulter la file d'attente d'une salle d'écoute (Hugo)
+- Contrôle du flux de lecture via un Widget intégré ou un lecteur externe (Maxence)
+- Authentification à l’aide d’un identifiant et mot de passe (Gaspard)
+- Créer la structure logique des interactions avec les plateformes de musique (Maxence)
+- Implémenter la logique pour chaque plateforme de streaming (Maxence)
+- Consulter la file d'attente d'une salle d'écoute (Hugo)
+- Gérer ses intégrations avec les plateformes de streaming (Thomas)
+- Générer un lien vers la salle d'écoute et rejoindre une salle d'écoute grâce à un lien (Noam)
