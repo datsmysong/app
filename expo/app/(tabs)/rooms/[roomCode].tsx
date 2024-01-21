@@ -20,7 +20,8 @@ export default function RoomPage() {
     let invitationLink = "";
     if (Platform.OS === "ios" || Platform.OS === "android") {
       const webLink = currentPageLink.replace("exp://", "http://");
-      invitationLink = `${webLink}/join/${roomCode}`;
+      const deepLink = Linking.createURL(`rooms/${roomCode}`);
+      invitationLink = `${webLink}/join/${roomCode}?deepLink=${encodeURIComponent(deepLink)}`;
     } else {
       invitationLink = currentPageLink.replace("/rooms", "/join");
     }

@@ -10,6 +10,7 @@ import { useUserProfile } from "../../lib/userProfile";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
+  const { deepLink } = useLocalSearchParams();
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
@@ -57,8 +58,7 @@ export default function JoinPage() {
     if (!isParticipant) {
       await addUserToRoom();
     }
-    const deepLink = Linking.createURL(path);
-    Linking.openURL(deepLink);
+    Linking.openURL(`${deepLink}`);
   };
 
   const onContinueWebsite = async (path: string) => {
