@@ -14,7 +14,7 @@ export default function RoomPage() {
 
   const onShare = async () => {
     if (!currentPageLink) {
-      Alert.alert("Aucun lien n'a été retourné")
+      Alert.alert("Aucun lien n'a été retourné");
       return;
     }
     let invitationLink = "";
@@ -27,6 +27,10 @@ export default function RoomPage() {
     }
     await Clipboard.setStringAsync(invitationLink);
     setIsCopied(true);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 5000);
   };
 
   return (
