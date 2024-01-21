@@ -1,5 +1,5 @@
 import { View, StyleSheet, Platform, Text } from "react-native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
@@ -8,6 +8,8 @@ import * as Clipboard from "expo-clipboard";
 export default function RoomPage() {
   const { roomCode } = useLocalSearchParams();
   const currentPageLink = Linking.useURL();
+
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   //Listening to any incoming deep link
   useEffect(() => {
@@ -30,15 +32,22 @@ export default function RoomPage() {
       invitationLink = currentPageLink.replace("/rooms", "/join");
     }
     await Clipboard.setStringAsync(invitationLink);
+    setIsCopied(true);
   };
 
   return (
     <View style={styles.headerContainer}>
       <Text style={styles.title}>Salle "{roomCode}"</Text>
       <View style={styles.buttonContainer}>
-        <Button block type="filled" onPress={onShare}>
-          Partager
-        </Button>
+        {isCopied ? (
+          <Button block prependIcon="check" onPress={onShare}>
+            Lien copié
+          </Button>
+        ) : (
+          <Button block onPress={onShare}>
+            Partager
+          </Button>
+        )}
       </View>
     </View>
   );
