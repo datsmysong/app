@@ -30,6 +30,9 @@ export default function JoinPage() {
         setIsConnected(true);
         getParticipant().then((result) => {
           if (!result) {
+            Alert.alert(
+              "Une erreur est survenue lors de la récupération des informations de l'utilisateur."
+            );
             return;
           }
           if (result.error) {
