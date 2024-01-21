@@ -11,17 +11,6 @@ export default function RoomPage() {
 
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  //Listening to any incoming deep link
-  useEffect(() => {
-    const subscription = Linking.addEventListener("url", handleDeepLink);
-    return () => {
-      subscription.remove();
-    };
-  });
-
-  //Deep links handler
-  const handleDeepLink = (event: any) => {};
-
   const onShare = async () => {
     if (!currentPageLink) throw new Error("No link found.");
     let invitationLink = "";
