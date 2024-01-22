@@ -32,7 +32,7 @@ export default async function BoundServicePOST(
     ])
     .then((res) => {
       if (res.error) {
-        return { code: res.status, error: res.error };
+        return response.code(res.status).send(res.error);
       } else {
         return response.send(res.data);
       }

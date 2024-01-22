@@ -16,31 +16,25 @@ export async function getUserFromRequest(
 }
 
 export async function getUserProfileIdFromAccountId(accId: string) {
-  return await adminSupabase
+  const { data, error } = await adminSupabase
     .from("user_profile")
     .select("user_profile_id")
     .eq("account_id", accId)
-    .then((res) => {
-      if (res.error) {
-        return { code: res.status, message: res.error.message };
-      } else {
-        return res.data[0].user_profile_id;
-      }
-    });
+    .single();
+
+  if (error) return { data: null, error };
+  return { data: data.user_profile_id, error: null };
 }
 
 export async function getStreamingServiceIdByName(serviceName: string) {
-  return await adminSupabase
+  const { data, error } = await adminSupabase
     .from("streaming_services")
     .select("service_id")
     .eq("service_name", serviceName)
-    .then((res) => {
-      if (res.error) {
-        return { code: res.status, message: res.error.message };
-      } else {
-        return res.data[0].service_id;
-      }
-    });
+    .single();
+
+  if (error) return { data: null, error };
+  return { data: data.service_id, error: null };
 }
 
 export default async function SoundcloudBoundGET(
@@ -80,15 +74,20 @@ export default async function SoundcloudBoundGET(
 
   const accessToken = json.access_token;
   const refreshToken = json.refresh_token;
-  const serviceId = await getStreamingServiceIdByName("SoundCloud");
+  const serviceIdRes = await getStreamingServiceIdByName("SoundCloud");
+  if (serviceIdRes.error) return response.code(500).send(serviceIdRes.error);
+  const serviceId = serviceIdRes.data;
 
-  let userProfileId: any = "";
   const user = await getUserFromRequest(request, response);
   if (!user.data.user) {
-    return { code: 401, message: "User not authenticated" };
+    return response.code(400).send("Missing user");
   }
-  userProfileId =
-    (await getUserProfileIdFromAccountId(user.data.user.id)) || null;
+  const userProfileIdRes = await getUserProfileIdFromAccountId(
+    user.data.user.id,
+  );
+  if (userProfileIdRes.error)
+    return response.code(500).send(userProfileIdRes.error);
+  const userProfileId = userProfileIdRes.data;
 
   const res = await fetch("http://localhost:3000/bound", {
     method: "POST",
