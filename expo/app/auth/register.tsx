@@ -1,7 +1,7 @@
 import { makeRedirectUri } from "expo-auth-session";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import Button from "../../components/Button";
 import ControledInput from "./ControledInput";
 type FormData = {
@@ -18,6 +18,7 @@ export default function Register() {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<FormData>({
     defaultValues: {
       username: "",
@@ -54,12 +55,24 @@ export default function Register() {
       }),
     });
     console.log("Result of register", data);
+    if (data.status === 200) {
+      Alert.alert("Veuillez confirmer votre compte via le lien reçu par mail.");
+      return router.replace("/auth/login");
+    }
+    if (data.status === 409) {
+      // Username already exists
+      setError("username", {
+        message: "Ce nom d'utilisateur est déjà pris",
+      });
+      return;
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.page}>
       <View style={styles.form}>
         <ControledInput
+          onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Adresse email"}
           name={"email"}
@@ -75,6 +88,7 @@ export default function Register() {
           autoComplete="email"
         />
         <ControledInput
+          onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Nom d'utilisateur"}
           name={"username"}
@@ -90,6 +104,7 @@ export default function Register() {
           autoComplete="username"
         />
         <ControledInput
+          onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Nom d'affichage"}
           name={"displayName"}
@@ -98,6 +113,7 @@ export default function Register() {
           autoComplete="nickname"
         />
         <ControledInput
+          onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Mot de passe"}
           name={"password"}
@@ -124,6 +140,7 @@ export default function Register() {
           secureTextEntry
         />
         <ControledInput
+          onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Confirmer le mot de passe"}
           name={"confirmPassword"}

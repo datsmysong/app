@@ -12,6 +12,7 @@ export default function ControledInput({
   autoComplete,
   secureTextEntry,
   errorMessage,
+  onSubmit,
 }: {
   control: any;
   label: string;
@@ -21,6 +22,7 @@ export default function ControledInput({
   autoComplete?: TextInputProps["autoComplete"];
   secureTextEntry?: boolean;
   errorMessage?: string | undefined;
+  onSubmit?: () => void;
 }) {
   return (
     <View style={styles.vbox}>
@@ -40,6 +42,7 @@ export default function ControledInput({
               value={value}
               autoComplete={autoComplete}
               secureTextEntry={secureTextEntry}
+              onSubmit={onSubmit}
             />
           ) : (
             <CustomPasswordInput
@@ -49,6 +52,7 @@ export default function ControledInput({
               value={value}
               autoComplete={autoComplete}
               secureTextEntry={secureTextEntry}
+              onSubmit={onSubmit}
             />
           )
         }

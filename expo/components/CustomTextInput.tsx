@@ -6,7 +6,7 @@ import {
   TextInputProps,
 } from "react-native";
 
-interface CustomTextInputProps {
+export interface CustomTextInputProps {
   placeholder?: string;
   style?: object;
   inputMode?: InputModeOptions;
@@ -16,6 +16,7 @@ interface CustomTextInputProps {
   onBlur?: () => void;
   autoComplete?: TextInputProps["autoComplete"];
   secureTextEntry?: boolean;
+  onSubmit?: () => void;
 }
 
 export default function CustomTextInput({
@@ -28,6 +29,7 @@ export default function CustomTextInput({
   onBlur,
   autoComplete,
   secureTextEntry,
+  onSubmit,
 }: CustomTextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -46,6 +48,7 @@ export default function CustomTextInput({
       editable={!disabled}
       autoComplete={autoComplete ? autoComplete : "off"}
       secureTextEntry={secureTextEntry}
+      onSubmitEditing={onSubmit}
     />
   );
 }
