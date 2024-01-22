@@ -3,8 +3,8 @@ import { ScrollView, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "../../../components/Tamed";
 import { Image } from "expo-image";
-import ConnectWithSpotify from "../../(auth)/connect-with-spotify";
-import ConnectWithSoundcloud from "../../(auth)/connect-with-soundcloud";
+import ConnectWithSpotify from "../../auth/connect-with-spotify";
+import ConnectWithSoundcloud from "../../auth/connect-with-soundcloud";
 import { router } from "expo-router";
 import Alert from "../../../components/Alert";
 
@@ -165,18 +165,6 @@ export default function ProfileIntegration() {
                       ? "Déconnecter mon compte"
                       : "Lier mon compte"
                   }
-                  buttonStyle={[
-                    styles.button,
-                    isBound(service.service_id)
-                      ? styles.disableButton
-                      : styles.enableButton,
-                  ]}
-                  textStyle={[
-                    styles.buttonText,
-                    isBound(service.service_id)
-                      ? styles.disableButtonText
-                      : styles.enableButtonText,
-                  ]}
                 />
               ) : (
                 <ConnectWithSoundcloud

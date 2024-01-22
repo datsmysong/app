@@ -33,7 +33,7 @@ function extractFromRequest(req: FastifyRequest): BodyParams {
 
 export default async function RoomPOST(
   req: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const roomOptions = extractFromRequest(req);
 
@@ -45,6 +45,7 @@ export default async function RoomPOST(
     roomOptions.maxMusicPerUser,
     roomOptions.maxMusicDuration,
     roomOptions.service,
+    reply
   );
 
   return reply;

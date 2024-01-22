@@ -3,7 +3,7 @@ import { adminSupabase } from "../server";
 
 export default async function StreamingServicesGET(
   req: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const {
     data: streamingServices,

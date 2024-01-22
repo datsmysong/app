@@ -23,7 +23,7 @@ export default function ConnectWithSoundcloud({
 }: params) {
   function getSoundCloudAuthorizationUrl(
     clientId: string,
-    redirectUri: string,
+    redirectUri: string
   ) {
     const baseUrl = "https://soundcloud.com/connect";
     const responseType = "code";
@@ -49,6 +49,7 @@ export default function ConnectWithSoundcloud({
     router.push("/profile");
   };
 
+  // TODO: Adapt with the button components
   return (
     <Pressable onPress={isBound ? onPress : handleConnect} style={buttonStyle}>
       <Text style={textStyle}>{title}</Text>
