@@ -14,8 +14,15 @@ export default async function AuthRegister(
   reply: FastifyReply
 ) {
   const body: BodyParams = req.body as BodyParams;
-  const { username, email, password, displayName } = body;
-  const verification = verifyInformations(body);
+  const { username, email, password } = body;
+  const displayName = body.displayName ? body.displayName : username;
+
+  const verification = await verifyInformations({
+    username: username,
+    email: email,
+    password: password,
+    displayName: displayName,
+  });
 
   if (verification !== true) {
     return reply.status(400).send({ error: verification });
@@ -37,6 +44,12 @@ export default async function AuthRegister(
       .status(400)
       .send({ error: "Impossible to register this user !" });
   }
+
+  const usernameWrong = await usernameAlreadyExist(body.username);
+  if (usernameWrong) {
+    return reply.code(409).send({ error: "Username already exist" });
+  }
+
   const { userProfileId, error } = await createAccount({
     displayName: displayName,
     account_id: user.id,
@@ -53,7 +66,7 @@ export default async function AuthRegister(
   return reply.status(200).send({ message: "Account created" });
 }
 
-const verifyInformations = (body: BodyParams) => {
+const verifyInformations = async (body: BodyParams) => {
   if (body.username.length < 3 || body.username.length > 20) {
     return "Username must be between 3 and 20 characters";
   }
@@ -67,4 +80,17 @@ const verifyInformations = (body: BodyParams) => {
   }
 
   return true;
+};
+
+const usernameAlreadyExist = async (username: string) => {
+  const { data, error } = await adminSupabase
+    .from("user_profile")
+    .select("username")
+    .eq("username", username);
+
+  if (error || data.length > 0) {
+    return true;
+  }
+
+  return false;
 };
