@@ -13,6 +13,7 @@ import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
 
 import * as Linking from "expo-linking";
+import { createSessionFromUrl } from "./auth/authMethod";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -71,6 +72,10 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const url = Linking.getInitialURL();
+
+  url.then(async (url) => {
+    if (url) createSessionFromUrl(url);
+  });
 
   return (
     <Stack
