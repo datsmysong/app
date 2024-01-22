@@ -9,7 +9,7 @@ export type InactiveRoomMusic = {
 };
 
 export type Participant = {
-  profile: UserProfile | Profile;
+  profile: Profile | (Profile & UserProfile);
   joinedAt: string;
   roomId: string;
   banned: boolean;

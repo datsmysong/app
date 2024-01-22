@@ -57,13 +57,41 @@ const usePlayedSongs = (roomHistory: RoomHistory[], user: User) => {
   });
 };
 
-function getParticipants(roomUsers: RoomUser[]): Participant[] {
+type RoomUserWithProfile = RoomUser & {
+  profile: {
+    id: string;
+    nickname: string;
+    created_at: string;
+    user_profile?: {
+      user_profile_id: string;
+      username: string;
+      avatar: string;
+      account_id: string;
+    };
+  };
+};
+
+function getParticipants(roomUsers: RoomUserWithProfile[]): Participant[] {
   const arrayRoomUsers = Array.isArray(roomUsers) ? roomUsers : [roomUsers];
 
   return arrayRoomUsers.map((participant) => {
+    if (participant.profile.user_profile) {
+      return {
+        profile: {
+          id: participant.profile.id,
+          nickname: participant.profile.nickname,
+          created_at: participant.profile.created_at,
+          ...participant.profile.user_profile,
+        },
+        joinedAt: participant.joined_at,
+        roomId: participant.room_id,
+        banned: participant.banned,
+      };
+    }
+
     return {
       profile: {
-        nickname: "John Doe",
+        nickname: participant.profile.nickname,
         id: participant.profile_id,
         created_at: new Date().toISOString(),
       },
@@ -87,7 +115,7 @@ const useProcessRoom = (
 
   const createdAt = roomCreationData.toLocaleDateString("fr-FR", {
     year: "numeric",
-    month: "narrow",
+    month: "short",
     day: "numeric",
   });
 
@@ -120,7 +148,25 @@ const useProcessRoom = (
     { genre: "", count: 0 }
   ).genre;
 
-  const participants = getParticipants(room.room_users);
+  console.log(room.room_users);
+
+  const roomUsers = Array.isArray(room.room_users)
+    ? room.room_users
+    : [room.room_users];
+
+  const filteredUsers = roomUsers
+    .filter((roomUser) => roomUser.profile !== null)
+    .map((roomUser) => {
+      return {
+        ...roomUser,
+        profile: {
+          ...roomUser.profile,
+          user_profile: roomUser.profile?.user_profile || undefined,
+        },
+      };
+    }) as RoomUserWithProfile[];
+
+  const participants = getParticipants(filteredUsers);
 
   return {
     name,
@@ -175,7 +221,9 @@ async function fetchRoomData(
 ) {
   return await supabase
     .from("rooms")
-    .select("*, room_users(*), room_history(*), streaming_services(*)")
+    .select(
+      "*, room_users(*, profile(*, user_profile(*))), room_history(*), streaming_services(*)"
+    )
     .eq("id", id)
     .single();
 }
