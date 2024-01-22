@@ -1,6 +1,7 @@
+import { makeRedirectUri } from "expo-auth-session";
 import { Link } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Button from "../../components/Button";
 import ControledInput from "./ControledInput";
 type FormData = {
@@ -8,8 +9,10 @@ type FormData = {
   email: string;
   password: string;
   confirmPassword: string;
+  displayName: string;
 };
 
+const directUri = makeRedirectUri();
 export default function Register() {
   const {
     control,
@@ -21,15 +24,56 @@ export default function Register() {
       email: "",
       password: "",
       confirmPassword: "",
+      displayName: "",
     },
   });
   const password = useWatch({ control, name: "password" });
 
-  const onSubmit = ({ email, password }: FormData) => {};
+  const onSubmit = async ({
+    email,
+    password,
+    username,
+    displayName,
+  }: FormData) => {
+    displayName = displayName ?? username;
+    // TODO after merge : getApiUrl() from lib
+    const baseUrl = directUri.includes("exp://")
+      ? "http://" + directUri.split(":8081")[0].split("//")[1]
+      : directUri.split(":8081")[0];
+
+    const data = await fetch(baseUrl + ":3000/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        username,
+        displayName,
+      }),
+    });
+    console.log("Result of register", data);
+  };
 
   return (
-    <View style={styles.page}>
+    <ScrollView contentContainerStyle={styles.page}>
       <View style={styles.form}>
+        <ControledInput
+          control={control}
+          label={"Adresse email"}
+          name={"email"}
+          rules={{
+            required: "Veuillez saisir votre adresse email",
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: "Veuillez saisir une adresse email valide",
+            },
+          }}
+          placeholder={"votre@adresse.email"}
+          errorMessage={errors.email && errors.email.message}
+          autoComplete="email"
+        />
         <ControledInput
           control={control}
           label={"Nom d'utilisateur"}
@@ -47,18 +91,11 @@ export default function Register() {
         />
         <ControledInput
           control={control}
-          label={"Adresse email"}
-          name={"email"}
-          rules={{
-            required: "Veuillez saisir votre adresse email",
-            pattern: {
-              value: /\S+@\S+\.\S+/,
-              message: "Veuillez saisir une adresse email valide",
-            },
-          }}
-          placeholder={"votre@adresse.email"}
-          errorMessage={errors.email && errors.email.message}
-          autoComplete="email"
+          label={"Nom d'affichage"}
+          name={"displayName"}
+          placeholder={"LePetitRenard"}
+          errorMessage={errors.displayName && errors.displayName.message}
+          autoComplete="nickname"
         />
         <ControledInput
           control={control}
@@ -135,13 +172,13 @@ export default function Register() {
           </Link>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   page: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 51,

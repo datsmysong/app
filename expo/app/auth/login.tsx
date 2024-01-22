@@ -1,8 +1,7 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
-import Alert from "../../components/Alert";
 import Button from "../../components/Button";
 import { supabase } from "../../lib/supabase";
 import ControledInput from "./ControledInput";
@@ -16,28 +15,36 @@ export default function Login() {
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginForm>({
     defaultValues: {
       email: "",
       password: "",
     },
+    shouldFocusError: true,
   });
 
   const onSubmit = async ({ email, password }: LoginForm) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) {
-      Alert.alert("Erreur" + error.message);
+      setError("root", {
+        message: "Informations d'authentification incorrects.",
+      });
       return;
     }
+    router.replace("/(tabs)");
   };
 
   return (
     <View style={styles.page}>
       <View style={styles.form}>
+        {errors.root && (
+          <Text style={styles.rootError}>{errors.root.message}</Text>
+        )}
         <ControledInput
           control={control}
           label={"Adresse email"}
@@ -59,20 +66,6 @@ export default function Login() {
           name={"password"}
           rules={{
             required: "Veuillez saisir votre mot de passe",
-            minLength: {
-              value: 6,
-              message: "Le mot de passe doit contenir au moins 6 caractères",
-            },
-            validate: {
-              hasNumber: (value) =>
-                /\d/.test(value) || "Le mot de passe doit contenir un chiffre",
-              hasUppercase: (value) =>
-                /[A-Z]/.test(value) ||
-                "Le mot de passe doit contenir une majuscule",
-              hasLowercase: (value) =>
-                /[a-z]/.test(value) ||
-                "Le mot de passe doit contenir une minuscule",
-            },
           }}
           placeholder={"Mon mot de passe robuste"}
           errorMessage={errors.password && errors.password.message}
@@ -100,6 +93,14 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
+  rootError: {
+    color: "red",
+    fontFamily: "Outfit-Bold",
+    fontSize: 18,
+    fontStyle: "normal",
+    lineHeight: 24,
+    paddingBottom: 5,
+  },
   form: {
     paddingHorizontal: 12,
     paddingVertical: 12,
@@ -118,12 +119,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",
-    fontFamily: "Outfit",
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "500",
     textDecorationLine: "underline",
     alignSelf: "stretch",
+    fontFamily: "Outfit-Regular",
   },
   label: {
     color: "#1A1A1A",
