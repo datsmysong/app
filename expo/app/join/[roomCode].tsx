@@ -1,177 +1,227 @@
+import { User } from "@supabase/supabase-js";
+import { UserProfile } from "commons/database-types-utils";
+import * as Device from "expo-device";
+import * as Linking from "expo-linking";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
-import { supabase } from "../../lib/supabase";
-import Button from "../../components/Button";
-import * as Linking from "expo-linking";
-import * as Device from "expo-device";
+
 import Alert from "../../components/Alert";
-import { useUserProfile } from "../../lib/userProfile";
+import Button from "../../components/Button";
+import { supabase } from "../../lib/supabase";
+import useSupabaseUser from "../../lib/useSupabaseUser";
 
 export default function JoinPage() {
-  const { roomCode, deepLink } = useLocalSearchParams();
+  const { roomCode } = useLocalSearchParams();
+  const isInsideApplication = Device.deviceType === Device.DeviceType.PHONE;
 
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>();
+  const [userProfile, setUserProfile] = useState<UserProfile>();
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
-  const [userProfileId, setUserProfileId] = useState<string>("");
+  const [roomId, setRoomId] = useState<string>("");
+  const currentPageLink = Linking.useURL();
 
-  let isMobile: boolean = false;
-
+  /**
+   * This effect fetches the user and the room id based on the room code given in the route
+   * during the first render of the page.
+   */
   useEffect(() => {
-    if (!roomCode) {
-      Alert.alert("Aucun code n'a été retourné");
-      return;
-    }
-    isMobile = Device.deviceType === Device.DeviceType.PHONE;
-    useUserProfile().then((userProfile) => {
-      if (userProfile) {
-        setUserProfileId(userProfile.user_profile_id);
-        setIsConnected(true);
-        getParticipant(userProfileId).then((result) => {
-          if (!result) {
-            Alert.alert(
-              "Une erreur est survenue lors de la récupération des informations de l'utilisateur."
-            );
-            return;
-          }
-          if (result.error) {
-            console.log(
-              "Aucun participant n'a été trouvé avec ce compte dans cette salle d'écoute."
-            );
-            return;
-          }
-          setIsParticipant(true);
-        });
-        handleIncomingLinks(userProfileId);
-      } else {
-        setIsConnected(false);
-        // ... when anonymous users are implemented, verifiy if the user is a participant or not
+    const fetchUser = async () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const user = await useSupabaseUser();
+      setUser(user);
+    };
+    const fetchRoomId = async () => {
+      const { data } = await supabase
+        .from("active_rooms")
+        .select("id")
+        .eq("code", roomCode)
+        .single();
+
+      if (!data) {
+        Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
+        return;
       }
-    });
-  }, [roomCode]);
+      setRoomId(data.id);
+    };
 
-  const handleIncomingLinks = async (userProfileId: string) => {
-    if (!isMobile) {
-      await onContinueWebsite(`rooms/${roomCode}`, userProfileId);
-    }
-  };
+    fetchUser();
+    fetchRoomId();
+  }, []);
 
-  const onOpenApp = async (path: string, userProfileId: string) => {
-    let roomUsersError;
-    if (!isParticipant) {
-      roomUsersError = await addUserToRoom(userProfileId);
-    }
-    if (roomUsersError) {
-      Alert.alert("L'utilisateur n'a pas pu être ajouté à la salle d'écoute.");
-      return;
-    }
-    Linking.openURL(`${deepLink}`);
-  };
+  /**
+   * This effect fetches the user profile based on the user id.
+   */
+  useEffect(() => {
+    if (!user) return;
 
-  const onContinueWebsite = async (path: string, userProfileId: string) => {
-    let roomUsersError;
-    if (!isParticipant) {
-      roomUsersError = await addUserToRoom(userProfileId);
-    }
-    if (roomUsersError) {
-      Alert.alert("L'utilisateur n'a pas pu être ajouté à la salle d'écoute.");
-      return;
-    }
-    router.replace(path as any);
-  };
+    const fetchData = async () => {
+      const { data: userProfile, error } = await supabase
+        .from("user_profile")
+        .select("*")
+        .eq("account_id", user.id)
+        .single();
+      if (error) {
+        Alert.alert(
+          "Une erreur est survenue lors de la récupération du profil"
+        );
+        return;
+      }
+      setUserProfile(userProfile);
+    };
 
-  const addUserToRoom = async (userProfileId: string) => {
-    const { data: roomId, error: errorRoomId } = await getRoomId();
-    if (errorRoomId) {
-      Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
-      return;
+    fetchData();
+  }, [user]);
+
+  /**
+   * This effect fetches the participant based on the user profile and the room id.
+   */
+  useEffect(() => {
+    if (!userProfile || !roomId) return;
+
+    const fetchParticipant = async () => {
+      const { data } = await supabase
+        .from("room_users")
+        .select("*")
+        .eq("profile_id", userProfile.user_profile_id)
+        .eq("room_id", roomId)
+        .single();
+      setIsParticipant(!!data);
+    };
+
+    fetchParticipant();
+  }, [userProfile, roomId]);
+
+  /**
+   * This automatically joins the user to the room if he is on mobile and not a participant.
+   * When this page is opened inside the app, we don't want to show the choice to join the room.
+   * We instead join the room automatically and redirect the user to the room page.
+   */
+  useEffect(() => {
+    if (userProfile && isInsideApplication && !isParticipant) {
+      joinRoom().then((r) => {
+        if (r?.error)
+          return Alert.alert("Impossible de rejoindre la salle d'écoute");
+
+        router.replace(`rooms/${roomId}`);
+      });
     }
+  }, [userProfile, isInsideApplication]);
+
+  /**
+   * Joins a room by inserting the user's profile into the room_users table.
+   * If the user is already a participant, it will act like he joined the room.
+   */
+  const joinRoom = async () => {
+    if (!userProfile) return { error: "Unauthorized" };
+    if (!roomId) return { error: "Unknown room" };
+
     const { error: roomUsersError } = await supabase.from("room_users").insert({
       room_id: roomId,
-      profile_id: userProfileId,
+      profile_id: userProfile.user_profile_id,
     });
+
     if (roomUsersError) {
-      return { error: roomUsersError };
+      if (roomUsersError.code !== "409") return { error: roomUsersError };
     }
+
     return { error: null };
   };
 
-  const getRoomId = async () => {
-    const { data: room, error: activeRoomError } = await supabase
-      .from("active_rooms")
-      .select("id")
-      .eq("code", roomCode)
-      .single();
-    if (activeRoomError) {
-      return { data: null, error: activeRoomError };
-    }
-    return { data: room.id, error: null };
-  };
+  /**
+   * Returns the app link based on the current environment and room code.
+   * On production, the app link is a deep link to the app (datsmysong://)
+   * On development, the app link is a deep link to the Expo Go app (exp://)
+   * Currently, this doesn't support native development builds.
+   * @returns The app link.
+   */
+  function getAppLink(): string {
+    const production = process.env.NODE_ENV === "production";
+    if (production) {
+      return `datsmysong://join/${roomCode}`;
+    } else {
+      if (!currentPageLink) return "";
 
-  const getParticipant = async (userProfileId: string) => {
-    const { data: roomId, error: errorRoomId } = await getRoomId();
-    if (errorRoomId) {
-      Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
-      return;
+      const host = currentPageLink.split("/").slice(2, 3).join("/");
+      return `exp://${host}/--/join/${roomCode}`;
     }
-    const { data: participant, error: roomUsersError } = await supabase
-      .from("room_users")
-      .select("profile_id")
-      .eq("profile_id", userProfileId)
-      .eq("room_id", roomId)
-      .single();
-    if (roomUsersError) {
-      return { data: null, error: roomUsersError };
-    }
-    return { data: participant, error: null };
-  };
-
-  if (isConnected) {
-    return (
-      <View style={styles.choiceContainer}>
-        <Text style={styles.title}>
-          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}"
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Button
-            block
-            type="filled"
-            onPress={async () =>
-              await onOpenApp(`rooms/${roomCode}`, userProfileId)
-            }
-          >
-            Ouvrir dans l'application
-          </Button>
-          <Button
-            block
-            type="outline"
-            onPress={async () =>
-              await onContinueWebsite(`rooms/${roomCode}`, userProfileId)
-            }
-          >
-            Continuer sur le site
-          </Button>
-        </View>
-      </View>
-    );
-  } else {
-    return (
-      <View style={styles.choiceContainer}>
-        <Text style={styles.title}>
-          Vous êtes sur le point de rejoindre la salle d'écoute "{roomCode}",
-          mais vous n'êtes pas connecté
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Button block type="filled" href={`auth`}>
-            Se connecter
-          </Button>
-          <Button block type="outline">
-            Continuer en tant qu'invité
-          </Button>
-        </View>
-      </View>
-    );
   }
+
+  /**
+   * Handles the action when the user continues on the website.
+   * If the user is already a participant, it replaces the current route with the room route.
+   * Otherwise, it joins the room and replaces the current route with the room route.
+   */
+  async function handleContinueOnWebsite() {
+    if (isParticipant) return router.replace(`rooms/${roomId}`);
+
+    const { error } = await joinRoom();
+    if (error)
+      return Alert.alert("Impossible de rejoindre la salle d'écoute: " + error);
+
+    router.replace(`rooms/${roomId}`);
+  }
+
+  function handleAnonymousJoin() {
+    return Alert.alert("Fonctionnalité non implémentée");
+  }
+
+  return (
+    <View style={styles.choiceContainer}>
+      {roomCode && (
+        <>
+          {isInsideApplication && (
+            <Text style={styles.title}>Redirection en cours...</Text>
+          )}
+          {!isInsideApplication && (
+            <>
+              {isParticipant && (
+                <>
+                  <Text style={styles.title}>
+                    Vous avez déjà rejoint la salle d'écoute "{roomCode}" !
+                  </Text>
+                  <Text style={styles.title}>
+                    Comment souhaitez-vous continuer ?
+                  </Text>
+                </>
+              )}
+              {!isParticipant && (
+                <Text style={styles.title}>
+                  Vous êtes sur le point de rejoindre la salle d'écoute "
+                  {roomCode}"
+                </Text>
+              )}
+
+              <View style={styles.buttonContainer}>
+                <Button block type="filled" href={getAppLink()}>
+                  Ouvrir dans l'application
+                </Button>
+                {!userProfile && (
+                  <Button block type="outline" onPress={handleAnonymousJoin}>
+                    Continuer en tant qu'invité
+                  </Button>
+                )}
+                {userProfile && (
+                  <Button
+                    block
+                    type="outline"
+                    onPress={handleContinueOnWebsite}
+                  >
+                    Continuer sur le site
+                  </Button>
+                )}
+              </View>
+            </>
+          )}
+        </>
+      )}
+      {!roomCode && (
+        <Text style={styles.title}>
+          Aucun code de salle d'écoute n'a été retourné
+        </Text>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
