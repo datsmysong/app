@@ -7,7 +7,6 @@ import * as Linking from "expo-linking";
 import * as Device from "expo-device";
 import Alert from "../../components/Alert";
 import { useUserProfile } from "../../lib/userProfile";
-import { PostgrestError } from "@supabase/supabase-js";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
