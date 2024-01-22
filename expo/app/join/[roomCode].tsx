@@ -7,6 +7,7 @@ import * as Linking from "expo-linking";
 import * as Device from "expo-device";
 import Alert from "../../components/Alert";
 import { useUserProfile } from "../../lib/userProfile";
+import { PostgrestError } from "@supabase/supabase-js";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
@@ -58,15 +59,25 @@ export default function JoinPage() {
   };
 
   const onOpenApp = async (path: string, userProfileId: string) => {
+    let roomUsersError;
     if (!isParticipant) {
-      await addUserToRoom(userProfileId);
+      roomUsersError = await addUserToRoom(userProfileId);
+    }
+    if (roomUsersError) {
+      Alert.alert("L'utilisateur n'a pas pu être ajouté à la salle d'écoute.");
+      return;
     }
     Linking.openURL(`${deepLink}`);
   };
 
   const onContinueWebsite = async (path: string, userProfileId: string) => {
+    let roomUsersError;
     if (!isParticipant) {
-      await addUserToRoom(userProfileId);
+      roomUsersError = await addUserToRoom(userProfileId);
+    }
+    if (roomUsersError) {
+      Alert.alert("L'utilisateur n'a pas pu être ajouté à la salle d'écoute.");
+      return;
     }
     router.replace(path as any);
   };
@@ -84,6 +95,7 @@ export default function JoinPage() {
     if (roomUsersError) {
       return { error: roomUsersError };
     }
+    return { error: null };
   };
 
   const getRoomId = async () => {
