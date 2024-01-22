@@ -9,6 +9,7 @@ import path from "path";
 import { Server } from "socket.io";
 import AuthCallbackGET from "./route/AuthCallbackGET";
 import AuthRedirectionGET from "./route/AuthRedirectionGET";
+import AuthRegister from "./route/AuthRegisterPOST";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
@@ -50,6 +51,24 @@ server.register(fastifyCors, {
 // Auth
 server.get("/auth/callback", AuthCallbackGET);
 server.get("/auth/redirection", AuthRedirectionGET);
+server.post(
+  "/auth/register",
+  {
+    schema: {
+      body: {
+        type: "object",
+        required: ["email", "password"],
+        properties: {
+          email: { type: "string" },
+          password: { type: "string" },
+          username: { type: "string" },
+          displayName: { type: "string" },
+        },
+      },
+    },
+  },
+  AuthRegister
+);
 
 server.get("/streaming-services", StreamingServicesGET);
 
