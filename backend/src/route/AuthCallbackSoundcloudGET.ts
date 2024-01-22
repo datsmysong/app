@@ -37,7 +37,7 @@ export async function getStreamingServiceIdByName(serviceName: string) {
   return { data: data.service_id, error: null };
 }
 
-export default async function SoundcloudBoundGET(
+export default async function AuthCallbackSoundcloudGET(
   request: FastifyRequest,
   response: FastifyReply,
 ) {

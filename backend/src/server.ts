@@ -13,7 +13,7 @@ import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
 import SoundcloudBoundGET from "./route/SoundcloudBoundGET";
-import StreamingServicesGET from "./route/StreamingServicesGET";
+import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import RoomIO from "./socketio/RoomIO";
 import CurrentUserGET from "./route/CurrentUserGET";
 import BoundServicesGET from "./route/BoundServicesGET";
@@ -101,9 +101,9 @@ const BoundServicePOSTSchema = {
 };
 
 // Auth
-server.get("/", SoundcloudBoundGET);
 server.register(authRoutes, { prefix: "/auth" });
 server.post("/soundcloud/bound", BoundServicePOST);
+server.get("/", AuthCallbackSoundcloudGET);
 
 server.post("/bound", { schema: BoundServicePOSTSchema }, BoundServicePOST);
 server.get("/bounded", BoundServicesGET);
