@@ -14,8 +14,8 @@ export default function JoinPage() {
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
+  const [userProfileId, setUserProfileId] = useState<string>("");
 
-  let userProfileId: string = "";
   let isMobile: boolean = false;
 
   useEffect(() => {
@@ -26,9 +26,9 @@ export default function JoinPage() {
     isMobile = Device.deviceType === Device.DeviceType.PHONE;
     useUserProfile().then((userProfile) => {
       if (userProfile) {
-        userProfileId = userProfile.user_profile_id;
+        setUserProfileId(userProfile.user_profile_id);
         setIsConnected(true);
-        getParticipant().then((result) => {
+        getParticipant(userProfileId).then((result) => {
           if (!result) {
             Alert.alert(
               "Une erreur est survenue lors de la récupération des informations de l'utilisateur."
@@ -43,7 +43,7 @@ export default function JoinPage() {
           }
           setIsParticipant(true);
         });
-        handleIncomingLinks();
+        handleIncomingLinks(userProfileId);
       } else {
         setIsConnected(false);
         // ... when anonymous users are implemented, verifiy if the user is a participant or not
@@ -51,27 +51,27 @@ export default function JoinPage() {
     });
   }, [roomCode]);
 
-  const handleIncomingLinks = async () => {
+  const handleIncomingLinks = async (userProfileId: string) => {
     if (!isMobile) {
-      await onContinueWebsite(`rooms/${roomCode}`);
+      await onContinueWebsite(`rooms/${roomCode}`, userProfileId);
     }
   };
 
-  const onOpenApp = async (path: string) => {
+  const onOpenApp = async (path: string, userProfileId: string) => {
     if (!isParticipant) {
-      await addUserToRoom();
+      await addUserToRoom(userProfileId);
     }
     Linking.openURL(`${deepLink}`);
   };
 
-  const onContinueWebsite = async (path: string) => {
+  const onContinueWebsite = async (path: string, userProfileId: string) => {
     if (!isParticipant) {
-      await addUserToRoom();
+      await addUserToRoom(userProfileId);
     }
     router.replace(path as any);
   };
 
-  const addUserToRoom = async () => {
+  const addUserToRoom = async (userProfileId: string) => {
     const { data: roomId, error: errorRoomId } = await getRoomId();
     if (errorRoomId) {
       Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
@@ -98,7 +98,7 @@ export default function JoinPage() {
     return { data: room.id, error: null };
   };
 
-  const getParticipant = async () => {
+  const getParticipant = async (userProfileId: string) => {
     const { data: roomId, error: errorRoomId } = await getRoomId();
     if (errorRoomId) {
       Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
@@ -126,14 +126,18 @@ export default function JoinPage() {
           <Button
             block
             type="filled"
-            onPress={async () => await onOpenApp(`rooms/${roomCode}`)}
+            onPress={async () =>
+              await onOpenApp(`rooms/${roomCode}`, userProfileId)
+            }
           >
             Ouvrir dans l'application
           </Button>
           <Button
             block
             type="outline"
-            onPress={async () => await onContinueWebsite(`rooms/${roomCode}`)}
+            onPress={async () =>
+              await onContinueWebsite(`rooms/${roomCode}`, userProfileId)
+            }
           >
             Continuer sur le site
           </Button>
