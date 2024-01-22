@@ -1,11 +1,4 @@
-export interface JSONTrack {
-  url: string;
-  title: string;
-  duration: number;
-  artistName: string;
-  albumName: string;
-  imgUrl: string;
-}
+import { JSONTrack } from "commons/Backend-types";
 
 export default abstract class MusicPlatform {
   // private static singleton: any;
@@ -15,13 +8,13 @@ export default abstract class MusicPlatform {
   protected constructor(urlPattern: RegExp) {
     this.urlPattern = new RegExp(urlPattern, "i");
     // let checkRegex = /^\/(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\([^?](?:[^(]|[^\\]\\\(|[^\\]\(\?)*\)(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\/.*$/
-    let resultRegex = new RegExp(this.urlPattern.toString() + "|")
+    const resultRegex = new RegExp(this.urlPattern.toString() + "|")
       .exec("")
       ?.slice(1).length;
     if (resultRegex !== 1) {
       throw new Error(
         "il y a plusieurs groupe de capture\n" +
-          "seul un groupe doit se trouver dans le pattern, et doit retourner l'identifiant unique de l'élément",
+          "seul un groupe doit se trouver dans le pattern, et doit retourner l'identifiant unique de l'élément"
       );
     }
 

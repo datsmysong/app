@@ -1,5 +1,6 @@
-import MusicPlatform, { JSONTrack } from "./MusicPlatform";
+import MusicPlatform from "./MusicPlatform";
 import { spotify } from "../server";
+import { JSONTrack } from "commons/Backend-types";
 
 interface SpotifyToken {
   access_token: string;
@@ -10,12 +11,12 @@ interface SpotifyToken {
 export default class Spotify extends MusicPlatform {
   constructor() {
     super(
-      /^https?:\/\/open\.spotify\.com\/(?:.*\/)?track\/([a-zA-Z0-9]*)(?:\?.*)?$/i,
+      /^https?:\/\/open\.spotify\.com\/(?:.*\/)?track\/([a-zA-Z0-9]*)(?:\?.*)?$/i
     );
   }
 
   async getJsonTrack(id: string): Promise<JSONTrack> {
-    let data = await spotify.tracks.get(id);
+    const data = await spotify.tracks.get(id);
 
     return {
       url: new URL(data.external_urls.spotify).toString(),

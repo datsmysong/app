@@ -9,14 +9,13 @@ import Alert from "../../../components/Alert";
 import Button from "../../../components/Button";
 import { supabase } from "../../../lib/supabase";
 
-interface JSONTrack {
-  url: string;
-  title: string;
-  duration: number;
-  artistName: string;
-  albumName: string;
-  imgUrl: string;
-}
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { JSONTrack } from "commons/Backend-types";
+import { Image } from "expo-image";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+
+import SocketIo from "../../../lib/socketio";
 
 export interface MusicRoomParams {
   id: string;
@@ -36,8 +35,8 @@ if (!ENDPOINT) {
 
 // Horizontal View
 const HView = (props: ViewProps) => {
-  let { style, ...others } = props;
-  return <View style={[style, { flexDirection: "row" }]} {...others}></View>;
+  const { style, ...others } = props;
+  return <View style={[style, { flexDirection: "row" }]} {...others} />;
 };
 
 const generatedInvitationLink = (currentUrl: string, roomCode: string) => {
@@ -63,10 +62,10 @@ const TrackItem = (prop: { track: JSONTrack; index: number }) => {
     albumName: album,
     imgUrl: rawImageUrl,
   } = prop.track;
-  let imageSrc = new URL(rawImageUrl).toString();
+  const imageSrc = new URL(rawImageUrl).toString();
   // mock image
-  let imageProfileSrc = new URL(
-    "https://s3-alpha-sig.figma.com/img/942f/8c54/9dd5171d2934478c6b2e1f64eea7d81b?Expires=1706486400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QQWwtvI8wCX3aN6TZggpc-IcOeYA21PftgQkCXnuVhcMue0uffDuBhvHDIu9SSuWJYc9AGBj8L7RpwV6Yv1X7fD1A0rdOYwTpbZuP1FbYHWxFjD9uyYEo8CpOXJQEzOndM~jtj9pNysYNWzhfJ5LnX5grgKEoU1AnXR5SFu0AAfCiB4PrFYLpOlhKwMQsv7uPQA5ftH9YNYq4yzgVsSbZX69jHCTYhTO0XOwEtu6DKNOhTMzl9naajFenIAHChgKxqlDrF-UvXsVwh7dwq4-jYPlFxV8-6QB-o0ffog60CHpBsfLnYs-KgaAqeTleydiBKjtYOk1zKBp9uHAOcjOAg__",
+  const imageProfileSrc = new URL(
+    "https://s3-alpha-sig.figma.com/img/942f/8c54/9dd5171d2934478c6b2e1f64eea7d81b?Expires=1706486400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QQWwtvI8wCX3aN6TZggpc-IcOeYA21PftgQkCXnuVhcMue0uffDuBhvHDIu9SSuWJYc9AGBj8L7RpwV6Yv1X7fD1A0rdOYwTpbZuP1FbYHWxFjD9uyYEo8CpOXJQEzOndM~jtj9pNysYNWzhfJ5LnX5grgKEoU1AnXR5SFu0AAfCiB4PrFYLpOlhKwMQsv7uPQA5ftH9YNYq4yzgVsSbZX69jHCTYhTO0XOwEtu6DKNOhTMzl9naajFenIAHChgKxqlDrF-UvXsVwh7dwq4-jYPlFxV8-6QB-o0ffog60CHpBsfLnYs-KgaAqeTleydiBKjtYOk1zKBp9uHAOcjOAg__"
   ).toString();
 
   return (
@@ -160,7 +159,7 @@ export default function musicRoom() {
     }, 3000);
   };
 
-  let url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
+  const url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
 
   const [data, setData] = useState<ActiveRoomSkeleton>();
 

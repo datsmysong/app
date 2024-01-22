@@ -4,8 +4,8 @@ import createClient from "./lib/supabase";
 import Spotify from "./musicplatform/Spotify";
 import { randomUUID } from "node:crypto";
 import MusicStorage from "./MusicStorage";
-import { JSONTrack } from "./musicplatform/MusicPlatform";
 import TrackFactory from "./musicplatform/TrackFactory";
+import { JSONTrack } from "commons/Backend-types";
 
 interface RoomJSON {
   currentActiveRoom: string;
@@ -129,7 +129,7 @@ export default class Room {
   }
 
   static newRoom(musicStorage: MusicStorage): Room {
-    let room = new Room();
+    const room = new Room();
     musicStorage.addRoom(room);
     return room;
   }
@@ -144,12 +144,12 @@ export default class Room {
 
   async add(rawUrl: string | URL) {
     // let track = new URL(rawUrl).toString();
-    let trackMetadata = new TrackFactory();
+    const trackMetadata = new TrackFactory();
     trackMetadata.register(
       new Spotify()
     ) /*, new SoundCloud(), new AppleMusic()*/;
 
-    let track = await trackMetadata.fromUrl(new URL(rawUrl))?.toJSON();
+    const track = await trackMetadata.fromUrl(new URL(rawUrl))?.toJSON();
     if (track !== undefined) this.tracks.add(track);
   }
 
