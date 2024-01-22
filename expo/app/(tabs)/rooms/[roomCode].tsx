@@ -1,5 +1,5 @@
 import { View, StyleSheet, Platform, Text } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import Button from "../../../components/Button";
 import * as Linking from "expo-linking";
