@@ -1,5 +1,6 @@
 import { Controller, RegisterOptions } from "react-hook-form";
 import { StyleSheet, Text, TextInputProps, View } from "react-native";
+import CustomPasswordInput from "../../components/CustomPasswordInput";
 import CustomTextInput from "../../components/CustomTextInput";
 
 export default function ControledInput({
@@ -23,20 +24,34 @@ export default function ControledInput({
 }) {
   return (
     <View style={styles.vbox}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.hbox}>
+        <Text style={styles.label}>{label}</Text>
+        {rules?.required && <Text style={styles.required}>*</Text>}
+      </View>
       <Controller
         control={control}
         rules={rules}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <CustomTextInput
-            placeholder={placeholder}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            autoComplete={autoComplete}
-            secureTextEntry={secureTextEntry}
-          />
-        )}
+        render={({ field: { onChange, onBlur, value } }) =>
+          !secureTextEntry ? (
+            <CustomTextInput
+              placeholder={placeholder}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              autoComplete={autoComplete}
+              secureTextEntry={secureTextEntry}
+            />
+          ) : (
+            <CustomPasswordInput
+              placeholder={placeholder}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              autoComplete={autoComplete}
+              secureTextEntry={secureTextEntry}
+            />
+          )
+        }
         name={name}
       />
       {errorMessage && (
@@ -54,7 +69,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Medium",
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "500",
@@ -70,5 +85,18 @@ const styles = StyleSheet.create({
   },
   textAlignCenter: {
     textAlign: "center",
+  },
+  required: {
+    color: "red",
+    fontFamily: "Outfit-Bold",
+    fontSize: 20,
+    fontStyle: "normal",
+    lineHeight: 24,
+    paddingBottom: 5,
+  },
+  hbox: {
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
   },
 });
