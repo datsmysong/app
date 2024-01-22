@@ -1,9 +1,10 @@
-import { makeRedirectUri } from "expo-auth-session";
 import { Link, router } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+
 import Button from "../../components/Button";
 import ControledInput from "../../components/ControledInput";
+import { getApiUrl } from "../../lib/apiUrl";
 type FormData = {
   username: string;
   email: string;
@@ -12,7 +13,6 @@ type FormData = {
   displayName: string;
 };
 
-const directUri = makeRedirectUri();
 export default function Register() {
   const {
     control,
@@ -37,11 +37,8 @@ export default function Register() {
     displayName,
   }: FormData) => {
     displayName = displayName ?? username;
-    // TODO after merge : getApiUrl() from lib
-    const baseUrl = directUri.includes("exp://")
-      ? "http://" + directUri.split(":8081")[0].split("//")[1]
-      : directUri.split(":8081")[0];
 
+    const baseUrl = getApiUrl();
     const data = await fetch(baseUrl + ":3000/auth/register", {
       method: "POST",
       headers: {
@@ -64,7 +61,6 @@ export default function Register() {
       setError("username", {
         message: "Ce nom d'utilisateur est déjà pris",
       });
-      return;
     }
   };
 
@@ -74,8 +70,8 @@ export default function Register() {
         <ControledInput
           onSubmit={handleSubmit(onSubmit)}
           control={control}
-          label={"Adresse email"}
-          name={"email"}
+          label="Adresse email"
+          name="email"
           rules={{
             required: "Veuillez saisir votre adresse email",
             pattern: {
@@ -83,7 +79,7 @@ export default function Register() {
               message: "Veuillez saisir une adresse email valide",
             },
           }}
-          placeholder={"votre@adresse.email"}
+          placeholder="votre@adresse.email"
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"
         />
@@ -91,7 +87,7 @@ export default function Register() {
           onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Nom d'utilisateur"}
-          name={"username"}
+          name="username"
           rules={{
             required: "Un nom d'utilisateur est requis",
             minLength: {
@@ -107,16 +103,16 @@ export default function Register() {
           onSubmit={handleSubmit(onSubmit)}
           control={control}
           label={"Nom d'affichage"}
-          name={"displayName"}
-          placeholder={"LePetitRenard"}
+          name="displayName"
+          placeholder="LePetitRenard"
           errorMessage={errors.displayName && errors.displayName.message}
           autoComplete="nickname"
         />
         <ControledInput
           onSubmit={handleSubmit(onSubmit)}
           control={control}
-          label={"Mot de passe"}
-          name={"password"}
+          label="Mot de passe"
+          name="password"
           rules={{
             required: "Veuillez saisir votre mot de passe",
             minLength: {
@@ -134,7 +130,7 @@ export default function Register() {
                 "Le mot de passe doit contenir une minuscule",
             },
           }}
-          placeholder={"Mon mot de passe robuste"}
+          placeholder="Mon mot de passe robuste"
           errorMessage={errors.password && errors.password.message}
           autoComplete="password"
           secureTextEntry
@@ -142,8 +138,8 @@ export default function Register() {
         <ControledInput
           onSubmit={handleSubmit(onSubmit)}
           control={control}
-          label={"Confirmer le mot de passe"}
-          name={"confirmPassword"}
+          label="Confirmer le mot de passe"
+          name="confirmPassword"
           rules={{
             required: "Veuillez confirmer votre mot de passe",
             minLength: {
@@ -160,10 +156,10 @@ export default function Register() {
                 /[a-z]/.test(value) ||
                 "Le mot de passe doit contenir une minuscule",
               sameAsPassword: (value) =>
-                value == password || "Les mots de passe ne correspondent pas",
+                value === password || "Les mots de passe ne correspondent pas",
             },
           }}
-          placeholder={"Mon mot de passe robuste"}
+          placeholder="Mon mot de passe robuste"
           errorMessage={
             errors.confirmPassword && errors.confirmPassword.message
           }
@@ -182,7 +178,7 @@ export default function Register() {
             width: "100%",
           }}
         >
-          <Link href={"/auth/login"} replace>
+          <Link href="/auth/login" replace>
             <Text style={{ ...styles.text, textAlign: "center" }}>
               Déjà un compte ? Connectez-vous !
             </Text>
