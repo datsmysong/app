@@ -98,8 +98,6 @@ server.register(authRoutes, { prefix: "/auth" });
 
 server.get("/streaming-services", StreamingServicesGET);
 
-server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
-
 server.get("/room/:id", RoomIdGET);
 
 server.get("/rooms", RoomsGET);
