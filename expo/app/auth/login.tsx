@@ -3,8 +3,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 import Button from "../../components/Button";
+import ControledInput from "../../components/ControledInput";
 import { supabase } from "../../lib/supabase";
-import ControledInput from "./ControledInput";
 
 type LoginForm = {
   email: string;
@@ -72,19 +72,21 @@ export default function Login() {
           autoComplete="password"
           secureTextEntry
         />
-        <Text style={{ ...styles.text, textAlign: "right" }}>
+        <Link href={"/auth/"} style={{ ...styles.text, textAlign: "center" }}>
           Mot de passe oublié ?
-        </Text>
+        </Link>
         <Button onPress={handleSubmit(onSubmit)} block>
           Se connecter
         </Button>
         <View
           style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }}
         >
-          <Link href={"/auth/register"} replace>
-            <Text style={{ ...styles.text, textAlign: "center" }}>
-              Vous n’avez pas de compte ? Inscrivez-vous !
-            </Text>
+          <Link
+            href={"/auth/register"}
+            replace
+            style={{ ...styles.text, textAlign: "center" }}
+          >
+            Vous n’avez pas de compte ? Inscrivez-vous !
           </Link>
         </View>
       </View>
@@ -102,20 +104,17 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   form: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
     borderRadius: 11,
     flex: 1,
     gap: 13,
     width: "100%",
-    // alignItems: "center",
   },
   page: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 48,
-    paddingHorizontal: 30,
+    paddingVertical: 51,
+    paddingHorizontal: 20,
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",

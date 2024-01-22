@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "#FFF",
     color: "#1A1A1A",
-    fontFamily: "Outfit-regular",
+    fontFamily: "Outfit-Regular",
     fontSize: 18,
     borderColor: "#DFDFDF",
     borderStyle: "solid",

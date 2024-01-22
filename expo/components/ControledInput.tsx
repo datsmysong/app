@@ -1,7 +1,7 @@
 import { Controller, RegisterOptions } from "react-hook-form";
 import { StyleSheet, Text, TextInputProps, View } from "react-native";
-import CustomPasswordInput from "../../components/CustomPasswordInput";
-import CustomTextInput from "../../components/CustomTextInput";
+import CustomPasswordInput from "./CustomPasswordInput";
+import CustomTextInput from "./CustomTextInput";
 
 export default function ControledInput({
   control,
@@ -45,14 +45,17 @@ export default function ControledInput({
               onSubmit={onSubmit}
             />
           ) : (
+            // We used two components because we can't change secureTextEntry value dynamically
+            // and we don't want load many states and logical conditions in CustomTextInput
             <CustomPasswordInput
-              placeholder={placeholder}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              autoComplete={autoComplete}
-              secureTextEntry={secureTextEntry}
-              onSubmit={onSubmit}
+              InputProps={{
+                placeholder: placeholder,
+                onBlur: onBlur,
+                onChangeText: onChange,
+                value: value,
+                autoComplete: autoComplete,
+                onSubmit: onSubmit,
+              }}
             />
           )
         }
@@ -69,7 +72,7 @@ export default function ControledInput({
 const styles = StyleSheet.create({
   vbox: {
     gap: 5,
-    height: 100,
+    minHeight: 100,
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",

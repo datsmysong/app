@@ -3,7 +3,7 @@ import { Link, router } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import Button from "../../components/Button";
-import ControledInput from "./ControledInput";
+import ControledInput from "../../components/ControledInput";
 type FormData = {
   username: string;
   email: string;
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 51,
-    paddingHorizontal: 38,
+    paddingHorizontal: 20,
     backgroundColor: "#fff",
   },
   form: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Medium",
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "500",
