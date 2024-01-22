@@ -176,6 +176,17 @@ server.get("/rooms", RoomGET);
 server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 
 // server.get("/track/spotify/:id", SpotifyGET);
+const getRoomSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "string" },
+    },
+  },
+};
+
+server.get("/rooms/:id", { schema: getRoomSchema }, RoomGET);
 
 server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", onRoomWSConnection);
