@@ -1,11 +1,10 @@
+import { Link } from "expo-router";
 import React from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
-import CustomTextInput from "../../components/CustomTextInput";
+import Alert from "../../components/Alert";
 import Button from "../../components/Button";
 import { supabase } from "../../lib/supabase";
-import { Link } from "expo-router";
-import Alert from "../../components/Alert";
 import ControledInput from "./ControledInput";
 
 type LoginForm = {
@@ -86,7 +85,9 @@ export default function Login() {
         <Button onPress={handleSubmit(onSubmit)} block>
           Se connecter
         </Button>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <View
+          style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }}
+        >
           <Link href={"/auth/register"} replace>
             <Text style={{ ...styles.text, textAlign: "center" }}>
               Vous n’avez pas de compte ? Inscrivez-vous !

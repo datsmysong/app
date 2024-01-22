@@ -1,5 +1,5 @@
 import { Controller, RegisterOptions } from "react-hook-form";
-import { Text, TextInputProps, View, StyleSheet } from "react-native";
+import { StyleSheet, Text, TextInputProps, View } from "react-native";
 import CustomTextInput from "../../components/CustomTextInput";
 
 export default function ControledInput({
@@ -22,7 +22,7 @@ export default function ControledInput({
   errorMessage?: string | undefined;
 }) {
   return (
-    <View style={styles.form}>
+    <View style={styles.vbox}>
       <Text style={styles.label}>{label}</Text>
       <Controller
         control={control}
@@ -48,8 +48,9 @@ export default function ControledInput({
   );
 }
 const styles = StyleSheet.create({
-  form: {
+  vbox: {
     gap: 5,
+    height: 100,
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",
