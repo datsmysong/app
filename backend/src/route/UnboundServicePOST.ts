@@ -6,7 +6,7 @@ interface bodyParams {
   serviceId: string;
 }
 
-export default function UnboundServicePOST(
+export default async function UnboundServicePOST(
   request: FastifyRequest,
   response: FastifyReply,
 ) {
@@ -23,16 +23,12 @@ export default function UnboundServicePOST(
     return;
   }
 
-  adminSupabase
+  const { data, status, error } = await adminSupabase
     .from("bound_services")
     .delete()
     .eq("user_profile_id", userId)
     .eq("service_id", serviceId)
-    .then((res) => {
-      if (res.error) {
-        response.code(res.status).send(res.error);
-      } else {
-        response.send(res.data);
-      }
-    });
+    .single();
+
+  response.code(status).send(error ?? data);
 }

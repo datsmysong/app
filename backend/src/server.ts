@@ -17,6 +17,7 @@ import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
 import CurrentUserGET from "./route/CurrentUserGET";
 import BoundServicesGET from "./route/BoundServicesGET";
+import UnboundServicePOST from "./route/UnboundServicePOST";
 
 config({ path: ".env.local" });
 
@@ -109,7 +110,7 @@ server.get("/bounded", BoundServicesGET);
 
 server.get("/streaming-services", StreamingServicesGET);
 server.get("/user/current", CurrentUserGET);
-server.delete("/unbound", BoundServicePOST);
+server.delete("/unbound", UnboundServicePOST);
 
 const createRoomSchema = {
   body: {
