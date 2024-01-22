@@ -13,7 +13,7 @@ export default async function RoomIdGET(
   const { id: activeRoomId } = req.params as QueryParams;
 
   // TODO DEBUG
-  let musicStorage = MusicStorage.getMusicStorage();
+  const musicStorage = MusicStorage.getMusicStorage();
   console.log(MusicStorage.getMusicStorage());
 
   // TODO MOCK
@@ -33,7 +33,7 @@ export default async function RoomIdGET(
     );
   }
 
-  let room = mock === undefined ? musicStorage.getRoom(activeRoomId) : mock;
+  const room = mock === undefined ? musicStorage.getRoom(activeRoomId) : mock;
   if (room === null) {
     reply.code(404);
   }

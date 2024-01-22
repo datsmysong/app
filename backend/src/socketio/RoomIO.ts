@@ -5,9 +5,9 @@ import MusicStorage from "../MusicStorage";
 export default function RoomIO(
   socket: Socket /*, next: (err?: ExtendedError) => void*/
 ) {
-  let namespace = socket.nsp;
+  const namespace = socket.nsp;
   /*regex uuid [0-9a-f]{8}-([0-9a-f]{4}){3}-[0-9a-f]{12}*/
-  let pattern = /^\/room\/(.*)$/;
+  const pattern = /^\/room\/(.*)$/;
   console.log(namespace.name);
 
   // if (!pattern.test(namespace.name)) {
@@ -18,14 +18,14 @@ export default function RoomIO(
 
   // remove first element which contains the whole tested string, then get the first group (surround with parenthesis)
 
-  let rawUrlMatchGroups = pattern.exec(namespace.name);
+  const rawUrlMatchGroups = pattern.exec(namespace.name);
   if (rawUrlMatchGroups === null) {
     socket.disconnect();
     return;
   }
-  let activeRoomId = rawUrlMatchGroups.slice(1)[0] as string;
+  const activeRoomId = rawUrlMatchGroups.slice(1)[0] as string;
 
-  let room = MusicStorage.getMusicStorage().getRoom(activeRoomId);
+  const room = MusicStorage.getMusicStorage().getRoom(activeRoomId);
   if (room === null) {
     socket.disconnect();
     return;
