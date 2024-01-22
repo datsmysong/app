@@ -6,6 +6,17 @@ import { Image } from "expo-image";
 import ConnectWithSpotify from "../../(auth)/connect-with-spotify";
 import ConnectWithSoundcloud from "../../(auth)/connect-with-soundcloud";
 import { router } from "expo-router";
+import Alert from "../../../components/Alert";
+
+type StreamingService = {
+  service_id: string;
+  service_name: string;
+  description: string;
+  image_url: string;
+  playback_available: boolean;
+  playlists_available: boolean;
+  likes_available: boolean;
+};
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([]);
@@ -33,11 +44,11 @@ export default function ProfileIntegration() {
     };
 
     fetchStreamingServicesData().catch((err) => {
-      console.error(err);
+      Alert.alert(err);
     });
 
     fetchUserData().catch((err) => {
-      console.error(err);
+      Alert.alert(err);
     });
   }, []);
 
@@ -53,7 +64,7 @@ export default function ProfileIntegration() {
 
     if (userId) {
       fetchBoundServices().catch((err) => {
-        console.error(err);
+        Alert.alert(err);
       });
     }
   }, [userId]);
@@ -89,20 +100,20 @@ export default function ProfileIntegration() {
     })
       .then((resUnbound) => {
         if (!resUnbound.ok) {
-          console.error("Error while unbinding service");
+          Alert.alert("Erreur lors de la déconnexion du service");
         } else {
           router.push("/profile");
         }
       })
       .catch((error) => {
-        console.error(error);
+        Alert.alert(error);
       });
   };
 
   return (
     <ScrollView contentContainerStyle={styles.page}>
       {servicesData &&
-        servicesData.map((service: any) => {
+        servicesData.map((service: StreamingService) => {
           return (
             <View key={service.service_id} style={styles.layout}>
               <View style={styles.info}>
