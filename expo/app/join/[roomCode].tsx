@@ -9,8 +9,7 @@ import Alert from "../../components/Alert";
 import { useUserProfile } from "../../lib/userProfile";
 
 export default function JoinPage() {
-  const { roomCode } = useLocalSearchParams();
-  const { deepLink } = useLocalSearchParams();
+  const { roomCode, deepLink } = useLocalSearchParams();
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isParticipant, setIsParticipant] = useState<boolean>(false);
