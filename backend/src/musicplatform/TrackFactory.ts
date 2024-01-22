@@ -11,7 +11,7 @@ export default class TrackFactory {
   register(newPlatform: MusicPlatform): boolean {
     if (
       Array.from(this.musicPlatformsList.keys()).includes(
-        newPlatform.getClass(),
+        newPlatform.getClass()
       )
     ) {
       return false;
@@ -21,15 +21,14 @@ export default class TrackFactory {
   }
 
   fromUrl(url: URL): Track | undefined {
-    for (let musicPlatform of this.musicPlatformsList.values()) {
-      let trackId = musicPlatform.trackIdFromUrl(url);
+    for (const musicPlatform of this.musicPlatformsList.values()) {
+      const trackId = musicPlatform.trackIdFromUrl(url);
       if (trackId) {
         return new Track(musicPlatform, { id: trackId });
       }
     }
   }
 }
-
 
 // // DEBUG
 // let track = new TrackFabrique(new Spotify()).fromUrl(new URL("https://open.spotify.com/intl-fr/track/4OUTQBwLBaTIUcgdI5PPt7?si=3aac1a9bcf3d4eac"));

@@ -1,13 +1,6 @@
 import MusicPlatform from "./MusicPlatform";
 import { spotify } from "../server";
 import { JSONTrack } from "commons/Backend-types";
-
-interface SpotifyToken {
-  access_token: string;
-  token_type: string;
-  expires_in: string;
-}
-
 export default class Spotify extends MusicPlatform {
   constructor() {
     super(
