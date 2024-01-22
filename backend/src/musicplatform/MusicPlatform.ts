@@ -33,6 +33,7 @@ export default abstract class MusicPlatform {
     return new RegExp(this.urlPattern);
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   getClass(): Function {
     return this.constructor;
   }

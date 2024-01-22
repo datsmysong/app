@@ -5,6 +5,7 @@ export default class TrackFactory {
   private readonly musicPlatformsList: Map<Function, MusicPlatform>;
 
   constructor() {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     this.musicPlatformsList = new Map<Function, MusicPlatform>();
   }
 
