@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Button from "../../../components/Button";
 
 export default function RoomsPage() {
-  const roomCode = "A1B2C3";
+  const roomId = "956992d0-f039-47d1-9475-ccacf10104d7";
 
   return (
     <View style={styles.headerContainer}>
@@ -12,7 +12,7 @@ export default function RoomsPage() {
         <Button block href={"/rooms/create"}>
           Créer une salle
         </Button>
-        <Button block type="outline" href={`/rooms/${roomCode}`}>
+        <Button block type="outline" href={`/rooms/${roomId}`}>
           Rejoindre une salle
         </Button>
       </View>
