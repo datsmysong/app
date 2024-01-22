@@ -21,7 +21,9 @@ export default function TabsProfile() {
       <Text>Profile</Text>
       {user && (
         <View>
-          <Link href={"/profile/integration"}>Intégrations</Link>
+          <Button prependIcon={"details"} href={"/profile/integration"}>
+            Intégrations
+          </Button>
           <Button prependIcon="logout" onPress={() => supabase.auth.signOut()}>
             Se déconnecter
           </Button>

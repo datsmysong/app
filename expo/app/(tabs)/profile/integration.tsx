@@ -165,6 +165,8 @@ export default function ProfileIntegration() {
                       ? "Déconnecter mon compte"
                       : "Lier mon compte"
                   }
+                  isBound={isBound(service.service_id)}
+                  onPress={() => unboundService(service.service_id)}
                 />
               ) : (
                 <ConnectWithSoundcloud
@@ -173,18 +175,6 @@ export default function ProfileIntegration() {
                       ? "Déconnecter mon compte"
                       : "Lier mon compte"
                   }
-                  buttonStyle={[
-                    styles.button,
-                    isBound(service.service_id)
-                      ? styles.disableButton
-                      : styles.enableButton,
-                  ]}
-                  textStyle={[
-                    styles.buttonText,
-                    isBound(service.service_id)
-                      ? styles.disableButtonText
-                      : styles.enableButtonText,
-                  ]}
                   isBound={isBound(service.service_id)}
                   onPress={() => unboundService(service.service_id)}
                 />
@@ -298,41 +288,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "stretch",
     flexWrap: "wrap",
-  },
-
-  button: {
-    display: "flex",
-    paddingVertical: 15,
-    paddingHorizontal: 26,
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "stretch",
-    borderRadius: 16,
-  },
-
-  buttonText: {
-    textAlign: "center",
-    fontFamily: "Outfit-Regular",
-    fontSize: 24,
-    fontStyle: "normal",
-    fontWeight: "700",
-    borderRadius: 16,
-  },
-
-  disableButton: {
-    borderColor: "#F33",
-    borderWidth: 2,
-  },
-
-  enableButton: {
-    backgroundColor: "#1A1A1A",
-  },
-
-  disableButtonText: {
-    color: "#F33",
-  },
-
-  enableButtonText: {
-    color: "#FFFFFF",
   },
 });

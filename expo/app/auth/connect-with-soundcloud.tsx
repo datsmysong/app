@@ -3,12 +3,11 @@ import React from "react";
 import { makeRedirectUri } from "expo-auth-session";
 import { Pressable, Text } from "react-native";
 import { router } from "expo-router";
+import Button from "../../components/Button";
 //import { URL } from "react-native-url-polyfill";
 
 interface params {
   title: string;
-  buttonStyle?: object;
-  textStyle?: object;
   onPress?: void | (() => void) | undefined;
   isBound?: boolean;
 }
@@ -16,8 +15,6 @@ interface params {
 const directUri = makeRedirectUri();
 export default function ConnectWithSoundcloud({
   title,
-  buttonStyle = {},
-  textStyle = {},
   onPress = () => {},
   isBound = false,
 }: params) {
@@ -49,10 +46,15 @@ export default function ConnectWithSoundcloud({
     router.push("/profile");
   };
 
-  // TODO: Adapt with the button components
+  // TODO: Adapt with integration page
   return (
-    <Pressable onPress={isBound ? onPress : handleConnect} style={buttonStyle}>
-      <Text style={textStyle}>{title}</Text>
-    </Pressable>
+    <Button
+      prependIcon="music-note"
+      onPress={isBound ? onPress : handleConnect}
+      type={isBound ? "outline" : "filled"}
+      block
+    >
+      {title}
+    </Button>
   );
 }
