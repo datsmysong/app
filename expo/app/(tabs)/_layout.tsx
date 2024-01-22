@@ -101,6 +101,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profil",
+          headerShown: false,
           tabBarLabel: ({ color, focused, children }) => (
             <TabBarLabel color={color} focused={focused}>
               {children}
