@@ -4,8 +4,8 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "react-native-screens";
 import Alert from "../components/Alert";
 import Button from "../components/Button";
-import {SupabaseErrorCode} from "../constants/SupabaseErrorCode";
-import {supabase} from "../lib/supabase";
+import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
+import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
 
 export default function AskName() {

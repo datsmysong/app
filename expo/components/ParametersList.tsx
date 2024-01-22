@@ -1,7 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Checkbox from "expo-checkbox";
 import CustomTextInput from "./CustomTextInput";
-import React, { useState } from "react";
+import { useState } from "react";
+import React from "react";
 
 interface ParametersListProps {
   percentageVoteToSkipAMusic: string;

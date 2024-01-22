@@ -5,5 +5,4 @@ function alert(content: string) {
     ? window.alert(content)
     : ReactNativeAlert.alert(content);
 }
-
-export default {alert};
+export default { alert };

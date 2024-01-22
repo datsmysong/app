@@ -41,11 +41,14 @@ if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
   throw new Error("Missing Spotify credentials");
 }
 
-export const spotify = SpotifyApi.withClientCredentials(process.env.SPOTIFY_CLIENT_ID, process.env.SPOTIFY_CLIENT_SECRET)
+export const spotify = SpotifyApi.withClientCredentials(
+  process.env.SPOTIFY_CLIENT_ID,
+  process.env.SPOTIFY_CLIENT_SECRET
+);
 server.register(fastifyIO, {
   cors: {
-    origin: "*"
-  }
+    origin: "*",
+  },
 });
 server.register(require("@fastify/cookie"), {
   secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
