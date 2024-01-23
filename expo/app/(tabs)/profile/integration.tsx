@@ -2,27 +2,21 @@ import { ScrollView, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "../../../components/Tamed";
 import { Image } from "expo-image";
-import ConnectWithSpotify from "../../auth/connect-with-spotify";
-import ConnectWithSoundcloud from "../../auth/connect-with-soundcloud";
 import { router } from "expo-router";
 import Alert from "../../../components/Alert";
 import { getApiUrl } from "../../../lib/apiUrl";
 import useSupabaseUser from "../../../lib/useSupabaseUser";
-import { BoundService } from "../../../../commons/database-types-utils";
+import { BoundService, StreamingService } from "commons/database-types-utils";
 import { getUserProfile } from "../../../lib/userProfile";
-
-type StreamingService = {
-  service_id: string;
-  service_name: string;
-  description: string;
-  image_url: string;
-  playback_available: boolean;
-  playlists_available: boolean;
-  likes_available: boolean;
-};
+import Button from "../../../components/Button";
+import {
+  signInWithProvider,
+  signInWithSoundcloud,
+} from "../../../lib/providerMethods";
+import { getSpotifyScopes } from "../../../constants/Api";
 
 export default function ProfileIntegration() {
-  const [servicesData, setServicesData] = useState([]);
+  const [servicesData, setServicesData] = useState([] as StreamingService[]);
   const [userId, setUserId] = useState("");
   const [boundServices, setBoundServices] = useState([] as BoundService[]); // To know which services are bound to the currrent user
 
@@ -72,7 +66,7 @@ export default function ProfileIntegration() {
     }
   }, [userId]);
 
-  const getServiceIds = (boundServices: any[]) => {
+  const getServiceIds = (boundServices: BoundService[]) => {
     const serviceIds = [];
     for (const [key, value] of Object.entries(boundServices)) {
       if (value) {
@@ -94,6 +88,7 @@ export default function ProfileIntegration() {
       serviceId: serviceId,
     };
 
+    // If I do a DELETE request, I get a CORS error
     fetch(baseUrl + "/streaming-service/uuid", {
       method: "POST",
       headers: {
@@ -115,6 +110,16 @@ export default function ProfileIntegration() {
       .catch((error) => {
         Alert.alert(error);
       });
+  };
+
+  const bindService = (serviceName: string) => {
+    if (serviceName == "Spotify") {
+      signInWithProvider({ provider: "spotify", scopes: getSpotifyScopes() });
+    } else if (serviceName == "SoundCloud") {
+      signInWithSoundcloud();
+    } else {
+      Alert.alert("Ce service n'est pas encore disponible");
+    }
   };
 
   return (
@@ -165,27 +170,19 @@ export default function ProfileIntegration() {
                   Gestion des titres aimés
                 </Text>
               </View>
-              {service.service_name == "Spotify" ? (
-                <ConnectWithSpotify
-                  title={
-                    isBound(service.service_id)
-                      ? "Déconnecter mon compte"
-                      : "Lier mon compte"
-                  }
-                  isBound={isBound(service.service_id)}
-                  onPress={() => unbindService(service.service_id)}
-                />
-              ) : (
-                <ConnectWithSoundcloud
-                  title={
-                    isBound(service.service_id)
-                      ? "Déconnecter mon compte"
-                      : "Lier mon compte"
-                  }
-                  isBound={isBound(service.service_id)}
-                  onPress={() => unbindService(service.service_id)}
-                />
-              )}
+              <Button
+                onPress={
+                  isBound(service.service_id)
+                    ? () => unbindService(service.service_id)
+                    : () => bindService(service.service_name)
+                }
+                type={isBound(service.service_id) ? "outline" : "filled"}
+                block
+              >
+                {isBound(service.service_id)
+                  ? "Déconnecter mon compte"
+                  : "Lier mon compte"}
+              </Button>
             </View>
           );
         })}

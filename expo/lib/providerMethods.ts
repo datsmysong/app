@@ -93,6 +93,29 @@ export const signInWithProvider = async ({
   Alert.alert("Une erreur est survenue avec votre navigateur.");
 };
 
+export const signInWithSoundcloud = async () => {
+  if (!process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID) {
+    throw new Error("Missing EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID env variable");
+  }
+
+  const clientId = process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID;
+  const redirectUri = getApiUrl() || "";
+
+  const baseUrl = "https://soundcloud.com/connect";
+  const responseType = "code";
+
+  const url = new URL(baseUrl);
+  url.searchParams.append("client_id", clientId);
+  url.searchParams.append("redirect_uri", redirectUri);
+  url.searchParams.append("response_type", responseType);
+
+  const authUrl = url.toString();
+
+  await WebBrowser.openAuthSessionAsync(authUrl);
+
+  router.push("/profile");
+};
+
 const getCookie = async (key: string): Promise<string | null> => {
   if (Platform.OS === "web") {
     if (typeof localStorage === "undefined") {
