@@ -1,4 +1,3 @@
-import { makeRedirectUri } from "expo-auth-session";
 import { ScrollView, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "../../../components/Tamed";
@@ -7,6 +6,10 @@ import ConnectWithSpotify from "../../auth/connect-with-spotify";
 import ConnectWithSoundcloud from "../../auth/connect-with-soundcloud";
 import { router } from "expo-router";
 import Alert from "../../../components/Alert";
+import { getApiUrl } from "../../../lib/apiUrl";
+import useSupabaseUser from "../../../lib/useSupabaseUser";
+import { BoundService } from "../../../../commons/database-types-utils";
+import { getUserProfile } from "../../../lib/userProfile";
 
 type StreamingService = {
   service_id: string;
@@ -21,39 +24,39 @@ type StreamingService = {
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([]);
   const [userId, setUserId] = useState("");
-  const [boundServices, setBoundServices] = useState([] as any[]); // To know which services are bound to the currrent user
+  const [boundServices, setBoundServices] = useState([] as BoundService[]); // To know which services are bound to the currrent user
 
-  const directUri = makeRedirectUri();
-  const baseUrl = directUri.includes("exp://")
-    ? "http://" + directUri.split(":8081")[0].split("//")[1]
-    : directUri.split(":8081")[0];
+  const baseUrl = getApiUrl();
 
   useEffect(() => {
     const fetchStreamingServicesData = async () => {
-      const services = await fetch(baseUrl + ":3000/streaming-services");
+      const services = await fetch(baseUrl + "/streaming-services");
       const data = await services.json();
       setServicesData(data);
-    };
-
-    const fetchUserData = async () => {
-      const responseUser = await fetch(baseUrl + ":3000/user/current", {
-        credentials: "include",
-      });
-      const dataUser = await responseUser.json();
-      setUserId(dataUser.userId);
     };
 
     fetchStreamingServicesData().catch((err) => {
       Alert.alert(err);
     });
 
-    fetchUserData().catch((err) => {
-      Alert.alert(err);
-    });
+    const user = useSupabaseUser();
+    if (user) {
+      user.then(async (user) => {
+        if (!user) {
+          Alert.alert("Erreur lors de la récupération de l'utilisateur");
+        } else {
+          const accountId = user.id;
+          const userProfile = await getUserProfile(accountId);
+          if (userProfile) {
+            setUserId(userProfile.user_profile_id);
+          }
+        }
+      });
+    }
   }, []);
 
   useEffect(() => {
-    const url = new URL(baseUrl + ":3000/bounded");
+    const url = new URL(baseUrl + "/bounded");
     url.searchParams.append("userId", userId);
     const fetchBoundServices = async () => {
       const responseBoundServices = await fetch(url.toString());
@@ -91,7 +94,7 @@ export default function ProfileIntegration() {
       serviceId: serviceId,
     };
 
-    fetch(baseUrl + ":3000/unbound", {
+    fetch(baseUrl + "/streaming-service/uuid", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
