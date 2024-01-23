@@ -49,10 +49,10 @@ export default function JoinRoom() {
         type="filled"
         block
         disabled={!isTextPresent}
-        prependIcon="search"
+        appendIcon="arrow-forward"
         onPress={() => onSubmitSearchRoom(roomCode)}
       >
-        Rechercher
+        Rejoindre
       </Button>
       {noRoomFound && (
         <Text style={styles.message}>
