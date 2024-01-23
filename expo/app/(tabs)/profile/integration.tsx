@@ -174,6 +174,7 @@ export default function ProfileIntegration() {
                 <Button
                   onPress={() => unbindService(service.service_id)}
                   type={"outline"}
+                  color={"danger"}
                   block
                 >
                   Déconnecter mon compte
@@ -182,6 +183,7 @@ export default function ProfileIntegration() {
                 <Button
                   onPress={() => bindService(service.service_name)}
                   type={"filled"}
+                  color={"primary"}
                   block
                 >
                   Lier mon compte
