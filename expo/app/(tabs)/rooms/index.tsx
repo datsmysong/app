@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import Button from "../../../components/Button";
 
@@ -16,8 +16,10 @@ export default function RoomsPage() {
         <Button block type="outline" href={`/rooms/${roomId}`}>
           Rejoindre une salle
         </Button>
-        <TextInput onChangeText={setValue} style={{borderWidth: 1, width: "25%", minWidth: 300}} />
-        <Button
+        <TextInput
+          onChangeText={setValue}
+          style={{ borderWidth: 1, width: "25%", minWidth: 300 }}
+        /><Button
           href={`/rooms/${encodeURIComponent(value)}`}>
           Current active room
         </Button>
