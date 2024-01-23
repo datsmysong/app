@@ -7,7 +7,6 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 
 import Alert from "../../../components/Alert";
 import {Button} from "../../../components/Button";
-import {View, Text} from "../../../components/Tamed"
 import { supabase } from "../../../lib/supabase";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -22,6 +21,7 @@ import {
   ViewProps,
 } from "react-native";
 
+import { View, Text } from "../../../components/Themed";
 import SocketIo from "../../../lib/socketio";
 
 export interface MusicRoomParams {
