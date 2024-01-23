@@ -27,6 +27,10 @@ export default function JoinRoom() {
 
     if (roomError) {
       setNoRoomFound(true);
+
+      setTimeout(() => {
+        setNoRoomFound(false);
+      }, 3000);
       return;
     }
 
@@ -34,48 +38,40 @@ export default function JoinRoom() {
   };
 
   return (
-    <>
-      <View style={styles.mainContainer}>
-        <CustomTextInput
-          placeholder="Code de la salle"
-          value={roomCode}
-          onChangeText={setRoomCode}
-          onSubmitEditing={() => onSubmitSearchRoom(roomCode)}
-        />
-        <Button
-          type="filled"
-          block
-          disabled={!isTextPresent}
-          prependIcon="search"
-          onPress={() => onSubmitSearchRoom(roomCode)}
-        >
-          Rechercher
-        </Button>
-      </View>
+    <View style={styles.mainContainer}>
+      <CustomTextInput
+        placeholder="Code de la salle"
+        value={roomCode}
+        onChangeText={setRoomCode}
+        onSubmitEditing={() => onSubmitSearchRoom(roomCode)}
+      />
+      <Button
+        type="filled"
+        block
+        disabled={!isTextPresent}
+        prependIcon="search"
+        onPress={() => onSubmitSearchRoom(roomCode)}
+      >
+        Rechercher
+      </Button>
       {noRoomFound && (
-        <View style={styles.messageContainer}>
-          <Text style={styles.message}>
-            Aucune salle n'a été trouvée avec ce code.
-          </Text>
-        </View>
+        <Text style={styles.message}>
+          Aucune salle n'a été trouvée avec ce code.
+        </Text>
       )}
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
     display: "flex",
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    padding: 24,
     flexDirection: "column",
     gap: 24,
-    alignSelf: "stretch",
-  },
-  messageContainer: {
     flex: 1,
+    alignSelf: "stretch",
     justifyContent: "center",
-    alignItems: "center",
   },
   message: {
     fontSize: 16,
