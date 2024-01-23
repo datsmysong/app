@@ -3,7 +3,7 @@ import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
 import Spotify from "./musicplatform/Spotify";
 import { randomUUID } from "node:crypto";
-import MusicStorage from "./MusicStorage";
+import RoomStorage from "./RoomStorage";
 import TrackFactory from "./musicplatform/TrackFactory";
 import { JSONTrack, RoomJSON } from "commons/Backend-types";
 
@@ -123,9 +123,9 @@ export default class Room {
     this.tracks = new Set();
   }
 
-  static newRoom(musicStorage: MusicStorage): Room {
+  static newRoom(roomStorage: RoomStorage): Room {
     const room = new Room();
-    musicStorage.addRoom(room);
+    roomStorage.addRoom(room);
     return room;
   }
 

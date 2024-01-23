@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import Room from "../room";
-import MusicStorage from "../MusicStorage";
+import RoomStorage from "../RoomStorage";
 
 export default function RoomIO(
   socket: Socket /*, next: (err?: ExtendedError) => void*/
@@ -23,9 +23,9 @@ export default function RoomIO(
     socket.disconnect();
     return;
   }
-  const activeRoomId = rawUrlMatchGroups.slice(1)[0] as string;
+  const activeRoomId = rawUrlMatchGroups.slice(1)[0];
 
-  const room = MusicStorage.getMusicStorage().getRoom(activeRoomId);
+  const room = RoomStorage.getRoomStorage().getRoom(activeRoomId);
   if (room === null) {
     socket.disconnect();
     return;

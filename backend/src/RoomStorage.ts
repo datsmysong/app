@@ -1,16 +1,16 @@
 import Room from "./room";
 
-export default class MusicStorage {
-  private static singleton: MusicStorage;
+export default class RoomStorage {
+  private static singleton: RoomStorage;
   private readonly data: Map<string, Room>;
 
   private constructor() {
     this.data = new Map();
   }
 
-  static getMusicStorage(): MusicStorage {
+  static getRoomStorage(): RoomStorage {
     if (this.singleton === undefined) {
-      this.singleton = new MusicStorage();
+      this.singleton = new RoomStorage();
     }
     return this.singleton;
   }
