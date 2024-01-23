@@ -170,19 +170,23 @@ export default function ProfileIntegration() {
                   Gestion des titres aimés
                 </Text>
               </View>
-              <Button
-                onPress={
-                  isBound(service.service_id)
-                    ? () => unbindService(service.service_id)
-                    : () => bindService(service.service_name)
-                }
-                type={isBound(service.service_id) ? "outline" : "filled"}
-                block
-              >
-                {isBound(service.service_id)
-                  ? "Déconnecter mon compte"
-                  : "Lier mon compte"}
-              </Button>
+              {isBound(service.service_id) ? (
+                <Button
+                  onPress={() => unbindService(service.service_id)}
+                  type={"outline"}
+                  block
+                >
+                  Déconnecter mon compte
+                </Button>
+              ) : (
+                <Button
+                  onPress={() => bindService(service.service_name)}
+                  type={"filled"}
+                  block
+                >
+                  Lier mon compte
+                </Button>
+              )}
             </View>
           );
         })}

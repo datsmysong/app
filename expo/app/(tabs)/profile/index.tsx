@@ -1,12 +1,11 @@
-import { Text } from "react-native";
+import { StyleSheet } from "react-native";
 import { supabase } from "../../../lib/supabase";
 import useSupabaseUser from "../../../lib/useSupabaseUser";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import Button from "../../../components/Button";
 import React from "react";
-import { View } from "../../../components/Tamed";
-import { Link } from "expo-router";
+import { View, Text } from "../../../components/Tamed";
 
 export default function TabsProfile() {
   const [user, setUser] = useState<User | null>();
@@ -21,9 +20,8 @@ export default function TabsProfile() {
 
   return (
     <>
-      <Text>Profile</Text>
       {user && (
-        <View>
+        <View style={styles.elements}>
           <Button prependIcon={"details"} href={"/profile/integration"}>
             Intégrations
           </Button>
@@ -35,3 +33,9 @@ export default function TabsProfile() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  elements: {
+    gap: 10,
+  },
+});
