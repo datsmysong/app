@@ -1,4 +1,4 @@
-import Track from "./Track";
+import TrackMetadata from "./TrackMetadata";
 import MusicPlatform from "./MusicPlatform";
 
 export default class TrackFactory {
@@ -21,13 +21,17 @@ export default class TrackFactory {
     return true;
   }
 
-  fromUrl(url: URL): Track | undefined {
+  fromUrl(url: URL): TrackMetadata | null {
     for (const musicPlatform of this.musicPlatformsList.values()) {
       const trackId = musicPlatform.trackIdFromUrl(url);
       if (trackId) {
-        return new Track(musicPlatform, { id: trackId });
+        const { data: track, error } = TrackMetadata.newTrackMetadata(musicPlatform, { id: trackId });
+        if (!error) {
+          return track;
+        }
       }
     }
+    return null;
   }
 }
 

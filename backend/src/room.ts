@@ -139,13 +139,20 @@ export default class Room {
 
   async add(rawUrl: string | URL) {
     // let track = new URL(rawUrl).toString();
-    const trackMetadata = new TrackFactory();
-    trackMetadata.register(
+    const trackFactory = new TrackFactory();
+    trackFactory.register(
       new Spotify()
     ) /*, new SoundCloud(), new AppleMusic()*/;
 
-    const track = await trackMetadata.fromUrl(new URL(rawUrl))?.toJSON();
-    if (track !== undefined) this.tracks.add(track);
+    const trackMetadata = trackFactory.fromUrl(new URL(rawUrl));
+    if (trackMetadata !== null) {
+      const track = await trackMetadata.toJSON();
+      if (track !== null) {
+        this.tracks.add(track);
+        return true;
+      }
+    }
+    return false;
   }
 
   async remove(rawUrl: string | URL) {
