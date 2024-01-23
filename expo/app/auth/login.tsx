@@ -2,6 +2,8 @@ import { Link, router } from "expo-router";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
+
+import Warning from "./Warning";
 import Button from "../../components/Button";
 import ControledInput from "../../components/ControledInput";
 import { supabase } from "../../lib/supabase";
@@ -32,7 +34,7 @@ export default function Login() {
     });
     if (error) {
       setError("root", {
-        message: "Informations d'authentification incorrects.",
+        message: "Informations d'authentification incorrects",
       });
       return;
     }
@@ -42,13 +44,13 @@ export default function Login() {
   return (
     <View style={styles.page}>
       <View style={styles.form}>
-        {errors.root && (
-          <Text style={styles.rootError}>{errors.root.message}</Text>
+        {errors.root && errors.root.message && (
+          <Warning label={errors.root.message} />
         )}
         <ControledInput
           control={control}
-          label={"Adresse email"}
-          name={"email"}
+          label="Adresse email"
+          name="email"
           rules={{
             required: "Veuillez saisir votre adresse email",
             pattern: {
@@ -56,23 +58,23 @@ export default function Login() {
               message: "Veuillez saisir une adresse email valide",
             },
           }}
-          placeholder={"votre@adresse.email"}
+          placeholder="votre@adresse.email"
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"
         />
         <ControledInput
           control={control}
-          label={"Mot de passe"}
-          name={"password"}
+          label="Mot de passe"
+          name="password"
           rules={{
             required: "Veuillez saisir votre mot de passe",
           }}
-          placeholder={"Mon mot de passe robuste"}
+          placeholder="Mon mot de passe robuste"
           errorMessage={errors.password && errors.password.message}
           autoComplete="password"
           secureTextEntry
         />
-        <Link href={"/auth/"} style={{ ...styles.text, textAlign: "center" }}>
+        <Link href="/auth/" style={{ ...styles.text, textAlign: "center" }}>
           Mot de passe oublié ?
         </Link>
         <Button onPress={handleSubmit(onSubmit)} block>
@@ -82,7 +84,7 @@ export default function Login() {
           style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }}
         >
           <Link
-            href={"/auth/register"}
+            href="/auth/register"
             replace
             style={{ ...styles.text, textAlign: "center" }}
           >

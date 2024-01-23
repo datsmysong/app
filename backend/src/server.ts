@@ -1,4 +1,3 @@
-import type { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "commons/Database-types";
@@ -11,6 +10,8 @@ import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
+import fastifyCookie from "@fastify/cookie";
+import { FastifyCookieOptions } from "@fastify/cookie";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -33,7 +34,8 @@ export const adminSupabase = createClient<Database>(
 );
 
 server.register(fastifyIO);
-server.register(require("@fastify/cookie"), {
+
+server.register(fastifyCookie, {
   secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
   hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
   parseOptions: {}, // options for parsing cookies
