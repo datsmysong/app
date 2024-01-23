@@ -5,9 +5,10 @@ import {
   PressableStateCallbackType,
   StyleSheet,
 } from "react-native";
+
 import { Text } from "./Tamed";
 
-type ButtonProps = {
+export type ButtonProps = {
   children: React.ReactNode;
   onPress?: () => void;
   onLongPress?: () => void;
@@ -18,13 +19,18 @@ type ButtonProps = {
   prependIcon?: keyof typeof MaterialIcons.glyphMap;
   appendIcon?: keyof typeof MaterialIcons.glyphMap;
   size?: "small" | "normal";
+  color?: "primary" | "success" | "danger";
   block?: boolean;
 };
 
 const ICON_SIZE_SMALL = 20;
 const ICON_SIZE_NORMAL = 30;
 const ICON_COLOR_FILLED = "white";
-const ICON_COLOR_OUTLINE = "#1A1A1A";
+const COLOR_PALETTE = {
+  primary: "#1A1A1A",
+  success: "#13863C",
+  danger: "#F33F33",
+};
 
 const Button: React.FC<ButtonProps> = ({
   children,
@@ -38,11 +44,13 @@ const Button: React.FC<ButtonProps> = ({
   onLongPress,
   prependIcon,
   block,
+  color = "primary",
 }) => {
   const isSmall = size === "small";
   const isFilled = type === "filled";
   const iconSize = isSmall ? ICON_SIZE_SMALL : ICON_SIZE_NORMAL;
-  const iconColor = isFilled ? ICON_COLOR_FILLED : ICON_COLOR_OUTLINE;
+  const buttonColor = COLOR_PALETTE[color];
+  const iconColor = isFilled ? ICON_COLOR_FILLED : buttonColor;
 
   const buttonStyles = [
     styles.button,
@@ -62,7 +70,9 @@ const Button: React.FC<ButtonProps> = ({
     !appendIcon &&
       !icon &&
       (isSmall ? styles.smallPadding : styles.normalPadding),
-    isFilled ? styles.filled : styles.outline,
+    isFilled
+      ? { backgroundColor: buttonColor }
+      : { ...styles.outline, borderColor: buttonColor },
     disabled && styles.disabled,
     block && styles.block,
   ];
@@ -162,12 +172,8 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingVertical: 15,
   },
-  filled: {
-    backgroundColor: "#1A1A1A",
-  },
   outline: {
     borderWidth: 2,
-    borderColor: "#1A1A1A",
   },
   disabled: {
     opacity: 0.5,
