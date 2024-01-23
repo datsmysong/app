@@ -1,15 +1,13 @@
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "commons/database-types";
+import { Database } from "commons/Database-types";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import path from "path";
 import { Server } from "socket.io";
-import AuthCallbackGET from "./route/AuthCallbackGET";
-import AuthRedirectionGET from "./route/AuthRedirectionGET";
-import AuthRegister from "./route/AuthRegisterPOST";
+import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
@@ -26,12 +24,12 @@ const server = fastify({
 
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   throw new Error(
-    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable",
+    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable"
   );
 }
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
-  process.env.SERVICE_ROLE,
+  process.env.SERVICE_ROLE
 );
 
 server.register(fastifyIO);
@@ -48,27 +46,15 @@ server.register(fastifyCors, {
   credentials: true, // or true to reflect origin
 });
 
+// timeWindow : It can be expressed in milliseconds or as a string (in the ms format)
+// https://github.com/vercel/ms
+server.register(import("@fastify/rate-limit"), {
+  max: 100,
+  timeWindow: "1 minute",
+});
+
 // Auth
-server.get("/auth/callback", AuthCallbackGET);
-server.get("/auth/redirection", AuthRedirectionGET);
-server.post(
-  "/auth/register",
-  {
-    schema: {
-      body: {
-        type: "object",
-        required: ["email", "password"],
-        properties: {
-          email: { type: "string" },
-          password: { type: "string" },
-          username: { type: "string" },
-          displayName: { type: "string" },
-        },
-      },
-    },
-  },
-  AuthRegister
-);
+server.register(authRoutes, { prefix: "/auth" });
 
 server.get("/streaming-services", StreamingServicesGET);
 

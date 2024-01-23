@@ -1,6 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { NavigationState } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import * as Linking from "expo-linking";
 import {
   SplashScreen,
   Stack,
@@ -8,12 +9,11 @@ import {
   useRootNavigationState,
 } from "expo-router";
 import { useEffect } from "react";
+
 import Alert from "../components/Alert";
+import { createSessionFromUrl } from "../lib/authMethod";
 import { supabase } from "../lib/supabase";
 import useSupabaseUser from "../lib/useSupabaseUser";
-
-import * as Linking from "expo-linking";
-import { createSessionFromUrl } from "./auth/authMethod";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -93,7 +93,7 @@ function RootLayoutNav() {
             if (!refresh_token)
               return enforceRouteAccessControl(currentPage.name);
             const { error } = await supabase.auth.refreshSession({
-              refresh_token: refresh_token,
+              refresh_token,
             });
             if (!error) {
               return navigation.navigation.navigate("(tabs)");
