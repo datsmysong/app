@@ -1,6 +1,9 @@
-import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
-import createClient from "./lib/supabase";
+import { FastifyReply, FastifyRequest } from "fastify";
+import {
+  getUserProfileIdFromAccountId,
+  getUserFromRequest,
+} from "./lib/auth-utils";
 import Spotify from "./musicplatform/Spotify";
 import TrackFactory from "./musicplatform/TrackFactory";
 import { JSONTrack, RoomJSON } from "commons/backend-types";
@@ -8,26 +11,6 @@ import RoomStorage from "./RoomStorage";
 
 interface Error {
   error: { message: string };
-}
-
-export async function getUserFromRequest(
-  request: FastifyRequest,
-  response: FastifyReply
-) {
-  const supabase = createClient({ request, response });
-
-  return await supabase.auth.getUser();
-}
-
-export async function getUserProfileIdFromAccountId(accId: string) {
-  const { data, error } = await adminSupabase
-    .from("user_profile")
-    .select("user_profile_id")
-    .eq("account_id", accId)
-    .single();
-
-  if (error) return { data: null, error };
-  return { data: data.user_profile_id, error: null };
 }
 
 function unauthorizedResponse(response: FastifyReply) {
@@ -42,8 +25,8 @@ export async function createRoom(
   maxMusicPerUser: number,
   maxMusicPerUserDuration: number,
   serviceId: string,
-  req: FastifyRequest,
-  rep: FastifyReply
+  rep: FastifyReply,
+  req: FastifyRequest
 ) {
   const supabase = adminSupabase;
   const user = await getUserFromRequest(req, rep);

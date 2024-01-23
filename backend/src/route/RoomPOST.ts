@@ -45,7 +45,8 @@ export default async function RoomPOST(
     roomOptions.maxMusicPerUser,
     roomOptions.maxMusicDuration,
     roomOptions.service,
-    reply
+    reply,
+    req
   );
 
   return reply;
