@@ -8,16 +8,16 @@ import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
+import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import BoundServicePOST from "./route/BoundServicePOST";
+import BoundServicesGET from "./route/BoundServicesGET";
+import CurrentUserGET from "./route/CurrentUserGET";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
-import SoundcloudBoundGET from "./route/SoundcloudBoundGET";
-import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
-import RoomIO from "./socketio/RoomIO";
-import CurrentUserGET from "./route/CurrentUserGET";
-import BoundServicesGET from "./route/BoundServicesGET";
+import StreamingServicesGET from "./route/StreamingServicesGET";
 import UnboundServicePOST from "./route/UnboundServicePOST";
+import RoomIO from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
 
@@ -38,6 +38,15 @@ if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
 if (!process.env.FRONTEND_URL) {
   throw new Error(
     "Missing FRONTEND_URL environment variable, check .env.local.example file"
+  );
+}
+
+if (
+  !process.env.SOUNDCLOUD_CLIENT_ID ||
+  !process.env.SOUNDCLOUD_CLIENT_SECRET
+) {
+  throw new Error(
+    "Missing SOUNDCLOUD_CLIENT_ID or SOUNDCLOUD_CLIENT_SECRET environment variable"
   );
 }
 export const adminSupabase = createClient<Database>(
@@ -104,8 +113,6 @@ const BoundServicePOSTSchema = {
 server.register(authRoutes, { prefix: "/auth" });
 server.post("/soundcloud/bound", BoundServicePOST);
 server.get("/", AuthCallbackSoundcloudGET);
-
-server.post("/bound", { schema: BoundServicePOSTSchema }, BoundServicePOST);
 server.get("/bounded", BoundServicesGET);
 
 server.get("/streaming-services", StreamingServicesGET);
