@@ -29,7 +29,7 @@ export interface MusicRoomParams {
 }
 
 // https://docs.expo.dev/guides/environment-variables/
-const ENDPOINT = process.env.EXPO_PUBLIC_API_ENDPOINT;
+const ENDPOINT = process.env.EXPO_PUBLIC_BACKEND_API;
 
 if (!ENDPOINT) {
   throw new Error("le endpoint de l'API REST n'est pas défini");
