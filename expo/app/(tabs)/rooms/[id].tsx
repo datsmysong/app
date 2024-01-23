@@ -16,8 +16,8 @@ const generatedInvitationLink = (currentUrl: string, roomCode: string) => {
   } else {
     const mobile = Platform.OS === "ios" || Platform.OS === "android";
     if (mobile) {
-      const webLink = currentUrl.replace("exp://", "http://");
-      return `${webLink}/join/${roomCode}`;
+      const baseUrl = "http://" + currentUrl.split("/").slice(2, 3).join("/");
+      return `${baseUrl}/join/${roomCode}`;
     } else {
       const host = currentUrl.split("/").slice(0, 3).join("/");
       return `${host}/join/${roomCode}`;
