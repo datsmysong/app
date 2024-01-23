@@ -1,9 +1,10 @@
 import { Link, router } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import Alert from "../../components/Alert";
 import Button from "../../components/Button";
-import ControledInput from "../../components/ControledInput";
+import ControlledInput from "../../components/ControlledInput";
 import { getApiUrl } from "../../lib/apiUrl";
 type FormData = {
   username: string;
@@ -39,7 +40,8 @@ export default function Register() {
     displayName = displayName ?? username;
 
     const baseUrl = getApiUrl();
-    const data = await fetch(baseUrl + ":3000/auth/register", {
+
+    const data = await fetch(baseUrl + "/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,10 +53,9 @@ export default function Register() {
         displayName,
       }),
     });
-    console.log("Result of register", data);
     if (data.status === 200) {
       Alert.alert("Veuillez confirmer votre compte via le lien reçu par mail.");
-      return router.replace("/auth/login");
+      return router.replace("/auth/");
     }
     if (data.status === 409) {
       // Username already exists
@@ -67,8 +68,8 @@ export default function Register() {
   return (
     <ScrollView contentContainerStyle={styles.page}>
       <View style={styles.form}>
-        <ControledInput
-          onSubmit={handleSubmit(onSubmit)}
+        <ControlledInput
+          onSubmitEditing={handleSubmit(onSubmit)}
           control={control}
           label="Adresse email"
           name="email"
@@ -83,8 +84,8 @@ export default function Register() {
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"
         />
-        <ControledInput
-          onSubmit={handleSubmit(onSubmit)}
+        <ControlledInput
+          onSubmitEditing={handleSubmit(onSubmit)}
           control={control}
           label={"Nom d'utilisateur"}
           name="username"
@@ -99,8 +100,8 @@ export default function Register() {
           errorMessage={errors.username && errors.username.message}
           autoComplete="username"
         />
-        <ControledInput
-          onSubmit={handleSubmit(onSubmit)}
+        <ControlledInput
+          onSubmitEditing={handleSubmit(onSubmit)}
           control={control}
           label={"Nom d'affichage"}
           name="displayName"
@@ -108,8 +109,8 @@ export default function Register() {
           errorMessage={errors.displayName && errors.displayName.message}
           autoComplete="nickname"
         />
-        <ControledInput
-          onSubmit={handleSubmit(onSubmit)}
+        <ControlledInput
+          onSubmitEditing={handleSubmit(onSubmit)}
           control={control}
           label="Mot de passe"
           name="password"
@@ -135,8 +136,8 @@ export default function Register() {
           autoComplete="password"
           secureTextEntry
         />
-        <ControledInput
-          onSubmit={handleSubmit(onSubmit)}
+        <ControlledInput
+          onSubmitEditing={handleSubmit(onSubmit)}
           control={control}
           label="Confirmer le mot de passe"
           name="confirmPassword"
@@ -205,7 +206,6 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 13,
     width: "100%",
-    // alignItems: "center",
   },
   text: {
     color: "rgba(0, 0, 0, 0.78)",

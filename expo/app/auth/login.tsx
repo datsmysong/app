@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 
 import Button from "../../components/Button";
-import ControledInput from "../../components/ControledInput";
+import ControlledInput from "../../components/ControlledInput";
 import Warning from "../../components/Warning";
 import { supabase } from "../../lib/supabase";
 
@@ -47,7 +47,7 @@ export default function Login() {
         {errors.root && errors.root.message && (
           <Warning label={errors.root.message} />
         )}
-        <ControledInput
+        <ControlledInput
           control={control}
           label="Adresse email"
           name="email"
@@ -62,7 +62,7 @@ export default function Login() {
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"
         />
-        <ControledInput
+        <ControlledInput
           control={control}
           label="Mot de passe"
           name="password"

@@ -59,7 +59,7 @@ export default async function AuthCallbackGET(
     // New account
     const { userProfileId: newUserProfileId, error } = await createAccount({
       displayName: data.user.user_metadata.full_name,
-      account_id: data.user.id,
+      accountId: data.user.id,
       username: null,
     });
     if (error || !newUserProfileId) {
@@ -133,11 +133,11 @@ const alreadyBoundService = async ({
 
 export const createAccount = async ({
   displayName,
-  account_id,
+  accountId,
   username,
 }: {
   displayName: string;
-  account_id: string;
+  accountId: string;
   username: string | null;
 }): Promise<{ userProfileId: string | null; error: PostgrestError | null }> => {
   const { data, error } = await adminSupabase
@@ -156,10 +156,10 @@ export const createAccount = async ({
       error: error,
     };
 
-  const { data: dataUserProfile, error: errorUserprofile } = await adminSupabase
+  const { error: errorUserprofile } = await adminSupabase
     .from("user_profile")
     .insert({
-      account_id: account_id,
+      account_id: accountId,
       user_profile_id: user_profile_id,
       username: username, // Add the missing 'username' property
     });

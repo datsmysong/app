@@ -1,9 +1,10 @@
 import { Controller, RegisterOptions } from "react-hook-form";
 import { StyleSheet, Text, TextInputProps, View } from "react-native";
+
 import CustomPasswordInput from "./CustomPasswordInput";
 import CustomTextInput from "./CustomTextInput";
 
-export default function ControledInput({
+export default function ControlledInput({
   control,
   label,
   name,
@@ -12,7 +13,7 @@ export default function ControledInput({
   autoComplete,
   secureTextEntry,
   errorMessage,
-  onSubmit,
+  onSubmitEditing,
 }: {
   control: any;
   label: string;
@@ -22,7 +23,7 @@ export default function ControledInput({
   autoComplete?: TextInputProps["autoComplete"];
   secureTextEntry?: boolean;
   errorMessage?: string | undefined;
-  onSubmit?: () => void;
+  onSubmitEditing?: () => void;
 }) {
   return (
     <View style={styles.vbox}>
@@ -42,19 +43,19 @@ export default function ControledInput({
               value={value}
               autoComplete={autoComplete}
               secureTextEntry={secureTextEntry}
-              onSubmit={onSubmit}
+              onSubmitEditing={onSubmitEditing}
             />
           ) : (
             // We used two components because we can't change secureTextEntry value dynamically
             // and we don't want load many states and logical conditions in CustomTextInput
             <CustomPasswordInput
               InputProps={{
-                placeholder: placeholder,
-                onBlur: onBlur,
+                placeholder,
+                onBlur,
                 onChangeText: onChange,
-                value: value,
-                autoComplete: autoComplete,
-                onSubmit: onSubmit,
+                value,
+                autoComplete,
+                onSubmitEditing,
               }}
             />
           )
@@ -63,7 +64,7 @@ export default function ControledInput({
       />
       {errorMessage && (
         <Text style={styles.text}>
-          {errorMessage ?? "Le champs est invalide"}
+          {errorMessage ?? "Le champ est invalide"}
         </Text>
       )}
     </View>

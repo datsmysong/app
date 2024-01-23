@@ -1,6 +1,5 @@
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "commons/Database-types";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
@@ -12,6 +11,7 @@ import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import fastifyCookie from "@fastify/cookie";
 import { FastifyCookieOptions } from "@fastify/cookie";
+import { Database } from "commons/Database-types";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -26,6 +26,12 @@ const server = fastify({
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   throw new Error(
     "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable"
+  );
+}
+
+if (!process.env.FRONT_END_URL) {
+  throw new Error(
+    "Missing FRONT_END_URL environment variable, check .env.local.example file"
   );
 }
 export const adminSupabase = createClient<Database>(
@@ -51,7 +57,7 @@ server.register(fastifyCors, {
 // timeWindow : It can be expressed in milliseconds or as a string (in the ms format)
 // https://github.com/vercel/ms
 server.register(import("@fastify/rate-limit"), {
-  max: 100,
+  max: 50,
   timeWindow: "1 minute",
 });
 

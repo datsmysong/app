@@ -28,6 +28,8 @@ export default async function AuthRegister(
     return reply.status(400).send({ error: verification });
   }
 
+  const urlBackend = process.env.BACKEND_URL;
+
   const {
     data: { user },
     error: signUpError,
@@ -35,7 +37,7 @@ export default async function AuthRegister(
     email: email,
     password: password,
     options: {
-      emailRedirectTo: "http://localhost:8081",
+      emailRedirectTo: urlBackend,
     },
   });
 
@@ -52,7 +54,7 @@ export default async function AuthRegister(
 
   const { userProfileId, error } = await createAccount({
     displayName: displayName,
-    account_id: user.id,
+    accountId: user.id,
     username: username,
   });
 

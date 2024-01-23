@@ -10,7 +10,7 @@ export default function authRoutes(
   done: () => void
 ) {
   server.rateLimit({
-    max: 100,
+    max: 10,
     timeWindow: "1 minute",
   });
 
