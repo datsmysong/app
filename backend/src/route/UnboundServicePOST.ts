@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "../server";
+import { getCurrentUser } from "../lib/auth-utils";
 
 interface bodyParams {
   userId: string;
@@ -8,10 +9,12 @@ interface bodyParams {
 
 export default async function UnboundServicePOST(
   request: FastifyRequest,
-  response: FastifyReply,
+  response: FastifyReply
 ) {
-  const userId = (request.body as bodyParams).userId;
-  const serviceId = (request.body as bodyParams).serviceId;
+  const bodyParams = request.body as bodyParams;
+
+  const userId = bodyParams.userId;
+  const serviceId = bodyParams.serviceId;
 
   if (!userId) {
     response.status(400).send("userId is required");
@@ -21,6 +24,11 @@ export default async function UnboundServicePOST(
   if (!serviceId) {
     response.status(400).send("serviceId is required");
     return;
+  }
+  const selfProfileId = await getCurrentUser(request, response);
+
+  if (selfProfileId !== userId) {
+    return response.code(401).send("Unauthorized");
   }
 
   const { data, status, error } = await adminSupabase

@@ -7,7 +7,6 @@ export default function ConnectWithGoogle() {
     signInWithProvider({ provider: "google" });
   };
 
-  //TODO: Adapt with the button components
   return (
     <Button type="outline" onPress={handleSignUp} block>
       Rejoindre avec Google

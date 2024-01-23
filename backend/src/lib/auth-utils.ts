@@ -32,3 +32,19 @@ export async function getUserFromRequest(
 
   return await supabase.auth.getUser();
 }
+
+export async function getCurrentUser(
+  request: FastifyRequest,
+  response: FastifyReply
+) {
+  const user = await getUserFromRequest(request, response);
+  if (!user.data.user) {
+    return response.code(400).send("Missing user");
+  }
+  const userProfileIdRes = await getUserProfileIdFromAccountId(
+    user.data.user.id
+  );
+  if (userProfileIdRes.error)
+    return response.code(500).send(userProfileIdRes.error);
+  return userProfileIdRes.data;
+}

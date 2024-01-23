@@ -11,9 +11,12 @@ import { Link } from "expo-router";
 export default function TabsProfile() {
   const [user, setUser] = useState<User | null>();
   useEffect(() => {
-    useSupabaseUser().then((res) => {
+    const fetchUser = async () => {
+      const res = await useSupabaseUser();
       setUser(res);
-    });
+    };
+
+    fetchUser();
   }, []);
 
   return (

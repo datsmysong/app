@@ -116,7 +116,7 @@ server.get("/", AuthCallbackSoundcloudGET);
 server.get("/bounded", BoundServicesGET);
 
 server.get("/streaming-services", StreamingServicesGET);
-server.delete("/unbound", UnboundServicePOST);
+server.post("/streaming-service/uuid", UnboundServicePOST);
 
 const createRoomSchema = {
   body: {

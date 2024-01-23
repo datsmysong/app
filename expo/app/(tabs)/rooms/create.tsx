@@ -207,7 +207,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 20,
   },
-  form: {},
   labelText: {
     fontSize: 14,
     fontWeight: "bold",

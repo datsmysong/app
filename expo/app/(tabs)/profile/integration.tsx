@@ -56,7 +56,7 @@ export default function ProfileIntegration() {
   }, []);
 
   useEffect(() => {
-    const url = new URL(baseUrl + "/bounded");
+    const url = new URL(baseUrl + "/user/bound");
     url.searchParams.append("userId", userId);
     const fetchBoundServices = async () => {
       const responseBoundServices = await fetch(url.toString());
@@ -88,22 +88,26 @@ export default function ProfileIntegration() {
     return serviceIds.includes(serviceId);
   };
 
-  const unboundService = (serviceId: string) => {
+  const unbindService = (serviceId: string) => {
     const body = {
       userId: userId,
       serviceId: serviceId,
     };
 
     fetch(baseUrl + "/streaming-service/uuid", {
-      method: "DELETE",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(body),
     })
       .then((resUnbound) => {
         if (!resUnbound.ok) {
-          Alert.alert("Erreur lors de la déconnexion du service");
+          Alert.alert(
+            "Erreur lors de la déconnexion du service : " +
+              resUnbound.statusText
+          );
         } else {
           router.push("/profile");
         }
@@ -169,7 +173,7 @@ export default function ProfileIntegration() {
                       : "Lier mon compte"
                   }
                   isBound={isBound(service.service_id)}
-                  onPress={() => unboundService(service.service_id)}
+                  onPress={() => unbindService(service.service_id)}
                 />
               ) : (
                 <ConnectWithSoundcloud
@@ -179,7 +183,7 @@ export default function ProfileIntegration() {
                       : "Lier mon compte"
                   }
                   isBound={isBound(service.service_id)}
-                  onPress={() => unboundService(service.service_id)}
+                  onPress={() => unbindService(service.service_id)}
                 />
               )}
             </View>

@@ -4,7 +4,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import createClient from "../lib/supabase";
 import { adminSupabase } from "../server";
 
-class StreamingService {
+export class StreamingService {
   static readonly Spotify = new StreamingService(
     "a2d17b25-d87e-42af-9e79-fd4df6b59222",
     "spotify"

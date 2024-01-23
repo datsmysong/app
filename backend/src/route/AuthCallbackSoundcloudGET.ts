@@ -1,9 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { StreamingService } from "./AuthCallbackGET";
-import {
-  getUserFromRequest,
-  getUserProfileIdFromAccountId,
-} from "../lib/auth-utils";
+import { getCurrentUser } from "../lib/auth-utils";
 import BoundService from "../lib/bound-service";
 
 export interface QueryParams {
@@ -49,17 +46,7 @@ export default async function AuthCallbackSoundcloudGET(
   const refreshToken = json.refresh_token;
   const serviceId = StreamingService.SoundCloud.id;
 
-  const user = await getUserFromRequest(request, response);
-  if (!user.data.user) {
-    return response.code(400).send("Missing user");
-  }
-  const userProfileIdRes = await getUserProfileIdFromAccountId(
-    user.data.user.id
-  );
-  if (userProfileIdRes.error)
-    return response.code(500).send(userProfileIdRes.error);
-  const userProfileId = userProfileIdRes.data;
-
+  const userProfileId = await getCurrentUser(request, response);
   const boundServiceRes = await BoundService(
     accessToken,
     refreshToken,

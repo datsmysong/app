@@ -1,18 +1,14 @@
 import * as WebBrowser from "expo-web-browser";
 import React from "react";
-import { makeRedirectUri } from "expo-auth-session";
-import { Pressable, Text } from "react-native";
 import { router } from "expo-router";
 import Button from "../../components/Button";
-//import { URL } from "react-native-url-polyfill";
+import { getApiUrl } from "../../lib/apiUrl";
 
 interface params {
   title: string;
   onPress?: void | (() => void) | undefined;
   isBound?: boolean;
 }
-
-const directUri = makeRedirectUri();
 export default function ConnectWithSoundcloud({
   title,
   onPress = () => {},
@@ -37,8 +33,10 @@ export default function ConnectWithSoundcloud({
       throw new Error("Missing EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID env variable");
     }
 
+    const baseUrl = getApiUrl();
+
     const clientId = process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID;
-    const redirectUri = "http://localhost:3000";
+    const redirectUri = getApiUrl() || "";
     const authUrl = getSoundCloudAuthorizationUrl(clientId, redirectUri);
 
     await WebBrowser.openAuthSessionAsync(authUrl);
