@@ -1,50 +1,54 @@
-import { ScrollView, Text, View } from "react-native";
-import Button from "../../components/Button";
+import { ScrollView } from "react-native";
+
+import Button, { ButtonProps } from "../../components/Button";
+import { Text } from "../../components/Themed";
+
+const propOptions: Partial<Record<keyof ButtonProps, any[]>> = {
+  type: ["filled", "outline"],
+  size: ["small", "normal"],
+  block: [true, false],
+  icon: ["home", null],
+  prependIcon: ["home", null],
+  appendIcon: ["home", null],
+  color: ["primary", "success", "danger"],
+};
+
+function generateCombinations(
+  options: Record<string, any[]>,
+  prefix: Partial<ButtonProps> = {}
+): Partial<ButtonProps>[] {
+  const keys = Object.keys(options);
+  if (!keys.length) return [prefix];
+  const key = keys[0];
+  const restOptions = { ...options };
+  delete restOptions[key];
+  return options[key].flatMap((option) => {
+    // Prevent combination of icon with prependIcon or appendIcon
+    if (
+      (key === "icon" &&
+        option !== null &&
+        (prefix.prependIcon || prefix.appendIcon)) ||
+      ((key === "prependIcon" || key === "appendIcon") &&
+        option !== null &&
+        prefix.icon)
+    ) {
+      return [];
+    }
+    return generateCombinations(restOptions, { ...prefix, [key]: option });
+  });
+}
+
+const buttonProps = generateCombinations(propOptions);
 
 export default function ButtonsMania() {
   return (
     <ScrollView>
       <Text>Index</Text>
-      <Button>Accueil</Button>
-      <Button type="outline">Accueil</Button>
-      <Button icon="home">Accueil</Button>
-      <Button icon="home" type="outline">
-        Accueil
-      </Button>
-      <Button prependIcon="home">Accueil</Button>
-      <Button prependIcon="home" type="outline">
-        Accueil
-      </Button>
-      <Button appendIcon="arrow-forward">Suivant</Button>
-      <Button appendIcon="arrow-forward" type="outline">
-        Suivant
-      </Button>
-      <Button size="small">Accueil</Button>
-      <Button size="small" type="outline">
-        Accueil
-      </Button>
-      <Button size="small" icon="home">
-        Accueil
-      </Button>
-      <Button size="small" icon="home" type="outline">
-        Accueil
-      </Button>
-      <Button size="small" prependIcon="home">
-        Accueil
-      </Button>
-      <Button size="small" prependIcon="home" type="outline">
-        Accueil
-      </Button>
-      <Button size="small" appendIcon="arrow-forward">
-        Suivant
-      </Button>
-      <Button size="small" appendIcon="arrow-forward" type="outline">
-        Suivant
-      </Button>
-      <Button block>Créer une salle</Button>
-      <Button block type="outline">
-        Rejoindre une salle
-      </Button>
+      {buttonProps.map((props, index) => (
+        <Button key={index} {...props}>
+          Button {index + 1}
+        </Button>
+      ))}
     </ScrollView>
   );
 }
