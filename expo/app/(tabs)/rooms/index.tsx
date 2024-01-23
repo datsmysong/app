@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+
 import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 
@@ -11,7 +12,7 @@ export default function RoomsPage() {
     <View style={styles.headerContainer}>
       <Text style={styles.title}>Salles d'écoute</Text>
       <View style={styles.buttonContainer}>
-        <Button block href={"/rooms/create"}>
+        <Button block href="/rooms/create">
           Créer une salle
         </Button>
         <CustomTextInput
