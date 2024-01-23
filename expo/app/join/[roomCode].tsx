@@ -13,7 +13,7 @@ import useSupabaseUser from "../../lib/useSupabaseUser";
 
 export default function JoinPage() {
   const { roomCode } = useLocalSearchParams();
-  const isInsideApplication = Device.deviceType === Device.DeviceType.PHONE;
+  const isInsideApplication = Platform.OS !== "web";
 
   const [user, setUser] = useState<User | null>();
   const [userProfile, setUserProfile] = useState<UserProfile>();
