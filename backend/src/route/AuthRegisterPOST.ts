@@ -24,8 +24,8 @@ export default async function AuthRegister(
     displayName: displayName,
   });
 
-  if (verification !== true) {
-    return reply.status(400).send({ error: verification });
+  if (!verification.valid) {
+    return reply.status(400).send({ error: verification.message });
   }
 
   const urlBackend = process.env.BACKEND_URL;
@@ -42,14 +42,12 @@ export default async function AuthRegister(
   });
 
   if (signUpError || user === null) {
-    return reply
-      .status(400)
-      .send({ error: "Impossible to register this user !" });
+    return reply.status(400).send({ error: "Registration failed!" });
   }
 
-  const usernameWrong = await usernameAlreadyExist(body.username);
-  if (usernameWrong) {
-    return reply.code(409).send({ error: "Username already exist" });
+  const usernameTaken = await usernameAlreadyExist(body.username);
+  if (usernameTaken) {
+    return reply.code(409).send({ error: "This username is taken" });
   }
 
   const { userProfileId, error } = await createAccount({
@@ -62,7 +60,7 @@ export default async function AuthRegister(
     req.log.error(
       "Impossible to create account: " + error?.code + " " + error?.message
     );
-    return reply.status(400).send({ error: "Impossible to create account" });
+    return reply.status(500).send({ error: "Impossible to create account" });
   }
 
   return reply.status(200).send({ message: "Account created" });
@@ -70,18 +68,24 @@ export default async function AuthRegister(
 
 const verifyInformations = async (body: BodyParams) => {
   if (body.username.length < 3 || body.username.length > 20) {
-    return "Username must be between 3 and 20 characters";
+    return {
+      message: "Username must be between 3 and 20 characters",
+      valid: false,
+    };
   }
-
   if (body.displayName.length < 3 || body.displayName.length > 20) {
-    return "Display name must be between 3 and 20 characters";
+    return {
+      message: "Display name must be between 3 and 20 characters",
+      valid: false,
+    };
   }
-
   if (body.password.length < 8) {
-    return "Password must be at least 8 characters";
+    return {
+      message: "Password must be at least 8 characters",
+      valid: false,
+    };
   }
-
-  return true;
+  return { valid: true };
 };
 
 const usernameAlreadyExist = async (username: string) => {
@@ -90,9 +94,5 @@ const usernameAlreadyExist = async (username: string) => {
     .select("username")
     .eq("username", username);
 
-  if (error || data.length > 0) {
-    return true;
-  }
-
-  return false;
+  return error || data.length > 0;
 };
