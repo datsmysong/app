@@ -106,17 +106,6 @@ server.get("/rooms", RoomsGET);
 
 server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
-
-  // we need to wait for the server to be ready, else `server.io` is undefined
-  // server.io.of(/.*/).on("connection", (socket: Socket) => {
-  //   console.info("Socket connected!", socket.id);
-  //   socket.emit("socketio-client", "world");
-  // });
-
-  // server.io.of(/^\/room/i).on("connection", (socket: Socket) => {
-  //   console.info("Socket connected!", socket.id);
-  //   console.log(socket.nsp.name)
-  // })
 });
 
 server.listen({ port: 3000, host: "0.0.0.0" });
