@@ -1,4 +1,5 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, Keyboard } from "react-native";
+import { Text, View } from "../../../components/Tamed";
 import CustomTextInput from "../../../components/CustomTextInput";
 import { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabase";
@@ -26,8 +27,8 @@ export default function JoinRoom() {
       .single();
 
     if (roomError) {
+      Keyboard.dismiss();
       setNoRoomFound(true);
-
       setTimeout(() => {
         setNoRoomFound(false);
       }, 3000);
