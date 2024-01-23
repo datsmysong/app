@@ -8,6 +8,16 @@ import {
 
 import { Text } from "./Tamed";
 
+const BUTTON_COLORS = ["primary", "success", "danger"] as const;
+
+type ButtonColor = (typeof BUTTON_COLORS)[number];
+
+const COLOR_PALETTE: Record<ButtonColor, string> = {
+  primary: "#1A1A1A",
+  success: "#13863C",
+  danger: "#F33F33",
+};
+
 export type ButtonProps = {
   children: React.ReactNode;
   onPress?: () => void;
@@ -19,18 +29,13 @@ export type ButtonProps = {
   prependIcon?: keyof typeof MaterialIcons.glyphMap;
   appendIcon?: keyof typeof MaterialIcons.glyphMap;
   size?: "small" | "normal";
-  color?: "primary" | "success" | "danger";
+  color?: ButtonColor;
   block?: boolean;
 };
 
 const ICON_SIZE_SMALL = 20;
 const ICON_SIZE_NORMAL = 30;
-const ICON_COLOR_FILLED = "white";
-const COLOR_PALETTE = {
-  primary: "#1A1A1A",
-  success: "#13863C",
-  danger: "#F33F33",
-};
+const ICON_COLOR_FILLED: string = "white";
 
 const Button: React.FC<ButtonProps> = ({
   children,
