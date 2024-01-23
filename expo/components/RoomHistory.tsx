@@ -1,11 +1,12 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { User } from "@supabase/supabase-js";
 import type { ProcessedRoom } from "commons/room-types";
+import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import InfoCard from "./InfoCard";
 import { Text, View } from "./Tamed";
-import { useNavigation } from "expo-router";
+import useSupabaseUser from "../lib/useSupabaseUser";
 
 type RoomHistoryProps = {
   roomId: string;
@@ -15,6 +16,18 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
   const navigation = useNavigation();
 
   const [processedRoom, setProcessedRoom] = useState<ProcessedRoom>();
+  const [error, setError] = useState<string>();
+  const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const user = await useSupabaseUser();
+      if (!user) return;
+      setUser(user);
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchProcessedRoomData = async () => {
@@ -25,17 +38,26 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
           "Content-Type": "application/json",
         },
       });
-      const processedRoomData = (await data.json()) as ProcessedRoom;
+
+      const dataJson = await data.json();
+      if (dataJson.error) return setError(dataJson.error);
+
+      const processedRoomData = dataJson as ProcessedRoom;
       setProcessedRoom(processedRoomData);
       navigation.setOptions({
         title: processedRoomData.name,
       });
     };
+    console.log("roomId", roomId);
+    console.log("user", user);
+
+    if (!roomId || !user) return;
     fetchProcessedRoomData();
-  }, [roomId]);
+  }, [roomId, user]);
 
   return (
     <View style={styles.header}>
+      {error && <Text>{error}</Text>}
       {processedRoom && (
         <>
           <View style={styles.infoCards}>
@@ -61,7 +83,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
           <Text>{processedRoom.name}</Text>
         </>
       )}
-      {!processedRoom && <Text>Chargement...</Text>}
+      {!processedRoom && !error && <Text>Chargement...</Text>}
     </View>
   );
 };
