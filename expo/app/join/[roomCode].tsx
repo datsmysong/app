@@ -1,10 +1,9 @@
 import { User } from "@supabase/supabase-js";
 import { UserProfile } from "commons/database-types-utils";
-import * as Device from "expo-device";
 import * as Linking from "expo-linking";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 
 import Alert from "../../components/Alert";
 import Button from "../../components/Button";
@@ -17,7 +16,7 @@ export default function JoinPage() {
 
   const [user, setUser] = useState<User | null>();
   const [userProfile, setUserProfile] = useState<UserProfile>();
-  const [isParticipant, setIsParticipant] = useState<boolean>(false);
+  const [isParticipant, setIsParticipant] = useState<boolean>();
   const [roomId, setRoomId] = useState<string>("");
   const currentPageLink = Linking.useURL();
 
@@ -86,6 +85,7 @@ export default function JoinPage() {
         .eq("profile_id", userProfile.user_profile_id)
         .eq("room_id", roomId)
         .single();
+
       setIsParticipant(!!data);
     };
 
@@ -98,15 +98,19 @@ export default function JoinPage() {
    * We instead join the room automatically and redirect the user to the room page.
    */
   useEffect(() => {
-    if (userProfile && isInsideApplication && !isParticipant) {
-      joinRoom().then((r) => {
-        if (r?.error)
-          return Alert.alert("Impossible de rejoindre la salle d'écoute");
+    if (isParticipant === undefined) return;
+    if (!userProfile || !isInsideApplication || !roomId) return;
 
-        router.replace(`rooms/${roomId}`);
+    if (!isParticipant) {
+      joinRoom().then((r) => {
+        if (r?.error) {
+          console.log(r?.error);
+          return Alert.alert("Impossible de rejoindre la salle d'écoute");
+        }
       });
     }
-  }, [userProfile, isInsideApplication]);
+    router.replace(`rooms/${roomId}`);
+  }, [userProfile, isInsideApplication, roomId, isParticipant]);
 
   /**
    * Joins a room by inserting the user's profile into the room_users table.
@@ -116,16 +120,14 @@ export default function JoinPage() {
     if (!userProfile) return { error: "Unauthorized" };
     if (!roomId) return { error: "Unknown room" };
 
+    if (isParticipant) return { error: null };
+
     const { error: roomUsersError } = await supabase.from("room_users").insert({
       room_id: roomId,
       profile_id: userProfile.user_profile_id,
     });
 
-    if (roomUsersError) {
-      if (roomUsersError.code !== "409") return { error: roomUsersError };
-    }
-
-    return { error: null };
+    return { error: roomUsersError };
   };
 
   /**
