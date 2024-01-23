@@ -1,15 +1,19 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ProcessedRoom } from "commons/room-types";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import InfoCard from "./InfoCard";
 import { Text, View } from "./Tamed";
+import { useNavigation } from "expo-router";
 
 type RoomHistoryProps = {
   roomId: string;
 };
 
 const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
+  const navigation = useNavigation();
+
   const [processedRoom, setProcessedRoom] = useState<ProcessedRoom>();
 
   useEffect(() => {
@@ -21,8 +25,11 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
           "Content-Type": "application/json",
         },
       });
-      const processedRoomData = await data.json();
-      setProcessedRoom(processedRoomData as ProcessedRoom);
+      const processedRoomData = (await data.json()) as ProcessedRoom;
+      setProcessedRoom(processedRoomData);
+      navigation.setOptions({
+        title: processedRoomData.name,
+      });
     };
     fetchProcessedRoomData();
   }, [roomId]);
@@ -52,13 +59,9 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
             />
           </View>
           <Text>{processedRoom.name}</Text>
-          <View style={styles.headerInfos}>
-            <View style={styles.headerLeft}>
-              <Text>{JSON.stringify(processedRoom)}</Text>
-            </View>
-          </View>
         </>
       )}
+      {!processedRoom && <Text>Chargement...</Text>}
     </View>
   );
 };
@@ -73,7 +76,6 @@ const styles = StyleSheet.create({
   infoCards: {
     display: "flex",
     backgroundColor: "transparent",
-    alignItems: "flex-start",
     flexDirection: "row",
     gap: 12,
     alignSelf: "stretch",
