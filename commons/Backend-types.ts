@@ -6,3 +6,8 @@ export interface JSONTrack {
   albumName: string;
   imgUrl: string;
 }
+
+export interface RoomJSON {
+  currentActiveRoom: string;
+  tracks: JSONTrack[];
+}

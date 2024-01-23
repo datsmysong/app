@@ -6,24 +6,26 @@ import { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
 import Alert from "../../../components/Alert";
-import Button from "../../../components/Button";
+import {Button} from "../../../components/Button";
+import {View, Text} from "../../../components/Tamed"
 import { supabase } from "../../../lib/supabase";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { JSONTrack } from "commons/Backend-types";
+import { JSONTrack, RoomJSON } from "commons/Backend-types";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  ViewProps,
+} from "react-native";
 
 import SocketIo from "../../../lib/socketio";
 
 export interface MusicRoomParams {
   id: string;
-}
-
-interface ActiveRoomSkeleton {
-  currentActiveRoom: string;
-  tracks: JSONTrack[];
 }
 
 // https://docs.expo.dev/guides/environment-variables/
@@ -122,6 +124,8 @@ export default function musicRoom() {
   const [room, setRoom] = useState<ActiveRoom>();
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
+  const [data, setData] = useState<RoomJSON>();
+
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase
@@ -161,8 +165,6 @@ export default function musicRoom() {
 
   const url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
 
-  const [data, setData] = useState<ActiveRoomSkeleton>();
-
   useEffect(() => {
     // fetch(url)
     //     .then(res => res.json())
@@ -170,7 +172,7 @@ export default function musicRoom() {
 
     SocketIo.getInstance()
       .getSocket(url.pathname)
-      .on("queue:update", (data: ActiveRoomSkeleton) => setData(data));
+      .on("queue:update", (data: RoomJSON) => setData(data));
   }, []);
 
   return (

@@ -39,12 +39,12 @@ export default function RoomIO(
       urlRaw: string /*, callback: (arg0: any) => void*/
     ) => {
       switch (event) {
-        case "queue:add":
-          await room?.add(urlRaw);
-          break;
-        case "queue:remove":
-          await room?.remove(urlRaw);
-          break;
+      case "queue:add":
+        await room?.add(urlRaw);
+        break;
+      case "queue:remove":
+        await room?.remove(urlRaw);
+        break;
       }
 
       // TODO replace by callback and remove emit here : "Acknowledgements" CANCELED

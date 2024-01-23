@@ -5,12 +5,7 @@ import Spotify from "./musicplatform/Spotify";
 import { randomUUID } from "node:crypto";
 import MusicStorage from "./MusicStorage";
 import TrackFactory from "./musicplatform/TrackFactory";
-import { JSONTrack } from "commons/Backend-types";
-
-interface RoomJSON {
-  currentActiveRoom: string;
-  tracks: JSONTrack[];
-}
+import { JSONTrack, RoomJSON } from "commons/Backend-types";
 
 interface Error {
   error: { message: string };
