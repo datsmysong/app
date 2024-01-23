@@ -22,10 +22,11 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 2,
     borderRadius: 11,
+    alignItems: "center",
   },
   warningText: {
     fontSize: 16,
-    textAlign: "center",
+    // textAlign: "center",
     fontFamily: "Outfit-Bold",
   },
 });

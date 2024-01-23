@@ -1,11 +1,11 @@
 import { Link, router } from "expo-router";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import Warning from "./Warning";
 import Button from "../../components/Button";
 import ControledInput from "../../components/ControledInput";
+import Warning from "../../components/Warning";
 import { supabase } from "../../lib/supabase";
 
 type LoginForm = {
@@ -74,7 +74,7 @@ export default function Login() {
           autoComplete="password"
           secureTextEntry
         />
-        <Link href="/auth/" style={{ ...styles.text, textAlign: "center" }}>
+        <Link href="/auth/" style={{ ...styles.text, textAlign: "right" }}>
           Mot de passe oublié ?
         </Link>
         <Button onPress={handleSubmit(onSubmit)} block>
