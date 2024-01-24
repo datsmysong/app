@@ -1,28 +1,53 @@
+import { useRef, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Button from "../../components/Button";
 import { Text, View } from "../../components/Themed";
 import Avatar from "../../components/profile/Avatar";
+import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
 export default function PersonalInfo() {
+  const user = useSupabaseUserHook();
+  const avatarRef = useRef<{ saveImage: () => Promise<void> }>();
+  const [loading, setLoading] = useState(false);
+  const [inputChanged, setInputChanged] = useState<{
+    email: boolean;
+    username: boolean;
+    profilePicture: boolean;
+  }>({
+    email: false,
+    username: false,
+    profilePicture: false,
+  });
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    if (!avatarRef.current) return;
+
+    const promiseAvatar = avatarRef.current.saveImage();
+
+    await Promise.all([promiseAvatar]);
+  };
+
   return (
     <View style={styles.rootContainer}>
       <View style={styles.container}>
         <Text>Adresse email</Text>
         <View>
           <Avatar
+            ref={avatarRef}
             size={200}
-            url={null}
-            onUpload={(url: string) => {
-              // setAvatarUrl(url);
-              // updateProfile({ username, website, avatar_url: url });
-              console.log("Uploaded avatar", url);
+            onImageLoad={() => {
+              setInputChanged({ ...inputChanged, profilePicture: true });
             }}
           />
         </View>
+        <Button block onPress={() => {}}>
+          Sauvegarer
+        </Button>
       </View>
       <View style={styles.container}>
-        <Button type="outline" block>
+        <Button type="outline" block disabled={loading}>
           Supprimer mon compte
         </Button>
       </View>

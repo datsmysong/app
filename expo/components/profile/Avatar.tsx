@@ -1,129 +1,142 @@
-import * as DocumentPicker from "expo-document-picker";
-import { useState, useEffect } from "react";
-import { StyleSheet, View, Alert, Image, Button } from "react-native";
+import { decode } from "base64-arraybuffer";
+import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { Alert, Image, Platform, StyleSheet, View } from "react-native";
 
 import { supabase } from "../../lib/supabase";
+import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
+import Button from "../Button";
+import { Text } from "../Themed";
 
 interface Props {
-  size: number;
-  url: string | null;
-  onUpload: (filePath: string) => void;
+  onImageLoad: () => Promise<void>;
 }
 
-export default function Avatar({ url, size = 150, onUpload }: Props) {
+const Avatar = forwardRef((props: Props, ref) => {
+  const { onImageLoad } = props;
+  const user = useSupabaseUserHook();
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const avatarSize = { height: size, width: size };
 
   useEffect(() => {
-    if (url) downloadImage(url);
-  }, [url]);
-
-  async function downloadImage(path: string) {
-    try {
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .download(path);
-
-      if (error) {
-        throw error;
-      }
-
-      const fr = new FileReader();
-      fr.readAsDataURL(data);
-      fr.onload = () => {
-        setAvatarUrl(fr.result as string);
-      };
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("Error downloading image: ", error.message);
-      }
+    if (user) {
+      downloadUserImage();
     }
+  }, [user]);
+
+  useImperativeHandle(ref, () => ({
+    saveImage: async () => {
+      await uploadAvatar();
+    },
+  }));
+
+  async function downloadUserImage() {
+    if (!user) {
+      return;
+    }
+    const path = `${user.id}.jpg`;
+    const { data } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(path + "?caches=" + Math.random());
+
+    if (!data) {
+      console.log("no data");
+      return;
+    }
+    console.log("link", data.publicUrl);
+    setAvatarUrl(data.publicUrl);
   }
 
   async function uploadAvatar() {
-    console.log("uploadAvatar");
-
-    // try {
-    setUploading(true);
-
-    const file = await DocumentPicker.getDocumentAsync({
-      type: "image/*",
-      copyToCacheDirectory: true,
-    });
-
-    console.log("Pick image", file.output);
-    // first image
-    console.log("Asset", file.assets);
-    if (file.assets?.length !== 1) {
-      Alert.alert("Veuillez sélectionner une image");
+    if (!user) {
+      console.error("No user");
       return;
     }
-    const firstImage = file.assets[0];
-
-    const image = {
-      uri: firstImage.uri,
-      type: firstImage.mimeType ?? "image/jpeg",
-      name: firstImage.name,
-    };
-
-    // const formData = new FormData();
-    // formData.append("file", image);
-
-    // const fileExt = file.name.split(".").pop();
-    // const filePath = `${Math.random()}.${fileExt}`;
-
+    if (!avatarUrl) {
+      console.error("no avatarurl");
+      return;
+    }
+    const fileName = `${user.id}.jpg`;
+    const image = await getBase64Image(avatarUrl);
+    // delete old avatar
+    await supabase.storage.from("avatars").remove([fileName]);
     const { error } = await supabase.storage
       .from("avatars")
-      .upload("test.png", image.uri, {
+      .upload(fileName, image, {
         upsert: true,
-        contentType: image.type,
+        contentType: "image/jpeg",
       });
-
     if (error) {
-      throw error;
+      console.log("error", error);
     }
+    downloadUserImage();
+  }
 
-    // onUpload(filePath);
-    // } catch (error) {
-    //   if (isCancel(error)) {
-    //     console.warn("cancelled");
-    //     // User cancelled the picker, exit any dialogs or menus and move on
-    //   } else if (isInProgress(error)) {
-    //     console.warn(
-    //       "multiple pickers were opened, only the last will be considered"
-    //     );
-    //   } else if (error instanceof Error) {
-    //     Alert.alert(error.message);
-    //   } else {
-    //     throw error;
-    //   }
-    // } finally {
-    //   setUploading(false);
-    // }
+  async function selectAvatar() {
+    if (!user) {
+      return;
+    }
+    setUploading(true);
+
+    console.log("start");
+
+    const file = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+      aspect: [1, 1],
+    });
+
+    if (file.assets) {
+      if (file.assets.length !== 1) {
+        Alert.alert("Veuillez sélectionner une image");
+        return;
+      }
+      const image = file.assets[0];
+      setAvatarUrl(image.uri);
+      onImageLoad();
+    }
+    setUploading(false);
   }
 
   return (
-    <View>
+    <View style={{ width: "100%" }}>
+      <Text>Photo de profil</Text>
       {avatarUrl ? (
         <Image
           source={{ uri: avatarUrl }}
-          accessibilityLabel="Avatar"
-          style={[avatarSize, styles.avatar, styles.image]}
+          aria-aria-label="Avatar"
+          style={[
+            { aspectRatio: 1, width: "100%" },
+            styles.avatar,
+            styles.image,
+          ]}
         />
       ) : (
-        <View style={[avatarSize, styles.avatar, styles.noImage]} />
+        <View
+          style={[
+            { aspectRatio: 1, width: "100%" },
+            styles.avatar,
+            styles.noImage,
+          ]}
+        />
       )}
       <View>
         <Button
-          title={uploading ? "Uploading ..." : "Upload"}
-          onPress={uploadAvatar}
+          onPress={selectAvatar}
           disabled={uploading}
-        />
+          block
+          type="outline"
+          size="small"
+        >
+          {uploading ? "Loading ..." : "Charger une image"}
+        </Button>
       </View>
     </View>
   );
-}
+});
+
+export default Avatar;
 
 const styles = StyleSheet.create({
   avatar: {
@@ -141,3 +154,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 });
+
+const getBase64Image = async (uri: string) => {
+  if (Platform.OS === "web") {
+    const uriWithoutMIME = uri.split(",")[1];
+    const base64data = decode(uriWithoutMIME);
+    return base64data;
+  } else {
+    // "uri": "file:///data/user/0/host.exp.exponent/cache/DocumentPicker/189be1eb-08a5-4bcb-8001-28aafd0febd6.jpg"}],
+    const fileUri = uri;
+    const base64Data = await FileSystem.readAsStringAsync(fileUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    return decode(base64Data);
+  }
+};

@@ -1,5 +1,4 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { Text, View } from "../Tamed";
