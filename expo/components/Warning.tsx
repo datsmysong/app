@@ -1,11 +1,26 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Text, View, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-const Warning = ({ label }: { label: string }) => {
+const Warning = ({
+  label,
+  children,
+}: {
+  label: string;
+  children?: React.ReactNode;
+}) => {
   return (
     <View style={styles.warning}>
       <MaterialIcons name="warning" size={24} color="red" />
-      <Text style={styles.warningText}>{label}</Text>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
+        <Text style={styles.warningText}>{label}</Text>
+        {children}
+      </View>
     </View>
   );
 };
@@ -16,7 +31,7 @@ const styles = StyleSheet.create({
   warning: {
     alignSelf: "auto",
     padding: 10,
-    gap: 10,
+    gap: 20,
     flexDirection: "row",
     borderColor: "red",
     borderStyle: "solid",
