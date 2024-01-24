@@ -8,6 +8,8 @@ import { Platform } from "react-native";
 import Alert from "../components/Alert";
 import { getApiUrl } from "./apiUrl";
 import { supabase } from "./supabase";
+import { generateRandomString, sha256, base64encode } from "./codeVerifier";
+import { getSpotifyScopes } from "../constants/Api";
 
 WebBrowser.maybeCompleteAuthSession(); // required for web only
 const redirectUrl = makeRedirectUri();
@@ -93,6 +95,16 @@ export const signInWithProvider = async ({
   Alert.alert("Une erreur est survenue avec votre navigateur.");
 };
 
+export const bindServiceToAccount = async (serviceName: string) => {
+  if (serviceName == "Spotify") {
+    bindToSpotify();
+  } else if (serviceName == "SoundCloud") {
+    signInWithSoundcloud();
+  } else {
+    Alert.alert("Ce service n'est pas encore disponible");
+  }
+};
+
 export const signInWithSoundcloud = async () => {
   if (!process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID) {
     throw new Error("Missing EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID env variable");
@@ -114,6 +126,79 @@ export const signInWithSoundcloud = async () => {
   await WebBrowser.openAuthSessionAsync(authUrl);
 
   router.push("/profile");
+};
+
+export const bindToSpotify = async () => {
+  // verify if dev or prod
+  const baseUrl = getApiUrl();
+
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) throw new Error("No supabaseUrl");
+
+  const codeVerifier = generateRandomString(64);
+  const hashed = await sha256(codeVerifier);
+  const codeChallenge = base64encode(hashed);
+  const urlEncodedCodeChallenge = encodeURIComponent(codeChallenge);
+
+  if (!process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID) {
+    throw new Error("Missing EXPO_PUBLIC_SPOTIFY_CLIENT_ID env variable");
+  }
+
+  const clientId = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID;
+  const redirectUri = baseUrl + "/auth/callback/bind/spotify";
+  console.log("redirectUri", redirectUri);
+
+  const scope = getSpotifyScopes();
+  const authUrl = new URL("https://accounts.spotify.com/authorize");
+
+  window.localStorage.setItem("code_verifier", codeVerifier);
+
+  const params = {
+    response_type: "code",
+    client_id: clientId,
+    scope,
+    code_challenge_method: "S256",
+    code_challenge: codeChallenge,
+    redirect_uri: redirectUri,
+  };
+
+  authUrl.search = new URLSearchParams(params).toString();
+
+  const redirectionUrl =
+    baseUrl +
+    "/auth/redirection?redirect_url=" +
+    authUrl.toString() +
+    "#code_verifier=" +
+    urlEncodedCodeChallenge;
+  if (Platform.OS === "web" && Device.osName !== "Windows") {
+    // if (Platform.OS === "web" ) {
+    // Second implementation for web browser on mobile:
+    // WebBrowser.openAuthSessionAsync doesn't work on mobile web browser (bug, open new tab and not redirect to app at the end of the auth process)
+    // So we redirect the user to the backend, and the middleware will support the refresh_token retourned and allowing the session to be refreshed
+    window.location.href = redirectionUrl;
+    return;
+  }
+
+  const webBrowser = await WebBrowser.openAuthSessionAsync(
+    redirectionUrl,
+    redirectUrl
+  );
+
+  if (webBrowser.type === "success" && webBrowser.url) {
+    const refreshToken = decodeURIComponent(
+      webBrowser.url.split("#refresh_token=")[1]
+    );
+    const { error } = await supabase.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+    if (!error) {
+      router.replace("/(tabs)");
+      return;
+    }
+    Alert.alert(
+      "Une erreur est survenue, l'authentification est impossible pour le moment"
+    );
+  }
 };
 
 const getCookie = async (key: string): Promise<string | null> => {

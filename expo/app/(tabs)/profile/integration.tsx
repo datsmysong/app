@@ -7,11 +7,7 @@ import Alert from "../../../components/Alert";
 import { getApiUrl } from "../../../lib/apiUrl";
 import { BoundService, StreamingService } from "commons/database-types-utils";
 import Button from "../../../components/Button";
-import {
-  signInWithProvider,
-  signInWithSoundcloud,
-} from "../../../lib/providerMethods";
-import { getSpotifyScopes } from "../../../constants/Api";
+import { bindServiceToAccount } from "../../../lib/providerMethods";
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([] as StreamingService[]);
@@ -73,6 +69,7 @@ export default function ProfileIntegration() {
               resUnbound.statusText
           );
         } else {
+          Alert.alert("Service déconnecté avec succès");
           router.push("/profile");
         }
       })
@@ -82,13 +79,7 @@ export default function ProfileIntegration() {
   };
 
   const bindService = (serviceName: string) => {
-    if (serviceName == "Spotify") {
-      signInWithProvider({ provider: "spotify", scopes: getSpotifyScopes() });
-    } else if (serviceName == "SoundCloud") {
-      signInWithSoundcloud();
-    } else {
-      Alert.alert("Ce service n'est pas encore disponible");
-    }
+    bindServiceToAccount(serviceName);
   };
 
   return (
@@ -190,7 +181,7 @@ const styles = StyleSheet.create({
     width: 394,
     padding: 20,
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 24,
     borderRadius: 24,
     backgroundColor: "#fff",
