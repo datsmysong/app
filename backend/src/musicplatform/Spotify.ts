@@ -16,7 +16,7 @@ export default class Spotify extends MusicPlatform {
       title: data.name,
       duration: data.duration_ms,
       artistsName: data.artists.reduce(
-        (acc, current) => (acc ? `${acc},` : "") + current.name,
+        (acc, current) => (acc ? `${acc}, ` : "") + current.name,
         ""
       ),
       albumName: data.album.name,
