@@ -14,6 +14,10 @@ export default function RoomsTabLayout() {
         name="[id]/add"
         options={{ title: "Ajouter une musique" }}
       />
+      <Stack.Screen
+        name="[id]"
+        options={{ title: "Nom de la salle", headerShown: false }}
+      />
     </Stack>
   );
 }

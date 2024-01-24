@@ -100,15 +100,9 @@ export default function MusicRoom() {
           <View style={headerStyles.headerContainer}>
             <Text style={headerStyles.title}>Salle "{room.name}"</Text>
             <View style={headerStyles.buttonContainer}>
-              {isCopied ? (
-                <Button block prependIcon="check" onPress={handleShare}>
-                  Lien copié
-                </Button>
-              ) : (
-                <Button block onPress={handleShare}>
-                  Partager
-                </Button>
-              )}
+              <Button block href="/rooms/id/invite">
+                Inviter des gens
+              </Button>
             </View>
             <View style={styles.container}>
               <Text style={styles.title}>
