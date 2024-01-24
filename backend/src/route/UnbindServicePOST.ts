@@ -2,33 +2,25 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "../server";
 import { getCurrentUser } from "../lib/auth-utils";
 
-interface bodyParams {
-  userId: string;
-  serviceId: string;
+interface QueryParams {
+  uuid: string;
 }
 
-export default async function UnboundServicePOST(
+export default async function UnbindServicePOST(
   request: FastifyRequest,
   response: FastifyReply
 ) {
-  const bodyParams = request.body as bodyParams;
-
-  const userId = bodyParams.userId;
-  const serviceId = bodyParams.serviceId;
-
-  if (!userId) {
-    response.status(400).send("userId is required");
-    return;
-  }
+  const { uuid: serviceId } = request.params as QueryParams;
 
   if (!serviceId) {
     response.status(400).send("serviceId is required");
     return;
   }
-  const selfProfileId = await getCurrentUser(request, response);
+  const userId = await getCurrentUser(request, response);
 
-  if (selfProfileId !== userId) {
-    return response.code(401).send("Unauthorized");
+  if (!userId) {
+    response.status(400).send("User not connected");
+    return;
   }
 
   const { data, status, error } = await adminSupabase

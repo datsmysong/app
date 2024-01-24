@@ -11,12 +11,11 @@ import authRoutes from "./authRoutes";
 import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import BoundServicePOST from "./route/BoundServicePOST";
 import BoundServicesGET from "./route/BoundServicesGET";
-import CurrentUserGET from "./route/CurrentUserGET";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
-import UnboundServicePOST from "./route/UnboundServicePOST";
+import UnbindServicePOST from "./route/UnbindServicePOST";
 import RoomIO from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
@@ -116,7 +115,7 @@ server.get("/", AuthCallbackSoundcloudGET);
 server.get("/bounded", BoundServicesGET);
 
 server.get("/streaming-services", StreamingServicesGET);
-server.post("/streaming-service/uuid", UnboundServicePOST);
+server.post("/streaming-service/:uuid", UnbindServicePOST);
 
 const createRoomSchema = {
   body: {

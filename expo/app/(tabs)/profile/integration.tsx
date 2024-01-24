@@ -5,9 +5,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import Alert from "../../../components/Alert";
 import { getApiUrl } from "../../../lib/apiUrl";
-import useSupabaseUser from "../../../lib/useSupabaseUser";
 import { BoundService, StreamingService } from "commons/database-types-utils";
-import { getUserProfile } from "../../../lib/userProfile";
 import Button from "../../../components/Button";
 import {
   signInWithProvider,
@@ -17,7 +15,6 @@ import { getSpotifyScopes } from "../../../constants/Api";
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([] as StreamingService[]);
-  const [userId, setUserId] = useState("");
   const [boundServices, setBoundServices] = useState([] as BoundService[]); // To know which services are bound to the currrent user
 
   const baseUrl = getApiUrl();
@@ -33,38 +30,19 @@ export default function ProfileIntegration() {
       Alert.alert(err);
     });
 
-    const user = useSupabaseUser();
-    if (user) {
-      user.then(async (user) => {
-        if (!user) {
-          Alert.alert("Erreur lors de la récupération de l'utilisateur");
-        } else {
-          const accountId = user.id;
-          const userProfile = await getUserProfile(accountId);
-          if (userProfile) {
-            setUserId(userProfile.user_profile_id);
-          }
-        }
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    const url = new URL(baseUrl + "/user/bound");
-    url.searchParams.append("userId", userId);
     const fetchBoundServices = async () => {
-      const responseBoundServices = await fetch(url.toString());
+      const responseBoundServices = await fetch(baseUrl + "/user/bound", {
+        credentials: "include",
+      });
       const dataBoundServices = await responseBoundServices.json();
 
       setBoundServices(dataBoundServices);
     };
 
-    if (userId) {
-      fetchBoundServices().catch((err) => {
-        Alert.alert(err);
-      });
-    }
-  }, [userId]);
+    fetchBoundServices().catch((err) => {
+      Alert.alert(err);
+    });
+  }, []);
 
   const getServiceIds = (boundServices: BoundService[]) => {
     const serviceIds = [];
@@ -83,19 +61,10 @@ export default function ProfileIntegration() {
   };
 
   const unbindService = (serviceId: string) => {
-    const body = {
-      userId: userId,
-      serviceId: serviceId,
-    };
-
     // If I do a DELETE request, I get a CORS error
-    fetch(baseUrl + "/streaming-service/uuid", {
+    fetch(baseUrl + "/streaming-service/" + serviceId, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       credentials: "include",
-      body: JSON.stringify(body),
     })
       .then((resUnbound) => {
         if (!resUnbound.ok) {

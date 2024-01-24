@@ -1,27 +1,20 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "../server";
-
-interface QueryParams {
-  userId: string;
-}
+import { getCurrentUser } from "../lib/auth-utils";
 
 export default async function BoundServicesGET(
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
-  const userId = (request.query as QueryParams).userId;
+  const userId = await getCurrentUser(request, reply);
   if (!userId) {
     return reply.code(400).send({ message: "Missing userId" });
   }
 
-  const res = await adminSupabase
+  const { data, status, error } = await adminSupabase
     .from("bound_services")
     .select("*")
     .eq("user_profile_id", userId);
 
-  if (res.error) {
-    return reply.code(res.status).send(res.error);
-  } else {
-    return reply.send(res.data);
-  }
+  reply.code(status).send(error ?? data);
 }
