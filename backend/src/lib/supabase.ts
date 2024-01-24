@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { Database } from "commons/Database-types";
+import { Database } from "commons/database-types";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export default function createClient(context: {

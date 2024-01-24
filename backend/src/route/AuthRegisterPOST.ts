@@ -28,7 +28,7 @@ export default async function AuthRegister(
     return reply.status(400).send({ error: message });
   }
 
-  const urlFront = process.env.FRONT_END_URL;
+  const urlFront = process.env.FRONTEND_URL;
 
   const {
     data: { user },

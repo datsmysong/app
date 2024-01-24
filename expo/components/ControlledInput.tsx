@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   text: {
-    color: "rgba(0, 0, 0, 0.78)",
+    color: "red",
     fontFamily: "Outfit-Medium",
     fontSize: 16,
     fontStyle: "normal",

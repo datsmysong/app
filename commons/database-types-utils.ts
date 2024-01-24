@@ -1,4 +1,4 @@
-import { Database } from "./Database-types";
+import { Database } from "./database-types";
 // prettier-ignore
 export type ActiveRoom = Database["public"]["Tables"]["active_rooms"]["Row"];
 // prettier-ignore

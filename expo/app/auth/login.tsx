@@ -26,7 +26,6 @@ export default function Login() {
     setError,
     getValues,
     reset,
-
     formState: { errors, isDirty },
   } = useForm<LoginForm>({
     defaultValues: {

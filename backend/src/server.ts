@@ -11,7 +11,7 @@ import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import fastifyCookie from "@fastify/cookie";
 import { FastifyCookieOptions } from "@fastify/cookie";
-import { Database } from "commons/Database-types";
+import { Database } from "commons/database-types";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -29,9 +29,9 @@ if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   );
 }
 
-if (!process.env.FRONT_END_URL) {
+if (!process.env.FRONTEND_URL) {
   throw new Error(
-    "Missing FRONT_END_URL environment variable, check .env.local.example file"
+    "Missing FRONTEND_URL environment variable, check .env.local.example file"
   );
 }
 export const adminSupabase = createClient<Database>(
