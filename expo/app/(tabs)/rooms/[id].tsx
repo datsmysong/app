@@ -125,19 +125,17 @@ export default function musicRoom() {
               </Button>
             )}
           </View>
-          <View style={styles.outerContainer}>
-            <View style={styles.innerContainer}>
-              <Text style={[styles.title]}>
-                File d'attente ({data?.tracks.length /* ?? 0*/})
-              </Text>
-              <FlatList
-                data={data?.tracks}
-                renderItem={({ item, index }) => (
-                  <TrackItem track={item} index={index + 1} />
-                )}
-              />
-            </View>
-          </View>
+          <View style={styles.container}>
+            <Text style={styles.title}>
+              File d'attente ({data?.tracks.length /* ?? 0*/})
+            </Text>
+            <FlatList
+              style={styles.list}
+              data={data?.tracks}
+              renderItem={({ item, index }) => (
+                <TrackItem track={item} index={index + 1} />
+              )}
+            />
         </View>
       )}
     </View>
@@ -161,20 +159,11 @@ const headerStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  outerContainer: {
+  container: {
+    // marginVertical: 32,
+    // marginHorizontal: 20,
     paddingVertical: 32,
     paddingHorizontal: 20,
-    alignItems: "flex-start",
-    gap: 48,
-    flexGrow: 1,
-    flexShrink: 0,
-    flexBasis: 0,
-    alignSelf: "stretch",
-  },
-  innerContainer: {
-    alignItems: "flex-start",
-    gap: 12,
-    alignSelf: "stretch",
   },
   title: {
     color: "#000",
@@ -182,7 +171,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontStyle: "normal",
     fontWeight: "700",
-    lineHeight: 0,
     letterSpacing: 0.48,
+  },
+  list: {
+    marginVertical: 12,
   },
 });

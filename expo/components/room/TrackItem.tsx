@@ -1,6 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { JSONTrack } from "commons/Backend-types";
 import { Image } from "expo-image";
+import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 
 import HView from "../HView";
@@ -13,6 +14,8 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
     albumName: album,
     imgUrl: rawImageUrl,
   } = prop.track;
+  const [dislike, setDislike] = useState(false);
+
   const imageSrc = new URL(rawImageUrl).toString();
   // mock image
   const imageProfileSrc = new URL(
@@ -21,107 +24,68 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
 
   return (
     <HView style={itemStyles.container}>
-      <View style={itemStyles.imagesContainer}>
-        <HView style={itemStyles.mainImageContainer}>
-          <Image source={imageSrc} style={itemStyles.mainImage} />
-        </HView>
-        <HView style={itemStyles.profileImageContainer}>
-          <Image source={imageProfileSrc} style={itemStyles.profileImage} />
-        </HView>
+      <View style={[itemStyles.imagesContainer]}>
+        <Image source={imageSrc} style={itemStyles.mainImage} />
+        <Image source={imageProfileSrc} style={itemStyles.profileImage} />
       </View>
-      <HView style={itemStyles.textOuterContainer}>
-        <View style={itemStyles.textInnerContainer}>
-          <HView style={itemStyles.trackNameContainer}>
-            <Text style={[itemStyles.text, itemStyles.textTop]}>
-              {prop.index}
-            </Text>
-            <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
-              .
-            </Text>
-            <Text
-              style={[
-                itemStyles.text,
-                itemStyles.textTop,
-                { flexGrow: 1, flexShrink: 0, flexBasis: 0 },
-              ]}
-            >
-              {title}
-            </Text>
-          </HView>
-          <Text style={[itemStyles.text, itemStyles.textBottom]}>{artist}</Text>
-        </View>
-      </HView>
-      <HView style={itemStyles.iconContainer}>
-        <Pressable>
-          <FontAwesome name="thumbs-o-down" />
+      <View style={[itemStyles.textContainer]}>
+        <HView>
+          <Text style={[itemStyles.text, itemStyles.textTop]}>
+            {prop.index}
+          </Text>
+          <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
+            .
+          </Text>
+          <Text style={[itemStyles.text, itemStyles.textTop]}>{title}</Text>
+        </HView>
+        <Text style={[itemStyles.text, itemStyles.textBottom]}>{artists}</Text>
+      </View>
+      <View>
+        <Pressable onPress={() => setDislike(!dislike)}>
+          <FontAwesome
+            name={`thumbs-${!dislike ? "o-" : ""}down`}
+            style={itemStyles.icon}
+          />
         </Pressable>
-      </HView>
-      <HView style={itemStyles.iconContainer}>
+      </View>
+      <View>
         <Pressable>
-          <FontAwesome name="ellipsis-v" />
+          <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
         </Pressable>
-      </HView>
+      </View>
     </HView>
   );
 }
 
 const itemStyles = StyleSheet.create({
   container: {
+    marginVertical: 12,
     paddingVertical: 9,
     paddingHorizontal: 10,
-    alignItems: "center",
     gap: 10,
-    alignSelf: "stretch",
+    alignItems: "center",
   },
   imagesContainer: {
     width: 46,
-    height: 36,
+    height: 46,
   },
   mainImage: {
     width: 46,
     height: 46,
-    flexShrink: 0,
-  },
-  mainImageContainer: {
-    width: 46,
-    height: 46,
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
     borderRadius: 6,
   },
   profileImage: {
-    flexGrow: 1,
-    flexShrink: 0,
-    flexBasis: 0,
-    alignSelf: "stretch",
-    borderRadius: 22,
-  },
-  profileImageContainer: {
     width: 22,
     height: 22,
-    alignItems: "flex-start",
-    gap: 10,
-    flexShrink: 0,
+    borderRadius: 22,
+    position: "absolute",
+    right: -8,
+    bottom: -8,
   },
-  textOuterContainer: {
-    alignItems: "center",
-    gap: 14,
-    flexGrow: 1,
-    flexShrink: 0,
-    flexBasis: 0,
-  },
-  textInnerContainer: {
-    width: 190,
-    paddingVertical: 0,
+  textContainer: {
     paddingHorizontal: 12,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    gap: 1,
-  },
-  trackNameContainer: {
-    alignItems: "center",
-    alignSelf: "stretch",
+    flexGrow: 1,
+    flexShrink: 1,
   },
   text: {
     fontFamily: "Outfit-Regular",
@@ -136,10 +100,10 @@ const itemStyles = StyleSheet.create({
   textBottom: {
     color: "#C3C3C3",
   },
-  iconContainer: {
+  icon: {
     width: 24,
     height: 24,
-    justifyContent: "center",
-    alignItems: "center",
+    fontSize: 24,
+    textAlign: "center",
   },
 });
