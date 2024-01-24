@@ -4,8 +4,7 @@ import Button from "../../../../components/Button";
 import { View } from "../../../../components/Themed";
 
 export default function InvitationModal() {
-  // TODO: add onPress to Buttons when feat/room-links is merged into main
-  // Check if the space in the icon button is visible
+  // TODO: add onPress to first Button when feat/room-links is merged into main
   return (
     <View style={styles.modalContent}>
       <View style={styles.shareButtonsContainer}>
