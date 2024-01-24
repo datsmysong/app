@@ -16,7 +16,7 @@ export default function JoinRoom() {
     setIsTextPresent(roomCode.length > 0);
   }, [roomCode]);
 
-  const onSubmitSearchRoom = async () => {
+  const searchRoom = async () => {
     Keyboard.dismiss();
 
     const { data: room, error: roomError } = await supabase
@@ -43,14 +43,14 @@ export default function JoinRoom() {
         placeholder="Code de la salle"
         value={roomCode}
         onChangeText={setRoomCode}
-        onSubmitEditing={() => onSubmitSearchRoom()}
+        onSubmitEditing={searchRoom}
       />
       <Button
         type="filled"
         block
         disabled={!isTextPresent}
         appendIcon="arrow-forward"
-        onPress={() => onSubmitSearchRoom()}
+        onPress={searchRoom}
       >
         Rejoindre
       </Button>
