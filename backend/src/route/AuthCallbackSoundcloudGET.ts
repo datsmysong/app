@@ -11,6 +11,11 @@ export default async function AuthCallbackSoundcloudGET(
   request: FastifyRequest,
   response: FastifyReply
 ) {
+  const directUri = request.url;
+  const baseUrl = directUri.includes("exp://")
+    ? "http://" + directUri.split(":8081")[0].split("//")[1]
+    : directUri.split(":8081")[0] + ":3000";
+
   const code = (request.query as QueryParams).code;
   if (!code) {
     return response.code(400).send({ error: "Missing code" });
@@ -29,7 +34,7 @@ export default async function AuthCallbackSoundcloudGET(
   bodyParams.append("client_id", process.env.SOUNDCLOUD_CLIENT_ID);
   bodyParams.append("client_secret", process.env.SOUNDCLOUD_CLIENT_SECRET);
   bodyParams.append("grant_type", "authorization_code");
-  bodyParams.append("redirect_uri", "http://localhost:3000");
+  bodyParams.append("redirect_uri", baseUrl);
   bodyParams.append("code", code);
 
   const token = await fetch("https://api.soundcloud.com/oauth2/token", {
