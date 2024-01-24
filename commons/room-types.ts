@@ -1,11 +1,17 @@
 import { Profile, StreamingService, UserProfile } from "./database-types-utils";
 
-export type InactiveRoomMusic = {
+export type MusicMetadata = {
   name: string;
   artist: string;
-  position: number;
   genre: string;
+  artwork: string;
+  duration: number;
+};
+
+export type InactiveRoomMusic = MusicMetadata & {
+  position: number;
   liked: boolean;
+  addedBy: Participant;
 };
 
 export type Participant = {
