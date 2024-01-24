@@ -36,15 +36,25 @@ export default function RoomIO(
   socket.onAny(
     async (
       event: string,
-      urlRaw: string /*, callback: (arg0: any) => void*/
+      params: string /*, callback: (arg0: any) => void*/
     ) => {
+      const number = Number.parseInt(params);
       switch (event) {
-      case "queue:add":
-        await room?.add(urlRaw);
-        break;
-      case "queue:remove":
-        await room?.remove(urlRaw);
-        break;
+        case "queue:add":
+          await room.add(params);
+          break;
+        case "queue:removeLink":
+          await room.removeWithLink(params);
+          break;
+        case "queue:remove":
+          if (Number.isSafeInteger(number)) {
+            if (0 <= number && number < room.size()) {
+              await room.removeWithIndex(number);
+            }
+          } else {
+            await room.removeWithLink(params);
+          }
+          break;
       }
 
       // TODO replace by callback and remove emit here : "Acknowledgements" CANCELED
