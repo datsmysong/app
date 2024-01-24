@@ -1,12 +1,25 @@
-import { User } from "@supabase/supabase-js";
-import { RoomHistory, RoomUser } from "commons/database-types-utils";
-import { Participant, ProcessedRoom } from "commons/room-types";
+import { QueryData, User } from "@supabase/supabase-js";
+import {
+  Profile,
+  RoomHistory,
+  UserProfile,
+} from "commons/database-types-utils";
+import {
+  InactiveRoomMusic,
+  MusicMetadata,
+  Participant,
+  ProcessedRoom,
+} from "commons/room-types";
 import { FastifyReply, FastifyRequest } from "fastify";
 import createClient from "../lib/supabase";
+import { adminSupabase } from "../server";
 
 export interface QueryParams {
   id: string;
 }
+
+type ReturnedRoomData = QueryData<ReturnType<typeof query>>[0];
+
 /*
  * This function is a workaround for the lack of support for the Intl.DurationFormat API in Expo
  * See https://www.30secondsofcode.org/js/s/format-duration/
@@ -32,19 +45,36 @@ function isLiked(song: RoomHistory, user: User): boolean {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getSongMetadata(song: RoomHistory) {
+function getSongMetadata(song: RoomHistory): MusicMetadata {
   return {
     name: "In The Name Of Love",
     artist: "Martin Garrix, Bebe Rexha",
     genre: "Rock",
     duration: 361,
+    artwork: "https://unsplash.it/300/300",
   };
 }
 
-const usePlayedSongs = (roomHistory: RoomHistory[], user: User) => {
-  return roomHistory.map((song) => {
+const usePlayedSongs = (
+  room: ReturnedRoomData,
+  user: User
+): (InactiveRoomMusic | null)[] => {
+  return room.room_history.map((song) => {
     const liked = isLiked(song, user);
     const metadata = getSongMetadata(song);
+
+    const songProfile = song.profile as unknown as Profile & {
+      userProfile: UserProfile | null;
+    };
+    const roomUsers = Array.isArray(room.room_users)
+      ? room.room_users
+      : [room.room_users];
+
+    const profileId = songProfile.id;
+    const addedBy = roomUsers.find(
+      (roomUser) => roomUser.profile_id === profileId
+    );
+    if (!addedBy || !addedBy.profile) return null;
 
     return {
       name: metadata.name,
@@ -53,35 +83,33 @@ const usePlayedSongs = (roomHistory: RoomHistory[], user: User) => {
       genre: metadata.genre,
       duration: metadata.duration,
       liked: liked,
+      artwork: metadata.artwork,
+      addedBy: {
+        banned: addedBy.banned,
+        joinedAt: addedBy.joined_at,
+        profile: addedBy.profile,
+        roomId: addedBy.room_id,
+      },
     };
   });
 };
 
-type RoomUserWithProfile = RoomUser & {
-  profile: {
-    id: string;
-    nickname: string;
-    created_at: string;
-    user_profile?: {
-      user_profile_id: string;
-      username: string;
-      avatar: string;
-      account_id: string;
-    };
-  };
-};
-
-function getParticipants(roomUsers: RoomUserWithProfile[]): Participant[] {
+function getParticipants(
+  roomUsers: ReturnedRoomData["room_users"]
+): (Participant | null)[] {
   const arrayRoomUsers = Array.isArray(roomUsers) ? roomUsers : [roomUsers];
 
   return arrayRoomUsers.map((participant) => {
-    if (participant.profile.user_profile) {
+    const participantProfile = participant.profile;
+    if (!participantProfile) return null;
+
+    if (participantProfile.user_profile) {
       return {
         profile: {
-          id: participant.profile.id,
-          nickname: participant.profile.nickname,
-          created_at: participant.profile.created_at,
-          ...participant.profile.user_profile,
+          id: participantProfile.id,
+          nickname: participantProfile.nickname,
+          created_at: participantProfile.created_at,
+          ...participantProfile.user_profile,
         },
         joinedAt: participant.joined_at,
         roomId: participant.room_id,
@@ -91,8 +119,8 @@ function getParticipants(roomUsers: RoomUserWithProfile[]): Participant[] {
 
     return {
       profile: {
-        nickname: participant.profile.nickname,
-        id: participant.profile_id,
+        nickname: participantProfile.nickname,
+        id: participantProfile.id,
         created_at: new Date().toISOString(),
       },
       joinedAt: participant.joined_at,
@@ -101,9 +129,8 @@ function getParticipants(roomUsers: RoomUserWithProfile[]): Participant[] {
     };
   });
 }
-
 const useProcessRoom = (
-  room: Awaited<ReturnType<typeof fetchRoomData>>["data"],
+  room: ReturnedRoomData,
   user: User
 ): ProcessedRoom | null => {
   if (!room) return null;
@@ -126,7 +153,9 @@ const useProcessRoom = (
   }).format(roomEndingDate.getTime() - roomCreationData.getTime());
 
   const streamingService = room.streaming_services;
-  const playedSongs = usePlayedSongs(room.room_history, user);
+  const playedSongs = usePlayedSongs(room, user).filter(
+    (song) => song !== null
+  ) as InactiveRoomMusic[];
 
   let averageSongDuration = "0s";
   if (playedSongs.length >= 1) {
@@ -160,19 +189,13 @@ const useProcessRoom = (
     ? room.room_users
     : [room.room_users];
 
-  const filteredUsers = roomUsers
-    .filter((roomUser) => roomUser.profile !== null)
-    .map((roomUser) => {
-      return {
-        ...roomUser,
-        profile: {
-          ...roomUser.profile,
-          user_profile: roomUser.profile?.user_profile || undefined,
-        },
-      };
-    }) as RoomUserWithProfile[];
+  const filteredUsers = roomUsers.filter(
+    (roomUser) => roomUser.profile !== null
+  );
 
-  const participants = getParticipants(filteredUsers);
+  const participants = getParticipants(filteredUsers).filter(
+    (participant) => participant !== null
+  ) as Participant[];
 
   return {
     name,
@@ -221,15 +244,17 @@ export default async function RoomGET(
   const processedRoomData = useProcessRoom(data, user);
   reply.code(200).send(processedRoomData);
 }
+
 async function fetchRoomData(
   supabase: ReturnType<typeof createClient>,
   id: string
 ) {
-  return await supabase
+  return await query().eq("id", id).single();
+}
+
+const query = () =>
+  adminSupabase
     .from("rooms")
     .select(
-      "*, room_users(*, profile(*, user_profile(*))), room_history(*), streaming_services(*)"
-    )
-    .eq("id", id)
-    .single();
-}
+      "*, room_users(*, profile(*, user_profile(*))), room_history(*, profile(*, user_profile(*))), streaming_services(*)"
+    );
