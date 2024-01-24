@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import InfoCard from "./InfoCard";
+import InactiveMusic from "./Music";
 import { Text, View } from "./Tamed";
+import H2 from "./text/H2";
 import { getApiUrl } from "../lib/apiUrl";
 import useSupabaseUser from "../lib/useSupabaseUser";
 
@@ -83,7 +85,14 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
               title="Participants"
             />
           </View>
-          <Text>{processedRoom.name}</Text>
+          <View>
+            <H2>
+              Historique des musiques ({processedRoom.playedSongs.length + ""})
+            </H2>
+            {processedRoom.playedSongs.map((song) => {
+              return <InactiveMusic key={song.name} music={song} />;
+            })}
+          </View>
         </>
       )}
       {!processedRoom && !error && <Text>Chargement...</Text>}
