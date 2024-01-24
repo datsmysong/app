@@ -1,32 +1,55 @@
+import { UserProfile } from "commons/database-types-utils";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Keyboard } from "react-native";
 
+import Alert from "../../../components/Alert";
 import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 import { Text, View } from "../../../components/Tamed";
 import { supabase } from "../../../lib/supabase";
+import { useUserProfile } from "../../../lib/userProfile";
 
 export default function JoinRoom() {
   const [roomCode, setRoomCode] = useState("");
   const [isTextPresent, setIsTextPresent] = useState(false);
   const [noRoomFound, setNoRoomFound] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      setUserProfile(await useUserProfile());
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     setIsTextPresent(roomCode.length > 0);
   }, [roomCode]);
 
-  //TODO: When feat/room-links is merged, add the user to the room in the database.
+  const joinRoom = async (roomId: string) => {
+    if (!userProfile) return { error: "Unauthorized" };
+
+    const { error: roomUsersError } = await supabase.from("room_users").insert({
+      room_id: roomId,
+      profile_id: userProfile.user_profile_id,
+    });
+
+    return { error: roomUsersError };
+  };
+
   const searchRoom = async () => {
     Keyboard.dismiss();
 
-    const { data: room, error: roomError } = await supabase
+    const { data: activeRoom, error: activeRoomError } = await supabase
       .from("active_rooms")
-      .select("id")
+      .select("*")
       .eq("code", roomCode)
       .single();
 
-    if (roomError) {
+    if (activeRoomError) {
       setNoRoomFound(true);
       setTimeout(() => {
         setNoRoomFound(false);
@@ -34,7 +57,17 @@ export default function JoinRoom() {
       return;
     }
 
-    router.replace(`/rooms/${room.id}`);
+    const { error: roomUsersError } = await joinRoom(activeRoom.id);
+
+    /**
+     * This returns an error even when the user is already in the room
+     * so we should prevent him to go back to this page if he is in a room, unless he leaves it
+     */
+    if (roomUsersError) {
+      return Alert.alert("Impossible de rejoindre la salle d'écoute");
+    }
+
+    router.replace(`/rooms/${activeRoom.id}`);
   };
 
   return (
