@@ -10,7 +10,7 @@ import Button from "../Button";
 import { Text } from "../Themed";
 
 interface Props {
-  onImageLoad: () => Promise<void>;
+  onImageLoad: () => void;
 }
 
 const Avatar = forwardRef((props: Props, ref) => {
@@ -44,7 +44,6 @@ const Avatar = forwardRef((props: Props, ref) => {
       console.log("no data");
       return;
     }
-    console.log("link", data.publicUrl);
     setAvatarUrl(data.publicUrl);
   }
 
@@ -78,8 +77,6 @@ const Avatar = forwardRef((props: Props, ref) => {
       return;
     }
     setUploading(true);
-
-    console.log("start");
 
     const file = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,

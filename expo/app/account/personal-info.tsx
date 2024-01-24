@@ -36,18 +36,17 @@ export default function PersonalInfo() {
         <View>
           <Avatar
             ref={avatarRef}
-            size={200}
             onImageLoad={() => {
               setInputChanged({ ...inputChanged, profilePicture: true });
             }}
           />
         </View>
-        <Button block onPress={() => {}}>
+        <Button block onPress={handleSubmit} disabled={loading}>
           Sauvegarer
         </Button>
       </View>
       <View style={styles.container}>
-        <Button type="outline" block disabled={loading}>
+        <Button type="outline" block>
           Supprimer mon compte
         </Button>
       </View>
