@@ -10,7 +10,7 @@ import { Text, View } from "../Themed";
 export default function TrackItem(prop: { track: JSONTrack; index: number }) {
   const {
     title,
-    artistName: artist,
+    artistsName: artists,
     albumName: album,
     imgUrl: rawImageUrl,
   } = prop.track;
