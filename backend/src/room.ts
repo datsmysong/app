@@ -116,11 +116,17 @@ export function endRoom(roomId: string) {
 
 export default class Room {
   public readonly uuid: string;
-  private readonly tracks: Set<JSONTrack>;
+  private readonly tracks: JSONTrack[];
+  private readonly trackFactory: TrackFactory;
 
   private constructor() {
     this.uuid = randomUUID();
-    this.tracks = new Set();
+    this.tracks = [];
+
+    this.trackFactory = new TrackFactory();
+    this.trackFactory.register(
+      new Spotify()
+    ) /*, new SoundCloud(), new AppleMusic()*/;
   }
 
   static newRoom(roomStorage: RoomStorage): Room {
@@ -138,40 +144,50 @@ export default class Room {
   }
 
   async add(rawUrl: string | URL) {
-    // let track = new URL(rawUrl).toString();
-    const trackFactory = new TrackFactory();
-    trackFactory.register(
-      new Spotify()
-    ) /*, new SoundCloud(), new AppleMusic()*/;
-
-    const trackMetadata = trackFactory.fromUrl(new URL(rawUrl));
+    const trackMetadata = this.trackFactory.fromUrl(new URL(rawUrl));
     if (trackMetadata !== null) {
       const track = await trackMetadata.toJSON();
       if (track !== null) {
-        this.tracks.add(track);
-        return true;
+        if (!this.tracks.map((value) => value.url).includes(track.url)) {
+          this.tracks.push(track);
+          return true;
+        }
       }
     }
     return false;
   }
 
-  async remove(rawUrl: string | URL) {
+  async removeWithLink(rawUrl: string | URL) {
+    // try to get the uniform URL of track from lambda url
+    let trackURL = null;
+    const trackMetadata = this.trackFactory.fromUrl(new URL(rawUrl));
+    if (trackMetadata !== null) {
+      const track = await trackMetadata.toJSON();
+      if (track !== null) {
+        trackURL = new URL(track.url).toString();
+      }
+    }
+
     let track;
     for (track of this.tracks) {
-      // replace by TrackFabrique to improve this like add
-      if (track.url === new URL(rawUrl).toString()) {
-        break;
+      if (trackURL !== null) {
+        if (track.url === trackURL) {
+          return await this.removeWithIndex(this.tracks.indexOf(track));
+        }
       }
     }
-    if (track !== undefined) return this.tracks.delete(track);
     return false;
   }
 
-  getTracksString(): string[] {
-    return [...JSON.stringify(this.tracks)];
+  async removeWithIndex(index: number) {
+    return this.tracks.splice(index, 1).length !== 0;
   }
 
   getTracks(): JSONTrack[] {
     return [...this.tracks];
+  }
+
+  size(): number {
+    return this.tracks.length;
   }
 }
