@@ -17,18 +17,18 @@ export default async function AuthRegister(
   const { username, email, password } = body;
   const displayName = body.displayName ? body.displayName : username;
 
-  const verification = await verifyInformations({
+  const { message, valid } = await verifyInformations({
     username: username,
     email: email,
     password: password,
     displayName: displayName,
   });
 
-  if (!verification.valid) {
-    return reply.status(400).send({ error: verification.message });
+  if (!valid) {
+    return reply.status(400).send({ error: message });
   }
 
-  const urlBackend = process.env.BACKEND_URL;
+  const urlFront = process.env.FRONT_END_URL;
 
   const {
     data: { user },
@@ -37,7 +37,7 @@ export default async function AuthRegister(
     email: email,
     password: password,
     options: {
-      emailRedirectTo: urlBackend,
+      emailRedirectTo: urlFront,
     },
   });
 
@@ -45,7 +45,7 @@ export default async function AuthRegister(
     return reply.status(400).send({ error: "Registration failed!" });
   }
 
-  const usernameTaken = await usernameAlreadyExist(body.username);
+  const usernameTaken = await isUsernameTaken(body.username);
   if (usernameTaken) {
     return reply.code(409).send({ error: "This username is taken" });
   }
@@ -88,7 +88,7 @@ const verifyInformations = async (body: BodyParams) => {
   return { valid: true };
 };
 
-const usernameAlreadyExist = async (username: string) => {
+const isUsernameTaken = async (username: string) => {
   const { data, error } = await adminSupabase
     .from("user_profile")
     .select("username")

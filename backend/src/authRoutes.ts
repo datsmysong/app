@@ -22,7 +22,8 @@ export default function authRoutes(
       schema: {
         body: {
           type: "object",
-          required: ["email", "password"],
+          // Display name is optional
+          required: ["email", "password", "username"],
           properties: {
             email: { type: "string" },
             password: { type: "string" },

@@ -63,6 +63,7 @@ export default function Register() {
         message: "Ce nom d'utilisateur est déjà pris",
       });
     }
+    Alert.alert("Une erreur est survenue, veuillez réessayer plus tard.");
   };
 
   return (
@@ -92,8 +93,9 @@ export default function Register() {
           rules={{
             required: "Un nom d'utilisateur est requis",
             minLength: {
-              value: 5,
-              message: "Le nom d'utilisateur est trop court",
+              value: 3,
+              message:
+                "Le nom d'utilisateur doit contenir au moins 3 caractères",
             },
           }}
           placeholder={"Nom d'utilisateur"}

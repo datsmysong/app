@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 
@@ -13,12 +13,21 @@ type LoginForm = {
   password: string;
 };
 
+enum AuthError {
+  EmailNotConfirmed = "Email not confirmed",
+  InvalidCredentials = "Invalid credentials",
+}
+
 export default function Login() {
+  const [resendEmail, setResendEmail] = React.useState(false);
   const {
     control,
     handleSubmit,
     setError,
-    formState: { errors },
+    getValues,
+    reset,
+
+    formState: { errors, isDirty },
   } = useForm<LoginForm>({
     defaultValues: {
       email: "",
@@ -33,19 +42,61 @@ export default function Login() {
       password,
     });
     if (error) {
-      setError("root", {
-        message: "Informations d'authentification incorrects",
+      // Logic to handle when user change a input after a failed login
+      reset({ email, password }, { keepDirty: false });
+      if (error.message === AuthError.EmailNotConfirmed) {
+        setResendEmail(true);
+        return;
+      }
+      if (error.message === AuthError.InvalidCredentials) {
+        return setError("password", {
+          message: "Identifiants incorrects",
+        });
+      }
+      return setError("root", {
+        message: error.message,
       });
-      return;
     }
     router.replace("/(tabs)");
   };
 
+  useEffect(() => {
+    if (isDirty && resendEmail) setResendEmail(false);
+  }, [isDirty]);
+
+  const handleResendEmail = async () => {
+    const email = getValues("email");
+    setResendEmail(false);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      // confirm email will be set in issue #67
+    });
+    if (error) {
+      setError("root", {
+        message: error.message,
+      });
+    }
+    router.replace("/auth/");
+  };
+
   return (
-    <View style={styles.page}>
+    <View
+      style={[
+        styles.page,
+        resendEmail || errors.root ? { paddingTop: 20 } : { paddingTop: 51 },
+      ]}
+    >
       <View style={styles.form}>
         {errors.root && errors.root.message && (
           <Warning label={errors.root.message} />
+        )}
+        {resendEmail && (
+          <Warning label="Veuillez confirmer votre compte via le lien reçu par mail.">
+            <Button size="small" onPress={handleResendEmail} block>
+              Renvoyer le mail
+            </Button>
+          </Warning>
         )}
         <ControlledInput
           control={control}
@@ -115,7 +166,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 51,
+    paddingBottom: 51,
     paddingHorizontal: 20,
   },
   text: {
