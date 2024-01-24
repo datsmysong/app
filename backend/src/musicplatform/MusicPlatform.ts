@@ -1,7 +1,6 @@
 import { JSONTrack } from "commons/Backend-types";
 
 export default abstract class MusicPlatform {
-  private static readonly musicPlatformsList = new Map<string, MusicPlatform>();
   private readonly urlPattern: RegExp;
 
   protected constructor(urlPattern: RegExp) {
@@ -15,12 +14,6 @@ export default abstract class MusicPlatform {
           "seul un groupe doit se trouver dans le pattern, et doit retourner l'identifiant unique de l'élément"
       );
     }
-
-    MusicPlatform.musicPlatformsList.set(MusicPlatform.constructor.name, this);
-  }
-
-  static getMusicPlatform(key: string): MusicPlatform | undefined {
-    return this.musicPlatformsList.get(key);
   }
 
   trackIdFromUrl(url: URL): string | undefined {
