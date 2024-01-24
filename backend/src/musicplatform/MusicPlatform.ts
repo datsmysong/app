@@ -1,16 +1,13 @@
 import { JSONTrack } from "commons/Backend-types";
 
 export default abstract class MusicPlatform {
-  // private static singleton: any;
   private static readonly musicPlatformsList = new Map<string, MusicPlatform>();
   private readonly urlPattern: RegExp;
 
   protected constructor(urlPattern: RegExp) {
     this.urlPattern = new RegExp(urlPattern, "i");
     // check if urlPattern have only one capture group (this must capture the id of a track)
-    const resultRegex = new RegExp(this.urlPattern.toString() + "|")
-      .exec("")
-      ?.slice(1).length;
+    const resultRegex = getNbCapturingGroupRegex(this.urlPattern);
     if (resultRegex !== 1) {
       // TODO remove throw and make like TrackFactory (think to watch history of this file...)
       throw new Error(
@@ -40,4 +37,8 @@ export default abstract class MusicPlatform {
   }
 
   abstract getJsonTrack(id: string): Promise<JSONTrack>;
+}
+
+function getNbCapturingGroupRegex(regex: RegExp) {
+  return new RegExp(regex.toString() + "|").exec("")?.slice(1).length;
 }
