@@ -7,11 +7,12 @@ export default abstract class MusicPlatform {
 
   protected constructor(urlPattern: RegExp) {
     this.urlPattern = new RegExp(urlPattern, "i");
-    // let checkRegex = /^\/(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\([^?](?:[^(]|[^\\]\\\(|[^\\]\(\?)*\)(?:[^(]|[^\\]\\\(|[^\\]\(\?)*\/.*$/
+    // check if urlPattern have only one capture group (this must capture the id of a track)
     const resultRegex = new RegExp(this.urlPattern.toString() + "|")
       .exec("")
       ?.slice(1).length;
     if (resultRegex !== 1) {
+      // TODO remove throw and make like TrackFactory (think to watch history of this file...)
       throw new Error(
         "il y a plusieurs groupe de capture\n" +
           "seul un groupe doit se trouver dans le pattern, et doit retourner l'identifiant unique de l'élément"
