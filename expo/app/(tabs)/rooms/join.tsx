@@ -16,6 +16,7 @@ export default function JoinRoom() {
     setIsTextPresent(roomCode.length > 0);
   }, [roomCode]);
 
+  //TODO: When feat/room-links is merged, add the user to the room in the database.
   const searchRoom = async () => {
     Keyboard.dismiss();
 
