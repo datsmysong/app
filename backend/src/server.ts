@@ -1,17 +1,17 @@
-import type { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "commons/database-types";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import path from "path";
 import { Server } from "socket.io";
-import AuthCallbackGET from "./route/AuthCallbackGET";
-import AuthRedirectionGET from "./route/AuthRedirectionGET";
+import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
+import fastifyCookie from "@fastify/cookie";
+import { FastifyCookieOptions } from "@fastify/cookie";
+import { Database } from "commons/database-types";
 
 config({ path: path.resolve(__dirname, "../.env.local") });
 
@@ -25,16 +25,23 @@ const server = fastify({
 
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   throw new Error(
-    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable",
+    "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variable"
+  );
+}
+
+if (!process.env.FRONTEND_URL) {
+  throw new Error(
+    "Missing FRONTEND_URL environment variable, check .env.local.example file"
   );
 }
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
-  process.env.SERVICE_ROLE,
+  process.env.SERVICE_ROLE
 );
 
 server.register(fastifyIO);
-server.register(require("@fastify/cookie"), {
+
+server.register(fastifyCookie, {
   secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
   hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
   parseOptions: {}, // options for parsing cookies
@@ -47,9 +54,15 @@ server.register(fastifyCors, {
   credentials: true, // or true to reflect origin
 });
 
+// timeWindow : It can be expressed in milliseconds or as a string (in the ms format)
+// https://github.com/vercel/ms
+server.register(import("@fastify/rate-limit"), {
+  max: 50,
+  timeWindow: "1 minute",
+});
+
 // Auth
-server.get("/auth/callback", AuthCallbackGET);
-server.get("/auth/redirection", AuthRedirectionGET);
+server.register(authRoutes, { prefix: "/auth" });
 
 server.get("/streaming-services", StreamingServicesGET);
 
