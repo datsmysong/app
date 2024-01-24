@@ -12,6 +12,7 @@ export default async function useSupabaseUser() {
   return user;
 }
 
+// create real hook
 export function useSupabaseUserHook(): User | null {
   const [user, setUser] = useState<User | null>(null);
 
