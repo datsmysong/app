@@ -143,8 +143,8 @@ export default class Room {
     }
   }
 
-  async add(rawUrl: string | URL) {
-    const trackMetadata = this.trackFactory.fromUrl(new URL(rawUrl));
+  async add(rawUrl: string) {
+    const trackMetadata = this.trackFactory.fromUrl(rawUrl);
     if (trackMetadata !== null) {
       const track = await trackMetadata.toJSON();
       if (track !== null) {
@@ -157,10 +157,10 @@ export default class Room {
     return false;
   }
 
-  async removeWithLink(rawUrl: string | URL) {
+  async removeWithLink(rawUrl: string) {
     // try to get the uniform URL of track from lambda url
     let trackURL = null;
-    const trackMetadata = this.trackFactory.fromUrl(new URL(rawUrl));
+    const trackMetadata = this.trackFactory.fromUrl(rawUrl);
     if (trackMetadata !== null) {
       const track = await trackMetadata.toJSON();
       if (track !== null) {

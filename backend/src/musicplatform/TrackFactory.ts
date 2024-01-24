@@ -21,11 +21,18 @@ export default class TrackFactory {
     return true;
   }
 
-  fromUrl(url: URL): TrackMetadata | null {
+  fromUrl(rawUrl: string | URL): TrackMetadata | null {
+    if (!URL.canParse(rawUrl)) {
+      return null;
+    }
+    const url = new URL(rawUrl);
     for (const musicPlatform of this.musicPlatformsList.values()) {
       const trackId = musicPlatform.trackIdFromUrl(url);
       if (trackId) {
-        const { data: track, error } = TrackMetadata.newTrackMetadata(musicPlatform, { id: trackId });
+        const { data: track, error } = TrackMetadata.newTrackMetadata(
+          musicPlatform,
+          { id: trackId }
+        );
         if (!error) {
           return track;
         }
