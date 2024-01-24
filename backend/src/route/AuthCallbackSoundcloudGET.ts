@@ -11,10 +11,10 @@ export default async function AuthCallbackSoundcloudGET(
   request: FastifyRequest,
   response: FastifyReply
 ) {
-  const directUri = request.url;
+  const directUri = request.hostname;
   const baseUrl = directUri.includes("exp://")
-    ? "http://" + directUri.split(":8081")[0].split("//")[1]
-    : directUri.split(":8081")[0] + ":3000";
+    ? "http://" + directUri.split(":3000")[0].split("//")[1]
+    : "http://" + directUri.split(":3000")[0] + ":3000";
 
   const code = (request.query as QueryParams).code;
   if (!code) {
@@ -50,6 +50,9 @@ export default async function AuthCallbackSoundcloudGET(
   const accessToken = json.access_token;
   const refreshToken = json.refresh_token;
   const serviceId = StreamingService.SoundCloud.id;
+  if (!accessToken || !refreshToken) {
+    return response.code(400).send({ error: "Missing tokens" });
+  }
 
   const userProfileId = await getCurrentUser(request, response);
   const boundServiceRes = await BoundService(
