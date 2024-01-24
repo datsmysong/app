@@ -34,7 +34,6 @@ export default function JoinRoom() {
       return;
     }
 
-    // The user should not be able to go back to the search page if he is already in a room.
     router.replace(`/rooms/${room.id}`);
   };
 
