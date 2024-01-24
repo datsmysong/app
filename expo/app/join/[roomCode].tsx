@@ -83,10 +83,9 @@ export default function JoinPage() {
         .from("room_users")
         .select("*")
         .eq("profile_id", userProfile.user_profile_id)
-        .eq("room_id", roomId)
-        .single();
+        .eq("room_id", roomId);
 
-      setIsParticipant(!!data);
+      setIsParticipant((data?.length ?? 0) > 0);
     };
 
     fetchParticipant();
@@ -121,6 +120,7 @@ export default function JoinPage() {
     if (!roomId) return { error: "Unknown room" };
 
     if (isParticipant) return { error: null };
+    console.log("user", userProfile);
 
     const { error: roomUsersError } = await supabase.from("room_users").insert({
       room_id: roomId,
