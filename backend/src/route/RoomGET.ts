@@ -63,6 +63,11 @@ const usePlayedSongs = (
     const liked = isLiked(song, user);
     const metadata = getSongMetadata(song);
 
+    /**
+     * This is ugly as hell, but Supabase is lying about its types...
+     * song.profile and room.room_users are typed as arrays, but they can be
+     * single elements instead
+     */
     const songProfile = song.profile as unknown as Profile & {
       userProfile: UserProfile | null;
     };
