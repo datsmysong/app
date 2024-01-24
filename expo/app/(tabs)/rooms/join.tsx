@@ -1,10 +1,11 @@
-import { StyleSheet, Keyboard } from "react-native";
-import { Text, View } from "../../../components/Tamed";
-import CustomTextInput from "../../../components/CustomTextInput";
-import { useEffect, useState } from "react";
-import { supabase } from "../../../lib/supabase";
-import Button from "../../../components/Button";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, Keyboard } from "react-native";
+
+import Button from "../../../components/Button";
+import CustomTextInput from "../../../components/CustomTextInput";
+import { Text, View } from "../../../components/Tamed";
+import { supabase } from "../../../lib/supabase";
 
 export default function JoinRoom() {
   const [roomCode, setRoomCode] = useState("");
@@ -15,10 +16,8 @@ export default function JoinRoom() {
     setIsTextPresent(roomCode.length > 0);
   }, [roomCode]);
 
-  const onSubmitSearchRoom = async (roomCode: string) => {
-    if (!roomCode) {
-      return;
-    }
+  const onSubmitSearchRoom = async () => {
+    Keyboard.dismiss();
 
     const { data: room, error: roomError } = await supabase
       .from("active_rooms")
@@ -27,7 +26,6 @@ export default function JoinRoom() {
       .single();
 
     if (roomError) {
-      Keyboard.dismiss();
       setNoRoomFound(true);
       setTimeout(() => {
         setNoRoomFound(false);
@@ -45,14 +43,14 @@ export default function JoinRoom() {
         placeholder="Code de la salle"
         value={roomCode}
         onChangeText={setRoomCode}
-        onSubmitEditing={() => onSubmitSearchRoom(roomCode)}
+        onSubmitEditing={() => onSubmitSearchRoom()}
       />
       <Button
         type="filled"
         block
         disabled={!isTextPresent}
         appendIcon="arrow-forward"
-        onPress={() => onSubmitSearchRoom(roomCode)}
+        onPress={() => onSubmitSearchRoom()}
       >
         Rejoindre
       </Button>
