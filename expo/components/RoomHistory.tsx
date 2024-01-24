@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native";
 
 import InfoCard from "./InfoCard";
 import { Text, View } from "./Tamed";
+import { getApiUrl } from "../lib/apiUrl";
 import useSupabaseUser from "../lib/useSupabaseUser";
 
 type RoomHistoryProps = {
@@ -29,9 +30,11 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
     fetchUser();
   }, []);
 
+  const apiUrl = getApiUrl();
+
   useEffect(() => {
     const fetchProcessedRoomData = async () => {
-      const data = await fetch(`http://localhost:3000/rooms/${roomId}`, {
+      const data = await fetch(`${apiUrl}/rooms/${roomId}`, {
         method: "GET",
         credentials: "include",
         headers: {
