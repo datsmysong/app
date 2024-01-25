@@ -28,13 +28,7 @@ export default class TrackFactory {
     for (const musicPlatform of this.musicPlatformsList.values()) {
       const trackId = musicPlatform.trackIdFromUrl(url);
       if (trackId) {
-        const { data: track, error } = TrackMetadata.newTrackMetadata(
-          musicPlatform,
-          { id: trackId }
-        );
-        if (!error) {
-          return track;
-        }
+        return new TrackMetadata(musicPlatform, trackId);
       }
     }
     return null;
