@@ -9,7 +9,6 @@ Notre application permet de :
 - Générer un lien vers une salle d'écoute
 - Rejoindre une salle d'écoute via un lien (seulement en tant qu'utilisateur connecté)
 - Ajouter une musique à la file d'attente (backend)
-- Consulter la file d'attente d'une salle d'écoute avec une écoute en utilisant un websocket
 - Créer un compte à partir d’une adresse email et d’un mot de passe
 
 Certaines fonctionnalités n'ont pas pu être terminées à temps :
@@ -18,6 +17,8 @@ Certaines fonctionnalités n'ont pas pu être terminées à temps :
 - Créer la logique des interactions avec les plateformes de musique
 - Implémenter la logique pour chaque plateforme de streaming
 - Gérer son compte (partie information personnels: avatar, changer de pseudo, d’email..)
+- Consulter la file d'attente d'une salle d'écoute avec une écoute en utilisant un websocket
+
 
 ### Bugs
 
@@ -29,5 +30,6 @@ Toutes les fonctionnalités présentes sur le main du dépôt ont été vérifi�
 
 ## Conformité des choix de cette itération par rapport à l'étude préalable
 
-- De légères modifications de types sur la base de données
-- Ajout de maquettes nécessaires pour la page de la salle active
+- Ajout de maquettes
+  - écran de partage d'une salle active
+  - page d'une salle d'écoute passée
