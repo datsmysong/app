@@ -20,10 +20,6 @@ export default async function AuthCallbackBindSpotifyGET(
       .code(400)
       .send({ error: "Missing cookie auth-token-code-verifier " });
   }
-  const supabase = createClient({
-    request,
-    response,
-  });
   const code = (
     request.query as {
       code: string;

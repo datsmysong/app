@@ -95,27 +95,14 @@ server.register(import("@fastify/rate-limit"), {
   timeWindow: "1 minute",
 });
 
-const BoundServicePOSTSchema = {
-  body: {
-    type: "object",
-    required: ["accessToken", "refreshToken", "serviceId", "userProfileId"],
-    properties: {
-      accessToken: { type: "string" },
-      refreshToken: { type: "string" },
-      serviceId: { type: "string" },
-      userProfileId: { type: "string" },
-    },
-  },
-};
-
 // Auth
 server.get("/", AuthCallbackSoundcloudGET); // / route is used until soundcloud change the redirection url
 server.get("/user/bound", BoundServicesGET);
 server.register(authRoutes, { prefix: "/auth" });
-server.get("auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
+server.get("/auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
 
 server.get("/streaming-services", StreamingServicesGET);
-server.post("/streaming-service/:uuid", UnbindServicePOST);
+server.delete("/streaming-service/:uuid", UnbindServicePOST);
 
 const createRoomSchema = {
   body: {

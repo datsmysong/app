@@ -59,7 +59,7 @@ export default function ProfileIntegration() {
   const unbindService = (serviceId: string) => {
     // If I do a DELETE request, I get a CORS error
     fetch(baseUrl + "/streaming-service/" + serviceId, {
-      method: "POST",
+      method: "DELETE",
       credentials: "include",
     })
       .then((resUnbound) => {

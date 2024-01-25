@@ -21,18 +21,12 @@ export default async function AuthCallbackSoundcloudGET(
     return response.code(400).send({ error: "Missing code" });
   }
 
-  if (
-    !process.env.SOUNDCLOUD_CLIENT_ID ||
-    !process.env.SOUNDCLOUD_CLIENT_SECRET
-  ) {
-    throw new Error(
-      "Missing SOUNDCLOUD_CLIENT_ID or SOUNDCLOUD_CLIENT_SECRET environment variable"
-    );
-  }
-
   const bodyParams = new URLSearchParams();
-  bodyParams.append("client_id", process.env.SOUNDCLOUD_CLIENT_ID);
-  bodyParams.append("client_secret", process.env.SOUNDCLOUD_CLIENT_SECRET);
+  bodyParams.append("client_id", process.env.SOUNDCLOUD_CLIENT_ID || "");
+  bodyParams.append(
+    "client_secret",
+    process.env.SOUNDCLOUD_CLIENT_SECRET || ""
+  );
   bodyParams.append("grant_type", "authorization_code");
   bodyParams.append("redirect_uri", baseUrl);
   bodyParams.append("code", code);
