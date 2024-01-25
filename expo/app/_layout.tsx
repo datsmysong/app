@@ -1,13 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { NavigationState } from "@react-navigation/native";
-import {useFonts} from "expo-font";
-import {SplashScreen, Stack} from "expo-router";
-import {useEffect} from "react";
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import {
@@ -75,7 +67,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav/>;
+  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
@@ -113,16 +105,11 @@ function RootLayoutNav() {
           });
         },
       })}
-    ><Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+    >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{presentation: "modal"}}/>
-      <Stack.Screen
-        name="ask-name"
-        options={{headerShown: false }} />
-      <Stack.Screen
-        name="musicQueue/[id]"
-        options={{presentation: "modal", title: "File d'attente"}}
-      />
+      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+      <Stack.Screen name="ask-name" options={{ headerShown: false }} />
     </Stack>
   );
 }

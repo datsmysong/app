@@ -3,9 +3,9 @@ import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
 import Spotify from "./musicplatform/Spotify";
 import { randomUUID } from "node:crypto";
-import RoomStorage from "./RoomStorage";
 import TrackFactory from "./musicplatform/TrackFactory";
-import { JSONTrack, RoomJSON } from "commons/Backend-types";
+import { JSONTrack, RoomJSON } from "commons/backend-types";
+import RoomStorage from "./RoomStorage";
 
 interface Error {
   error: { message: string };

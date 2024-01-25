@@ -5,18 +5,14 @@ import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
-import RoomGET from "./route/RoomGET";
-import RoomPOST from "./route/RoomPOST";
 import RoomIdGET from "./route/RoomIdGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
-import fastifyCookie from "@fastify/cookie";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import RoomIO from "./socketio/RoomIO";
-import HelloGet from "./route/HelloGET";
 
-config({path: ".env.local"});
+config({ path: ".env.local" });
 
 const server = fastify({
   logger: {

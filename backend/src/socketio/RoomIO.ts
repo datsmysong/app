@@ -31,7 +31,7 @@ export default function RoomIO(
     return;
   }
 
-  socket.emit("queue:update" /*"playlist"*/, Room.toJSON(room));
+  socket.emit("queue:update", Room.toJSON(room));
 
   socket.onAny(
     async (

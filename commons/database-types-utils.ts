@@ -1,4 +1,4 @@
-import { Database } from "./Database-types";
+import { Database } from "./database-types";
 // prettier-ignore
 export type BoundService = Database["public"]["Tables"]["bound_services"]["Row"];
 // prettier-ignore

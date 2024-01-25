@@ -1,26 +1,18 @@
+import { RoomJSON } from "commons/Backend-types";
 import { ActiveRoom } from "commons/database-types-utils";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, StyleSheet } from "react-native";
 
 import Alert from "../../../components/Alert";
-import {Button} from "../../../components/Button";
-import { supabase } from "../../../lib/supabase";
-
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { JSONTrack, RoomJSON } from "commons/Backend-types";
-import { Image } from "expo-image";
-import { RoomJSON } from "commons/Backend-types";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, ViewProps } from "react-native";
-
+import Button from "../../../components/Button";
 import { Text, View } from "../../../components/Themed";
 import TrackItem from "../../../components/room/TrackItem";
 import { getApiUrl } from "../../../lib/apiUrl";
 import SocketIo from "../../../lib/socketio";
+import { supabase } from "../../../lib/supabase";
 
 // TODO delete soon
 export interface MusicRoomParams {
@@ -44,7 +36,7 @@ const generatedInvitationLink = (currentUrl: string, roomCode: string) => {
 };
 
 // TODO socket io which refresh playlist on live
-export default function musicRoom() {
+export default function MusicRoom() {
   const { id } = useLocalSearchParams() as MusicRoomParams;
   const currentPageLink = Linking.useURL();
 
@@ -53,7 +45,24 @@ export default function musicRoom() {
 
   const [queue, setQueue] = useState<RoomJSON>();
 
-  const url: URL = new URL("/room/" + activeRoomId, getApiUrl());
+  const url: URL = new URL("/room/" + id, getApiUrl());
+
+  const handleShare = async () => {
+    if (!currentPageLink) {
+      Alert.alert("Aucun lien n'a été retourné");
+      return;
+    }
+
+    const roomCode = room?.code ?? "";
+    const invitationLink = generatedInvitationLink(currentPageLink, roomCode);
+
+    await Clipboard.setStringAsync(invitationLink);
+    setIsCopied(true);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 3000);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,30 +83,14 @@ export default function musicRoom() {
 
     fetchData();
 
-    const handleShare = async () => {
-      if (!currentPageLink) {
-        Alert.alert("Aucun lien n'a été retourné");
-        return;
-      }
+    // unused for the moment
+    // fetch(url)
+    //     .then(res => res.json())
+    //     .then((data: ActiveRoomSkeleton) => setData(data))
 
-      const roomCode = room?.code ?? "";
-      const invitationLink = generatedInvitationLink(currentPageLink, roomCode);
-
-      await Clipboard.setStringAsync(invitationLink);
-      setIsCopied(true);
-
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 3000);
-
-      // unused for the moment
-      // fetch(url)
-      //     .then(res => res.json())
-      //     .then((data: ActiveRoomSkeleton) => setData(data))
-
-      SocketIo.getInstance()
-        .getSocket(url.pathname)
-        .on("queue:update", (data: RoomJSON) => setQueue(data));
+    SocketIo.getInstance()
+      .getSocket(url.pathname)
+      .on("queue:update", (data: RoomJSON) => setQueue(data));
   }, []);
 
   return (
