@@ -1,4 +1,3 @@
-import { User } from "@supabase/supabase-js";
 import { UserProfile } from "commons/database-types-utils";
 import * as Linking from "expo-linking";
 import { router, useLocalSearchParams } from "expo-router";
@@ -7,17 +6,16 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 
 import Alert from "../../components/Alert";
 import Button from "../../components/Button";
-import { supabase } from "../../lib/supabase";
-import useSupabaseUser from "../../lib/useSupabaseUser";
+import { getParticipant, getRoomId, joinRoom } from "../../lib/room-utils";
+import { useUserProfile } from "../../lib/userProfile";
 
 export default function JoinPage() {
-  const { roomCode } = useLocalSearchParams();
+  const { roomCode } = useLocalSearchParams<{ roomCode: string }>();
   const isInsideApplication = Platform.OS !== "web";
 
-  const [user, setUser] = useState<User | null>();
-  const [userProfile, setUserProfile] = useState<UserProfile>();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>();
   const [isParticipant, setIsParticipant] = useState<boolean>();
-  const [roomId, setRoomId] = useState<string>("");
+  const [roomId, setRoomId] = useState<string>();
   const currentPageLink = Linking.useURL();
 
   /**
@@ -27,51 +25,25 @@ export default function JoinPage() {
   useEffect(() => {
     const fetchUser = async () => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const user = await useSupabaseUser();
-      setUser(user);
+      setUserProfile(await useUserProfile());
     };
-    const fetchRoomId = async () => {
-      const { data } = await supabase
-        .from("rooms")
-        .select("id")
-        .eq("code", roomCode)
-        .eq("is_active", true)
-        .single();
 
-      if (!data) {
-        Alert.alert("Aucune salle d'écoute n'a été trouvée avec ce code.");
-        return;
+    const fetchRoomId = async () => {
+      const { data: roomId, error: activeRoomsError } =
+        await getRoomId(roomCode);
+
+      if (activeRoomsError || !roomId) {
+        return Alert.alert(
+          "Aucune salle d'écoute n'a été trouvée avec ce code."
+        );
       }
-      setRoomId(data.id);
+
+      setRoomId(roomId);
     };
 
     fetchUser();
     fetchRoomId();
   }, []);
-
-  /**
-   * This effect fetches the user profile based on the user id.
-   */
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchData = async () => {
-      const { data: userProfile, error } = await supabase
-        .from("user_profile")
-        .select("*")
-        .eq("account_id", user.id)
-        .single();
-      if (error) {
-        Alert.alert(
-          "Une erreur est survenue lors de la récupération du profil"
-        );
-        return;
-      }
-      setUserProfile(userProfile);
-    };
-
-    fetchData();
-  }, [user]);
 
   /**
    * This effect fetches the participant based on the user profile and the room id.
@@ -80,11 +52,7 @@ export default function JoinPage() {
     if (!userProfile || !roomId) return;
 
     const fetchParticipant = async () => {
-      const { data } = await supabase
-        .from("room_users")
-        .select("*")
-        .eq("profile_id", userProfile.user_profile_id)
-        .eq("room_id", roomId);
+      const { data } = await getParticipant(roomId, userProfile);
 
       setIsParticipant((data?.length ?? 0) > 0);
     };
@@ -102,34 +70,15 @@ export default function JoinPage() {
     if (!userProfile || !isInsideApplication || !roomId) return;
 
     if (!isParticipant) {
-      joinRoom().then((r) => {
-        if (r?.error) {
-          console.log(r?.error);
-          return Alert.alert("Impossible de rejoindre la salle d'écoute");
+      joinRoom(roomId, userProfile, isParticipant).then((result) => {
+        if (result.error) {
+          return Alert.alert("Impossible de rejoindre la salle d'écoute.");
         }
       });
     }
-    router.replace(`rooms/${roomId}`);
+
+    router.replace(`/rooms/${roomId}`);
   }, [userProfile, isInsideApplication, roomId, isParticipant]);
-
-  /**
-   * Joins a room by inserting the user's profile into the room_users table.
-   * If the user is already a participant, it will act like he joined the room.
-   */
-  const joinRoom = async () => {
-    if (!userProfile) return { error: "Unauthorized" };
-    if (!roomId) return { error: "Unknown room" };
-
-    if (isParticipant) return { error: null };
-    console.log("user", userProfile);
-
-    const { error: roomUsersError } = await supabase.from("room_users").insert({
-      room_id: roomId,
-      profile_id: userProfile.user_profile_id,
-    });
-
-    return { error: roomUsersError };
-  };
 
   /**
    * Returns the app link based on the current environment and room code.
@@ -156,13 +105,14 @@ export default function JoinPage() {
    * Otherwise, it joins the room and replaces the current route with the room route.
    */
   async function handleContinueOnWebsite() {
-    if (isParticipant) return router.replace(`rooms/${roomId}`);
+    if (isParticipant) return router.replace(`/rooms/${roomId}`);
+    if (!roomId || userProfile === undefined) return;
 
-    const { error } = await joinRoom();
+    const { error } = await joinRoom(roomId, userProfile, isParticipant);
     if (error)
       return Alert.alert("Impossible de rejoindre la salle d'écoute: " + error);
 
-    router.replace(`rooms/${roomId}`);
+    router.replace(`/rooms/${roomId}`);
   }
 
   function handleAnonymousJoin() {

@@ -7,14 +7,13 @@ import Alert from "../../../components/Alert";
 import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 import { Text, View } from "../../../components/Tamed";
-import { joinRoom } from "../../../lib/room-utils";
-import { supabase } from "../../../lib/supabase";
+import { getParticipant, getRoomId, joinRoom } from "../../../lib/room-utils";
 import { useUserProfile } from "../../../lib/userProfile";
 
 export default function JoinRoom() {
-  const [roomCode, setRoomCode] = useState("");
-  const [isTextPresent, setIsTextPresent] = useState(false);
-  const [noRoomFound, setNoRoomFound] = useState(false);
+  const [roomCode, setRoomCode] = useState<string>("");
+  const [isTextPresent, setIsTextPresent] = useState<boolean>(false);
+  const [noRoomFound, setNoRoomFound] = useState<boolean>();
   const [userProfile, setUserProfile] = useState<UserProfile | null>();
   const [isParticipant, setIsParticipant] = useState<boolean>();
 
@@ -34,13 +33,9 @@ export default function JoinRoom() {
   const searchRoom = async () => {
     Keyboard.dismiss();
 
-    const { data: activeRoom, error: activeRoomError } = await supabase
-      .from("active_rooms")
-      .select("*")
-      .eq("code", roomCode)
-      .single();
+    const { data: roomId, error: activeRoomError } = await getRoomId(roomCode);
 
-    if (activeRoomError) {
+    if (activeRoomError || !roomId) {
       setNoRoomFound(true);
       setTimeout(() => {
         setNoRoomFound(false);
@@ -48,21 +43,31 @@ export default function JoinRoom() {
       return;
     }
 
-    const { error: roomUsersError } = await joinRoom(
-      activeRoom.id,
-      userProfile.user_profile_id,
-      isParticipant
-    );
+    if (userProfile === undefined)
+      return Alert.alert(
+        "Une erreur est survenue lors de la récupération de votre profil"
+      );
 
-    /**
-     * This returns an error even when the user is already in the room
-     * so we should prevent him to go back to this page if he is in a room, unless he leaves it
-     */
-    if (roomUsersError) {
-      return Alert.alert("Impossible de rejoindre la salle d'écoute");
+    const { data } = await getParticipant(roomId, userProfile);
+    setIsParticipant((data?.length ?? 0) > 0);
+
+    if (!isParticipant) {
+      const { error: roomUsersError } = await joinRoom(
+        roomId,
+        userProfile,
+        isParticipant
+      );
+
+      /**
+       * This returns an error even when the user is already in the room
+       * so we should prevent him to go back to this page if he is in a room, unless he leaves it
+       */
+      if (roomUsersError) {
+        return Alert.alert("Impossible de rejoindre la salle d'écoute");
+      }
     }
 
-    router.replace(`/rooms/${activeRoom.id}`);
+    router.replace(`/rooms/${roomId}`);
   };
 
   return (
