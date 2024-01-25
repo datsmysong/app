@@ -1,0 +1,16 @@
+Fonctionnalités et taches développées dans cette itération :
+
+Terminée
+- Générer un lien vers une salle d’écoute et rejoindre une salle d’écoute grâce à ce lien
+- Création de compte à partir d’une adresse email et d’un mot de passe
+- Modification du composant Bouton afin d’y ajouter une propriété de couleur
+
+
+Non achevé lors de cette itération
+- Créer le menu de paramétrage d’une salle d’écoute
+- Gérer son compte
+- Consulter la file d’attente d’une salle d’écoute
+- Gérer ses intégrations aux plateformes de streaming
+- Afficher un QR code sur l’écran de partage d’une salle
+- Consulter l’historique et les détails d’une salle passée
+- Rejoindre une salle d’écoute à l’aide d’un code
