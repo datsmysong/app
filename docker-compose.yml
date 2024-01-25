@@ -1,0 +1,6 @@
+version: "3.9"
+services:
+  backend:
+    build: .
+    ports:
+      - "127.0.0.1:8182:3000"
