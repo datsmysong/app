@@ -11,6 +11,7 @@ import { FastifyCookieOptions } from "@fastify/cookie";
 import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import RoomIO from "./socketio/RoomIO";
+import RoomGET from "./route/RoomGET";
 
 config({ path: ".env.local" });
 
@@ -96,7 +97,7 @@ server.get("/streaming-services", StreamingServicesGET);
 
 server.get("/room/:id", RoomIdGET);
 
-server.get("/rooms", RoomsGET);
+server.get("/rooms", RoomGET);
 
 // server.get("/track/spotify/:id", SpotifyGET);
 

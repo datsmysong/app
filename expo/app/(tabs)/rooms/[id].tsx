@@ -94,9 +94,9 @@ export default function MusicRoom() {
   }, []);
 
   return (
-    <View style={headerStyles.headerContainer}>
+    <View>
       {room && (
-        <View>
+        <View style={headerStyles.headerContainer}>
           <Text style={headerStyles.title}>Salle "{room.name}"</Text>
           <View style={headerStyles.buttonContainer}>
             {isCopied ? (
@@ -109,20 +109,20 @@ export default function MusicRoom() {
               </Button>
             )}
           </View>
-          <View style={styles.container}>
-            <Text style={styles.title}>
-              File d'attente ({queue?.tracks.length /* ?? 0*/})
-            </Text>
-            <FlatList
-              style={styles.list}
-              data={queue?.tracks}
-              renderItem={({ item, index }) => (
-                <TrackItem track={item} index={index + 1} />
-              )}
-            />
-          </View>
         </View>
       )}
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          File d'attente ({queue?.tracks.length /* ?? 0*/})
+        </Text>
+        <FlatList
+          style={styles.list}
+          data={queue?.tracks}
+          renderItem={({ item, index }) => (
+            <TrackItem track={item} index={index + 1} />
+          )}
+        />
+      </View>
     </View>
   );
 }

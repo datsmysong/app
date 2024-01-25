@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, TextInput } from "react-native";
 import Button from "../../../components/Button";
 
 export default function RoomsPage() {
-  const [value, setValue] = useState("");
-  const roomId = "956992d0-f039-47d1-9475-ccacf10104d7";
+  const [roomId, setRoomId] = useState("");
+  //const roomId = "956992d0-f039-47d1-9475-ccacf10104d7";
 
   return (
     <View style={styles.headerContainer}>
@@ -14,15 +14,16 @@ export default function RoomsPage() {
         <Button block href="/rooms/create">
           Créer une salle
         </Button>
+        <TextInput
+          onChangeText={setRoomId}
+          style={{ borderWidth: 1, width: "25%", minWidth: 300 }}
+          placeholder={
+            "Entrer l'identifiant de la salle d'écoute (Pas de base de donnée)"
+          }
+          placeholderTextColor="gray"
+        />
         <Button block type="outline" href={`/rooms/${roomId}`}>
           Rejoindre une salle
-        </Button>
-        <TextInput
-          onChangeText={setValue}
-          style={{ borderWidth: 1, width: "25%", minWidth: 300 }}
-        />
-        <Button href={`/rooms/${encodeURIComponent(value)}`}>
-          Current active room
         </Button>
       </View>
     </View>
