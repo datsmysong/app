@@ -116,12 +116,12 @@ export function endRoom(roomId: string) {
 
 export default class Room {
   public readonly uuid: string;
-  private readonly tracks: JSONTrack[];
+  private readonly queue: JSONTrack[];
   private readonly trackFactory: TrackFactory;
 
   private constructor() {
     this.uuid = randomUUID();
-    this.tracks = [];
+    this.queue = [];
 
     this.trackFactory = new TrackFactory();
     this.trackFactory.register(
@@ -137,7 +137,7 @@ export default class Room {
 
   static toJSON(room: Room | null | undefined): RoomJSON | Error {
     if (room instanceof Room) {
-      return { currentActiveRoom: room.uuid, tracks: room.getTracks() };
+      return { currentActiveRoom: room.uuid, tracks: room.getQueue() };
     } else {
       return { error: { message: "the given id is not active room" } };
     }
@@ -148,8 +148,8 @@ export default class Room {
     if (trackMetadata !== null) {
       const track = await trackMetadata.toJSON();
       if (track !== null) {
-        if (!this.tracks.map((value) => value.url).includes(track.url)) {
-          this.tracks.push(track);
+        if (!this.queue.map((value) => value.url).includes(track.url)) {
+          this.queue.push(track);
           return true;
         }
       }
@@ -169,10 +169,10 @@ export default class Room {
     }
 
     let track;
-    for (track of this.tracks) {
+    for (track of this.queue) {
       if (trackURL !== null) {
         if (track.url === trackURL) {
-          return await this.removeWithIndex(this.tracks.indexOf(track));
+          return await this.removeWithIndex(this.queue.indexOf(track));
         }
       }
     }
@@ -180,14 +180,14 @@ export default class Room {
   }
 
   async removeWithIndex(index: number) {
-    return this.tracks.splice(index, 1).length !== 0;
+    return this.queue.splice(index, 1).length !== 0;
   }
 
-  getTracks(): JSONTrack[] {
-    return [...this.tracks];
+  getQueue(): JSONTrack[] {
+    return [...this.queue];
   }
 
   size(): number {
-    return this.tracks.length;
+    return this.queue.length;
   }
 }

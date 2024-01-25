@@ -13,8 +13,6 @@ export default async function RoomIdGET(
   const { id: activeRoomId } = req.params as QueryParams;
 
   const roomStorage = RoomStorage.getRoomStorage();
-  // TODO DEBUG
-  console.log(RoomStorage.getRoomStorage());
 
   // TODO MOCK
   let mock;
