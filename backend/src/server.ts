@@ -109,10 +109,10 @@ const BoundServicePOSTSchema = {
 };
 
 // Auth
+server.get("/", AuthCallbackSoundcloudGET); // / route is used until soundcloud change the redirection url
+server.get("/user/bound", BoundServicesGET);
 server.register(authRoutes, { prefix: "/auth" });
-server.post("/soundcloud/bound", BoundServicePOST);
-server.get("/", AuthCallbackSoundcloudGET);
-server.get("/bounded", BoundServicesGET);
+server.get("auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
 
 server.get("/streaming-services", StreamingServicesGET);
 server.post("/streaming-service/:uuid", UnbindServicePOST);
