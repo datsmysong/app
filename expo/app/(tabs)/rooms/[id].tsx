@@ -51,7 +51,7 @@ export default function musicRoom() {
   const [room, setRoom] = useState<ActiveRoom>();
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  const [data, setData] = useState<RoomJSON>();
+  const [queue, setQueue] = useState<RoomJSON>();
 
   const url: URL = new URL("/room/" + activeRoomId, getApiUrl());
 
@@ -73,35 +73,32 @@ export default function musicRoom() {
     };
 
     fetchData();
+
+    const handleShare = async () => {
+      if (!currentPageLink) {
+        Alert.alert("Aucun lien n'a été retourné");
+        return;
+      }
+
+      const roomCode = room?.code ?? "";
+      const invitationLink = generatedInvitationLink(currentPageLink, roomCode);
+
+      await Clipboard.setStringAsync(invitationLink);
+      setIsCopied(true);
+
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 3000);
+
+      // unused for the moment
+      // fetch(url)
+      //     .then(res => res.json())
+      //     .then((data: ActiveRoomSkeleton) => setData(data))
+
+      SocketIo.getInstance()
+        .getSocket(url.pathname)
+        .on("queue:update", (data: RoomJSON) => setQueue(data));
   }, []);
-
-  const handleShare = async () => {
-    if (!currentPageLink) {
-      Alert.alert("Aucun lien n'a été retourné");
-      return;
-    }
-
-    const roomCode = room?.code ?? "";
-    const invitationLink = generatedInvitationLink(currentPageLink, roomCode);
-
-    await Clipboard.setStringAsync(invitationLink);
-    setIsCopied(true);
-
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 3000);
-
-    // unused for the moment
-    // fetch(url)
-    //     .then(res => res.json())
-    //     .then((data: ActiveRoomSkeleton) => setData(data))
-
-    SocketIo.getInstance()
-      .getSocket(url.pathname)
-      .on("queue:update", (data: RoomJSON) => setData(data));
-  };
-
-  const url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
 
   return (
     <View style={headerStyles.headerContainer}>
@@ -121,11 +118,11 @@ export default function musicRoom() {
           </View>
           <View style={styles.container}>
             <Text style={styles.title}>
-              File d'attente ({data?.tracks.length /* ?? 0*/})
+              File d'attente ({queue?.tracks.length /* ?? 0*/})
             </Text>
             <FlatList
               style={styles.list}
-              data={data?.tracks}
+              data={queue?.tracks}
               renderItem={({ item, index }) => (
                 <TrackItem track={item} index={index + 1} />
               )}
