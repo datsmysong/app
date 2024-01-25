@@ -11,6 +11,10 @@ export default class Spotify extends MusicPlatform {
   async getJsonTrack(id: string): Promise<JSONTrack> {
     const data = await spotify.tracks.get(id);
 
+    const image = data.album.images.reduce((acc, current) => {
+      return current.width < acc.width && current.width >= 46 ? current : acc;
+    });
+
     return {
       url: new URL(data.external_urls.spotify).toString(),
       title: data.name,
@@ -20,7 +24,7 @@ export default class Spotify extends MusicPlatform {
         ""
       ),
       albumName: data.album.name,
-      imgUrl: new URL(data.album.images[0].url).toString(),
+      imgUrl: new URL(image.url).toString(),
     };
   }
 }
