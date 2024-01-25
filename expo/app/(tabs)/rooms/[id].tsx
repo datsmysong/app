@@ -19,18 +19,12 @@ import { FlatList, Pressable, StyleSheet, ViewProps } from "react-native";
 
 import { Text, View } from "../../../components/Themed";
 import TrackItem from "../../../components/room/TrackItem";
+import { getApiUrl } from "../../../lib/apiUrl";
 import SocketIo from "../../../lib/socketio";
 
 // TODO delete soon
 export interface MusicRoomParams {
   id: string;
-}
-
-// https://docs.expo.dev/guides/environment-variables/
-const ENDPOINT = process.env.EXPO_PUBLIC_BACKEND_API;
-
-if (!ENDPOINT) {
-  throw new Error("le endpoint de l'API REST n'est pas défini");
 }
 
 const generatedInvitationLink = (currentUrl: string, roomCode: string) => {
@@ -58,6 +52,8 @@ export default function musicRoom() {
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const [data, setData] = useState<RoomJSON>();
+
+  const url: URL = new URL("/room/" + activeRoomId, getApiUrl());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,11 +90,7 @@ export default function musicRoom() {
     setTimeout(() => {
       setIsCopied(false);
     }, 3000);
-  };
 
-  const url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
-
-  useEffect(() => {
     // unused for the moment
     // fetch(url)
     //     .then(res => res.json())
@@ -107,7 +99,9 @@ export default function musicRoom() {
     SocketIo.getInstance()
       .getSocket(url.pathname)
       .on("queue:update", (data: RoomJSON) => setData(data));
-  }, []);
+  };
+
+  const url: URL = new URL("/room/" + activeRoomId, ENDPOINT);
 
   return (
     <View style={headerStyles.headerContainer}>
@@ -136,6 +130,7 @@ export default function musicRoom() {
                 <TrackItem track={item} index={index + 1} />
               )}
             />
+          </View>
         </View>
       )}
     </View>
