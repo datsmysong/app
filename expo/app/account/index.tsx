@@ -3,33 +3,43 @@ import { ScrollView } from "react-native";
 
 import Separator from "../../components/Separator";
 import SettingsOptions from "../../components/profile/SettingsOptions";
+import { supabase } from "../../lib/supabase";
 
 export default function Account() {
   return (
     <ScrollView>
-      <Link href="/account/personal-info">
-        <SettingsOptions icon="home" title="Informations personnelles" />
-      </Link>
+      <SettingsOptions
+        icon="home"
+        title="Informations personnelles"
+        href="/account/personal-info"
+      />
       <Separator />
-      <Link href="/account/security">
-        <SettingsOptions icon="lock" title="Sécurité" />
-      </Link>
+      <SettingsOptions icon="lock" title="Sécurité" href="/account/security" />
       <Separator />
-      <Link href="/manage-account/notifications">
-        <SettingsOptions icon="notifications" title="Notifications" />
-      </Link>
+      <SettingsOptions
+        icon="notifications"
+        title="Notifications"
+        href="/manage-account/notifications"
+      />
       <Separator />
-      <Link href="/manage-account/integrations">
-        <SettingsOptions icon="language" title="Intégrations" />
-      </Link>
+      <SettingsOptions
+        icon="language"
+        title="Intégrations"
+        href="/manage-account/integrations"
+      />
       <Separator />
-      <Link href="/manage-account/help">
-        <SettingsOptions icon="help" title="Assistance" />
-      </Link>
+      <SettingsOptions
+        icon="help"
+        title="Assistance"
+        href="/manage-account/help"
+      />
       <Separator />
-      <Link href="/manage-account/logout">
-        <SettingsOptions icon="logout" title="Se déconnecter" color="red" />
-      </Link>
+      <SettingsOptions
+        onPress={() => supabase.auth.signOut()}
+        icon="logout"
+        title="Se déconnecter"
+        color="red"
+      />
     </ScrollView>
   );
 }

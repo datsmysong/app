@@ -44,8 +44,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   titleContainer: {
-    marginTop: 100,
-    marginBottom: 100,
+    marginVertical: 50,
   },
   containerWithDivider: {
     flexDirection: "row",
