@@ -1,5 +1,5 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import { UserProfile } from "commons/database-types-utils";
+import { RoomUser, UserProfile } from "commons/database-types-utils";
 
 import { supabase } from "./supabase";
 
@@ -12,7 +12,7 @@ type JoinRoomFunction = (
 type GetParticipantFunction = (
   roomId: string,
   userProfile: UserProfile | null
-) => Promise<{ error: string } | { error: PostgrestError | null }>;
+) => Promise<{ data: RoomUser[] | null } | undefined>;
 
 export const joinRoom: JoinRoomFunction = async (
   roomId: string,
@@ -30,4 +30,19 @@ export const joinRoom: JoinRoomFunction = async (
   });
 
   return { error: roomUsersError };
+};
+
+export const getParticipant: GetParticipantFunction = async (
+  roomId: string,
+  userProfile: UserProfile | null
+) => {
+  if (!userProfile || !roomId) return;
+
+  const { data: participant } = await supabase
+    .from("room_users")
+    .select("*")
+    .eq("profile_id", userProfile.user_profile_id)
+    .eq("room_id", roomId);
+
+  return { data: participant };
 };
