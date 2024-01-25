@@ -7,6 +7,7 @@ import Alert from "../../../components/Alert";
 import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 import { Text, View } from "../../../components/Tamed";
+import { joinRoom } from "../../../lib/room-utils";
 import { supabase } from "../../../lib/supabase";
 import { useUserProfile } from "../../../lib/userProfile";
 
@@ -15,6 +16,7 @@ export default function JoinRoom() {
   const [isTextPresent, setIsTextPresent] = useState(false);
   const [noRoomFound, setNoRoomFound] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>();
+  const [isParticipant, setIsParticipant] = useState<boolean>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,17 +30,6 @@ export default function JoinRoom() {
   useEffect(() => {
     setIsTextPresent(roomCode.length > 0);
   }, [roomCode]);
-
-  const joinRoom = async (roomId: string) => {
-    if (!userProfile) return { error: "Unauthorized" };
-
-    const { error: roomUsersError } = await supabase.from("room_users").insert({
-      room_id: roomId,
-      profile_id: userProfile.user_profile_id,
-    });
-
-    return { error: roomUsersError };
-  };
 
   const searchRoom = async () => {
     Keyboard.dismiss();
@@ -57,7 +48,11 @@ export default function JoinRoom() {
       return;
     }
 
-    const { error: roomUsersError } = await joinRoom(activeRoom.id);
+    const { error: roomUsersError } = await joinRoom(
+      activeRoom.id,
+      userProfile.user_profile_id,
+      isParticipant
+    );
 
     /**
      * This returns an error even when the user is already in the room
