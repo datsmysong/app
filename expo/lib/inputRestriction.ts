@@ -6,7 +6,8 @@ import { RegisterOptions } from "react-hook-form";
 const usernameRules: RegisterOptions = {
   required: "Un nom d'utilisateur est requis",
   minLength: {
-    value: 3,
+    // 4 because we restrict the first character to be @
+    value: 4,
     message: "Le nom d'utilisateur doit contenir au moins 3 caractères",
   },
   maxLength: {
