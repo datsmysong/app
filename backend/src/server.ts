@@ -12,6 +12,7 @@ import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import RoomIO from "./socketio/RoomIO";
 import RoomGET from "./route/RoomGET";
+import RoomPOST from "./route/RoomPOST";
 
 config({ path: ".env.local" });
 
@@ -29,6 +30,11 @@ if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   );
 }
 
+if (!process.env.FRONTEND_URL) {
+  throw new Error(
+    "Missing FRONTEND_URL environment variable, check .env.local.example file"
+  );
+}
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SERVICE_ROLE
@@ -89,6 +95,8 @@ const createRoomSchema = {
     },
   },
 };
+
+server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
 // Auth
 server.register(authRoutes, { prefix: "/auth" });
