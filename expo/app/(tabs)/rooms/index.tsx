@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
-
 import Button from "../../../components/Button";
 
 export default function RoomsPage() {
@@ -11,7 +10,7 @@ export default function RoomsPage() {
     <View style={styles.headerContainer}>
       <Text style={styles.title}>Salles d'écoute</Text>
       <View style={styles.buttonContainer}>
-        <Button block href="/rooms/create">
+        <Button block href={"/rooms/create"}>
           Créer une salle
         </Button>
         <TextInput
