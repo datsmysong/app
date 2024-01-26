@@ -10,7 +10,7 @@ export default function Account() {
       <SettingsOptions
         icon="home"
         title="Informations personnelles"
-        href="/account/personal-info"
+        href="/account/edit"
       />
       <Separator />
       <SettingsOptions icon="lock" title="Sécurité" href="/account/security" />

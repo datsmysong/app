@@ -10,11 +10,11 @@ import Button from "../Button";
 import { formStyles } from "../ControlledInput";
 import { Text } from "../Themed";
 
-interface Props {
+interface AvatarProps {
   onImageLoad: () => void;
 }
 
-const Avatar = forwardRef((props: Props, ref) => {
+const Avatar = forwardRef((props: AvatarProps, ref) => {
   const { onImageLoad } = props;
   const user = useSupabaseUserHook();
   const [uploading, setUploading] = useState(false);
@@ -39,7 +39,7 @@ const Avatar = forwardRef((props: Props, ref) => {
     const path = `${user.id}.jpg`;
     const { data } = supabase.storage
       .from("avatars")
-      .getPublicUrl(path + "?caches=" + Math.random());
+      .getPublicUrl(path + "?avoidCache=" + Math.random());
 
     if (!data) {
       console.log("no data");
@@ -59,8 +59,6 @@ const Avatar = forwardRef((props: Props, ref) => {
     }
     const fileName = `${user.id}.jpg`;
     const image = await getBase64Image(avatarUrl);
-    // delete old avatar
-    await supabase.storage.from("avatars").remove([fileName]);
     const { error } = await supabase.storage
       .from("avatars")
       .upload(fileName, image, {
@@ -98,7 +96,7 @@ const Avatar = forwardRef((props: Props, ref) => {
   }
 
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", gap: 10 }}>
       <Text style={formStyles.label}>Photo de profil</Text>
       {avatarUrl ? (
         <Image
@@ -119,17 +117,15 @@ const Avatar = forwardRef((props: Props, ref) => {
           ]}
         />
       )}
-      <View>
-        <Button
-          onPress={selectAvatar}
-          disabled={uploading}
-          block
-          type="outline"
-          size="small"
-        >
-          {uploading ? "Loading ..." : "Charger une image"}
-        </Button>
-      </View>
+      <Button
+        onPress={selectAvatar}
+        disabled={uploading}
+        block
+        type="outline"
+        size="small"
+      >
+        {uploading ? "Loading ..." : "Charger une image"}
+      </Button>
     </View>
   );
 });

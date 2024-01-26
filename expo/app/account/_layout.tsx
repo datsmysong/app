@@ -1,11 +1,12 @@
 import { Stack } from "expo-router";
 
+// Account will be mooved to (tabs)/profile/account...
 export default function AccountLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: "Gérer mon compte" }} />
       <Stack.Screen
-        name="personal-info"
+        name="edit"
         options={{ presentation: "modal", title: "Informations personnelles" }}
       />
     </Stack>
