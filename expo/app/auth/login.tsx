@@ -6,6 +6,7 @@ import { StyleSheet, View } from "react-native";
 import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
 import Warning from "../../components/Warning";
+import { emailRules } from "../../lib/inputRestriction";
 import { supabase } from "../../lib/supabase";
 
 type LoginForm = {
@@ -101,13 +102,7 @@ export default function Login() {
           control={control}
           label="Adresse email"
           name="email"
-          rules={{
-            required: "Veuillez saisir votre adresse email",
-            pattern: {
-              value: /\S+@\S+\.\S+/,
-              message: "Veuillez saisir une adresse email valide",
-            },
-          }}
+          rules={emailRules}
           placeholder="votre@adresse.email"
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"
