@@ -26,10 +26,10 @@ export default function ControlledInput({
   onSubmitEditing?: () => void;
 }) {
   return (
-    <View style={styles.vbox}>
-      <View style={styles.hbox}>
-        <Text style={styles.label}>{label}</Text>
-        {rules?.required && <Text style={styles.required}>*</Text>}
+    <View style={formStyles.vbox}>
+      <View style={formStyles.hbox}>
+        <Text style={formStyles.label}>{label}</Text>
+        {rules?.required && <Text style={formStyles.required}>*</Text>}
       </View>
       <Controller
         control={control}
@@ -63,14 +63,14 @@ export default function ControlledInput({
         name={name}
       />
       {errorMessage && (
-        <Text style={styles.text}>
+        <Text style={formStyles.text}>
           {errorMessage ?? "Le champ est invalide"}
         </Text>
       )}
     </View>
   );
 }
-const styles = StyleSheet.create({
+export const formStyles = StyleSheet.create({
   vbox: {
     gap: 5,
     minHeight: 100,

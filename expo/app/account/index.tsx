@@ -1,4 +1,3 @@
-import { Link } from "expo-router";
 import { ScrollView } from "react-native";
 
 import Separator from "../../components/Separator";

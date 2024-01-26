@@ -24,9 +24,9 @@ const SettingsOptions = ({
 }: SettingsOptionsProps) => {
   const content = (
     <View style={[styles.container, { width: "100%" }]}>
-      <MaterialIcons name={icon} size={40} color={color} />
+      <MaterialIcons name={icon} size={30} color={color} />
       <Text style={[styles.label, { width: "100%", color }]}>{title}</Text>
-      <MaterialIcons name="keyboard-arrow-right" size={40} color={color} />
+      <MaterialIcons name="keyboard-arrow-right" size={30} color={color} />
     </View>
   );
 
@@ -38,6 +38,7 @@ export default SettingsOptions;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "white",
     gap: 24,
     paddingVertical: 16,
     paddingHorizontal: 20,
@@ -46,5 +47,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Outfit-Regular",
+    fontSize: 18,
   },
 });

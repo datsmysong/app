@@ -7,6 +7,7 @@ import { Alert, Image, Platform, StyleSheet, View } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 import Button from "../Button";
+import { formStyles } from "../ControlledInput";
 import { Text } from "../Themed";
 
 interface Props {
@@ -98,7 +99,7 @@ const Avatar = forwardRef((props: Props, ref) => {
 
   return (
     <View style={{ width: "100%" }}>
-      <Text>Photo de profil</Text>
+      <Text style={formStyles.label}>Photo de profil</Text>
       {avatarUrl ? (
         <Image
           source={{ uri: avatarUrl }}
