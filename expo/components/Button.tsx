@@ -84,7 +84,6 @@ const Button: React.FC<ButtonProps> = ({
 
   const pressableStyle = (state: PressableStateCallbackType) => [
     buttonStyles,
-    // TODO le projet m'indique un problème avec state.hovered
     state.hovered && styles.hovered,
     state.pressed && styles.pressed,
   ];
