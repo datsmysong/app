@@ -8,8 +8,13 @@ export default class Spotify extends MusicPlatform {
     );
   }
 
-  async getJsonTrack(id: string): Promise<JSONTrack> {
-    const data = await spotify.tracks.get(id);
+  async getJsonTrack(id: string): Promise<JSONTrack | null> {
+    let data;
+    try {
+      data = await spotify.tracks.get(id);
+    } catch {
+      return null;
+    }
 
     const image = data.album.images.reduce((acc, current) => {
       return current.width < acc.width && current.width >= 46 ? current : acc;

@@ -24,10 +24,6 @@ export default class TrackMetadata {
   }
 
   async toJSON(): Promise<JSONTrack | null> {
-    try {
-      return await this.platform.getJsonTrack(this.id);
-    } catch {
-      return null;
-    }
+    return await this.platform.getJsonTrack(this.id);
   }
 }
