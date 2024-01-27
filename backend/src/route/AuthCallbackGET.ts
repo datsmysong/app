@@ -99,7 +99,7 @@ export default async function AuthCallbackGET(
   const redirectUrl = decodeURIComponent(request.url).split("redirect_url=")[1];
 
   // redirect user to the redirect url with the refresh token
-  response.redirect(
+  return response.redirect(
     redirectUrl + "#refresh_token=" + encodeURIComponent(refresh_token)
   );
 }
