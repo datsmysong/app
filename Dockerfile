@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:18-alpine
+FROM node:20.11.0
 WORKDIR /
 COPY . ./
 WORKDIR /backend
