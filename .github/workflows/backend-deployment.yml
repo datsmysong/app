@@ -1,0 +1,35 @@
+name: Backend Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH connection
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: SSH into server and update code
+        uses: appleboy/ssh-action@v0.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/.docker/datsmysong
+            git pull
+
+      - name: Stop containers
+        run: docker-compose -f /home/ubuntu/.docker/datsmysong/docker-compose.yml down
+
+      - name: Start containers
+        run: docker-compose -f /home/ubuntu/.docker/datsmysong/docker-compose.yml up -d
