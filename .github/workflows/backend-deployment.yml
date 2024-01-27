@@ -18,7 +18,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: SSH into server and update code
+      - name: Update and restart containers
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -27,9 +27,5 @@ jobs:
           script: |
             cd /home/ubuntu/.docker/datsmysong
             git pull
-
-      - name: Stop containers
-        run: docker-compose -f /home/ubuntu/.docker/datsmysong/docker-compose.yml down
-
-      - name: Start containers
-        run: docker-compose -f /home/ubuntu/.docker/datsmysong/docker-compose.yml up -d
+            docker-compose down
+            docker-compose up -d
