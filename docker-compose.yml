@@ -4,14 +4,8 @@ services:
   backend:
     container_name: datsmysong-backend
     build: .
-    networks:
-      - host
     ports:
-      - "8182:3000"
+      - "127.0.0.1:8182:3000"
     env_file:
       - .backend.production.env
     restart: always
-
-networks:
-  host:
-    external: true
