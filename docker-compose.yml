@@ -5,7 +5,12 @@ services:
     container_name: datsmysong-backend
     build: .
     ports:
-      - "127.0.0.1:8182:3000"
+      - "8182:3000"
     env_file:
       - .backend.production.env
     restart: always
+
+networks:
+  default:
+    name: datsmysong
+    external: true
