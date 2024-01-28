@@ -5,7 +5,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 
 export async function getUserFromRequest(
   request: FastifyRequest,
-  response: FastifyReply,
+  response: FastifyReply
 ) {
   const supabase = createClient({ request, response });
 
@@ -32,7 +32,7 @@ export async function createRoom(
   maxMusicPerUserDuration: number,
   serviceId: string,
   req: FastifyRequest,
-  rep: FastifyReply,
+  rep: FastifyReply
 ) {
   const supabase = adminSupabase;
 
@@ -60,7 +60,7 @@ export async function createRoom(
   const configurationId = roomConfigRes.data.id;
 
   const roomRes = await supabase
-    .from("active_rooms")
+    .from("rooms")
     .insert([
       {
         name: name,
@@ -81,36 +81,6 @@ export async function createRoom(
 }
 
 export function endRoom(roomId: string) {
-  let room: any = null;
-  const supabase = adminSupabase;
-
-  supabase
-    .from("active_rooms")
-    .delete()
-    .eq("id", roomId)
-    .select("*")
-    .then((res) => {
-      if (res.error) {
-        return res.error;
-      } else {
-        room = res.data[0];
-        console.log("Room ended");
-      }
-    });
-
-  supabase
-    .from("rooms")
-    .insert([
-      {
-        ...room,
-        ended_at: new Date(),
-      },
-    ])
-    .then((res) => {
-      if (res.error) {
-        return res.error;
-      } else {
-        console.log("Room added to rooms");
-      }
-    });
+  // TODO: Properly end room
+  // This will set the join code of this room to null, and set is_active to false
 }

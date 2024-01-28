@@ -35,9 +35,10 @@ export default function RoomPage() {
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase
-        .from("active_rooms")
+        .from("rooms")
         .select("*")
         .eq("id", id)
+        .eq("is_active", true)
         .single();
       if (error) {
         Alert.alert(
