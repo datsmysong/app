@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
+import fastifyCookie from "@fastify/cookie";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
 import RoomIdGET from "./route/RoomIdGET";
@@ -53,7 +54,7 @@ server.register(fastifyIO, {
     origin: "*",
   },
 });
-server.register(require("@fastify/cookie"), {
+server.register(fastifyCookie, {
   secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
   hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
   parseOptions: {}, // options for parsing cookies
