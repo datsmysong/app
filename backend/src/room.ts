@@ -68,27 +68,23 @@ export async function createRoom(
 
   const { error, data, status } = await supabase
     .from("rooms")
-    .insert([
-      {
-        name: name,
-        code: code,
-        configuration_id: configurationId,
-        host_user_profile_id: hostUserProfileId,
-        service_id: serviceId,
-      },
-    ])
+    .insert({
+      name: name,
+      code: code,
+      configuration_id: configurationId,
+      host_user_profile_id: hostUserProfileId,
+      service_id: serviceId,
+    })
     .select("id")
     .single();
 
   // If we didn't manage to create the room
   if (error || !data) return rep.code(status).send(error);
 
-  const { error: roomUserError } = await supabase.from("room_users").insert([
-    {
-      room_id: data.id,
-      profile_id: hostUserProfileId,
-    },
-  ]);
+  const { error: roomUserError } = await supabase.from("room_users").insert({
+    room_id: data.id,
+    profile_id: hostUserProfileId,
+  });
 
   // If we didn't manage to add the host to the participants
   if (error) return rep.code(500).send(roomUserError);
