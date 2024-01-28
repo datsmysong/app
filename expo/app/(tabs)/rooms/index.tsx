@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import Button from "../../../components/Button";
+import CustomTextInput from "../../../components/CustomTextInput";
 
 export default function RoomsPage() {
   const [roomId, setRoomId] = useState("");
@@ -13,13 +14,11 @@ export default function RoomsPage() {
         <Button block href={"/rooms/create"}>
           Créer une salle
         </Button>
-        <TextInput
+        <CustomTextInput
           onChangeText={setRoomId}
-          style={{ borderWidth: 1, width: "25%", minWidth: 300 }}
           placeholder={
             "Entrer l'identifiant de la salle d'écoute (Pas de base de donnée)"
           }
-          placeholderTextColor="gray"
         />
         <Button block type="outline" href={`/rooms/${roomId}`}>
           Rejoindre une salle
