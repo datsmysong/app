@@ -1,7 +1,5 @@
 import { Database } from "./database-types";
 // prettier-ignore
-export type ActiveRoom = Database["public"]["Tables"]["active_rooms"]["Row"];
-// prettier-ignore
 export type BoundService = Database["public"]["Tables"]["bound_services"]["Row"];
 // prettier-ignore
 export type FriendList = Database["public"]["Tables"]["friends_list"]["Row"];

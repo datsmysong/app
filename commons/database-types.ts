@@ -9,58 +9,6 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      active_rooms: {
-        Row: {
-          code: string;
-          configuration_id: string | null;
-          created_at: string;
-          host_user_profile_id: string | null;
-          id: string;
-          name: string;
-          service_id: string | null;
-        };
-        Insert: {
-          code: string;
-          configuration_id?: string | null;
-          created_at?: string;
-          host_user_profile_id?: string | null;
-          id?: string;
-          name: string;
-          service_id?: string | null;
-        };
-        Update: {
-          code?: string;
-          configuration_id?: string | null;
-          created_at?: string;
-          host_user_profile_id?: string | null;
-          id?: string;
-          name?: string;
-          service_id?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "active_rooms_configuration_id_fkey";
-            columns: ["configuration_id"];
-            isOneToOne: false;
-            referencedRelation: "room_configurations";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "active_rooms_host_user_profile_id_fkey";
-            columns: ["host_user_profile_id"];
-            isOneToOne: false;
-            referencedRelation: "user_profile";
-            referencedColumns: ["user_profile_id"];
-          },
-          {
-            foreignKeyName: "active_rooms_service_id_fkey";
-            columns: ["service_id"];
-            isOneToOne: false;
-            referencedRelation: "streaming_services";
-            referencedColumns: ["service_id"];
-          }
-        ];
-      };
       bound_services: {
         Row: {
           access_token: string | null;
@@ -280,7 +228,7 @@ export interface Database {
           {
             foreignKeyName: "room_users_room_id_fkey";
             columns: ["room_id"];
-            isOneToOne: true;
+            isOneToOne: false;
             referencedRelation: "rooms";
             referencedColumns: ["id"];
           }
@@ -288,29 +236,32 @@ export interface Database {
       };
       rooms: {
         Row: {
+          code: string;
           configuration_id: string | null;
           created_at: string;
-          ended_at: string | null;
           host_user_profile_id: string | null;
           id: string;
+          is_active: boolean;
           name: string;
           service_id: string | null;
         };
         Insert: {
+          code: string;
           configuration_id?: string | null;
-          created_at: string;
-          ended_at?: string | null;
+          created_at?: string;
           host_user_profile_id?: string | null;
           id?: string;
+          is_active?: boolean;
           name: string;
           service_id?: string | null;
         };
         Update: {
+          code?: string;
           configuration_id?: string | null;
           created_at?: string;
-          ended_at?: string | null;
           host_user_profile_id?: string | null;
           id?: string;
+          is_active?: boolean;
           name?: string;
           service_id?: string | null;
         };
@@ -506,3 +457,4 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
   ? Database["public"]["Enums"][PublicEnumNameOrOptions]
   : never;
+

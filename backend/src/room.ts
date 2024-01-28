@@ -1,11 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
-import { PostgrestError } from "@supabase/supabase-js";
 
 export async function getUserFromRequest(
   request: FastifyRequest,
-  response: FastifyReply,
+  response: FastifyReply
 ) {
   const supabase = createClient({ request, response });
 
@@ -23,6 +22,10 @@ export async function getUserProfileIdFromAccountId(accId: string) {
   return { data: data.user_profile_id, error: null };
 }
 
+function unauthorizedResponse(response: FastifyReply) {
+  return response.code(401).send("User not logged in");
+}
+
 export async function createRoom(
   name: string,
   code: string,
@@ -32,16 +35,19 @@ export async function createRoom(
   maxMusicPerUserDuration: number,
   serviceId: string,
   req: FastifyRequest,
-  rep: FastifyReply,
+  rep: FastifyReply
 ) {
   const supabase = adminSupabase;
-
   const user = await getUserFromRequest(req, rep);
-  if (!user.data.user) {
-    return rep.code(401).send("User not logged in");
-  }
-  const hostUserProfileId =
-    (await getUserProfileIdFromAccountId(user.data.user.id)).data || null;
+
+  // If the user is not logged in
+  if (!user.data.user) return unauthorizedResponse(rep);
+
+  // If we didn't manage to get the user profile id from the account id
+  const { data: hostUserProfileId } = await getUserProfileIdFromAccountId(
+    user.data.user.id
+  );
+  if (!hostUserProfileId) return unauthorizedResponse(rep);
 
   const roomConfigRes = await supabase
     .from("room_configurations")
@@ -54,63 +60,47 @@ export async function createRoom(
     .select("id")
     .single();
 
-  if (roomConfigRes.error) {
+  // If we didn't manage to create the room configuration
+  if (roomConfigRes.error)
     return rep.code(roomConfigRes.status).send(roomConfigRes.error);
-  }
+
   const configurationId = roomConfigRes.data.id;
 
-  const roomRes = await supabase
-    .from("active_rooms")
-    .insert([
-      {
-        name: name,
-        code: code,
-        configuration_id: configurationId,
-        host_user_profile_id: hostUserProfileId,
-        service_id: serviceId,
-      },
-    ])
-    .select("id");
+  const { error, data, status } = await supabase
+    .from("rooms")
+    .insert({
+      name: name,
+      code: code,
+      configuration_id: configurationId,
+      host_user_profile_id: hostUserProfileId,
+      service_id: serviceId,
+    })
+    .select("id")
+    .single();
 
-  if (roomRes.error) {
-    return rep.code(roomRes.status).send(roomRes.error);
-  } else {
-    // TODO use roomid here (send)
-    return rep.code(201).send("Room created");
-  }
+  // If we didn't manage to create the room
+  if (error || !data) return rep.code(status).send(error);
+
+  const { error: roomUserError } = await supabase.from("room_users").insert({
+    room_id: data.id,
+    profile_id: hostUserProfileId,
+  });
+
+  // If we didn't manage to add the host to the participants
+  if (error) return rep.code(500).send(roomUserError);
+
+  const response = {
+    error: null,
+    data: {
+      room_id: data.id,
+    },
+  };
+
+  // If we managed to create the room
+  return rep.code(201).send(response);
 }
 
 export function endRoom(roomId: string) {
-  let room: any = null;
-  const supabase = adminSupabase;
-
-  supabase
-    .from("active_rooms")
-    .delete()
-    .eq("id", roomId)
-    .select("*")
-    .then((res) => {
-      if (res.error) {
-        return res.error;
-      } else {
-        room = res.data[0];
-        console.log("Room ended");
-      }
-    });
-
-  supabase
-    .from("rooms")
-    .insert([
-      {
-        ...room,
-        ended_at: new Date(),
-      },
-    ])
-    .then((res) => {
-      if (res.error) {
-        return res.error;
-      } else {
-        console.log("Room added to rooms");
-      }
-    });
+  // TODO: Properly end room
+  // This will set the join code of this room to null, and set is_active to false
 }

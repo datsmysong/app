@@ -32,9 +32,10 @@ export default function JoinPage() {
     };
     const fetchRoomId = async () => {
       const { data } = await supabase
-        .from("active_rooms")
+        .from("rooms")
         .select("id")
         .eq("code", roomCode)
+        .eq("is_active", true)
         .single();
 
       if (!data) {
