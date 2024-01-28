@@ -32,39 +32,33 @@ export default function RoomIO(
       return;
     }
 
+    /**
+     * TODO
+     *
+     * Instead of sending the whole state, we should only send the actions taken by other users
+     * so that the client can update its state accordingly
+     */
+
     socket.emit("queue:update", Room.toJSON(room));
 
-    socket.onAny(
-      async (
-        event: string,
-        params: string /*, callback: (arg0: any) => void*/
-      ) => {
-        const number = Number.parseInt(params);
-        switch (event) {
-          case "queue:add":
-            await room.add(params);
-            break;
-          case "queue:removeLink":
-            await room.removeWithLink(params);
-            break;
-          case "queue:remove":
-            if (Number.isSafeInteger(number)) {
-              if (0 <= number && number < room.size()) {
-                await room.removeWithIndex(number);
-              }
-            } else {
-              await room.removeWithLink(params);
-            }
-            break;
+    socket.on("queue:add", async (params: string) => {
+      await room.add(params);
+      socket.nsp.emit("queue:update", Room.toJSON(room));
+    });
+    socket.on("queue:remove", async (params: string) => {
+      const number = Number.parseInt(params);
+      if (Number.isSafeInteger(number)) {
+        if (0 <= number && number < room.size()) {
+          await room.removeWithIndex(number);
         }
-
-        // TODO replace by callback and remove emit here : "Acknowledgements" CANCELED
-        // TODO replace "socketio-client" by "playlist"
-
-        // TODO ferbach : actionReducer pattern
-        socket.nsp.emit("queue:update", Room.toJSON(room));
-        // callback(Room.toJSON(room))
+      } else {
+        await room.removeWithLink(params);
       }
-    );
+      socket.nsp.emit("queue:update", Room.toJSON(room));
+    });
+    socket.on("queue:removeLink", async (params: string) => {
+      await room.removeWithLink(params);
+      socket.nsp.emit("queue:update", Room.toJSON(room));
+    });
   })();
 }
