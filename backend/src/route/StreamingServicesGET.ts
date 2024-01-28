@@ -11,5 +11,6 @@ export default async function StreamingServicesGET(
     error,
   } = await adminSupabase.from("streaming_services").select("*");
 
-  reply.code(status).send(error ?? streamingServices);
+  // https://fastify.dev/docs/latest/Reference/Routes/#async-await
+  return reply.code(status).send(error ?? streamingServices);
 }

@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { createRoom } from "../room";
+import * as repl from "repl";
 
 interface BodyParams {
   name: string;
@@ -33,7 +34,7 @@ function extractFromRequest(req: FastifyRequest): BodyParams {
 
 export default async function RoomPOST(
   req: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) {
   const roomOptions = extractFromRequest(req);
 
@@ -46,6 +47,8 @@ export default async function RoomPOST(
     roomOptions.maxMusicDuration,
     roomOptions.service,
     req,
-    reply
+    reply,
   );
+
+  return reply;
 }

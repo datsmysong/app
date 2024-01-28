@@ -17,6 +17,9 @@ yarn-error.*
 # local env files
 .env*.local
 
+# expo env files
+.env
+
 # typescript
 *.tsbuildinfo
 

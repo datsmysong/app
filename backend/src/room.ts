@@ -1,6 +1,14 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
+import Spotify from "./musicplatform/Spotify";
+import TrackFactory from "./musicplatform/TrackFactory";
+import { JSONTrack, RoomJSON } from "commons/backend-types";
+import RoomStorage from "./RoomStorage";
+
+interface Error {
+  error: { message: string };
+}
 
 export async function getUserFromRequest(
   request: FastifyRequest,
@@ -103,4 +111,87 @@ export async function createRoom(
 export function endRoom(roomId: string) {
   // TODO: Properly end room
   // This will set the join code of this room to null, and set is_active to false
+}
+
+export default class Room {
+  public readonly uuid: string;
+  private readonly queue: JSONTrack[];
+  private readonly trackFactory: TrackFactory;
+
+  private constructor(uuid: string /*...platforms*/) {
+    this.uuid = uuid;
+    this.queue = [];
+
+    this.trackFactory = new TrackFactory();
+    this.trackFactory.register(
+      new Spotify()
+    ) /*, new SoundCloud(), new AppleMusic()*/;
+  }
+
+  static getOrCreate(roomStorage: RoomStorage, uuid: string): Room {
+    let room = roomStorage.getRoom(uuid);
+
+    if (room === null) {
+      room = new Room(uuid);
+      roomStorage.addRoom(room);
+    }
+
+    return room;
+  }
+
+  static toJSON(room: Room | null | undefined): RoomJSON | Error {
+    if (room instanceof Room) {
+      return { currentActiveRoom: room.uuid, tracks: room.getQueue() };
+    } else {
+      return { error: { message: "the given id is not active room" } };
+    }
+  }
+
+  async add(rawUrl: string) {
+    const trackMetadata = this.trackFactory.fromUrl(rawUrl);
+    if (trackMetadata !== null) {
+      const track = await trackMetadata.toJSON();
+      if (track !== null) {
+        if (!this.queue.map((value) => value.url).includes(track.url)) {
+          this.queue.push(track);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  async removeWithLink(rawUrl: string) {
+    // try to get the uniform URL of track from lambda url
+    let trackURL = null;
+    const trackMetadata = this.trackFactory.fromUrl(rawUrl);
+    if (trackMetadata !== null) {
+      const track = await trackMetadata.toJSON();
+      if (track !== null) {
+        trackURL = new URL(track.url).toString();
+      }
+    }
+
+    let track;
+    for (track of this.queue) {
+      if (trackURL !== null) {
+        if (track.url === trackURL) {
+          return await this.removeWithIndex(this.queue.indexOf(track));
+        }
+      }
+    }
+    return false;
+  }
+
+  async removeWithIndex(index: number) {
+    return this.queue.splice(index, 1).length !== 0;
+  }
+
+  getQueue(): JSONTrack[] {
+    return [...this.queue];
+  }
+
+  size(): number {
+    return this.queue.length;
+  }
 }

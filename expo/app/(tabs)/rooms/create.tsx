@@ -1,5 +1,4 @@
-import { makeRedirectUri } from "expo-auth-session";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -13,6 +12,7 @@ import Alert from "../../../components/Alert";
 import CustomTextInput from "../../../components/CustomTextInput";
 import ParametersList from "../../../components/ParametersList";
 import ServiceList from "../../../components/ServicesList";
+import { getApiUrl } from "../../../lib/apiUrl";
 
 type CreateRoomFormBody = {
   name: string;
@@ -43,15 +43,11 @@ export default function CreateRoom() {
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
 
-  const directUri = makeRedirectUri();
-
-  const baseUrl = directUri.includes("exp://")
-    ? "http://" + directUri.split(":8081")[0].split("//")[1]
-    : directUri.split(":8081")[0];
+  const baseUrl = getApiUrl();
 
   useEffect(() => {
     const fetchServices = async () => {
-      const response = await fetch(baseUrl + ":3000/streaming-services");
+      const response = await fetch(baseUrl + "/streaming-services");
       const data = await response.json();
 
       const services: StreamingService[] = [];
@@ -76,21 +72,21 @@ export default function CreateRoom() {
   function checkConstraints(body: CreateRoomFormBody): { error: true | null } {
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
       Alert.alert(
-        "Mauvais pourcentage: Le pourcentage doit être entre 0 et 100"
+        "Mauvais pourcentage : Le pourcentage doit être entre 0 et 100"
       );
       return { error: true };
     }
 
     if (body.maxMusicPerUser <= 0) {
       Alert.alert(
-        "Mauvais nombre de musique: Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
+        "Mauvais nombre de musique : Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
       );
       return { error: true };
     }
 
     if (body.maxMusicDuration <= 0) {
       Alert.alert(
-        "Mauvaise durée de musique: La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
+        "Mauvaise durée de musique : La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
       );
       return { error: true };
     }
@@ -116,7 +112,7 @@ export default function CreateRoom() {
     if (!body.voteSkipping) body.voteSkippingNeeded = 0;
 
     try {
-      const response = await fetch(baseUrl + ":3000/rooms/create", {
+      const response = await fetch(baseUrl + "/rooms/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +150,7 @@ export default function CreateRoom() {
         />
         <Text style={styles.labelText}>Code de la salle</Text>
         <CustomTextInput
-          placeholder="1234"
+          placeholder="ABC123"
           value={roomCode}
           onChangeText={setRoomCode}
         />

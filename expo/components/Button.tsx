@@ -3,7 +3,9 @@ import { router } from "expo-router";
 import {
   Pressable,
   PressableStateCallbackType,
+  StyleProp,
   StyleSheet,
+  ViewStyle,
 } from "react-native";
 
 import { Text } from "./Tamed";
@@ -31,6 +33,7 @@ export type ButtonProps = {
   size?: "small" | "normal";
   color?: ButtonColor;
   block?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 const ICON_SIZE_SMALL = 20;
@@ -50,6 +53,7 @@ const Button: React.FC<ButtonProps> = ({
   prependIcon,
   block,
   color = "primary",
+  style,
 }) => {
   const isSmall = size === "small";
   const isFilled = type === "filled";
@@ -59,6 +63,7 @@ const Button: React.FC<ButtonProps> = ({
 
   const buttonStyles = [
     styles.button,
+    style,
     icon && (isSmall ? styles.iconSmall : styles.iconNormal),
     !icon && (isSmall ? styles.small : styles.normal),
     prependIcon &&
