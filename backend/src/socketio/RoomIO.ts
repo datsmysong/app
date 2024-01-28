@@ -25,44 +25,46 @@ export default function RoomIO(
   }
   const activeRoomId = rawUrlMatchGroups.slice(1)[0];
 
-  const room = RoomStorage.getRoomStorage().getRoom(activeRoomId);
-  if (room === null) {
-    socket.disconnect();
-    return;
-  }
-
-  socket.emit("queue:update", Room.toJSON(room));
-
-  socket.onAny(
-    async (
-      event: string,
-      params: string /*, callback: (arg0: any) => void*/
-    ) => {
-      const number = Number.parseInt(params);
-      switch (event) {
-        case "queue:add":
-          await room.add(params);
-          break;
-        case "queue:removeLink":
-          await room.removeWithLink(params);
-          break;
-        case "queue:remove":
-          if (Number.isSafeInteger(number)) {
-            if (0 <= number && number < room.size()) {
-              await room.removeWithIndex(number);
-            }
-          } else {
-            await room.removeWithLink(params);
-          }
-          break;
-      }
-
-      // TODO replace by callback and remove emit here : "Acknowledgements" CANCELED
-      // TODO replace "socketio-client" by "playlist"
-
-      // TODO ferbach : actionReducer pattern
-      socket.nsp.emit("queue:update", Room.toJSON(room));
-      // callback(Room.toJSON(room))
+  (async () => {
+    const room = await RoomStorage.getRoomStorage().roomFromUuid(activeRoomId);
+    if (room === null) {
+      socket.disconnect();
+      return;
     }
-  );
+
+    socket.emit("queue:update", Room.toJSON(room));
+
+    socket.onAny(
+      async (
+        event: string,
+        params: string /*, callback: (arg0: any) => void*/
+      ) => {
+        const number = Number.parseInt(params);
+        switch (event) {
+          case "queue:add":
+            await room.add(params);
+            break;
+          case "queue:removeLink":
+            await room.removeWithLink(params);
+            break;
+          case "queue:remove":
+            if (Number.isSafeInteger(number)) {
+              if (0 <= number && number < room.size()) {
+                await room.removeWithIndex(number);
+              }
+            } else {
+              await room.removeWithLink(params);
+            }
+            break;
+        }
+
+        // TODO replace by callback and remove emit here : "Acknowledgements" CANCELED
+        // TODO replace "socketio-client" by "playlist"
+
+        // TODO ferbach : actionReducer pattern
+        socket.nsp.emit("queue:update", Room.toJSON(room));
+        // callback(Room.toJSON(room))
+      }
+    );
+  })();
 }
