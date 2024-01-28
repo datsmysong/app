@@ -5,10 +5,10 @@ import RoomStorage from "../RoomStorage";
 export default function RoomIO(
   socket: Socket /*, next: (err?: ExtendedError) => void*/
 ) {
-  const namespace = socket.nsp;
+  const roomSocket = socket.nsp;
   /*regex uuid [0-9a-f]{8}-([0-9a-f]{4}){3}-[0-9a-f]{12}*/
   const pattern = /^\/room\/(.*)$/;
-  console.log(namespace.name);
+  console.log(roomSocket.name);
 
   // if (!pattern.test(namespace.name)) {
   //     //next()
@@ -18,7 +18,7 @@ export default function RoomIO(
 
   // remove first element which contains the whole tested string, then get the first group (surround with parenthesis)
 
-  const rawUrlMatchGroups = pattern.exec(namespace.name);
+  const rawUrlMatchGroups = pattern.exec(roomSocket.name);
   if (rawUrlMatchGroups === null) {
     socket.disconnect();
     return;
@@ -43,7 +43,7 @@ export default function RoomIO(
 
     socket.on("queue:add", async (params: string) => {
       await room.add(params);
-      socket.nsp.emit("queue:update", Room.toJSON(room));
+      roomSocket.emit("queue:update", Room.toJSON(room));
     });
     socket.on("queue:remove", async (params: string) => {
       const number = Number.parseInt(params);
@@ -54,11 +54,11 @@ export default function RoomIO(
       } else {
         await room.removeWithLink(params);
       }
-      socket.nsp.emit("queue:update", Room.toJSON(room));
+      roomSocket.emit("queue:update", Room.toJSON(room));
     });
     socket.on("queue:removeLink", async (params: string) => {
       await room.removeWithLink(params);
-      socket.nsp.emit("queue:update", Room.toJSON(room));
+      roomSocket.emit("queue:update", Room.toJSON(room));
     });
   })();
 }
