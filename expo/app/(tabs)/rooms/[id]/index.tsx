@@ -2,17 +2,17 @@ import { RoomJSON } from "commons/Backend-types";
 import { ActiveRoom } from "commons/database-types-utils";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
-import { useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Platform, StyleSheet } from "react-native";
+import { FlatList, Platform, Pressable, StyleSheet } from "react-native";
 
-import Alert from "../../../components/Alert";
-import Button from "../../../components/Button";
-import { Text, View } from "../../../components/Themed";
-import TrackItem from "../../../components/room/TrackItem";
-import { getApiUrl } from "../../../lib/apiUrl";
-import SocketIo from "../../../lib/socketio";
-import { supabase } from "../../../lib/supabase";
+import Alert from "../../../../components/Alert";
+import Button from "../../../../components/Button";
+import { Text, View } from "../../../../components/Themed";
+import TrackItem from "../../../../components/room/TrackItem";
+import { getApiUrl } from "../../../../lib/apiUrl";
+import SocketIo from "../../../../lib/socketio";
+import { supabase } from "../../../../lib/supabase";
 
 // TODO delete soon
 export interface MusicRoomParams {
@@ -94,38 +94,64 @@ export default function MusicRoom() {
   }, []);
 
   return (
-    <View>
+    <>
       {room && (
-        <View style={headerStyles.headerContainer}>
-          <Text style={headerStyles.title}>Salle "{room.name}"</Text>
-          <View style={headerStyles.buttonContainer}>
-            {isCopied ? (
-              <Button block prependIcon="check" onPress={handleShare}>
-                Lien copié
-              </Button>
-            ) : (
-              <Button block onPress={handleShare}>
-                Partager
-              </Button>
-            )}
+        <>
+          <View style={headerStyles.headerContainer}>
+            <Text style={headerStyles.title}>Salle "{room.name}"</Text>
+            <View style={headerStyles.buttonContainer}>
+              {isCopied ? (
+                <Button block prependIcon="check" onPress={handleShare}>
+                  Lien copié
+                </Button>
+              ) : (
+                <Button block onPress={handleShare}>
+                  Partager
+                </Button>
+              )}
+            </View>
+            <View style={styles.container}>
+              <Text style={styles.title}>
+                File d'attente ({queue?.tracks.length})
+              </Text>
+              <FlatList
+                style={styles.list}
+                data={queue?.tracks}
+                renderItem={({ item, index }) => (
+                  <TrackItem track={item} index={index + 1} />
+                )}
+              />
+            </View>
           </View>
-        </View>
+          <Link href={`/rooms/${room.id}/add`} asChild>
+            <Pressable style={floatingStyle.container}>
+              <Text style={floatingStyle.text}>+</Text>
+            </Pressable>
+          </Link>
+        </>
       )}
-      <View style={styles.container}>
-        <Text style={styles.title}>
-          File d'attente ({queue?.tracks.length /* ?? 0*/})
-        </Text>
-        <FlatList
-          style={styles.list}
-          data={queue?.tracks}
-          renderItem={({ item, index }) => (
-            <TrackItem track={item} index={index + 1} />
-          )}
-        />
-      </View>
-    </View>
+    </>
   );
 }
+
+const floatingStyle = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    backgroundColor: "#1A1A1A",
+    borderRadius: 16,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  text: {
+    color: "#FFF",
+    fontFamily: "Outfit",
+    fontSize: 50,
+  },
+});
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
