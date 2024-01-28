@@ -1,10 +1,10 @@
 import { RoomJSON } from "commons/Backend-types";
-import { ActiveRoom } from "commons/database-types-utils";
+import { Room } from "commons/database-types-utils";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Platform, Pressable, StyleSheet } from "react-native";
+import { FlatList, Platform, StyleSheet } from "react-native";
 
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
@@ -40,7 +40,7 @@ export default function MusicRoom() {
   const { id } = useLocalSearchParams() as MusicRoomParams;
   const currentPageLink = Linking.useURL();
 
-  const [room, setRoom] = useState<ActiveRoom>();
+  const [room, setRoom] = useState<Room>();
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const [queue, setQueue] = useState<RoomJSON>();
@@ -123,11 +123,13 @@ export default function MusicRoom() {
               />
             </View>
           </View>
-          <Link href={`/rooms/${room.id}/add`} asChild>
-            <Pressable style={floatingStyle.container}>
-              <Text style={floatingStyle.text}>+</Text>
-            </Pressable>
-          </Link>
+          <Button
+            icon="add"
+            href={`/rooms/${room.id}/add`}
+            style={floatingStyle.container}
+          >
+            Ajouter une musique
+          </Button>
         </>
       )}
     </>
@@ -139,12 +141,6 @@ const floatingStyle = StyleSheet.create({
     position: "absolute",
     bottom: 24,
     right: 24,
-    backgroundColor: "#1A1A1A",
-    borderRadius: 16,
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
   },
   text: {
     color: "#FFF",
