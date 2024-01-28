@@ -41,7 +41,7 @@ export default function TabLayout() {
         // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarActiveTintColor: "black",
         tabBarStyle: {
-          height: 87,
+          height: 88,
           gap: 4,
         },
         tabBarItemStyle: {
