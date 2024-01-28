@@ -2,13 +2,14 @@ import { makeRedirectUri } from "expo-auth-session";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import Alert from "../../../components/Alert";
 import CustomTextInput from "../../../components/CustomTextInput";
 import ParametersList from "../../../components/ParametersList";
 import ServiceList from "../../../components/ServicesList";
@@ -53,7 +54,7 @@ export default function CreateRoom() {
       const response = await fetch(baseUrl + ":3000/streaming-services");
       const data = await response.json();
 
-      const services: Array<StreamingService> = [];
+      const services: StreamingService[] = [];
 
       data.forEach((service: StreamingService) => {
         services.push(service);
@@ -75,24 +76,21 @@ export default function CreateRoom() {
   function checkConstraints(body: CreateRoomFormBody): { error: true | null } {
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
       Alert.alert(
-        "Mauvais pourcentage",
-        "Le pourcentage doit être entre 0 et 100",
+        "Mauvais pourcentage: Le pourcentage doit être entre 0 et 100"
       );
       return { error: true };
     }
 
     if (body.maxMusicPerUser <= 0) {
       Alert.alert(
-        "Mauvais nombre de musique",
-        "Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1",
+        "Mauvais nombre de musique: Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
       );
       return { error: true };
     }
 
     if (body.maxMusicDuration <= 0) {
       Alert.alert(
-        "Mauvaise durée de musique",
-        "La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde",
+        "Mauvaise durée de musique: La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
       );
       return { error: true };
     }
@@ -107,9 +105,9 @@ export default function CreateRoom() {
       code: roomCode,
       service: selectedService,
       voteSkipping: canVote,
-      voteSkippingNeeded: parseInt(percentageVoteToSkipAMusic),
-      maxMusicPerUser: parseInt(maxMusicPerUser),
-      maxMusicDuration: parseInt(maxMusicDuration),
+      voteSkippingNeeded: parseInt(percentageVoteToSkipAMusic, 10),
+      maxMusicPerUser: parseInt(maxMusicPerUser, 10),
+      maxMusicDuration: parseInt(maxMusicDuration, 10),
     };
 
     const { error } = checkConstraints(body);
@@ -126,11 +124,22 @@ export default function CreateRoom() {
         body: JSON.stringify(body),
         credentials: "include",
       });
-      if (response.ok) {
-        router.push("/rooms");
+      console.log(response);
+
+      if (!response.ok) {
+        if (response.status === 409)
+          return Alert.alert("Ce code de salle est déjà utilisé");
+
+        return Alert.alert(response.statusText);
       }
+
+      const jsonResponse = await response.json();
+
+      const roomId = jsonResponse.data.room_id;
+      router.push(`/rooms/${roomId}`);
     } catch (error) {
-      return error;
+      console.error(error);
+      Alert.alert("Une erreur est survenue lors de la création de la salle");
     }
   };
 
@@ -139,13 +148,13 @@ export default function CreateRoom() {
       <View style={styles.form}>
         <Text style={styles.labelText}>Nom de la salle</Text>
         <CustomTextInput
-          placeholder={"Ma salle"}
+          placeholder="Ma salle"
           value={roomName}
           onChangeText={setRoomName}
         />
         <Text style={styles.labelText}>Code de la salle</Text>
         <CustomTextInput
-          placeholder={"1234"}
+          placeholder="1234"
           value={roomCode}
           onChangeText={setRoomCode}
         />
