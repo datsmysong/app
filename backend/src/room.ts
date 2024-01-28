@@ -119,8 +119,8 @@ export default class Room {
   private readonly queue: JSONTrack[];
   private readonly trackFactory: TrackFactory;
 
-  private constructor() {
-    this.uuid = randomUUID();
+  private constructor(uuid: string /*...platforms*/) {
+    this.uuid = uuid;
     this.queue = [];
 
     this.trackFactory = new TrackFactory();
@@ -129,9 +129,14 @@ export default class Room {
     ) /*, new SoundCloud(), new AppleMusic()*/;
   }
 
-  static newRoom(roomStorage: RoomStorage): Room {
-    const room = new Room();
-    roomStorage.addRoom(room);
+  static getOrCreate(roomStorage: RoomStorage, uuid: string): Room {
+    let room = roomStorage.getRoom(uuid);
+
+    if (room === null) {
+      room = new Room(uuid);
+      roomStorage.addRoom(room);
+    }
+
     return room;
   }
 

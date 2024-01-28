@@ -96,7 +96,13 @@ const createRoomSchema = {
   },
 };
 
-server.post("/rooms/create", { schema: createRoomSchema }, RoomPOST);
+server.post<{
+  Reply: {
+    message: string;
+    room: { uuid: string } | null;
+    error: object | null;
+  };
+}>("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
 // Auth
 server.register(authRoutes, { prefix: "/auth" });

@@ -14,24 +14,7 @@ export default async function RoomIdGET(
 
   const roomStorage = RoomStorage.getRoomStorage();
 
-  // TODO MOCK
-  let mock;
-  if (activeRoomId === "mock") {
-    mock = Room.newRoom(roomStorage);
-
-    await mock.add(
-      "https://open.spotify.com/intl-fr/track/4OUTQBwLBaTIUcgdI5PPt7?si=3aac1a9bcf3d4eac"
-    );
-    await mock.add(
-      "https://open.spotify.com/intl-fr/track/5b8HD1dJDuPawgS5FjSC2q?si=1c2499f5cb334ca9"
-    );
-
-    await mock.add(
-      "https://open.spotify.com/intl-fr/track/42CJLS5WkK6jckfYvJ8ULb?si=22b524f4d60643ce"
-    );
-  }
-
-  const room = mock === undefined ? roomStorage.getRoom(activeRoomId) : mock;
+  const room = roomStorage.getRoom(activeRoomId);
   if (room === null) {
     reply.code(404);
   }
