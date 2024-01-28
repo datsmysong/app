@@ -2,7 +2,6 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { adminSupabase } from "./server";
 import createClient from "./lib/supabase";
 import Spotify from "./musicplatform/Spotify";
-import { randomUUID } from "node:crypto";
 import TrackFactory from "./musicplatform/TrackFactory";
 import { JSONTrack, RoomJSON } from "commons/backend-types";
 import RoomStorage from "./RoomStorage";
