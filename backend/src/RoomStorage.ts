@@ -18,9 +18,10 @@ export default class RoomStorage {
 
   async roomFromUuid(rawUuid: string): Promise<Room | null> {
     const { data: remoteRoom } = await adminSupabase
-      .from("active_rooms")
+      .from("rooms")
       .select("*")
       .eq("id", rawUuid)
+      .eq("is_active", true)
       .single();
 
     if (remoteRoom === null) {
@@ -32,9 +33,10 @@ export default class RoomStorage {
 
   async roomFromCode(code: string): Promise<Room | null> {
     const { data: remoteRoom } = await adminSupabase
-      .from("active_rooms")
+      .from("rooms")
       .select("*")
       .eq("code", code)
+      .eq("is_active", true)
       .single();
 
     if (remoteRoom === null) {
