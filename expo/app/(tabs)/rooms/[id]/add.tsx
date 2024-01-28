@@ -1,11 +1,10 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 
-// custom Button give me long time of debug because when href is defined, then onPress event is ignored
 import Button from "../../../../components/Button";
 import HView from "../../../../components/HView";
-import { Text, View } from "../../../../components/Themed";
+import { Text } from "../../../../components/Themed";
 import SocketIo from "../../../../lib/socketio";
 
 export default function AddTrack() {
@@ -18,7 +17,7 @@ export default function AddTrack() {
       .getSocket(`/room/${id}`)
       .emit("queue:add", new URL(value).toString());
 
-    router.push("../");
+    router.back();
   };
 
   return (
