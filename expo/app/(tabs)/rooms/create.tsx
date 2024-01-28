@@ -47,7 +47,7 @@ export default function CreateRoom() {
 
   useEffect(() => {
     const fetchServices = async () => {
-      const response = await fetch(baseUrl + ":3000/streaming-services");
+      const response = await fetch(baseUrl + "/streaming-services");
       const data = await response.json();
 
       const services: StreamingService[] = [];
