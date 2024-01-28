@@ -48,6 +48,12 @@ if (
     "Missing SOUNDCLOUD_CLIENT_ID or SOUNDCLOUD_CLIENT_SECRET environment variable"
   );
 }
+
+if (!process.env.SPOTIFY_CLIENT_ID) {
+  throw new Error(
+    "Missing SPOTIFY_CLIENT_ID environment variable, check .env.local.example file"
+  );
+}
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SERVICE_ROLE
@@ -102,7 +108,7 @@ server.register(authRoutes, { prefix: "/auth" });
 server.get("/auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
 
 server.get("/streaming-services", StreamingServicesGET);
-server.delete("/streaming-service/:uuid", UnbindServicePOST);
+server.post("/streaming-service/:uuid", UnbindServicePOST);
 
 const createRoomSchema = {
   body: {

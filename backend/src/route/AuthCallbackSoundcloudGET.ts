@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { StreamingService } from "./AuthCallbackGET";
 import { getCurrentUser } from "../lib/auth-utils";
 import BoundService from "../lib/bound-service";
+import { getApiUrl } from "../lib/apiUrl";
 
 export interface QueryParams {
   code: string;
@@ -12,9 +13,7 @@ export default async function AuthCallbackSoundcloudGET(
   response: FastifyReply
 ) {
   const directUri = request.hostname;
-  const baseUrl = directUri.includes("exp://")
-    ? "http://" + directUri.split(":3000")[0].split("//")[1]
-    : "http://" + directUri.split(":3000")[0] + ":3000";
+  const baseUrl = getApiUrl(directUri);
 
   const code = (request.query as QueryParams).code;
   if (!code) {

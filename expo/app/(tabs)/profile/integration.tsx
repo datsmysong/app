@@ -18,6 +18,12 @@ export default function ProfileIntegration() {
   useEffect(() => {
     const fetchStreamingServicesData = async () => {
       const services = await fetch(baseUrl + "/streaming-services");
+      if (!services.ok) {
+        Alert.alert(
+          "Erreur serveur, revenez plus tard ou contactez un administrateur"
+        );
+        return;
+      }
       const data = await services.json();
       setServicesData(data);
     };
@@ -30,6 +36,12 @@ export default function ProfileIntegration() {
       const responseBoundServices = await fetch(baseUrl + "/user/bound", {
         credentials: "include",
       });
+      if (!responseBoundServices.ok) {
+        Alert.alert(
+          "Erreur serveur, revenez plus tard ou contactez un administrateur"
+        );
+        return;
+      }
       const dataBoundServices = await responseBoundServices.json();
 
       setBoundServices(dataBoundServices);
@@ -59,14 +71,13 @@ export default function ProfileIntegration() {
   const unbindService = (serviceId: string) => {
     // If I do a DELETE request, I get a CORS error
     fetch(baseUrl + "/streaming-service/" + serviceId, {
-      method: "DELETE",
+      method: "POST",
       credentials: "include",
     })
       .then((resUnbound) => {
         if (!resUnbound.ok) {
           Alert.alert(
-            "Erreur lors de la déconnexion du service : " +
-              resUnbound.statusText
+            "Erreur lors de la déconnexion du service, veuillez réessayer plus tard"
           );
         } else {
           Alert.alert("Service déconnecté avec succès");

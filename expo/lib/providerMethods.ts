@@ -138,7 +138,7 @@ export const bindToSpotify = async () => {
   const codeVerifier = generateRandomString(64);
   const hashed = await sha256(codeVerifier);
   const codeChallenge = base64encode(hashed);
-  const urlEncodedCodeChallenge = encodeURIComponent(codeChallenge);
+  const urlEncodedCodeVerifier = encodeURIComponent(codeVerifier);
 
   if (!process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID) {
     throw new Error("Missing EXPO_PUBLIC_SPOTIFY_CLIENT_ID env variable");
@@ -146,12 +146,11 @@ export const bindToSpotify = async () => {
 
   const clientId = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID;
   const redirectUri = baseUrl + "/auth/callback/bind/spotify";
-  console.log("redirectUri", redirectUri);
 
   const scope = getSpotifyScopes();
   const authUrl = new URL("https://accounts.spotify.com/authorize");
 
-  window.localStorage.setItem("code_verifier", codeVerifier);
+  window.localStorage.setItem("code_verifier", codeChallenge);
 
   const params = {
     response_type: "code",
@@ -169,7 +168,8 @@ export const bindToSpotify = async () => {
     "/auth/redirection?redirect_url=" +
     authUrl.toString() +
     "#code_verifier=" +
-    urlEncodedCodeChallenge;
+    urlEncodedCodeVerifier;
+
   if (Platform.OS === "web" && Device.osName !== "Windows") {
     // if (Platform.OS === "web" ) {
     // Second implementation for web browser on mobile:
@@ -183,22 +183,6 @@ export const bindToSpotify = async () => {
     redirectionUrl,
     redirectUrl
   );
-
-  if (webBrowser.type === "success" && webBrowser.url) {
-    const refreshToken = decodeURIComponent(
-      webBrowser.url.split("#refresh_token=")[1]
-    );
-    const { error } = await supabase.auth.refreshSession({
-      refresh_token: refreshToken,
-    });
-    if (!error) {
-      router.replace("/(tabs)");
-      return;
-    }
-    Alert.alert(
-      "Une erreur est survenue, l'authentification est impossible pour le moment"
-    );
-  }
 };
 
 const getCookie = async (key: string): Promise<string | null> => {
