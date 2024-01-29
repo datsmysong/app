@@ -11,12 +11,12 @@ name: ESLint
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '39 22 * * 2'
+    - cron: "39 22 * * 2"
 
 jobs:
   eslint:
@@ -35,16 +35,26 @@ jobs:
           npm install eslint@8.10.0
           npm install @microsoft/eslint-formatter-sarif@2.1.7
 
-      - name: Run ESLint
-        run: npx eslint .
-          --config .eslintrc.js
+      - name: Run ESLint on expo/
+        run: npx eslint expo/
+          --config expo/.eslintrc.js
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
+          --output-file eslint-results-expo.sarif
+        continue-on-error: true
+
+      - name: Run ESLint on backend/
+        run: npx eslint backend/
+          --config backend/.eslintrc.js
+          --ext .js,.jsx,.ts,.tsx
+          --format @microsoft/eslint-formatter-sarif
+          --output-file eslint-results-backend.sarif
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: eslint-results.sarif
+          sarif_file: |
+            eslint-results-expo.sarif
+            eslint-results-backend.sarif
           wait-for-processing: true
