@@ -41,7 +41,7 @@ jobs:
           --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results-expo.sarif
+          --output-file ../sarif/eslint-results-expo.sarif
         continue-on-error: true
 
       - name: Install ESLint in backend/
@@ -55,7 +55,7 @@ jobs:
           --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results-backend.sarif
+          --output-file ../sarif/eslint-results-backend.sarif
         continue-on-error: true
 
       - run: |
@@ -65,7 +65,5 @@ jobs:
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: |
-            backend/eslint-results-backend.sarif
-            expo/eslint-results-expo.sarif
+          sarif_file: sarif/
           wait-for-processing: true
