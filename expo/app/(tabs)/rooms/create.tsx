@@ -141,42 +141,40 @@ export default function CreateRoom() {
 
   return (
     <ScrollView contentContainerStyle={styles.page}>
-      <View style={styles.form}>
-        <Text style={styles.labelText}>Nom de la salle</Text>
-        <CustomTextInput
-          placeholder="Ma salle"
-          value={roomName}
-          onChangeText={setRoomName}
-        />
-        <Text style={styles.labelText}>Code de la salle</Text>
-        <CustomTextInput
-          placeholder="ABC123"
-          value={roomCode}
-          onChangeText={setRoomCode}
-        />
-        <Text style={styles.labelText}>Plateforme de streaming à utiliser</Text>
-        <ServiceList
-          availableServices={services}
-          handleServiceChange={setSelectedService}
-        />
-        <ParametersList
-          percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
-          setPercentageVote={setPercentageVote}
-          maxMusicDuration={maxMusicDuration}
-          setMaxMusicDuration={setMaxMusicDuration}
-          maxMusicPerUser={maxMusicPerUser}
-          setMaxMusicPerUser={setMaxMusicPerUser}
-          canVote={canVote}
-          setCanVote={setCanVote}
-        />
-        <TouchableOpacity
-          style={[styles.button, !isFormValid && styles.buttonDisabled]}
-          onPress={onSubmit}
-          disabled={!isFormValid}
-        >
-          <Text style={styles.buttonText}>Créer une salle d'écoute</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.labelText}>Nom de la salle</Text>
+      <CustomTextInput
+        placeholder="Ma salle"
+        value={roomName}
+        onChangeText={setRoomName}
+      />
+      <Text style={styles.labelText}>Code de la salle</Text>
+      <CustomTextInput
+        placeholder="ABC123"
+        value={roomCode}
+        onChangeText={setRoomCode}
+      />
+      <Text style={styles.labelText}>Plateforme de streaming à utiliser</Text>
+      <ServiceList
+        availableServices={services}
+        handleServiceChange={setSelectedService}
+      />
+      <ParametersList
+        percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
+        setPercentageVote={setPercentageVote}
+        maxMusicDuration={maxMusicDuration}
+        setMaxMusicDuration={setMaxMusicDuration}
+        maxMusicPerUser={maxMusicPerUser}
+        setMaxMusicPerUser={setMaxMusicPerUser}
+        canVote={canVote}
+        setCanVote={setCanVote}
+      />
+      <TouchableOpacity
+        style={[styles.button, !isFormValid && styles.buttonDisabled]}
+        onPress={onSubmit}
+        disabled={!isFormValid}
+      >
+        <Text style={styles.buttonText}>Créer une salle d'écoute</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
