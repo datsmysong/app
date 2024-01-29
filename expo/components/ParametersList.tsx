@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import CustomTextInput from "./CustomTextInput";
 
+
 interface ParametersListProps {
   percentageVoteToSkipAMusic: string;
   setPercentageVote: (text: string) => void;
@@ -25,43 +26,47 @@ export default function ParametersList({
   canVote,
   setCanVote,
 }: ParametersListProps) {
-  const [isPressed, setIsPressed] = useState(false);
-  const TriangleRight = () => {
-    return <View style={[styles.triangle, styles.triangleRight]} />;
-  };
-
-  const TriangleDown = () => {
-    return <View style={[styles.triangle, styles.triangleDown]} />;
-  };
-
   return (
     <View>
-      <TouchableOpacity
-        onPress={() => {
-          setIsPressed(!isPressed);
-        }}
-      >
-        <View style={styles.items}>
-          {isPressed ? <TriangleDown /> : <TriangleRight />}
-          <Text style={styles.item}>Paramètres supplémentaires</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.checkboxContainer}>
+        <Text style={styles.labelText}>
+          Autoriser à lancer un vote pour passer une musique
+        </Text>
+        <Checkbox
+          style={styles.checkbox}
+          disabled={false}
+          value={canVote}
+          color={"black"}
+          onValueChange={(newValue) => setCanVote(newValue)}
+        />
+      </View>
 
-      {isPressed && (
-        <View>
-          <View style={styles.checkboxContainer}>
-            <Text style={styles.labelText}>
-              Autoriser à lancer un vote pour passer une musique
-            </Text>
-            <Checkbox
-              style={styles.checkbox}
-              disabled={false}
-              value={canVote}
-              color="black"
-              onValueChange={(newValue) => setCanVote(newValue)}
-            />
-          </View>
-
+      <Text style={styles.labelText}>
+        Pourcentage de votes pour passer une musique
+      </Text>
+      <CustomTextInput
+        style={[styles.input, !canVote && styles.inputDisabled]}
+        inputMode={"numeric"}
+        value={canVote ? percentageVoteToSkipAMusic : ""}
+        onChangeText={setPercentageVote}
+        disabled={!canVote}
+      />
+      <Text style={styles.labelText}>
+        Nombre maximum de musique par utilisateur
+      </Text>
+      <CustomTextInput
+        style={styles.input}
+        inputMode={"numeric"}
+        value={maxMusicPerUser}
+        onChangeText={setMaxMusicPerUser}
+      />
+      <Text style={styles.labelText}>Durée maximale d'une musique</Text>
+      <CustomTextInput
+        style={styles.input}
+        inputMode={"numeric"}
+        value={maxMusicDuration}
+        onChangeText={setMaxMusicDuration}
+      />
           <Text style={styles.labelText}>
             Pourcentage de votes pour passer une musique
           </Text>
@@ -96,39 +101,6 @@ export default function ParametersList({
 }
 
 const styles = StyleSheet.create({
-  triangle: {
-    width: 0,
-    height: 0,
-    backgroundColor: "transparent",
-    borderStyle: "solid",
-    borderLeftWidth: 7,
-    borderRightWidth: 7,
-    borderBottomWidth: 14,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderBottomColor: "black",
-  },
-
-  triangleRight: {
-    transform: "rotateZ(90deg)",
-  },
-
-  triangleDown: {
-    transform: "rotateX(180deg)",
-  },
-
-  items: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 20,
-    paddingLeft: 10,
-  },
-
-  item: {
-    marginLeft: 10,
-  },
-
   checkbox: {
     margin: 10,
   },

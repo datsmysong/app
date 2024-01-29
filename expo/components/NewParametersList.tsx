@@ -2,23 +2,32 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import Slider from "@react-native-community/slider";
 import { View, Text } from "./Themed";
+import Checkbox from "expo-checkbox";
+import CustomTextInput from "./CustomTextInput";
 
 export default function ParametersList() {
-  const [sliderValue, setSliderValue] = React.useState(0);
+  const [sliderParticipantValue, setSliderParticipantValue] = React.useState(0);
+  const [canBeAnonymous, setCanBeAnonymous] = React.useState(false);
+  const [canSkip, setCanSkip] = React.useState(true);
+  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(0);
+  const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
+  const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
 
   return (
-    <View>
+    <View style={styles.page}>
       <View style={styles.slider}>
-        <Text style={styles.labelText}>Limite de participants *</Text>
+        <Text style={styles.labelText}>
+          Limite de participants <Text style={{ color: "red" }}>*</Text>
+        </Text>
         <Text
           style={{
-            marginLeft: 100,
+            marginLeft: "50%",
             textAlign: "center",
             marginTop: 32,
           }}
         >
-          {Math.floor(sliderValue)}
+          {sliderParticipantValue}
         </Text>
         <Slider
           style={styles.sliderBar}
@@ -27,25 +36,110 @@ export default function ParametersList() {
           maximumTrackTintColor={"#CCCCCC"}
           minimumTrackTintColor={"#1A1A1A"}
           thumbImage={thumbImage}
-          value={sliderValue}
-          onValueChange={(value) => setSliderValue(value)}
+          value={sliderParticipantValue}
+          onValueChange={(value) => setSliderParticipantValue(value)}
+          step={1}
         />
         <View style={styles.sliderDuration}>
           <Text>1</Text>
           <Text>20</Text>
         </View>
       </View>
+      <View style={styles.checkboxLayout}>
+        <Checkbox
+          value={canBeAnonymous}
+          onValueChange={setCanBeAnonymous}
+          style={styles.checkbox}
+          color={"black"}
+        />
+        <Text style={styles.checkboxText}>
+          Autoriser les participants anonymes
+        </Text>
+        <View />
+      </View>
+      <View style={styles.separator} />
+      <View style={styles.checkboxLayout}>
+        <Checkbox
+          value={canSkip}
+          onValueChange={setCanSkip}
+          style={styles.checkbox}
+          color={"black"}
+        />
+        <Text style={styles.checkboxText}>Activer le vote skipping</Text>
+      </View>
+      <View style={styles.slider}>
+        <Text style={styles.labelText}>
+          Pourcentage nécessaire <Text style={{ color: "red" }}>*</Text>
+        </Text>
+        <Text
+          style={{
+            marginLeft: "50%",
+            textAlign: "center",
+            marginTop: 20,
+          }}
+        >
+          {sliderPercentageValue}
+        </Text>
+        <Slider
+          style={styles.sliderBar}
+          maximumValue={100}
+          minimumValue={1}
+          maximumTrackTintColor={"#CCCCCC"}
+          minimumTrackTintColor={"#1A1A1A"}
+          thumbImage={thumbImage}
+          value={sliderPercentageValue}
+          onValueChange={(value) => setSliderPercentageValue(value)}
+          step={5}
+        />
+        <View style={styles.sliderDuration}>
+          <Text>1</Text>
+          <Text>100</Text>
+        </View>
+      </View>
+      <View style={styles.separator} />
+      <View style={styles.inputLayout}>
+        <Text style={styles.labelText}>
+          Durée maximale d'une musique <Text style={{ color: "red" }}>*</Text>
+        </Text>
+        <CustomTextInput
+          value={maxMusicDuration}
+          onChangeText={setMaxMusicDuration}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.inputLayout}>
+        <Text style={styles.labelText}>
+          Nombre de musiques maximal par participant{" "}
+          <Text style={{ color: "red" }}>*</Text>
+        </Text>
+        <CustomTextInput
+          value={maxMusicPerUser}
+          onChangeText={setMaxMusicPerUser}
+          style={styles.input}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  page: {
+    display: "flex",
+    width: 394,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 12,
+    paddingBottom: 20,
+    paddingTop: 20,
+  },
+
   slider: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "flex-start",
     marginLeft: 20,
+    width: "90%",
   },
 
   sliderBar: {
@@ -64,10 +158,55 @@ const styles = StyleSheet.create({
   },
 
   labelText: {
-    color: "#1A1A1A",
-    fontFamily: "Outfit",
-    fontSize: 20,
+    fontFamily: "Outfit-Bold",
+    fontSize: 17,
     fontStyle: "normal",
-    fontWeight: "700",
+  },
+
+  checkboxLayout: {
+    display: "flex",
+    flexDirection: "row",
+    padding: 10,
+    marginLeft: 10,
+    alignItems: "center",
+    gap: 10,
+    alignSelf: "stretch",
+  },
+
+  checkboxText: {
+    fontFamily: "Outfit-Regular",
+    fontSize: 17,
+  },
+  checkbox: {
+    width: 25,
+    height: 25,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: "#1A1A1A",
+    backgroundColor: "#FFF",
+  },
+  separator: {
+    height: 1,
+    width: "80%",
+    backgroundColor: "grey",
+    marginLeft: "10%",
+    marginRight: "10%",
+  },
+
+  inputLayout: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    alignSelf: "stretch",
+    gap: 10,
+    marginLeft: 20,
+  },
+
+  input: {
+    textAlign: "center",
+    color: "grey",
+    width: "90%",
+    marginRight: "10%",
   },
 });
