@@ -1,4 +1,6 @@
+import Deezer from "./musicplatform/Deezer";
 import MusicPlatform from "./musicplatform/MusicPlatform";
+import SoundCloud from "./musicplatform/SoundCloud";
 import Spotify from "./musicplatform/Spotify";
 import Room from "./room";
 import { adminSupabase } from "./server";
@@ -15,11 +17,10 @@ function getMusicPlatform(serviceId: string): MusicPlatform | null {
   switch (serviceId) {
     case STREAMING_SERVICES["Spotify"]:
       return new Spotify();
-    /*     case STREAMING_SERVICES["SoundCloud"]:
+    case STREAMING_SERVICES["SoundCloud"]:
       return new SoundCloud();
     case STREAMING_SERVICES["Deezer"]:
       return new Deezer();
- */
   }
 
   return null;
