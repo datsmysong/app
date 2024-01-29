@@ -14,5 +14,9 @@
     "typescript",
     "typescriptreact"
   ],
-  "typescript.surveys.enabled": false
+  "typescript.surveys.enabled": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  }
 }
