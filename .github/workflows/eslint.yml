@@ -62,11 +62,8 @@ jobs:
         continue-on-error: true
 
       - run: |
-          ls -la
           ls -la expo/
           ls -la backend/
-          cat expo/eslint-results-expo.sarif
-          cat backend/eslint-results-backend.sarif
 
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
