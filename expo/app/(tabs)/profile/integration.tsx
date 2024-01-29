@@ -81,7 +81,7 @@ export default function ProfileIntegration() {
           );
         } else {
           Alert.alert("Service déconnecté avec succès");
-          router.push("/profile");
+          router.replace("/profile");
         }
       })
       .catch((error) => {

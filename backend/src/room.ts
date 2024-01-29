@@ -1,9 +1,6 @@
 import { adminSupabase } from "./server";
 import { FastifyReply, FastifyRequest } from "fastify";
-import {
-  getUserProfileIdFromAccountId,
-  getUserFromRequest,
-} from "./lib/auth-utils";
+import { getCurrentUser } from "./lib/auth-utils";
 import Spotify from "./musicplatform/Spotify";
 import TrackFactory from "./musicplatform/TrackFactory";
 import { JSONTrack, RoomJSON } from "commons/backend-types";
@@ -29,15 +26,9 @@ export async function createRoom(
   req: FastifyRequest
 ) {
   const supabase = adminSupabase;
-  const user = await getUserFromRequest(req, rep);
 
-  // If the user is not logged in
-  if (!user.data.user) return unauthorizedResponse(rep);
+  const hostUserProfileId = await getCurrentUser(req, rep);
 
-  // If we didn't manage to get the user profile id from the account id
-  const { data: hostUserProfileId } = await getUserProfileIdFromAccountId(
-    user.data.user.id
-  );
   if (!hostUserProfileId) return unauthorizedResponse(rep);
 
   const roomConfigRes = await supabase

@@ -9,7 +9,6 @@ import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
 import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
-import BoundServicePOST from "./route/BoundServicePOST";
 import BoundServicesGET from "./route/BoundServicesGET";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
@@ -141,11 +140,6 @@ server.post<{
     error: object | null;
   };
 }>("/rooms/create", { schema: createRoomSchema }, RoomPOST);
-
-// Auth
-server.register(authRoutes, { prefix: "/auth" });
-
-server.get("/streaming-services", StreamingServicesGET);
 
 server.get("/room/:id", RoomIdGET);
 

@@ -125,7 +125,7 @@ export const signInWithSoundcloud = async () => {
 
   await WebBrowser.openAuthSessionAsync(authUrl);
 
-  router.push("/profile");
+  router.replace("/profile");
 };
 
 export const bindToSpotify = async () => {
@@ -179,10 +179,9 @@ export const bindToSpotify = async () => {
     return;
   }
 
-  const webBrowser = await WebBrowser.openAuthSessionAsync(
-    redirectionUrl,
-    redirectUrl
-  );
+  await WebBrowser.openAuthSessionAsync(redirectionUrl, redirectUrl);
+
+  router.replace("/profile");
 };
 
 const getCookie = async (key: string): Promise<string | null> => {
