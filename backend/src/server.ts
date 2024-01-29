@@ -167,6 +167,7 @@ declare module "fastify" {
   interface FastifyInstance {
     io: Server<{
       hello: (a: string) => void;
+      "queue:deleted": (a: "") => void;
     }>;
   }
 }
