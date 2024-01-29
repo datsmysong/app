@@ -5,12 +5,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { Spotify } from "../lib/spotify";
-import { StreamingPlatformRemote, StreamingService } from "../lib/types";
+
+import { StreamingPlatformRemote } from "../lib/types";
+import { ActiveRoom } from "../lib/useRoom";
 import SoundCloudPlayer, { SoundCloudPlayerRemote } from "./SoundCloudPlayer";
 
 type AudioRemoteProps = {
-  streamingService: StreamingService;
+  streamingService: ActiveRoom["streaming_services"];
 };
 
 const AudioRemote = forwardRef<
@@ -31,11 +32,11 @@ const AudioRemote = forwardRef<
   // If it's Spotify, we return the Spotify remote
   // If it's not supported, we return null
   function getRemoteFromService(
-    streamingService: StreamingService
+    streamingService: AudioRemoteProps["streamingService"]
   ): StreamingPlatformRemote | null {
-    if (streamingService.serviceName === "SoundCloud") {
+    if (streamingService?.service_name === "SoundCloud") {
       return soundCloudRef.current;
-    } else if (streamingService.serviceName === "Spotify") {
+    } else if (streamingService?.service_name === "Spotify") {
       //return new Spotify();
       return null;
     }
@@ -63,7 +64,7 @@ const AudioRemote = forwardRef<
   return (
     <>
       {/* If the streaming service is SoundCloud, we return the SoundCloudPlayer component*/}
-      {streamingService.serviceName === "SoundCloud" && (
+      {streamingService?.service_name === "SoundCloud" && (
         <SoundCloudPlayer ref={soundCloudRef} />
       )}
     </>

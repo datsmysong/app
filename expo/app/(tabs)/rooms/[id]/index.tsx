@@ -1,170 +1,23 @@
-import { RoomJSON } from "commons/backend-types";
-import { Room } from "commons/database-types-utils";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 
-import Alert from "../../../../components/Alert";
-import Button from "../../../../components/Button";
+import ActiveRoomView from "../../../../components/ActiveRoomView";
 import { Text, View } from "../../../../components/Themed";
-import TrackItem from "../../../../components/room/TrackItem";
-import { getApiUrl } from "../../../../lib/apiUrl";
-import { getRoomHostedByUser } from "../../../../lib/room-utils";
-import SocketIo from "../../../../lib/socketio";
-import { supabase } from "../../../../lib/supabase";
-import { useUserProfile } from "../../../../lib/userProfile";
+import useRoom from "../../../../lib/useRoom";
 
-// TODO socket io which refresh playlist on live
-export default function MusicRoom() {
-  const { id: roomId } = useLocalSearchParams<{ id: string }>();
-
-  const [room, setRoom] = useState<Room>();
-  const [queue, setQueue] = useState<RoomJSON>();
-  const [isHost, setIsHost] = useState<boolean>(false);
-
-  const userProfile = useUserProfile();
-
-  const url: URL = new URL("/room/" + roomId, getApiUrl());
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("rooms")
-        .select("*")
-        .eq("id", roomId)
-        .eq("is_active", true)
-        .single();
-      if (error) {
-        router.replace("/rooms");
-        Alert.alert(
-          "Une erreur est survenue lors de la récupération de la salle"
-        );
-        return;
-      }
-      setRoom(data);
-    };
-
-    fetchData();
-
-    const namespace = SocketIo.getInstance().getSocket(url.pathname);
-    namespace.on("queue:update", (data: RoomJSON) => setQueue(data));
-    namespace.on("disconnect", () => {
-      router.replace("/rooms");
-      Alert.alert("Cette salle d'écoute vient d'être supprimée");
-    });
-  }, []);
-
-  const deleteRoom = async () => {
-    const response = await fetch(url + "/end", { credentials: "include" });
-    if (!response.ok && process.env.NODE_ENV !== "production") {
-      Alert.alert(await response.text());
-    }
-  };
-  useEffect(() => {
-    if (!userProfile || !room) return;
-
-    const fetchHost = async () => {
-      const { data } = await getRoomHostedByUser(roomId, userProfile, true);
-
-      setIsHost((data?.length ?? 0) > 0);
-    };
-
-    fetchHost();
-  }, [userProfile, roomId]);
+export default function RoomView() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const room = useRoom(id);
 
   return (
-    <>
-      {room && (
-        <>
-          <View style={headerStyles.headerContainer}>
-            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
-            <View style={headerStyles.buttonContainer}>
-              <Button block href={`/rooms/${roomId}/invite`}>
-                Inviter des amis
-              </Button>
-            </View>
-            <View style={styles.container}>
-              <Text style={styles.title}>
-                File d'attente ({queue?.tracks.length})
-              </Text>
-              <FlatList
-                style={styles.list}
-                data={queue?.tracks}
-                renderItem={({ item, index }) => (
-                  <TrackItem
-                    track={item}
-                    index={index}
-                    roomId={roomId}
-                    isMenuDisabled={!isHost}
-                  />
-                )}
-              />
-            </View>
-          </View>
-          <Button
-            onPress={deleteRoom}
-            color="danger"
-            block
-            style={{ margin: 20, marginRight: 100 }}
-          >
-            Supprimer la salle
-          </Button>
-          <Button
-            icon="add"
-            href={`/rooms/${room.id}/add`}
-            style={floatingStyle.container}
-          >
-            Ajouter une musique
-          </Button>
-        </>
+    <View>
+      {room && room.is_active && <ActiveRoomView room={room} />}
+      {room && !room.is_active && <Text>TODO</Text>}
+      {!room && (
+        <Text>
+          Vous semblez perdu, la salle à laquelle vous essayez d'accéder
+          n'existe pas, ou vous n'êtes pas autorisé à y accéder.
+        </Text>
       )}
-    </>
+    </View>
   );
 }
-
-const floatingStyle = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 24,
-    right: 24,
-  },
-  text: {
-    color: "#FFF",
-    fontFamily: "Outfit",
-    fontSize: 50,
-  },
-});
-
-const headerStyles = StyleSheet.create({
-  headerContainer: {
-    flex: 1,
-    marginHorizontal: 24,
-    marginVertical: 14,
-    gap: 10,
-  },
-  buttonContainer: {
-    gap: 8,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: "bold",
-  },
-});
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 32,
-    paddingHorizontal: 20,
-  },
-  title: {
-    color: "#000",
-    fontFamily: "Outfit-Bold",
-    fontSize: 24,
-    fontStyle: "normal",
-    fontWeight: "700",
-    letterSpacing: 0.48,
-  },
-  list: {
-    marginVertical: 12,
-  },
-});

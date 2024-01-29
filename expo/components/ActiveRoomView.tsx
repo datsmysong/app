@@ -1,144 +1,184 @@
-import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
-import { Socket, io } from "socket.io-client";
-import {
-  ActiveRoom,
-  OrderedMusic,
-  PlaybackState,
-  StreamingPlatformRemote,
-  StreamingService,
-} from "../lib/types";
-import AudioRemote from "./AudioRemote";
+import { RoomJSON } from "commons/Backend-types";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { FlatList, Platform, StyleSheet } from "react-native";
+import { Socket } from "socket.io-client";
+
+import Alert from "./Alert";
 import Button from "./Button";
-import Player from "./Player";
-import PlayerControls from "./PlayerControls";
-import {
-  SoundCloudPlayerRemote,
-  isSoundCloudPlayerRemote,
-} from "./SoundCloudPlayer";
+import RoomPlayer from "./RoomPlayer";
+import { Text, View } from "./Themed";
+import TrackItem from "./room/TrackItem";
+import { getApiUrl } from "../lib/apiUrl";
+import { getRoomHostedByUser } from "../lib/room-utils";
+import SocketIo from "../lib/socketio";
+import { ActiveRoom } from "../lib/useRoom";
+import { useUserProfile } from "../lib/userProfile";
+
+export interface MusicRoomParams {
+  id: string;
+}
+
+export const generatedInvitationLink = (
+  currentUrl: string,
+  roomCode: string
+) => {
+  const production = process.env.NODE_ENV === "production";
+  if (production) {
+    return `https://datsmysong.app/join/${roomCode}`;
+  } else {
+    const mobile = Platform.OS === "ios" || Platform.OS === "android";
+    if (mobile) {
+      const baseUrl = "http://" + currentUrl.split("/").slice(2, 3).join("/");
+      return `${baseUrl}/join/${roomCode}`;
+    } else {
+      const host = currentUrl.split("/").slice(0, 3).join("/");
+      return `${host}/join/${roomCode}`;
+    }
+  }
+};
 
 type ActiveRoomViewProps = {
   room: ActiveRoom;
 };
 
-const knownStreamingServices: Array<StreamingService> = [
-  {
-    serviceId: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
-    serviceName: "Spotify",
-  },
-  {
-    serviceId: "c99631a2-f06c-4076-80c2-13428944c3a8",
-    serviceName: "SoundCloud",
-  },
-];
-
-type StateUpdatedMessage = {
-  type: "stateUpdated";
-  data: PlaybackState;
-};
-
-type StateRequestMessage = {
-  type: "stateRequest";
-};
-
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
-  const isHost = true;
-  const remote = useRef<StreamingPlatformRemote>(null);
+  const [liveRoom, setLiveRoom] = useState<RoomJSON>();
+  const [isHost, setIsHost] = useState<boolean>(false);
+  const [socket, setSocket] = useState<Socket>();
 
-  const [playbackState, setCurrentPlaybackState] = useState<PlaybackState>({
-    currentMusic: null,
-    isPlaying: false,
-    progressMs: 0,
-    volume: 0,
-  });
-  const [queue, setQueue] = useState<OrderedMusic[]>([]);
+  const userProfile = useUserProfile();
 
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const url: URL = new URL("/room/" + room.id, getApiUrl());
 
-  const onStateUpdated = (socket: Socket, message: PlaybackState): void => {
-    setCurrentPlaybackState(message);
-  };
-
-  const onStateRequest = async (
-    socket: Socket,
-    message: StateRequestMessage
-  ) => {
-    if (!isHost) return;
-    // This should never happen because the server should only send that message when the room
-    // is using SoundCloud
-    if (room.streamingService.serviceName !== "SoundCloud") return;
-    if (!isSoundCloudPlayerRemote(remote.current)) return;
-
-    const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
-    const currentPlaybackState = await soundCloudRemote.fetchCurrent();
-
-    socket.emit("stateUpdated", {
-      type: "stateUpdated",
-      data: currentPlaybackState,
-    });
+  const deleteRoom = async () => {
+    const response = await fetch(url + "/end", { credentials: "include" });
+    if (!response.ok && process.env.NODE_ENV !== "production") {
+      Alert.alert(await response.text());
+    }
   };
   useEffect(() => {
-    if (socket == null) return;
-    console.log("[WS] Setting up event listeners");
+    if (!userProfile || !room) return;
 
-    socket.on("connect", () => {
-      console.log("[WS] Connected to room server");
-    });
+    const fetchHost = async () => {
+      const { data } = await getRoomHostedByUser(room.id, userProfile, true);
 
-    socket.on("stateUpdated", (message: any) => {
-      console.log("[WS] Received stateUpdated message");
-      onStateUpdated(socket, message);
-    });
+      setIsHost((data?.length ?? 0) > 0);
+    };
 
-    socket.on("stateRequest", (message: any) => {
-      console.log("[WS] Server is requesting playback state");
-      onStateRequest(socket, message as StateRequestMessage);
+    fetchHost();
+  }, [userProfile, room]);
+
+  useEffect(() => {
+    const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
+    setSocket(socketInstance);
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("queue:update", (data: RoomJSON) => setLiveRoom(data));
+    socket.on("disconnect", () => {
+      router.replace("/rooms");
+      Alert.alert("Cette salle d'écoute vient d'être supprimée");
     });
   }, [socket]);
 
-  useEffect(() => {
-    setSocket(
-      io("http://localhost:3000", {
-        withCredentials: true,
-      })
-    );
-
-    return () => {
-      console.log("[WS] Disconnecting from room server");
-      socket?.disconnect();
-    };
-  }, []);
-
-  const playCoolSong = async () => {
-    if (remote.current === null) return;
-
-    if (room.streamingService.serviceName === "Spotify") {
-      await remote.current.playMusic("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
-    } else if (room.streamingService.serviceName === "SoundCloud") {
-      await remote.current.playMusic(
-        "https://soundcloud.com/dukeandjones/call-me-chill-mix"
-      );
-    }
-  };
-
   return (
     <>
-      <View>
-        {isHost && (
-          <AudioRemote ref={remote} streamingService={room.streamingService} />
-        )}
-        <Player state={playbackState}>
-          {isHost && remote.current && (
-            <PlayerControls state={playbackState} remote={remote.current} />
-          )}
-        </Player>
-      </View>
-
-      <Button type="outline" onPress={playCoolSong}>
-        play Duke & Jones - Call Me (Chill Mix)
-      </Button>
+      {room && liveRoom && socket && (
+        <>
+          <View style={headerStyles.headerContainer}>
+            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+            <View style={headerStyles.buttonContainer}>
+              <Button block href={`/rooms/${room.id}/invite`}>
+                Inviter des amis
+              </Button>
+            </View>
+            <RoomPlayer socket={socket} room={room} liveRoom={liveRoom} />
+            <View style={styles.container}>
+              <Text style={styles.title}>
+                File d'attente ({liveRoom.queue.length})
+              </Text>
+              <FlatList
+                style={styles.list}
+                data={liveRoom.queue}
+                renderItem={({ item, index }) => (
+                  <TrackItem
+                    track={item}
+                    index={index}
+                    roomId={room.id}
+                    isMenuDisabled={!isHost}
+                  />
+                )}
+              />
+            </View>
+          </View>
+          <Button
+            onPress={deleteRoom}
+            color="danger"
+            block
+            style={{ margin: 20, marginRight: 100 }}
+          >
+            Supprimer la salle
+          </Button>
+          <Button
+            icon="add"
+            href={`/rooms/${room.id}/add`}
+            style={floatingStyle.container}
+          >
+            Ajouter une musique
+          </Button>
+        </>
+      )}
     </>
   );
 };
 
 export default ActiveRoomView;
+
+const floatingStyle = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+  },
+  text: {
+    color: "#FFF",
+    fontFamily: "Outfit",
+    fontSize: 50,
+  },
+});
+
+const headerStyles = StyleSheet.create({
+  headerContainer: {
+    flex: 1,
+    marginHorizontal: 24,
+    marginVertical: 14,
+    gap: 10,
+  },
+  buttonContainer: {
+    gap: 8,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+  },
+});
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 32,
+    paddingHorizontal: 20,
+  },
+  title: {
+    color: "#000",
+    fontFamily: "Outfit-Bold",
+    fontSize: 24,
+    fontStyle: "normal",
+    fontWeight: "700",
+    letterSpacing: 0.48,
+  },
+  list: {
+    marginVertical: 12,
+  },
+});

@@ -115,7 +115,11 @@ export default class Room {
 
   static toJSON(room: Room | null | undefined): RoomJSON | Error {
     if (room instanceof Room) {
-      return { currentActiveRoom: room.uuid, tracks: room.getQueue() };
+      return {
+        currentActiveRoom: room.uuid,
+        queue: room.getQueue(),
+        currentlyPlaying: null,
+      };
     } else {
       return { error: { message: "the given id is not active room" } };
     }
