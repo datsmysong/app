@@ -1,12 +1,13 @@
 import { UserProfile } from "commons/database-types-utils";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, Keyboard } from "react-native";
+import { Keyboard, StyleSheet } from "react-native";
 
 import Alert from "../../../components/Alert";
 import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
-import { Text, View } from "../../../components/Tamed";
+import { View } from "../../../components/Tamed";
+import Warning from "../../../components/Warning";
 import { getParticipant, getRoomId, joinRoom } from "../../../lib/room-utils";
 import { useUserProfile } from "../../../lib/userProfile";
 
@@ -69,6 +70,9 @@ export default function JoinRoom() {
 
   return (
     <View style={styles.mainContainer}>
+      {noRoomFound && (
+        <Warning label="Aucune salle n'a été trouvée avec ce code." />
+      )}
       <CustomTextInput
         placeholder="Code de la salle"
         value={roomCode}
@@ -84,11 +88,6 @@ export default function JoinRoom() {
       >
         Rejoindre
       </Button>
-      {noRoomFound && (
-        <Text style={styles.message}>
-          Aucune salle n'a été trouvée avec ce code.
-        </Text>
-      )}
     </View>
   );
 }
@@ -102,9 +101,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: "stretch",
     justifyContent: "center",
-  },
-  message: {
-    fontSize: 16,
-    textAlign: "center",
   },
 });
