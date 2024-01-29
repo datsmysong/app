@@ -15,7 +15,6 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "react-hook-form": "^7.49.3",
     "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-native-community/checkbox": "^0.5.16",
@@ -28,6 +27,7 @@
     "expo-auth-session": "~5.0.2",
     "expo-blur": "~12.4.1",
     "expo-checkbox": "~2.4.0",
+    "expo-clipboard": "~4.3.1",
     "expo-crypto": "~12.4.1",
     "expo-device": "~5.4.0",
     "expo-font": "~11.4.0",
@@ -41,6 +41,7 @@
     "expo-web-browser": "~12.3.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.49.3",
     "react-native": "0.72.6",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.12.0",
@@ -49,12 +50,12 @@
     "react-native-svg": "13.9.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
-    "expo-clipboard": "~4.3.1",
     "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
-    "@expo/ngrok": "4.1.0",
     "@babel/core": "^7.20.0",
+    "@expo/ngrok": "4.1.0",
+    "@microsoft/eslint-formatter-sarif": "^3.0.0",
     "@types/react": "~18.2.14",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
