@@ -57,8 +57,8 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, liveRoom, socket }) => {
     const soundCloudRemote = remote.current as SoundCloudPlayerRemote;
     const currentPlaybackState = await soundCloudRemote.fetchCurrent();
 
-    socket.emit("stateUpdated", {
-      type: "stateUpdated",
+    socket.emit("player:stateUpdated", {
+      type: "player:stateUpdated",
       data: currentPlaybackState,
     });
   };
@@ -70,12 +70,12 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, liveRoom, socket }) => {
       console.log("[WS] Connected to room server");
     });
 
-    socket.on("stateUpdated", (message: any) => {
+    socket.on("player:stateUpdated", (message: any) => {
       console.log("[WS] Received stateUpdated message");
       onStateUpdated(socket, message);
     });
 
-    socket.on("stateRequest", (message: any) => {
+    socket.on("player:stateRequest", (message: any) => {
       console.log("[WS] Server is requesting playback state");
       onStateRequest(socket, message as StateRequestMessage);
     });

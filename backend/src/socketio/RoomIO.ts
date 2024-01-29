@@ -1,6 +1,7 @@
 import { Socket } from "socket.io";
 import RoomStorage from "../RoomStorage";
 import Room from "../room";
+import updateState from "../websocket/updateState";
 
 export default function RoomIO(
   socket: Socket /*, next: (err?: ExtendedError) => void*/
@@ -40,6 +41,7 @@ export default function RoomIO(
      */
 
     socket.emit("queue:update", Room.toJSON(room));
+    socket.on("player:stateUpdated", updateState(socket));
 
     socket.on("queue:add", async (params: string) => {
       await room.add(params);

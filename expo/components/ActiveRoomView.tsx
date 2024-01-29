@@ -22,7 +22,7 @@ export interface MusicRoomParams {
 export const generatedInvitationLink = (
   currentUrl: string,
   roomCode: string
-) => {
+): string => {
   const production = process.env.NODE_ENV === "production";
   if (production) {
     return `https://datsmysong.app/join/${roomCode}`;

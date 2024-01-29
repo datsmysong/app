@@ -1,8 +1,7 @@
-import { Server, Socket } from "socket.io";
+import { Socket } from "socket.io";
 
-const updateState =
-  (io: Server, socket: Socket) => async (message: any, done: any) => {
-    const playingMusic = message.data.playingMusic;
-    socket.emit("stateUpdated", playingMusic);
-  };
+const updateState = (socket: Socket) => async (message: any, done: any) => {
+  const playingMusic = message.data.playingMusic;
+  socket.nsp.emit("player:stateUpdated", playingMusic);
+};
 export default updateState;
