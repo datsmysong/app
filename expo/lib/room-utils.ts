@@ -57,12 +57,13 @@ export const getParticipant: GetParticipantFunction = async (
 };
 
 export const getRoomId: GetRoomIdFunction = async (roomCode: string) => {
-  const { data: room, error: activeRoomsError } = await supabase
-    .from("active_rooms")
+  const { data: room, error: roomsError } = await supabase
+    .from("rooms")
     .select("*")
     .eq("code", roomCode)
+    .eq("is_active", true)
     .single();
 
-  if (activeRoomsError) return { data: null, error: activeRoomsError };
+  if (roomsError) return { data: null, error: roomsError };
   return { data: room.id, error: null };
 };

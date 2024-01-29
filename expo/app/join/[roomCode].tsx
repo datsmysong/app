@@ -29,10 +29,9 @@ export default function JoinPage() {
     };
 
     const fetchRoomId = async () => {
-      const { data: roomId, error: activeRoomsError } =
-        await getRoomId(roomCode);
+      const { data: roomId, error: roomsError } = await getRoomId(roomCode);
 
-      if (activeRoomsError || !roomId) {
+      if (roomsError || !roomId) {
         return Alert.alert(
           "Aucune salle d'écoute n'a été trouvée avec ce code."
         );

@@ -15,7 +15,6 @@ export default function JoinRoom() {
   const [isTextPresent, setIsTextPresent] = useState<boolean>(false);
   const [noRoomFound, setNoRoomFound] = useState<boolean>();
   const [userProfile, setUserProfile] = useState<UserProfile | null>();
-  const [isParticipant, setIsParticipant] = useState<boolean>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,9 +32,11 @@ export default function JoinRoom() {
   const searchRoom = async () => {
     Keyboard.dismiss();
 
-    const { data: roomId, error: activeRoomError } = await getRoomId(roomCode);
+    if (!roomCode) return;
 
-    if (activeRoomError || !roomId) {
+    const { data: roomId, error: roomsError } = await getRoomId(roomCode);
+
+    if (roomsError || !roomId) {
       setNoRoomFound(true);
       setTimeout(() => {
         setNoRoomFound(false);
@@ -49,7 +50,7 @@ export default function JoinRoom() {
       );
 
     const { data } = await getParticipant(roomId, userProfile);
-    setIsParticipant((data?.length ?? 0) > 0);
+    const isParticipant = (data?.length ?? 0) > 0;
 
     if (!isParticipant) {
       const { error: roomUsersError } = await joinRoom(
@@ -58,10 +59,6 @@ export default function JoinRoom() {
         isParticipant
       );
 
-      /**
-       * This returns an error even when the user is already in the room
-       * so we should prevent him to go back to this page if he is in a room, unless he leaves it
-       */
       if (roomUsersError) {
         return Alert.alert("Impossible de rejoindre la salle d'écoute");
       }
