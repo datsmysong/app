@@ -37,7 +37,7 @@ jobs:
 
       - name: Run ESLint on expo/
         run: npx eslint expo/
-          --config expo/.eslintrc.js
+          --config expo/.eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results-expo.sarif
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run ESLint on backend/
         run: npx eslint backend/
-          --config backend/.eslintrc.js
+          --config backend/.eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results-backend.sarif
