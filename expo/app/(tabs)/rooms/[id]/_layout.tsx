@@ -8,6 +8,7 @@ export default function RoomTabLayout() {
         name="invite"
         options={{ presentation: "modal", title: "Menu d'invitation" }}
       />
+      <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
     </Stack>
   );
 }

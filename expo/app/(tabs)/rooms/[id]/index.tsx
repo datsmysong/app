@@ -1,10 +1,8 @@
 import { RoomJSON } from "commons/backend-types";
 import { Room } from "commons/database-types-utils";
-import * as Clipboard from "expo-clipboard";
-import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Platform, StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
@@ -14,55 +12,15 @@ import { getApiUrl } from "../../../../lib/apiUrl";
 import SocketIo from "../../../../lib/socketio";
 import { supabase } from "../../../../lib/supabase";
 
-// TODO delete soon
-export interface MusicRoomParams {
-  id: string;
-}
-
-const generatedInvitationLink = (currentUrl: string, roomCode: string) => {
-  const production = process.env.NODE_ENV === "production";
-  if (production) {
-    return `https://datsmysong.app/join/${roomCode}`;
-  } else {
-    const mobile = Platform.OS === "ios" || Platform.OS === "android";
-    if (mobile) {
-      const baseUrl = "http://" + currentUrl.split("/").slice(2, 3).join("/");
-      return `${baseUrl}/join/${roomCode}`;
-    } else {
-      const host = currentUrl.split("/").slice(0, 3).join("/");
-      return `${host}/join/${roomCode}`;
-    }
-  }
-};
-
 // TODO socket io which refresh playlist on live
 export default function MusicRoom() {
-  const { id } = useLocalSearchParams() as MusicRoomParams;
-  const currentPageLink = Linking.useURL();
+  const { id } = useLocalSearchParams();
 
   const [room, setRoom] = useState<Room>();
-  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const [queue, setQueue] = useState<RoomJSON>();
 
   const url: URL = new URL("/room/" + id, getApiUrl());
-
-  const handleShare = async () => {
-    if (!currentPageLink) {
-      Alert.alert("Aucun lien n'a été retourné");
-      return;
-    }
-
-    const roomCode = room?.code ?? "";
-    const invitationLink = generatedInvitationLink(currentPageLink, roomCode);
-
-    await Clipboard.setStringAsync(invitationLink);
-    setIsCopied(true);
-
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 3000);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,11 +41,6 @@ export default function MusicRoom() {
 
     fetchData();
 
-    // unused for the moment
-    // fetch(url)
-    //     .then(res => res.json())
-    //     .then((data: ActiveRoomSkeleton) => setData(data))
-
     SocketIo.getInstance()
       .getSocket(url.pathname)
       .on("queue:update", (data: RoomJSON) => setQueue(data));
@@ -97,11 +50,11 @@ export default function MusicRoom() {
     <>
       {room && (
         <>
-          <View style={headerStyles.headerContainer}>
-            <Text style={headerStyles.title}>Salle "{room.name}"</Text>
-            <View style={headerStyles.buttonContainer}>
-              <Button block href="/rooms/id/invite">
-                Inviter des gens
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerTitle}>Salle "{room.name}"</Text>
+            <View style={styles.buttonContainer}>
+              <Button block href={`/rooms/${id}/invite`}>
+                Inviter des amis
               </Button>
             </View>
             <View style={styles.container}>
@@ -120,7 +73,7 @@ export default function MusicRoom() {
           <Button
             icon="add"
             href={`/rooms/${room.id}/add`}
-            style={floatingStyle.container}
+            style={styles.floatingContainer}
           >
             Ajouter une musique
           </Button>
@@ -130,39 +83,8 @@ export default function MusicRoom() {
   );
 }
 
-const floatingStyle = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 24,
-    right: 24,
-  },
-  text: {
-    color: "#FFF",
-    fontFamily: "Outfit",
-    fontSize: 50,
-  },
-});
-
-const headerStyles = StyleSheet.create({
-  headerContainer: {
-    flex: 1,
-    marginHorizontal: 24,
-    marginVertical: 14,
-    gap: 10,
-  },
-  buttonContainer: {
-    gap: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-  },
-});
-
 const styles = StyleSheet.create({
   container: {
-    // marginVertical: 32,
-    // marginHorizontal: 20,
     paddingVertical: 32,
     paddingHorizontal: 20,
   },
@@ -176,5 +98,28 @@ const styles = StyleSheet.create({
   },
   list: {
     marginVertical: 12,
+  },
+  floatingContainer: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+  },
+  text: {
+    color: "#FFF",
+    fontFamily: "Outfit",
+    fontSize: 50,
+  },
+  headerContainer: {
+    flex: 1,
+    marginHorizontal: 24,
+    marginVertical: 14,
+    gap: 10,
+  },
+  buttonContainer: {
+    gap: 8,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
   },
 });

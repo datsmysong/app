@@ -9,15 +9,7 @@ export default function RoomsTabLayout() {
         name="create"
         options={{ presentation: "modal", title: "Création d'une salle" }}
       />
-      <Stack.Screen name="[id]/index" options={{ title: "Salle d'écoute" }} />
-      <Stack.Screen
-        name="[id]/add"
-        options={{ title: "Ajouter une musique" }}
-      />
-      <Stack.Screen
-        name="[id]"
-        options={{ title: "Nom de la salle", headerShown: false }}
-      />
+      <Stack.Screen name="[id]" options={{ headerShown: false }} />
     </Stack>
   );
 }
