@@ -30,22 +30,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install ESLint
-        run: |
-          npm install eslint@8.10.0
-          npm install @microsoft/eslint-formatter-sarif@2.1.7
+      - name: Install dependencies in expo/
+        working-directory: expo/
+        run: npm i
 
       - name: Run ESLint on expo/
-        run: npx eslint expo/
-          --config expo/.eslintrc.json
+        working-directory: expo/
+        run: npx eslint .
+          --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results-expo.sarif
         continue-on-error: true
 
+      - name: Install ESLint in backend/
+        working-directory: backend/
+        run: npm i
+
       - name: Run ESLint on backend/
-        run: npx eslint backend/
-          --config backend/.eslintrc.json
+        working-directory: backend/
+        run: npx eslint .
+          --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results-backend.sarif
