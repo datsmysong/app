@@ -25,7 +25,7 @@ const SettingsOptions = ({
   const content = (
     <View style={styles.container}>
       <MaterialIcons name={icon} size={30} color={color} />
-      <Text style={styles.label}>{title}</Text>
+      <Text style={[styles.label, { color }]}>{title}</Text>
       <MaterialIcons name="keyboard-arrow-right" size={30} color={color} />
     </View>
   );
