@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 import Alert from "../../components/Alert";
 import Button from "../../components/Button";
@@ -24,7 +24,19 @@ type EditForm = {
 
 export default function PersonalInfo() {
   const user = useSupabaseUserHook();
+  const avatarRef = useRef<{
+    saveImage: () => Promise<{
+      error: string | null;
+    }>;
+  }>();
+
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const [initialUsername, setInitialUsername] = useState<string | null>(null);
+  const [profilePictureChanged, setProfilePictureChanged] =
+    useState<boolean>(false);
+  const [subbmitable, setSubbmitable] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const {
     control,
@@ -32,7 +44,7 @@ export default function PersonalInfo() {
     setValue,
     setError,
     watch,
-    formState: { dirtyFields, errors },
+    formState: { errors },
   } = useForm<EditForm>({
     defaultValues: {
       email: "",
@@ -41,100 +53,125 @@ export default function PersonalInfo() {
     shouldFocusError: true,
   });
 
-  const avatarRef = useRef<{ saveImage: () => Promise<void> }>();
-  const [profilePictureChanged, setProfilePictureChanged] =
-    useState<boolean>(false);
-  const [subbmitable, setSubbmitable] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const inputs = watch();
+  const inputsChange = watch();
 
   useEffect(() => {
     if (user && user.email) {
-      setValue("email", user.email, {
-        shouldDirty: false,
-      });
+      setValue("email", user.email);
       getUserProfile(user.id).then((profile) => {
         if (profile && profile.username) {
-          setValue("username", "@" + profile.username, {
-            shouldDirty: false,
-          });
+          setValue("username", "@" + profile.username);
           setInitialUsername(profile.username);
         }
       });
     }
   }, [user]);
 
+  useEffect(() => {
+    if (inputsChange.email !== user?.email) return setSubbmitable(true);
+    if (inputsChange.username !== "@" + initialUsername)
+      return setSubbmitable(true);
+    if (profilePictureChanged) return setSubbmitable(true);
+
+    setSubbmitable(false);
+  }, [inputsChange]);
+
+  /**
+   *  Update email
+   * @param email valid email
+   * @returns string if success, undefined if error
+   */
+  const updateEmail = async (email: string): Promise<string | undefined> => {
+    console.log("Mise a jour email", email);
+
+    const { error } = await supabase.auth.updateUser({ email });
+    if (error) {
+      setError("email", {
+        message:
+          error.message === AuthErrorMessage.EmailAlreadyUsed
+            ? "Cette adresse email est déjà utilisée"
+            : error.message,
+      });
+      return;
+    }
+    return "Email mise à jour, veuillez confirmer votre nouvelle adresse email";
+  };
+
+  /**
+   * Update username
+   * @param username username without @
+   * @returns string if success, undefined if error
+   */
+  const updateUsername = async (
+    username: string
+  ): Promise<string | undefined> => {
+    console.log("Mise a jour username");
+
+    const accountId = user?.id;
+    if (!accountId) return;
+
+    const usernameWithoutAt = username.replace("@", "");
+    const { error } = await supabase
+      .from("user_profile")
+      .update({
+        username: usernameWithoutAt,
+      })
+      .eq("account_id", accountId);
+    if (error) {
+      setValue("username", "@" + initialUsername, {
+        shouldDirty: false,
+      });
+      const errorMessage =
+        error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION
+          ? "Le pseudo '" +
+            username +
+            "' est déjà pris par un autre utilisateur"
+          : error.message;
+      setError("username", {
+        message: errorMessage,
+      });
+      return;
+    }
+    setInitialUsername(usernameWithoutAt);
+    setValue("username", "@" + usernameWithoutAt);
+    return "Pseudo mis à jour";
+  };
+
   const onSubmit = async ({ email, username }: EditForm) => {
     const succedResum: string[] = [];
-    if (dirtyFields.email) {
-      const { error } = await supabase.auth.updateUser({ email });
-      if (error) {
-        setError("email", {
-          message:
-            error.message === AuthErrorMessage.EmailAlreadyUsed
-              ? "Cette adresse email est déjà utilisée"
-              : error.message,
-        });
-      } else
-        succedResum.push(
-          "Email mise à jour, veuillez confirmer votre nouvelle adresse email"
-        );
+
+    if (inputsChange.email !== user?.email) {
+      const res = await updateEmail(email);
+      if (res) succedResum.push(res);
     }
 
-    if (dirtyFields.username) {
-      const accountId = user?.id;
-      if (!accountId) return;
-
-      const usernameWithoutAt = username.replace("@", "");
-      const { error } = await supabase
-        .from("user_profile")
-        .update({
-          username: usernameWithoutAt,
-        })
-        .eq("account_id", accountId);
-      if (error) {
-        setValue("username", "@" + initialUsername, {
-          shouldDirty: false,
-        });
-        if (error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION) {
-          setError("username", {
-            message:
-              "Le pseudo '" +
-              username +
-              "' est déjà pris par un autre utilisateur",
-          });
-        } else {
-          setError("root", {
-            message: error.message,
-          });
-        }
-      } else succedResum.push("- Pseudo mis à jour");
-      setInitialUsername(usernameWithoutAt);
+    if (inputsChange.username !== "@" + initialUsername) {
+      const res = await updateUsername(username);
+      if (res) succedResum.push(res);
     }
 
     if (profilePictureChanged) {
-      await avatarRef.current?.saveImage();
+      if (!avatarRef.current) return;
       setProfilePictureChanged(false);
-      succedResum.push("- Photo de profil mise à jour");
+
+      const { error } = await avatarRef.current.saveImage();
+      if (error) {
+        return setError("root", {
+          message: "Impossible d'ajouter la photo de profil" + error,
+        });
+      }
+      succedResum.push("Photo de profil mise à jour");
     }
 
     if (succedResum.length > 0) setSuccessMessage(succedResum.join("\n"));
     else setSuccessMessage(null);
 
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     setSubbmitable(false);
   };
 
-  useEffect(() => {
-    if (inputs.email !== user?.email) return setSubbmitable(true);
-    if (inputs.username !== "@" + initialUsername) return setSubbmitable(true);
-    if (profilePictureChanged) return setSubbmitable(true);
-
-    setSubbmitable(false);
-  }, [inputs]);
-
   return (
-    <View style={styles.rootContainer}>
+    <ScrollView ref={scrollViewRef} style={styles.rootContainer}>
       <View style={styles.container}>
         {errors.root && errors.root.message && (
           <Warning label={errors.root.message} variant="warning" />
@@ -177,7 +214,7 @@ export default function PersonalInfo() {
           Supprimer mon compte
         </Button>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

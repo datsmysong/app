@@ -28,7 +28,7 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
 
   useImperativeHandle(ref, () => ({
     saveImage: async () => {
-      await uploadAvatar();
+      return await uploadAvatar();
     },
   }));
 
@@ -48,14 +48,13 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
     setAvatarUrl(data.publicUrl);
   }
 
-  async function uploadAvatar() {
-    if (!user) {
-      console.error("No user");
-      return;
-    }
-    if (!avatarUrl) {
-      console.error("no avatarurl");
-      return;
+  async function uploadAvatar(): Promise<{
+    error: string | null;
+  }> {
+    if (!user || !avatarUrl) {
+      return {
+        error: "No user or avatar",
+      };
     }
     const fileName = `${user.id}.jpg`;
     const image = await getBase64Image(avatarUrl);
@@ -67,8 +66,14 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
       });
     if (error) {
       console.log("error", error);
+      return {
+        error: error.message,
+      };
     }
     downloadUserImage();
+    return {
+      error: null,
+    };
   }
 
   async function selectAvatar() {
@@ -85,7 +90,7 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
 
     if (file.assets) {
       if (file.assets.length !== 1) {
-        Alert.alert("Veuillez sélectionner une image");
+        Alert.alert("Veuillez sélectionner une seule image");
         return;
       }
       const image = file.assets[0];
@@ -124,7 +129,7 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
         type="outline"
         size="small"
       >
-        {uploading ? "Loading ..." : "Charger une image"}
+        {uploading ? "Chargement ..." : "Charger une image"}
       </Button>
     </View>
   );

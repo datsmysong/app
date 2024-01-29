@@ -7,6 +7,7 @@ const Separator = () => {
         height: 1,
         width: "100%",
         backgroundColor: "#E6E6E6",
+        opacity: 0.5,
       }}
     />
   );
