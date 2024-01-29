@@ -49,7 +49,7 @@ jobs:
         working-directory: backend/
         run: |
           npm i
-          npm install @microsoft/eslint-formatter-sarif@3.0.0
+          npm install @microsoft/eslint-formatter-sarif@2.1.7
 
       - name: Run ESLint on backend/
         working-directory: backend/
