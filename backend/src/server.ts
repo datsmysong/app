@@ -166,7 +166,7 @@ server.get("/room/:id/end", RoomEndGET);
 
 server.get("/rooms", RoomGET);
 
-server.post("room/configuration/:id", RoomConfigurationUpdatePOST);
+server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 
 // server.get("/track/spotify/:id", SpotifyGET);
 
