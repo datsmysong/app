@@ -2,7 +2,14 @@ import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Alert, Image, Platform, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import { supabase } from "../../lib/supabase";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
@@ -58,12 +65,14 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
     }
     const fileName = `${user.id}.jpg`;
     const image = await getBase64Image(avatarUrl);
+
     const { error } = await supabase.storage
       .from("avatars")
       .upload(fileName, image, {
         upsert: true,
         contentType: "image/jpeg",
       });
+
     if (error) {
       console.log("error", error);
       return {
@@ -103,25 +112,27 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
   return (
     <View style={{ width: "100%", gap: 10 }}>
       <Text style={formStyles.label}>Photo de profil</Text>
-      {avatarUrl ? (
-        <Image
-          source={{ uri: avatarUrl }}
-          aria-aria-label="Avatar"
-          style={[
-            { aspectRatio: 1, width: "100%" },
-            styles.avatar,
-            styles.image,
-          ]}
-        />
-      ) : (
-        <View
-          style={[
-            { aspectRatio: 1, width: "100%" },
-            styles.avatar,
-            styles.noImage,
-          ]}
-        />
-      )}
+      <Pressable onPress={selectAvatar}>
+        {avatarUrl ? (
+          <Image
+            source={{ uri: avatarUrl }}
+            aria-aria-label="Avatar"
+            style={[
+              { aspectRatio: 1, width: "100%" },
+              styles.avatar,
+              styles.image,
+            ]}
+          />
+        ) : (
+          <View
+            style={[
+              { aspectRatio: 1, width: "100%" },
+              styles.avatar,
+              styles.noImage,
+            ]}
+          />
+        )}
+      </Pressable>
       <Button
         onPress={selectAvatar}
         disabled={uploading}

@@ -153,7 +153,6 @@ export default function PersonalInfo() {
     if (profilePictureChanged) {
       if (!avatarRef.current) return;
       setProfilePictureChanged(false);
-
       const { error } = await avatarRef.current.saveImage();
       if (error) {
         return setError("root", {
@@ -172,47 +171,59 @@ export default function PersonalInfo() {
 
   return (
     <ScrollView ref={scrollViewRef} style={styles.rootContainer}>
-      <View style={styles.container}>
-        {errors.root && errors.root.message && (
-          <Warning label={errors.root.message} variant="warning" />
-        )}
-        {successMessage && <Warning label={successMessage} variant="success" />}
-        <ControlledInput
-          control={control}
-          label="Adresse email"
-          name="email"
-          placeholder="nouvelle adresse email"
-          rules={emailRules}
-          errorMessage={errors.email && errors.email.message}
-        />
-        <ControlledInput
-          control={control}
-          label="Nom d'uilisateur"
-          name="username"
-          placeholder="@nouveau_nom"
-          rules={usernameRules}
-          errorMessage={errors.username && errors.username.message}
-        />
-        <Avatar
-          ref={avatarRef}
-          onImageLoad={() => {
-            setProfilePictureChanged(true);
-          }}
-        />
-        <Button block onPress={handleSubmit(onSubmit)} disabled={!subbmitable}>
-          Sauvegarder
-        </Button>
-      </View>
-      <View style={styles.container}>
-        <Button
-          type="outline"
-          color="danger"
-          size="small"
-          block
-          onPress={() => Alert.alert("Not implemented")}
-        >
-          Supprimer mon compte
-        </Button>
+      <View
+        style={{
+          paddingBottom: 32,
+        }}
+      >
+        <View style={styles.container}>
+          {errors.root && errors.root.message && (
+            <Warning label={errors.root.message} variant="warning" />
+          )}
+          {successMessage && (
+            <Warning label={successMessage} variant="success" />
+          )}
+          <ControlledInput
+            control={control}
+            label="Adresse email"
+            name="email"
+            placeholder="nouvelle adresse email"
+            rules={emailRules}
+            errorMessage={errors.email && errors.email.message}
+          />
+          <ControlledInput
+            control={control}
+            label="Nom d'uilisateur"
+            name="username"
+            placeholder="@nouveau_nom"
+            rules={usernameRules}
+            errorMessage={errors.username && errors.username.message}
+          />
+          <Avatar
+            ref={avatarRef}
+            onImageLoad={() => {
+              setProfilePictureChanged(true);
+            }}
+          />
+          <Button
+            block
+            onPress={handleSubmit(onSubmit)}
+            disabled={!subbmitable}
+          >
+            Sauvegarder
+          </Button>
+        </View>
+        <View style={styles.container}>
+          <Button
+            type="outline"
+            color="danger"
+            size="small"
+            block
+            onPress={() => Alert.alert("Not implemented")}
+          >
+            Supprimer mon compte
+          </Button>
+        </View>
       </View>
     </ScrollView>
   );
@@ -224,6 +235,7 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingHorizontal: 18,
     flex: 1,
+    paddingBottom: 300,
   },
   container: {
     alignItems: "stretch",
