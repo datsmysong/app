@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Divider } from "react-native-elements";
 
 import ConnectWithGoogle from "./connect-with-google";
 import ConnectWithSpotify from "./connect-with-spotify";
 import Button from "../../components/Button";
+import Separator from "../../components/Separator";
 
 export default function Onboarding() {
   return (
@@ -17,9 +17,9 @@ export default function Onboarding() {
         <ConnectWithGoogle />
         <ConnectWithSpotify />
         <View style={styles.containerWithDivider}>
-          <Divider style={{ width: "80%", margin: 20 }} />
-          <Text>ou</Text>
-          <Divider style={{ width: "80%", margin: 20 }} />
+          <Separator />
+          <Text style={{ marginHorizontal: 10 }}>ou</Text>
+          <Separator />
         </View>
         <Button prependIcon="mail" type="outline" href="/auth/login" block>
           Rejoindre avec une adresse email
@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     gap: 20,
     alignItems: "center",
     padding: 15,
+    paddingHorizontal: 10,
   },
   buttonContainer: {
     alignItems: "center",
@@ -50,5 +51,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    width: "80%",
+    alignSelf: "center",
   },
 });

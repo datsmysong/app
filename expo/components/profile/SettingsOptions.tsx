@@ -23,14 +23,20 @@ const SettingsOptions = ({
   onPress,
 }: SettingsOptionsProps) => {
   const content = (
-    <View style={[styles.container, { width: "100%" }]}>
+    <View style={styles.container}>
       <MaterialIcons name={icon} size={30} color={color} />
-      <Text style={[styles.label, { width: "100%", color }]}>{title}</Text>
+      <Text style={styles.label}>{title}</Text>
       <MaterialIcons name="keyboard-arrow-right" size={30} color={color} />
     </View>
   );
 
-  if (href) return <Link href={href as any}>{content}</Link>;
+  if (href)
+    // using asChild because in android, <Link> are not styled
+    return (
+      <Link href={href as any} asChild>
+        <Pressable>{content}</Pressable>
+      </Link>
+    );
   return <Pressable onPress={onPress}>{content}</Pressable>;
 };
 
@@ -44,9 +50,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
+    justifyContent: "space-between",
   },
   label: {
     fontFamily: "Outfit-Regular",
     fontSize: 18,
+    flex: 1,
   },
 });

@@ -4,10 +4,10 @@ const Separator = () => {
   return (
     <View
       style={{
-        height: 1,
-        width: "100%",
+        flex: 1,
         backgroundColor: "#E6E6E6",
-        opacity: 0.5,
+        opacity: 1,
+        paddingBottom: 1,
       }}
     />
   );

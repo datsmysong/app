@@ -221,8 +221,9 @@ export default function PersonalInfo() {
 const styles = StyleSheet.create({
   rootContainer: {
     gap: 24,
-    paddingVertical: 32,
+    paddingTop: 32,
     paddingHorizontal: 18,
+    flex: 1,
   },
   container: {
     alignItems: "stretch",
@@ -231,5 +232,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     gap: 10,
     padding: 20,
+    marginBottom: 30,
   },
 });
