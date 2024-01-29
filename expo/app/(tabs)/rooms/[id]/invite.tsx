@@ -4,6 +4,7 @@ import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 
 import Button from "../../../../components/Button";
 import { View } from "../../../../components/Themed";
@@ -11,10 +12,11 @@ import { supabase } from "../../../../lib/supabase";
 
 export default function InvitationModal() {
   const { id } = useLocalSearchParams();
-  const currentPageLink = Linking.useURL();
+  const currentUrl = Linking.useURL();
 
   const [room, setRoom] = useState<Room>();
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isQRCodeDisplayed, setIsQRCodeDisplayed] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,13 +39,7 @@ export default function InvitationModal() {
   }, []);
 
   const handleShare = async () => {
-    if (!currentPageLink) {
-      Alert.alert("Aucun lien n'a été retourné");
-      return;
-    }
-
-    const roomCode = room?.code ?? "";
-    const invitationLink = generatedInvitationLink(currentPageLink, roomCode);
+    const invitationLink = generatedInvitationLink();
 
     await Clipboard.setStringAsync(invitationLink);
     setIsCopied(true);
@@ -53,7 +49,13 @@ export default function InvitationModal() {
     }, 3000);
   };
 
-  const generatedInvitationLink = (currentUrl: string, roomCode: string) => {
+  const generatedInvitationLink = () => {
+    if (!currentUrl) {
+      Alert.alert("Aucun lien n'a été retourné");
+      return "";
+    }
+    const roomCode = room?.code ?? "";
+
     const production = process.env.NODE_ENV === "production";
     if (production) {
       return `https://datsmysong.app/join/${roomCode}`;
@@ -69,12 +71,11 @@ export default function InvitationModal() {
     }
   };
 
-  // TODO: add onPress to first Button when feat/room-links is merged into main
   return (
     <View style={styles.modalContent}>
       <View style={styles.shareButtonsContainer}>
         {isCopied ? (
-          <Button block onPress={handleShare} prependIcon="check">
+          <Button block prependIcon="check">
             Lien copié
           </Button>
         ) : (
@@ -82,11 +83,23 @@ export default function InvitationModal() {
             Copier le lien
           </Button>
         )}
-        <Button type="outline" icon="qr-code">
+        <Button
+          type="outline"
+          icon="qr-code"
+          onPress={() => setIsQRCodeDisplayed(true)}
+        >
           Afficher le QR code
         </Button>
       </View>
-      <Button block href="/rooms/id" prependIcon="arrow-back">
+      {isQRCodeDisplayed && (
+        <QRCode
+          value={generatedInvitationLink()}
+          size={200}
+          color="black"
+          backgroundColor="white"
+        />
+      )}
+      <Button block href={`/rooms/${id}`} prependIcon="arrow-back">
         Retour à la salle d'écoute
       </Button>
     </View>
