@@ -32,7 +32,9 @@ jobs:
 
       - name: Install dependencies in expo/
         working-directory: expo/
-        run: npm i
+        run: |
+          npm i
+          npm install @microsoft/eslint-formatter-sarif@2.1.7
 
       - name: Run ESLint on expo/
         working-directory: expo/
@@ -45,7 +47,9 @@ jobs:
 
       - name: Install ESLint in backend/
         working-directory: backend/
-        run: npm i
+        run: |
+          npm i
+          npm install @microsoft/eslint-formatter-sarif@2.1.7
 
       - name: Run ESLint on backend/
         working-directory: backend/
