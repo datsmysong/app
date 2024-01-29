@@ -6,10 +6,10 @@ import Checkbox from "expo-checkbox";
 import CustomTextInput from "./CustomTextInput";
 
 export default function ParametersList() {
-  const [sliderParticipantValue, setSliderParticipantValue] = React.useState(0);
+  const [sliderParticipantValue, setSliderParticipantValue] = React.useState(1);
   const [canBeAnonymous, setCanBeAnonymous] = React.useState(false);
   const [canSkip, setCanSkip] = React.useState(true);
-  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(0);
+  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(1);
   const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
   const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
@@ -35,6 +35,8 @@ export default function ParametersList() {
           minimumValue={1}
           maximumTrackTintColor={"#CCCCCC"}
           minimumTrackTintColor={"#1A1A1A"}
+          // Doesn't change anything, don't really understand why, but i'll need to find a
+          // solution to this later
           thumbImage={thumbImage}
           value={sliderParticipantValue}
           onValueChange={(value) => setSliderParticipantValue(value)}
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   separator: {
-    height: 1,
+    height: 2,
     width: "80%",
     backgroundColor: "grey",
     marginLeft: "10%",
