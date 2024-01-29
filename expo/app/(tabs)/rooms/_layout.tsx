@@ -10,6 +10,11 @@ export default function RoomsTabLayout() {
         options={{ presentation: "modal", title: "Création d'une salle" }}
       />
       <Stack.Screen name="[id]" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="[id]/add"
+        options={{ title: "Ajouter une musique" }}
+      />
+      <Stack.Screen name="[id]/settings" options={{ title: "Paramètres" }} />
     </Stack>
   );
 }
