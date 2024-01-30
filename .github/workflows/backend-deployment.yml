@@ -28,4 +28,4 @@ jobs:
             cd /home/ubuntu/.docker/datsmysong
             git pull
             docker-compose down
-            docker-compose up -d
+            docker-compose up -d --force-recreate
