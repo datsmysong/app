@@ -1,0 +1,111 @@
+@startuml Diagramme de classe
+
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b>x</b>
+!define foreign_key(x) <u>#x</u>
+!define int_field(x) x : INT
+!define text_field(x) x : TEXT
+!define bucket(x) x : BUCKET
+!define or_null(x) x : NULL
+!define boolean_field(x) x : BOOLEAN
+!define date_field(x) x : DATE
+
+Table(public.Profile, "profile") {
+    int_field(primary_key(profile_id))
+    text_field(nickname)
+    date_field(created_at)
+}
+
+Table(public.RoomConfig, "rooms_configuration"){
+    int_field(primary_key(id))
+    boolean_field(vote_skipping)
+    int_field(vote_skipping_needed_percentage)
+    int_field(max_music_count_in_queue_per_user)
+    int_field(max_music_duration)
+}
+
+Table(public.Rooms, "rooms"){
+    int_field(primary_key(id))
+    text_field(name)
+    text_field(code)
+    int_field(foreign_key(configuration_id))
+    int_field(foreign_key(host_user_profile_id))
+    date_field(created_at)
+    int_field(int_field(foreign_key(service_id)))
+    boolean_field(is_active)
+}
+
+Table(public.RoomUsers, "room_users") {
+    int_field(primary_key(foreign_key(room_id)))
+    text_field(primary_key(foreign_key(profile_id)))
+    boolean_field(banned)
+    date_field(joined_at)
+}
+
+Table(public.FriendList, "friends_list"){
+    int_field(primary_key(foreign_key(user_profile1_id)))
+    int_field(primary_key(foreign_key(user_profile2_id)))
+    date_field(friends_since)
+}
+
+Table(public.FriendsRequest, "friends_request"){
+    int_field(primary_key(foreign_key(asker_user_profile_id)))
+    int_field(primary_key(foreign_key(receiver_user_profile_id)))
+    date_field(sent_at)
+    date_field(expires_at)
+}
+
+Table(public.StreamingService, "streaming_services"){
+    int_field(primary_key(service_id))
+    text_field(service_name)
+    text_field(service_description)
+    text_field(image_url)
+    boolean_field(playback_available)
+    boolean_field(playlists_available)
+    boolean_field(likes_available)
+}
+
+Table(public.BoundServices, "bound_services"){
+    int_field(primary_key(foreign_key(service_id)))
+    int_field(primary_key(foreign_key(user_profile_id)))
+    text_field(access_token)
+    text_field(refresh_token)
+    date_field(expires_in)
+}
+
+Table(public.UserProfile, "user_profile"){
+    int_field(primary_key(user_profile_id))
+    int_field(foreign_key(account_id))
+    text_field(username)
+    avatar : AVATAR
+}
+
+Table(public.RoomHistory, "room_history"){
+    int_field(primary_key(history_id))
+    int_field(foreign_key(room_id))
+    text_field(music_id)
+    int_field(position)
+}
+
+Table(auth.user, "user") {
+}
+
+Table(storage.objects, "objects"){
+}
+
+public.Profile "0" -- "1" public.RoomUsers : profile_id
+public.UserProfile "1" -- "*" public.FriendList : user_profile_id_1
+public.UserProfile "1" -- "*" public.FriendList : user_profile_id_2
+public.UserProfile "1" -- "*" public.FriendsRequest : asker_user_profile_id
+public.UserProfile "1" -- "*" public.FriendsRequest : receiver_user_profile_id
+public.RoomConfig "1" -- "*" public.Rooms : configuration_id
+public.UserProfile "1" -- "*" public.Rooms : host_user_profile_id
+public.StreamingService "1" -- "*" public.Rooms : service_id
+public.UserProfile "1" -- "*" public.BoundServices : user_profile_id
+public.StreamingService "1" -- "*" public.BoundServices : service_id
+public.Profile "1" -- "*" public.UserProfile : user_profile_id
+public.RoomUsers "1" -- "1" public.Rooms : room_id
+public.UserProfile "1" -- "1" auth.user : account_id
+public.UserProfile "1" -- "0..1" storage.objects : id
+public.RoomHistory "1" -- "1" public.Rooms : room_id
+@enduml
