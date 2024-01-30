@@ -12,10 +12,15 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
+import SocketIo from "../../lib/socketio";
 import HView from "../HView";
 import { Text, View } from "../Themed";
 
-export default function TrackItem(prop: { track: JSONTrack; index: number }) {
+export default function TrackItem(prop: {
+  track: JSONTrack;
+  index: number;
+  roomId: string;
+}) {
   const {
     title,
     artistsName: artists,
@@ -29,6 +34,12 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
   const imageProfileSrc = new URL(
     "https://s3-alpha-sig.figma.com/img/942f/8c54/9dd5171d2934478c6b2e1f64eea7d81b?Expires=1706486400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QQWwtvI8wCX3aN6TZggpc-IcOeYA21PftgQkCXnuVhcMue0uffDuBhvHDIu9SSuWJYc9AGBj8L7RpwV6Yv1X7fD1A0rdOYwTpbZuP1FbYHWxFjD9uyYEo8CpOXJQEzOndM~jtj9pNysYNWzhfJ5LnX5grgKEoU1AnXR5SFu0AAfCiB4PrFYLpOlhKwMQsv7uPQA5ftH9YNYq4yzgVsSbZX69jHCTYhTO0XOwEtu6DKNOhTMzl9naajFenIAHChgKxqlDrF-UvXsVwh7dwq4-jYPlFxV8-6QB-o0ffog60CHpBsfLnYs-KgaAqeTleydiBKjtYOk1zKBp9uHAOcjOAg__"
   ).toString();
+
+  const removeTrack = () => {
+    SocketIo.getInstance()
+      .getSocket(`/room/${prop.roomId}`)
+      .emit("queue:remove", prop.index);
+  };
 
   return (
     <MenuProvider>
@@ -65,7 +76,7 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
               <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
             </MenuTrigger>
             <MenuOptions customStyles={optionsStyles}>
-              <MenuOption onSelect={() => alert("Delete")}>
+              <MenuOption onSelect={removeTrack}>
                 <MaterialIcons name="close" size={28} color="red" />
                 <Text style={optionsStyles.optionText}>Supprimer</Text>
               </MenuOption>
@@ -138,7 +149,6 @@ const optionsStyles = StyleSheet.create({
     borderColor: "#D2D2D2",
     paddingVertical: 6,
     paddingHorizontal: 12,
-    marginTop: 18,
   },
   optionWrapper: {
     display: "flex",
