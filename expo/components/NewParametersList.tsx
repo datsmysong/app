@@ -1,12 +1,22 @@
 import Slider from "@react-native-community/slider";
+import { RoomConfiguration } from "commons/database-types-utils";
 import Checkbox from "expo-checkbox";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
 import CustomTextInput from "./CustomTextInput";
 import { Text, View } from "./Themed";
+import { getApiUrl } from "../lib/apiUrl";
 
-export default function ParametersList() {
+interface ParametersListProps {
+  roomId: string;
+}
+
+export default function ParametersList({ roomId }: ParametersListProps) {
+  const baseUrl = getApiUrl();
+
+  const [roomConfigurationId, setRoomConfigurationId] =
+    React.useState<string>();
   const [sliderParticipantValue, setSliderParticipantValue] =
     React.useState(10);
   const [canBeAnonymous, setCanBeAnonymous] = React.useState(false);
@@ -15,6 +25,35 @@ export default function ParametersList() {
   const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
   const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
+
+  useEffect(() => {
+    (async () => {
+      const room = await fetch(baseUrl + "/rooms?id=" + roomId);
+
+      const roomJSON = await room.json();
+      setRoomConfigurationId(roomJSON.configuration_id);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!roomConfigurationId) return;
+    (async () => {
+      const roomConfiguration = await fetch(
+        baseUrl + "/room/configuration/" + roomConfigurationId
+      );
+
+      const roomConfigurationJSON: RoomConfiguration =
+        await roomConfiguration.json();
+      setCanSkip(roomConfigurationJSON.vote_skipping);
+      setSliderPercentageValue(
+        roomConfigurationJSON.vote_skipping_needed_percentage
+      );
+      setMaxMusicDuration(roomConfigurationJSON.max_music_duration.toString());
+      setMaxMusicPerUser(
+        roomConfigurationJSON.max_music_count_in_queue_per_participant.toString()
+      );
+    })();
+  }, [roomConfigurationId]);
 
   return (
     <View style={styles.page}>
