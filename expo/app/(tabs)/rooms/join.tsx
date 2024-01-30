@@ -1,4 +1,3 @@
-import { UserProfile } from "commons/database-types-utils";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Keyboard, StyleSheet } from "react-native";
@@ -15,22 +14,15 @@ export default function JoinRoom() {
   const [roomCode, setRoomCode] = useState<string>("");
   const [isTextPresent, setIsTextPresent] = useState<boolean>(false);
   const [noRoomFound, setNoRoomFound] = useState<boolean>();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      setUserProfile(await useUserProfile());
-    };
-
-    fetchData();
-  }, []);
+  const userProfile = useUserProfile();
 
   useEffect(() => {
     setIsTextPresent(roomCode.length > 0);
   }, [roomCode]);
 
   const searchRoom = async () => {
+    setNoRoomFound(false);
     Keyboard.dismiss();
 
     if (!roomCode) return;
@@ -39,13 +31,10 @@ export default function JoinRoom() {
 
     if (roomsError || !roomId) {
       setNoRoomFound(true);
-      setTimeout(() => {
-        setNoRoomFound(false);
-      }, 3000);
       return;
     }
 
-    if (userProfile === undefined)
+    if (!userProfile)
       return Alert.alert(
         "Une erreur est survenue lors de la récupération de votre profil"
       );

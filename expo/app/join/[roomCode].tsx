@@ -1,4 +1,3 @@
-import { UserProfile } from "commons/database-types-utils";
 import * as Linking from "expo-linking";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,21 +12,16 @@ export default function JoinPage() {
   const { roomCode } = useLocalSearchParams<{ roomCode: string }>();
   const isInsideApplication = Platform.OS !== "web";
 
-  const [userProfile, setUserProfile] = useState<UserProfile | null>();
   const [isParticipant, setIsParticipant] = useState<boolean>();
   const [roomId, setRoomId] = useState<string>();
   const currentPageLink = Linking.useURL();
 
+  const userProfile = useUserProfile();
   /**
    * This effect fetches the user and the room id based on the room code given in the route
    * during the first render of the page.
    */
   useEffect(() => {
-    const fetchUser = async () => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      setUserProfile(await useUserProfile());
-    };
-
     const fetchRoomId = async () => {
       const { data: roomId, error: roomsError } = await getRoomId(roomCode);
 
@@ -39,8 +33,6 @@ export default function JoinPage() {
 
       setRoomId(roomId);
     };
-
-    fetchUser();
     fetchRoomId();
   }, []);
 

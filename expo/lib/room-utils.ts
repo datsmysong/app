@@ -3,32 +3,15 @@ import { RoomUser, UserProfile } from "commons/database-types-utils";
 
 import { supabase } from "./supabase";
 
-type JoinRoomFunction = (
-  roomId: string,
-  userProfile: UserProfile | null,
-  isParticipant?: boolean
-) => Promise<{ error: string | PostgrestError | null }>;
-
-type GetParticipantFunction = (
-  roomId: string,
-  userProfile: UserProfile | null
-) => Promise<{
-  data: RoomUser[] | null;
-}>;
-
-type GetRoomIdFunction = (
-  roomCode: string
-) => Promise<{ data: string | null; error: PostgrestError | null }>;
-
 /**
  * Joins a room by inserting the user's profile into the room_users table.
  * If the user is already a participant, it will act like he joined the room.
  */
-export const joinRoom: JoinRoomFunction = async (
+export async function joinRoom(
   roomId: string,
   userProfile: UserProfile | null,
   isParticipant?: boolean
-) => {
+): Promise<{ error: string | PostgrestError | null }> {
   if (!userProfile) return { error: "Unauthorized" };
 
   if (isParticipant) return { error: null };
@@ -39,12 +22,12 @@ export const joinRoom: JoinRoomFunction = async (
   });
 
   return { error: roomUsersError };
-};
+}
 
-export const getParticipant: GetParticipantFunction = async (
+export async function getParticipant(
   roomId: string,
   userProfile: UserProfile | null
-) => {
+): Promise<{ data: RoomUser[] | null }> {
   if (!userProfile) return { data: null };
 
   const { data: participant } = await supabase
@@ -54,9 +37,11 @@ export const getParticipant: GetParticipantFunction = async (
     .eq("room_id", roomId);
 
   return { data: participant };
-};
+}
 
-export const getRoomId: GetRoomIdFunction = async (roomCode: string) => {
+export async function getRoomId(
+  roomCode: string
+): Promise<{ data: string | null; error: PostgrestError | null }> {
   const { data: room, error: roomsError } = await supabase
     .from("rooms")
     .select("*")
@@ -66,4 +51,4 @@ export const getRoomId: GetRoomIdFunction = async (roomCode: string) => {
 
   if (roomsError) return { data: null, error: roomsError };
   return { data: room.id, error: null };
-};
+}
