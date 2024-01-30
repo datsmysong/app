@@ -6,8 +6,10 @@ import "react-native-url-polyfill/auto";
 // import * as SecureStore from 'expo-secure-store';
 // var aesjs = require('aes-js');
 
+const production = process.env.NODE_ENV === "production";
 // https://github.com/supabase/supabase-js/issues/786
 // Bug with classical AsyncStorage, so I use this one
+
 class SupabaseStorage {
   async getItem(key: string) {
     if (Platform.OS === "web") {
@@ -26,7 +28,7 @@ class SupabaseStorage {
   }
   async setItem(key: string, value: string) {
     if (Platform.OS === "web") {
-      document.cookie = `${key}=${value}`;
+      document.cookie = `${key}=${value}${production && ";domain=.datsmysong.app;secure"}`;
       return localStorage.setItem(key, value);
     }
     return AsyncStorage.setItem(key, value);
