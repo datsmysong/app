@@ -1,3 +1,6 @@
+import * as crypto from "expo-crypto";
+import { CryptoDigestAlgorithm } from "expo-crypto";
+
 export const generateRandomString = (length: number) => {
   const possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -9,7 +12,7 @@ export function sha256(plain: string) {
   // returns promise ArrayBuffer
   const encoder = new TextEncoder();
   const data = encoder.encode(plain);
-  return window.crypto.subtle.digest("SHA-256", data);
+  return crypto.digest(CryptoDigestAlgorithm.SHA256, data);
 }
 
 export const base64encode = (input: ArrayBuffer) => {

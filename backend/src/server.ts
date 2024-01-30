@@ -89,7 +89,7 @@ const corsOrigin: () => string[] | boolean[] = () => {
 
 server.register(fastifyCors, {
   origin: corsOrigin(), // or true to allow all origins
-  methods: ["*"], // or just ['*'] for all methods
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"], // or just ['*'] for all methods
   credentials: true, // or true to reflect origin
 });
 
@@ -107,7 +107,7 @@ server.register(authRoutes, { prefix: "/auth" });
 server.get("/auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
 
 server.get("/streaming-services", StreamingServicesGET);
-server.post("/streaming-service/:uuid", UnbindServicePOST);
+server.delete("/streaming-service/:uuid", UnbindServicePOST);
 
 const createRoomSchema = {
   body: {

@@ -1,12 +1,13 @@
-import { ScrollView, StyleSheet } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Text, View } from "../../../components/Tamed";
+import { BoundService, StreamingService } from "commons/database-types-utils";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+
 import Alert from "../../../components/Alert";
-import { getApiUrl } from "../../../lib/apiUrl";
-import { BoundService, StreamingService } from "commons/database-types-utils";
 import Button from "../../../components/Button";
+import { Text, View } from "../../../components/Tamed";
+import { getApiUrl } from "../../../lib/apiUrl";
 import { bindServiceToAccount } from "../../../lib/providerMethods";
 
 export default function ProfileIntegration() {
@@ -71,7 +72,7 @@ export default function ProfileIntegration() {
   const unbindService = (serviceId: string) => {
     // If I do a DELETE request, I get a CORS error
     fetch(baseUrl + "/streaming-service/" + serviceId, {
-      method: "POST",
+      method: "DELETE",
       credentials: "include",
     })
       .then((resUnbound) => {
@@ -101,7 +102,7 @@ export default function ProfileIntegration() {
             <View key={service.service_id} style={styles.layout}>
               <View style={styles.info}>
                 <Image
-                  contentFit={"contain"}
+                  contentFit="contain"
                   source={service.image_url}
                   alt={service.service_name}
                   style={styles.image}
@@ -144,8 +145,8 @@ export default function ProfileIntegration() {
               {isBound(service.service_id) ? (
                 <Button
                   onPress={() => unbindService(service.service_id)}
-                  type={"outline"}
-                  color={"danger"}
+                  type="outline"
+                  color="danger"
                   block
                 >
                   Déconnecter mon compte
@@ -153,8 +154,8 @@ export default function ProfileIntegration() {
               ) : (
                 <Button
                   onPress={() => bindService(service.service_name)}
-                  type={"filled"}
-                  color={"primary"}
+                  type="filled"
+                  color="primary"
                   block
                 >
                   Lier mon compte
@@ -170,13 +171,12 @@ export default function ProfileIntegration() {
 const styles = StyleSheet.create({
   page: {
     display: "flex",
-    width: 430,
+    maxWidth: 400,
     paddingVertical: 32,
     paddingHorizontal: 18,
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 24,
-    flex: 1,
   },
 
   image: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
 
   layout: {
     display: "flex",
-    width: 394,
+    maxWidth: 394,
     padding: 20,
     flexDirection: "column",
     alignItems: "center",
@@ -238,15 +238,13 @@ const styles = StyleSheet.create({
   },
 
   tag: {
+    width: "45%",
     borderRadius: 16,
-    display: "flex",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    alignItems: "flex-start",
-    gap: 10,
     textAlign: "center",
     fontFamily: "Outfit-Regular",
+    margin: 4,
     fontSize: 16,
+    padding: 2,
     fontStyle: "normal",
     fontWeight: "500",
   },
@@ -262,12 +260,7 @@ const styles = StyleSheet.create({
   },
 
   tags: {
-    display: "flex",
-    alignItems: "center",
-    alignContent: "center",
-    gap: 7,
     flexDirection: "row",
-    alignSelf: "stretch",
     flexWrap: "wrap",
   },
 });
