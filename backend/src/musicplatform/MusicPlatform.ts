@@ -1,4 +1,4 @@
-import { JSONTrack } from "commons/Backend-types";
+import { JSONTrack } from "commons/backend-types";
 
 export default abstract class MusicPlatform {
   private readonly urlPattern: RegExp;

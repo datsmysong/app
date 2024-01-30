@@ -1,4 +1,4 @@
-import { RoomJSON } from "commons/Backend-types";
+import { RoomJSON } from "commons/backend-types";
 import { Room } from "commons/database-types-utils";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";

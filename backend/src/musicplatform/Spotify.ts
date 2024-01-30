@@ -1,6 +1,6 @@
-import MusicPlatform from "./MusicPlatform";
+import { JSONTrack } from "commons/backend-types";
 import { spotify } from "../server";
-import { JSONTrack } from "commons/Backend-types";
+import MusicPlatform from "./MusicPlatform";
 export default class Spotify extends MusicPlatform {
   constructor() {
     super(

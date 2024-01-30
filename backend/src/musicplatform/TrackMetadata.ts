@@ -1,5 +1,5 @@
+import { JSONTrack } from "commons/backend-types";
 import MusicPlatform from "./MusicPlatform";
-import { JSONTrack } from "commons/Backend-types";
 
 export default class TrackMetadata {
   private readonly platform: MusicPlatform;

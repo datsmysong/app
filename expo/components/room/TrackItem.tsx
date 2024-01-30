@@ -1,5 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { JSONTrack } from "commons/Backend-types";
+import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
