@@ -28,7 +28,7 @@
     "@microsoft/eslint-formatter-sarif": "^3.0.0",
     "@types/node": "^20.11.5",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
+    "@typescript-eslint/parser": "^6.20.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
