@@ -9,6 +9,7 @@ export interface JSONTrack {
 
 export interface PlayingJSONTrack extends JSONTrack {
   currentTime: number;
+  isPlaying: boolean;
 }
 
 export interface RoomJSON {

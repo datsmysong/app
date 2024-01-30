@@ -1,4 +1,5 @@
-import { JSONTrack } from "commons/backend-types";
+import { JSONTrack } from "commons/Backend-types";
+import Remote from "./remotes/Remote";
 
 export default abstract class MusicPlatform {
   private readonly urlPattern: RegExp;
@@ -30,6 +31,7 @@ export default abstract class MusicPlatform {
 
   abstract getJsonTrack(id: string): Promise<JSONTrack | null>;
   abstract isClientSide(): boolean;
+  abstract getRemote(roomId: string): Promise<Remote | null>;
 }
 
 function getNbCapturingGroupRegex(regex: RegExp) {

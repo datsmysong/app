@@ -4,6 +4,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import RoomStorage from "./RoomStorage";
 import MusicPlatform from "./musicplatform/MusicPlatform";
 import TrackFactory from "./musicplatform/TrackFactory";
+import Remote from "./musicplatform/remotes/Remote";
 import { adminSupabase } from "./server";
 
 interface Error {
@@ -88,25 +89,32 @@ export default class Room {
   private readonly queue: JSONTrack[];
   private readonly trackFactory: TrackFactory;
   private readonly streamingService: MusicPlatform;
+  private readonly remote: Remote | null;
 
-  private constructor(uuid: string, streamingService: MusicPlatform) {
+  private constructor(
+    uuid: string,
+    streamingService: MusicPlatform,
+    remote: Remote | null
+  ) {
     this.uuid = uuid;
     this.queue = [];
     this.streamingService = streamingService;
 
     this.trackFactory = new TrackFactory();
     this.trackFactory.register(this.streamingService);
+    this.remote = remote;
   }
 
-  static getOrCreate(
+  static async getOrCreate(
     roomStorage: RoomStorage,
     uuid: string,
     streamingService: MusicPlatform
-  ): Room {
+  ): Promise<Room> {
     let room = roomStorage.getRoom(uuid);
+    const remote = await streamingService.getRemote(uuid);
 
     if (room === null) {
-      room = new Room(uuid, streamingService);
+      room = new Room(uuid, streamingService, remote);
       roomStorage.addRoom(room);
     }
 

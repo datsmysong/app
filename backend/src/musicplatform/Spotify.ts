@@ -1,6 +1,9 @@
 import { JSONTrack } from "commons/backend-types";
 import { spotify } from "../server";
 import MusicPlatform from "./MusicPlatform";
+import Remote from "./remotes/Remote";
+import SpotifyRemote from "./remotes/SpotifyRemote";
+
 export default class Spotify extends MusicPlatform {
   constructor() {
     super(
@@ -35,5 +38,9 @@ export default class Spotify extends MusicPlatform {
 
   isClientSide(): boolean {
     return false;
+  }
+
+  async getRemote(roomId: string): Promise<Remote | null> {
+    return await SpotifyRemote.createRemote(roomId, this);
   }
 }
