@@ -4,6 +4,7 @@ import Checkbox from "expo-checkbox";
 import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
+import Alert from "./Alert";
 import CustomTextInput from "./CustomTextInput";
 import { Text, View } from "./Themed";
 import { getApiUrl } from "../lib/apiUrl";
@@ -14,6 +15,7 @@ interface ParametersListProps {
 
 export default function ParametersList({ roomId }: ParametersListProps) {
   const baseUrl = getApiUrl();
+  const didMountRef = React.useRef(false);
 
   const [roomConfigurationId, setRoomConfigurationId] =
     React.useState<string>();
@@ -21,7 +23,7 @@ export default function ParametersList({ roomId }: ParametersListProps) {
     React.useState(10);
   const [canBeAnonymous, setCanBeAnonymous] = React.useState(false);
   const [canSkip, setCanSkip] = React.useState(true);
-  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(60);
+  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(70);
   const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
   const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
@@ -55,6 +57,39 @@ export default function ParametersList({ roomId }: ParametersListProps) {
     })();
   }, [roomConfigurationId]);
 
+  const handleSave = async () => {
+    const roomConfiguration = await fetch(
+      baseUrl + "/room/configuration/" + roomConfigurationId + "/update",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          voteSkipping: canSkip,
+          voteSkippingPercentage: sliderPercentageValue,
+          maxMusicPerUser: parseInt(maxMusicPerUser, 10),
+          maxMusicDuration: parseInt(maxMusicDuration, 10),
+        }),
+      }
+    );
+
+    if (!roomConfiguration.ok) {
+      Alert.alert(
+        "Une erreur est survenue lors de la sauvegarde des paramètres"
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (didMountRef.current) {
+      handleSave();
+    } else {
+      didMountRef.current = true;
+    }
+    // can be anonymous is not on the table room_configuration
+  }, [canSkip]);
+
   return (
     <View style={styles.page}>
       <View style={styles.slider}>
@@ -80,6 +115,8 @@ export default function ParametersList({ roomId }: ParametersListProps) {
           thumbImage={thumbImage}
           value={sliderParticipantValue}
           onValueChange={(value) => setSliderParticipantValue(value)}
+          // The column is not on the table room_configuration
+          //onSlidingComplete={handleSave}
           step={1}
         />
         <View style={styles.sliderDuration}>
@@ -131,6 +168,7 @@ export default function ParametersList({ roomId }: ParametersListProps) {
           value={sliderPercentageValue}
           onValueChange={(value) => setSliderPercentageValue(value)}
           step={5}
+          onSlidingComplete={handleSave}
         />
         <View style={styles.sliderDuration}>
           <Text>1</Text>
@@ -145,6 +183,7 @@ export default function ParametersList({ roomId }: ParametersListProps) {
         <CustomTextInput
           value={maxMusicDuration}
           onChangeText={setMaxMusicDuration}
+          onSubmitEditing={handleSave}
           style={styles.input}
         />
       </View>
@@ -156,6 +195,7 @@ export default function ParametersList({ roomId }: ParametersListProps) {
         <CustomTextInput
           value={maxMusicPerUser}
           onChangeText={setMaxMusicPerUser}
+          onSubmitEditing={handleSave}
           style={styles.input}
         />
       </View>
@@ -165,7 +205,7 @@ export default function ParametersList({ roomId }: ParametersListProps) {
 
 const styles = StyleSheet.create({
   page: {
-    width: 394,
+    maxWidth: 394,
     gap: 12,
     paddingBottom: 20,
     paddingTop: 20,

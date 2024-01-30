@@ -3,15 +3,17 @@ import { ScrollView, StyleSheet } from "react-native";
 
 import { MusicRoomParams } from "./index";
 import ParametersList from "../../../../components/NewParametersList";
-import { Text } from "../../../../components/Themed";
+import { Text, View } from "../../../../components/Themed";
 
 export default function RoomSettings() {
   const { id } = useLocalSearchParams() as MusicRoomParams;
 
   return (
-    <ScrollView contentContainerStyle={styles.pageLayout}>
-      <Text style={styles.title}>Paramètres de la salle</Text>
-      <ParametersList roomId={id} />
+    <ScrollView>
+      <View style={styles.pageLayout}>
+        <Text style={styles.title}>Paramètres de la salle</Text>
+        <ParametersList roomId={id} />
+      </View>
     </ScrollView>
   );
 }
