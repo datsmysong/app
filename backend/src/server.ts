@@ -59,9 +59,14 @@ server.register(fastifyCookie, {
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);
 
-const corsOrigin: () => string[] | string = () => {
-  if (process.env.NODE_ENV === "development") return "*";
-  return ["https://datsmysong.app", "https://api.datsmysnog.app/"];
+/**
+If we set the CORS origin to ["*"], it tells the client that all origins are accepted
+This won't work if the client fetches our backend with credentials, because it's simply unauthorized by the CORS spec
+To fix this, we return [true], which sets the CORS origin header to the request origin, which means it will trick the client to believe only its origin is allowed to fetch the URL
+*/
+const corsOrigin: () => string[] | boolean[] = () => {
+  if (process.env.NODE_ENV === "development") return [true];
+  return ["https://datsmysong.app", "https://api.datsmysong.app/"];
 };
 
 server.register(fastifyCors, {
