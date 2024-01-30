@@ -21,7 +21,11 @@ export default function AddTrack() {
 
   return (
     <HView>
-      <CustomTextInput placeholder="URL Spotify" onChangeText={setValue} />
+      <CustomTextInput
+        placeholder="URL Spotify"
+        onChangeText={setValue}
+        style={{ flexShrink: 0, flexGrow: 1, minWidth: 0, flexBasis: 0 }}
+      />
       <Button onPress={addMusic}>Ajouter</Button>
     </HView>
   );
