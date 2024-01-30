@@ -28,7 +28,8 @@ class SupabaseStorage {
   }
   async setItem(key: string, value: string) {
     if (Platform.OS === "web") {
-      document.cookie = `${key}=${value}${production && ";domain=.datsmysong.app;secure"}`;
+      const cookiesParam = production ? ";domain=.datsmysong.app;secure" : "";
+      document.cookie = `${key}=${value}${cookiesParam}`;
       return localStorage.setItem(key, value);
     }
     return AsyncStorage.setItem(key, value);
