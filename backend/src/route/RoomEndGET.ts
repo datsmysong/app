@@ -38,8 +38,6 @@ export default async function RoomEndGET(
   if (updatedValueError)
     return reply.code(404).send("error during update room database");
 
-  reply.send("this room is archived");
-
   await req.server.ready();
   req.server.io.of(`/room/${roomUuid}`).emit("queue:deleted");
 
