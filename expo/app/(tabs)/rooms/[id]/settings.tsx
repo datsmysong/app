@@ -26,11 +26,11 @@ const styles = StyleSheet.create({
 
   title: {
     color: "#000",
-    fontFamily: "Outfit",
+    fontFamily: "Outfit-Regular",
     fontSize: 24,
     fontStyle: "normal",
     fontWeight: "700",
     letterSpacing: 0.48,
-    padding: 20,
+    padding: 10,
   },
 });
