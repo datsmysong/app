@@ -26,15 +26,15 @@ export default async function RoomConfigurationUpdatePOST(
 
   const { id } = req.params as QueryParams;
 
-  const { error, status, data } = await adminSupabase
+  const { error, status } = await adminSupabase
     .from("room_configurations")
     .update({
       vote_skipping: voteSkipping,
-      vote_skipping_percentage: voteSkippingPercentage,
-      max_music_per_user: maxMusicPerUser,
+      vote_skipping_needed_percentage: voteSkippingPercentage,
+      max_music_count_in_queue_per_participant: maxMusicPerUser,
       max_music_duration: maxMusicDuration,
     })
     .eq("id", id);
 
-  return res.code(status).send(error || data);
+  return res.code(status).send(error || "room configuration updated");
 }
