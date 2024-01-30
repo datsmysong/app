@@ -3,30 +3,35 @@ import { getUserFromRequest } from "../room";
 import { adminSupabase } from "../server";
 import RoomStorage from "../RoomStorage";
 
-export default async function RoomEndGET(req: FastifyRequest, reply: FastifyReply) {
-  const {id: roomUuid} = await req.params as {id: string};
+export default async function RoomEndGET(
+  req: FastifyRequest,
+  reply: FastifyReply
+) {
+  const { id: roomUuid } = (await req.params) as { id: string };
   const { data } = await getUserFromRequest(req, reply);
 
-  if (!data.user)
-    return reply.code(404).send("user is impossible to find");
+  if (!data.user) return reply.code(404).send("user is impossible to find");
 
   const { data: queryRoom, error: queryRoomError } = await adminSupabase
     .from("rooms")
-    .select("*, host_user_profile_id(*)")
+    .select("*, user_profile(*)")
     .eq("id", roomUuid)
-    .eq("account_id", data.user.id)
+    .eq("user_profile.account_id", data.user.id)
     .single();
-  
-  if (queryRoomError)
-    return reply.code(404).send("error during test if user is allowed to archive room");
+
+  if (queryRoomError) {
+    return reply
+      .code(404)
+      .send("error during test if user is allowed to archive room");
+  }
 
   RoomStorage.getRoomStorage().removeRoomByUuid(queryRoom.id);
 
-  const {error: updatedValueError} = await adminSupabase
+  const { error: updatedValueError } = await adminSupabase
     .from("rooms")
     .update({
-      "code": null,
-      "is_active": false
+      code: null,
+      is_active: false,
     })
     .eq("id", roomUuid);
 
