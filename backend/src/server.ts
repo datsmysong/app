@@ -18,6 +18,7 @@ import RoomIO from "./socketio/RoomIO";
 import RoomGET from "./route/RoomGET";
 import RoomPOST from "./route/RoomPOST";
 import RoomEndGET from "./route/RoomEndGET";
+import { RoomJSON } from "commons/backend-types";
 
 config({ path: ".env.local" });
 
@@ -166,8 +167,8 @@ server.listen({ port: 3000, host: "0.0.0.0" });
 declare module "fastify" {
   interface FastifyInstance {
     io: Server<{
-      hello: (a: string) => void;
-      "queue:deleted": (a: "") => void;
+      "queue:update": (room: RoomJSON) => void;
+      "queue:deleted": () => void;
     }>;
   }
 }

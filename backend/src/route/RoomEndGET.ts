@@ -41,7 +41,7 @@ export default async function RoomEndGET(
   reply.send("this room is archived");
 
   await req.server.ready();
-  req.server.io.of(`/room/${roomUuid}`).emit("queue:deleted", "");
+  req.server.io.of(`/room/${roomUuid}`).emit("queue:deleted");
 
   return reply;
 }
