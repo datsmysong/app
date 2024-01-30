@@ -163,12 +163,13 @@ export default function ParametersList({ roomId }: ParametersListProps) {
           maximumValue={100}
           minimumValue={1}
           maximumTrackTintColor="#CCCCCC"
-          minimumTrackTintColor="#1A1A1A"
+          minimumTrackTintColor={canSkip ? "#1A1A1A" : "grey"}
           thumbImage={thumbImage}
           value={sliderPercentageValue}
           onValueChange={(value) => setSliderPercentageValue(value)}
           step={5}
           onSlidingComplete={handleSave}
+          disabled={!canSkip}
         />
         <View style={styles.sliderDuration}>
           <Text>1</Text>
