@@ -14,11 +14,6 @@ const usernameRules: RegisterOptions = {
     value: 15,
     message: "Le nom d'utilisateur doit contenir au plus 15 caractères",
   },
-  // We need to talk about this one
-  pattern: {
-    value: /^@/,
-    message: "Le nom d'utilisateur doit commencer par @",
-  },
 };
 
 const emailRules: RegisterOptions = {
@@ -52,4 +47,4 @@ const passwordConfirmationRules: RegisterOptions = {
     value === passwordRules || "Les mots de passe ne correspondent pas",
 };
 
-export { usernameRules, emailRules, passwordRules, passwordConfirmationRules };
+export { emailRules, passwordConfirmationRules, passwordRules, usernameRules };

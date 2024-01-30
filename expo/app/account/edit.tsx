@@ -35,8 +35,9 @@ export default function PersonalInfo() {
   const [initialUsername, setInitialUsername] = useState<string | null>(null);
   const [profilePictureChanged, setProfilePictureChanged] =
     useState<boolean>(false);
-  const [subbmitable, setSubbmitable] = useState<boolean>(false);
+  const [submittable, setSubmittable] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [emailDisabled, setEmailDisabled] = useState<boolean>(false);
 
   const {
     control,
@@ -57,10 +58,15 @@ export default function PersonalInfo() {
 
   useEffect(() => {
     if (user && user.email) {
+      console.log("user", user);
+      console.log("Providers", user.app_metadata.providers);
+      // si l'utilisateur a un provider autre que email, on ne peut pas changer l'email
+      if (user.app_metadata.provider !== "email") setEmailDisabled(true);
+
       setValue("email", user.email);
       getUserProfile(user.id).then((profile) => {
         if (profile && profile.username) {
-          setValue("username", "@" + profile.username);
+          setValue("username", profile.username);
           setInitialUsername(profile.username);
         }
       });
@@ -68,12 +74,11 @@ export default function PersonalInfo() {
   }, [user]);
 
   useEffect(() => {
-    if (inputsChange.email !== user?.email) return setSubbmitable(true);
-    if (inputsChange.username !== "@" + initialUsername)
-      return setSubbmitable(true);
-    if (profilePictureChanged) return setSubbmitable(true);
+    if (inputsChange.email !== user?.email) return setSubmittable(true);
+    if (inputsChange.username !== initialUsername) return setSubmittable(true);
+    if (profilePictureChanged) return setSubmittable(true);
 
-    setSubbmitable(false);
+    setSubmittable(false);
   }, [inputsChange]);
 
   /**
@@ -82,8 +87,6 @@ export default function PersonalInfo() {
    * @returns string if success, undefined if error
    */
   const updateEmail = async (email: string): Promise<string | undefined> => {
-    console.log("Mise a jour email", email);
-
     const { error } = await supabase.auth.updateUser({ email });
     if (error) {
       setError("email", {
@@ -105,22 +108,19 @@ export default function PersonalInfo() {
   const updateUsername = async (
     username: string
   ): Promise<string | undefined> => {
-    console.log("Mise a jour username");
-
     const accountId = user?.id;
     if (!accountId) return;
 
-    const usernameWithoutAt = username.replace("@", "");
     const { error } = await supabase
       .from("user_profile")
       .update({
-        username: usernameWithoutAt,
+        username,
       })
       .eq("account_id", accountId);
     if (error) {
-      setValue("username", "@" + initialUsername, {
-        shouldDirty: false,
-      });
+      // setValue("username", "@" + initialUsername, {
+      //   shouldDirty: false,
+      // });
       const errorMessage =
         error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION
           ? "Le pseudo '" +
@@ -132,22 +132,22 @@ export default function PersonalInfo() {
       });
       return;
     }
-    setInitialUsername(usernameWithoutAt);
-    setValue("username", "@" + usernameWithoutAt);
+    setInitialUsername(username);
+    setValue("username", username);
     return "Pseudo mis à jour";
   };
 
   const onSubmit = async ({ email, username }: EditForm) => {
-    const succedResum: string[] = [];
+    const validationResum: string[] = [];
 
     if (inputsChange.email !== user?.email) {
       const res = await updateEmail(email);
-      if (res) succedResum.push(res);
+      if (res) validationResum.push(res);
     }
 
-    if (inputsChange.username !== "@" + initialUsername) {
+    if (inputsChange.username !== initialUsername) {
       const res = await updateUsername(username);
-      if (res) succedResum.push(res);
+      if (res) validationResum.push(res);
     }
 
     if (profilePictureChanged) {
@@ -159,14 +159,15 @@ export default function PersonalInfo() {
           message: "Impossible d'ajouter la photo de profil" + error,
         });
       }
-      succedResum.push("Photo de profil mise à jour");
+      validationResum.push("Photo de profil mise à jour");
     }
 
-    if (succedResum.length > 0) setSuccessMessage(succedResum.join("\n"));
+    if (validationResum.length > 0)
+      setSuccessMessage(validationResum.join("\n"));
     else setSuccessMessage(null);
 
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-    setSubbmitable(false);
+    setSubmittable(false);
   };
 
   return (
@@ -190,10 +191,11 @@ export default function PersonalInfo() {
             placeholder="nouvelle adresse email"
             rules={emailRules}
             errorMessage={errors.email && errors.email.message}
+            disabled={emailDisabled}
           />
           <ControlledInput
             control={control}
-            label="Nom d'uilisateur"
+            label="Nom d'utilisateur"
             name="username"
             placeholder="@nouveau_nom"
             rules={usernameRules}
@@ -208,7 +210,7 @@ export default function PersonalInfo() {
           <Button
             block
             onPress={handleSubmit(onSubmit)}
-            disabled={!subbmitable}
+            disabled={!submittable}
           >
             Sauvegarder
           </Button>
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingHorizontal: 18,
     flex: 1,
-    paddingBottom: 300,
+    // paddingBottom: 300,
   },
   container: {
     alignItems: "stretch",
