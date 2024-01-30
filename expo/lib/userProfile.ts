@@ -1,7 +1,9 @@
-import { PostgrestError } from "@supabase/supabase-js";
-import Alert from "../components/Alert";
+import { PostgrestError, User } from "@supabase/supabase-js";
+import { UserProfile } from "commons/database-types-utils";
+import { useEffect, useState } from "react";
+
 import { supabase } from "./supabase";
-import useSupabaseUser from "./useSupabaseUser";
+import { useSupabaseUserHook } from "./useSupabaseUser";
 
 export const getUserProfile = async (id: string) => {
   const { data, error } = await supabase
@@ -15,18 +17,30 @@ export const getUserProfile = async (id: string) => {
   return data;
 };
 
-export async function useUserProfile() {
-  const user = await useSupabaseUser();
-  if (!user) return null;
-  const profile = await getUserProfile(user.id);
+export function useUserProfile() {
+  const [profile, setProfile] = useState<UserProfile | null>();
+  const user = useSupabaseUserHook();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return setProfile(null);
+
+      const userProfile = await getUserProfile(user.id);
+      setProfile(userProfile);
+    };
+
+    fetchProfile();
+  }, [user]);
+
   return profile;
 }
 
-export const getUsernameFromUser = async (): Promise<{
+export const getUsernameFromUser = async (
+  user: User
+): Promise<{
   username: string | null;
   error: PostgrestError | null;
 }> => {
-  const user = await useSupabaseUser();
   if (!user?.id)
     return {
       username: null,
@@ -40,7 +54,7 @@ export const getUsernameFromUser = async (): Promise<{
   if (error) {
     return {
       username: null,
-      error: error,
+      error,
     };
   }
   return {
