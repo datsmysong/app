@@ -1,19 +1,18 @@
+import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
+import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { createClient } from "@supabase/supabase-js";
+import { Database } from "commons/database-types";
 import { config } from "dotenv";
 import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
-import fastifyCookie from "@fastify/cookie";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
-import RoomIdGET from "./route/RoomIdGET";
-import StreamingServicesGET from "./route/StreamingServicesGET";
-import { FastifyCookieOptions } from "@fastify/cookie";
-import { Database } from "commons/database-types";
-import { SpotifyApi } from "@spotify/web-api-ts-sdk";
-import RoomIO from "./socketio/RoomIO";
 import RoomGET from "./route/RoomGET";
+import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
+import StreamingServicesGET from "./route/StreamingServicesGET";
+import RoomIO from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
 
@@ -60,8 +59,13 @@ server.register(fastifyCookie, {
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);
 
+const corsOrigin: () => string[] | string = () => {
+  if (process.env.NODE_ENV === "development") return "*";
+  return ["https://datsmysong.app", "https://api.datsmysnog.app/"];
+};
+
 server.register(fastifyCors, {
-  origin: [true], // or true to allow all origins
+  origin: corsOrigin(), // or true to allow all origins
   methods: ["*"], // or just ['*'] for all methods
   credentials: true, // or true to reflect origin
 });
