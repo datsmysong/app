@@ -14,9 +14,6 @@ export default function RoomSettings() {
 
 const styles = StyleSheet.create({
   pageLayout: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
     marginVertical: 16,
     alignSelf: "stretch",
   },

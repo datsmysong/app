@@ -17,10 +17,12 @@ export default async function RoomConfigurationUpdatePOST(
   res: FastifyReply
 ) {
   const bodyParams = req.body as BodyParams;
-  const voteSkipping = bodyParams.voteSkipping;
-  const voteSkippingPercentage = bodyParams.voteSkippingPercentage;
-  const maxMusicPerUser = bodyParams.maxMusicPerUser;
-  const maxMusicDuration = bodyParams.maxMusicDuration;
+  const {
+    voteSkipping,
+    voteSkippingPercentage,
+    maxMusicPerUser,
+    maxMusicDuration,
+  } = bodyParams;
 
   const { id } = req.params as QueryParams;
 

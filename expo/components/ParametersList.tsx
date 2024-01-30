@@ -1,9 +1,8 @@
 import Checkbox from "expo-checkbox";
-import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 import CustomTextInput from "./CustomTextInput";
-
 
 interface ParametersListProps {
   percentageVoteToSkipAMusic: string;
@@ -36,7 +35,7 @@ export default function ParametersList({
           style={styles.checkbox}
           disabled={false}
           value={canVote}
-          color={"black"}
+          color="black"
           onValueChange={(newValue) => setCanVote(newValue)}
         />
       </View>
@@ -46,7 +45,7 @@ export default function ParametersList({
       </Text>
       <CustomTextInput
         style={[styles.input, !canVote && styles.inputDisabled]}
-        inputMode={"numeric"}
+        inputMode="numeric"
         value={canVote ? percentageVoteToSkipAMusic : ""}
         onChangeText={setPercentageVote}
         disabled={!canVote}
@@ -56,14 +55,14 @@ export default function ParametersList({
       </Text>
       <CustomTextInput
         style={styles.input}
-        inputMode={"numeric"}
+        inputMode="numeric"
         value={maxMusicPerUser}
         onChangeText={setMaxMusicPerUser}
       />
       <Text style={styles.labelText}>Durée maximale d'une musique</Text>
       <CustomTextInput
         style={styles.input}
-        inputMode={"numeric"}
+        inputMode="numeric"
         value={maxMusicDuration}
         onChangeText={setMaxMusicDuration}
       />

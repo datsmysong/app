@@ -4,13 +4,14 @@ import React from "react";
 import { StyleSheet } from "react-native";
 
 import CustomTextInput from "./CustomTextInput";
-import { View, Text } from "./Themed";
+import { Text, View } from "./Themed";
 
 export default function ParametersList() {
-  const [sliderParticipantValue, setSliderParticipantValue] = React.useState(1);
+  const [sliderParticipantValue, setSliderParticipantValue] =
+    React.useState(10);
   const [canBeAnonymous, setCanBeAnonymous] = React.useState(false);
   const [canSkip, setCanSkip] = React.useState(true);
-  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(1);
+  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(60);
   const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
   const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
@@ -23,7 +24,6 @@ export default function ParametersList() {
         </Text>
         <Text
           style={{
-            marginLeft: "50%",
             textAlign: "center",
             marginTop: 32,
           }}
@@ -34,9 +34,9 @@ export default function ParametersList() {
           style={styles.sliderBar}
           maximumValue={20}
           minimumValue={1}
-          maximumTrackTintColor={"#CCCCCC"}
-          minimumTrackTintColor={"#1A1A1A"}
-          // Doesn't change anything, don't really understand why, but i'll need to find a
+          maximumTrackTintColor="#CCCCCC"
+          minimumTrackTintColor="#1A1A1A"
+          // Doesn't change anything, don't really understand why, but I'll need to find a
           // solution to this later
           thumbImage={thumbImage}
           value={sliderParticipantValue}
@@ -53,7 +53,7 @@ export default function ParametersList() {
           value={canBeAnonymous}
           onValueChange={setCanBeAnonymous}
           style={styles.checkbox}
-          color={"black"}
+          color="black"
         />
         <Text style={styles.checkboxText}>
           Autoriser les participants anonymes
@@ -66,7 +66,7 @@ export default function ParametersList() {
           value={canSkip}
           onValueChange={setCanSkip}
           style={styles.checkbox}
-          color={"black"}
+          color="black"
         />
         <Text style={styles.checkboxText}>Activer le vote skipping</Text>
       </View>
@@ -76,7 +76,6 @@ export default function ParametersList() {
         </Text>
         <Text
           style={{
-            marginLeft: "50%",
             textAlign: "center",
             marginTop: 20,
           }}
@@ -87,8 +86,8 @@ export default function ParametersList() {
           style={styles.sliderBar}
           maximumValue={100}
           minimumValue={1}
-          maximumTrackTintColor={"#CCCCCC"}
-          minimumTrackTintColor={"#1A1A1A"}
+          maximumTrackTintColor="#CCCCCC"
+          minimumTrackTintColor="#1A1A1A"
           thumbImage={thumbImage}
           value={sliderPercentageValue}
           onValueChange={(value) => setSliderPercentageValue(value)}
@@ -127,20 +126,14 @@ export default function ParametersList() {
 
 const styles = StyleSheet.create({
   page: {
-    display: "flex",
     width: 394,
-    flexDirection: "column",
-    alignItems: "flex-start",
     gap: 12,
     paddingBottom: 20,
     paddingTop: 20,
   },
 
   slider: {
-    display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
-    alignItems: "flex-start",
     marginLeft: 20,
     width: "90%",
   },
