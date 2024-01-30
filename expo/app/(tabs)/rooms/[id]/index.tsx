@@ -33,6 +33,7 @@ export default function MusicRoom() {
         .eq("is_active", true)
         .single();
       if (error) {
+        router.replace("/rooms");
         Alert.alert(
           "Une erreur est survenue lors de la récupération de la salle"
         );
@@ -48,18 +49,17 @@ export default function MusicRoom() {
     //     .then(res => res.json())
     //     .then((data: ActiveRoomSkeleton) => setData(data))
 
-    const namespace = SocketIo.getInstance()
-      .getSocket(url.pathname);
+    const namespace = SocketIo.getInstance().getSocket(url.pathname);
     namespace.on("queue:update", (data: RoomJSON) => setQueue(data));
     namespace.on("queue:deleted", () => {
       router.replace("/rooms");
-      Alert.alert("Cette salle d'écoute vient d'être supprimer");
+      Alert.alert("Cette salle d'écoute vient d'être supprimée");
     });
   }, []);
 
   const deleteRoom = async () => {
-    const response = await fetch(url + "/end");
-    if (!response.ok) {
+    const response = await fetch(url + "/end", { credentials: "include" });
+    if (!response.ok && process.env.NODE_ENV !== "production") {
       Alert.alert(await response.text());
     }
   };
