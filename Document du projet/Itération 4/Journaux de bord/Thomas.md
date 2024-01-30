@@ -24,6 +24,7 @@
 | 14h - 15h30   | Résolution des review sur ma branche feat/streaming-platform-integration |
 | 15h30 - 16h30 | Ajustement du frontend de la page de paramétrage                         |
 | 16h30 - 17h30 | Rédaction du document final                                              |
+| 17h30 - 18h   | Réunion avec mme. Debled                                                 |
 
 ## Mercredi
 
