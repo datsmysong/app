@@ -1,9 +1,10 @@
+import Slider from "@react-native-community/slider";
+import Checkbox from "expo-checkbox";
 import React from "react";
 import { StyleSheet } from "react-native";
-import Slider from "@react-native-community/slider";
-import { View, Text } from "./Themed";
-import Checkbox from "expo-checkbox";
+
 import CustomTextInput from "./CustomTextInput";
+import { View, Text } from "./Themed";
 
 export default function ParametersList() {
   const [sliderParticipantValue, setSliderParticipantValue] = React.useState(1);

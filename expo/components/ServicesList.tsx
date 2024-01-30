@@ -1,12 +1,6 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import {
-  FlatList,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text
-} from "react-native";
+import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
 import { StreamingService } from "../app/(tabs)/rooms/create";
 
 interface ServicesListProps {
@@ -36,7 +30,7 @@ export default function ServicesList({
       showsHorizontalScrollIndicator={Platform.OS === "web"}
       data={availableServices}
       columnWrapperStyle={styles.list}
-      numColumns={2}
+      numColumns={3}
       renderItem={({ item }) => (
         <Pressable
           onPress={() => toggleSelect(item)}

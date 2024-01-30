@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet } from "react-native";
-import { Text, View } from "../../../../components/Themed";
+
 import ParametersList from "../../../../components/NewParametersList";
+import { Text } from "../../../../components/Themed";
 
 export default function RoomSettings() {
   return (
