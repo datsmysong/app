@@ -14,7 +14,9 @@ interface ParametersListProps {
   roomId: string;
 }
 
-export default function ParametersList({ roomId }: ParametersListProps) {
+export default function RoomConfigurationParametersList({
+  roomId,
+}: ParametersListProps) {
   const baseUrl = getApiUrl();
   const didMountRef = React.useRef(false);
 

@@ -2,7 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet } from "react-native";
 
 import { MusicRoomParams } from "./index";
-import ParametersList from "../../../../components/NewParametersList";
+import RoomConfigurationParametersList from "../../../../components/RoomConfigurationParametersList";
 import { Text, View } from "../../../../components/Themed";
 
 export default function RoomSettings() {
@@ -12,7 +12,7 @@ export default function RoomSettings() {
     <ScrollView>
       <View style={styles.pageLayout}>
         <Text style={styles.title}>Paramètres de la salle</Text>
-        <ParametersList roomId={id} />
+        <RoomConfigurationParametersList roomId={id} />
       </View>
     </ScrollView>
   );
