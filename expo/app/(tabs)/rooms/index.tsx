@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import Button from "../../../components/Button";
+import CustomTextInput from "../../../components/CustomTextInput";
 
 export default function RoomsPage() {
+  const [roomId, setRoomId] = useState("");
+  //const roomId = "956992d0-f039-47d1-9475-ccacf10104d7";
+
   return (
     <View style={styles.headerContainer}>
       <Text style={styles.title}>Salles d'écoute</Text>

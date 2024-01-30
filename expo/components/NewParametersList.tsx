@@ -64,7 +64,7 @@ export default function ParametersList({ roomId }: ParametersListProps) {
         <Text
           style={{
             textAlign: "center",
-            marginTop: 32,
+            marginTop: 20,
           }}
         >
           {sliderParticipantValue}
