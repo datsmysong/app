@@ -59,8 +59,8 @@ server.register(fastifyCookie, {
   parseOptions: {}, // options for parsing cookies
 } as FastifyCookieOptions);
 
-const corsOrigin: () => string[] | string = () => {
-  if (process.env.NODE_ENV === "development") return "*";
+const corsOrigin: () => string[] | boolean[] = () => {
+  if (process.env.NODE_ENV === "development") return [true];
   return ["https://datsmysong.app", "https://api.datsmysnog.app/"];
 };
 

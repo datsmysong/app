@@ -6,5 +6,6 @@ COPY . ./
 WORKDIR /backend
 RUN npm install
 RUN npm run build
+ENV NODE_ENV=production
 CMD ["node", "build/server.js"]
 EXPOSE 3000
