@@ -15,9 +15,20 @@
 
 ## Mardi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horaire     | Tâche                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------ |
+| 8h - 9h00   | Je regarde les reviews que j’ai reçu et je discute de certaines choses avec le groupe (bugs rencontrés, etc) |
+| 9h00 - 9h15 | Daily                                                                                                        |
+| 9h15 - 9h20 | Nouvelle maquette et recherche d’une librairie de context menu pour Noam                                     |
+| 9h20 - 9h37 | Je continue d’appliquer les changements proposés dans ma review                                              |
+| 9h37 - 10h  | Je reprends ma tâche de lecture des plateformes de streaming                                                 |
+| 10h - 11h30 | Je règle des problèmes sur la production avec le CORS                                                        |
+| 11h30 - 12h | J’avance sur ma tâche de lecture des plateformes de streaming                                                |
+| 14h - 14h30 | Avec Gaspard, je review et fais des changements sur une branche à merge                                      |
+| 14h30 - 15h | Je review une autre branche à merge avec Gaspard                                                             |
+| 15h - 16h25 | J’avance sur ma tâche de lecture de musique                                                                  |
+| 16h25 - 17h | Je travaille sur le document final de semestre                                                               |
+| 17h - 18h   | Réunion avec Isabelle et code reviews                                                                        |
 
 ## Mercredi
 

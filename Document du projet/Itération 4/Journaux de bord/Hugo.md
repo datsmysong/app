@@ -16,7 +16,10 @@
 
 | Horaire  | Tâche |
 | -------- | ----- |
-| 8h - 10h | ...   |
+| 8h - 8h30 | Création d'une nouvelle branche "feat/close-book" attachée à la fonctionnalité "Fermer une salle d'écoute en tant qu'hôte" |
+| 8h30h - 9h | Ajout d'un bouton temporaire pour supprimer une salle d'écoute |
+| 9h - 16h | Création d'une route HTTP permettant de supprimer une salle d'écoute : - cela consiste à vérifier si l'utilisateur est bien l'hôte de la salle - supprimer la salle d'écoute du serveur - définir la salle d'écoute comme inactive et supprimer son code de partage dans la base de donnée - avertir tous les participants que la salle d'écoute est supprimé |
+| 16h - 17h | Rendre le code plus orienté production (nettoyage, suppression des bugs) |
 
 ## Mercredi
 

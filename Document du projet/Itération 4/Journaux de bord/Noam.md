@@ -12,9 +12,13 @@
 
 ## Mardi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horaire   | Tâche                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 8h - 9h   | J’ai effectué des changements demandés dans les reviews de ma branche et j’ai effectué un rebase pour mettre à jour ma branche avec les changements de main.                                                                                                                                                                                                                                               |
+| 9h - 12h  | J’ai commencé ma nouvelle tâche “feat/remove-track”. J’ai cherché une librairie afin de pouvoir afficher un menu contextuel lorsque l’utilisateur clique sur une icône d’un des morceaux. Après l’avoir trouvée, j’ai implémenté ce menu contextuel dans le composant correspondant aux morceaux. J’ai effectué beaucoup de changements afin que ce menu corresponde à celui représenté sur les maquettes. |
+| 14h - 16h | J’ai tenté de régler un problème : le menu contextuel n’est pas entièrement affiché car il est dans un composant avec une taille limitée, et donc dépasse de ce composant. J’ai donc cherché un moyen de le mettre dans un composant parent. Après cela, j’ai ajouté la logique pour retirer un morceau du côté backend lorsque l’utilisateur clique sur “Supprimer”.                                      |
+| 16h - 17h | J’ai commencé à rédiger le document final avec mes camarades.                                                                                                                                                                                                                                                                                                                                              |
+| 17h - 18h | J’ai review le code de mes camarades.                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Mercredi
 
@@ -27,4 +31,3 @@
 | Horaire  | Tâche |
 | -------- | ----- |
 | 8h - 10h | ...   |
-

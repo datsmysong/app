@@ -14,9 +14,15 @@
 
 ## Mardi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horraire      | Tâche                                                                                                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 8h - 9h       | Retour sur les reviews et réunion du jour.                                                                                                                                                                        |
+| 9h - 10h      | Résolution de problèmes liés à la mise en production (problèmes de cookies).                                                                                                                                      |
+| 10h - 11h30   | Résolution de problèmes CORS sur le serveur avec Maxence.                                                                                                                                                         |
+| 11h30 - 12h15 | Travail sur l'entrée du mot de passe.                                                                                                                                                                             |
+| 14h00 - 15h   | Review et merge de la branche de Noam, `feat/join-with-code`.                                                                                                                                                     |
+| 15h00 - 17h   | Résolution d'un bug sur les cookies définis par Supabase côté client. Grosse perte de temps car le problème n'a pas été trouvé en lisant les logs du serveur, j'ai donc cherché les problèmes au mauvais endroit. |
+| 17h - 18h     | Reviews sur les branches des camarades.                                                                                                                                                                           |
 
 ## Mercredi
 
@@ -29,4 +35,3 @@
 | Horaire  | Tâche |
 | -------- | ----- |
 | 8h - 10h | ...   |
-
