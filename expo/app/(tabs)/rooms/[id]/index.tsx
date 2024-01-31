@@ -14,7 +14,7 @@ import { supabase } from "../../../../lib/supabase";
 
 // TODO socket io which refresh playlist on live
 export default function MusicRoom() {
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
   const [room, setRoom] = useState<Room>();
 

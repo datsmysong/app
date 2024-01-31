@@ -1,18 +1,12 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuProvider,
-  MenuTrigger,
-} from "react-native-popup-menu";
+import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 
 import SocketIo from "../../lib/socketio";
+import CustomMenuOption from "../CustomMenuOption";
 import HView from "../HView";
 import { Text, View } from "../Themed";
 
@@ -42,49 +36,44 @@ export default function TrackItem(prop: {
   };
 
   return (
-    <MenuProvider>
-      <HView style={itemStyles.container}>
-        <View style={[itemStyles.imagesContainer]}>
-          <Image source={imageSrc} style={itemStyles.mainImage} />
-          <Image source={imageProfileSrc} style={itemStyles.profileImage} />
-        </View>
-        <View style={[itemStyles.textContainer]}>
-          <HView>
-            <Text style={[itemStyles.text, itemStyles.textTop]}>
-              {prop.index + 1}
-            </Text>
-            <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
-              .
-            </Text>
-            <Text style={[itemStyles.text, itemStyles.textTop]}>{title}</Text>
-          </HView>
-          <Text style={[itemStyles.text, itemStyles.textBottom]}>
-            {artists}
+    <HView style={itemStyles.container}>
+      <View style={[itemStyles.imagesContainer]}>
+        <Image source={imageSrc} style={itemStyles.mainImage} />
+        <Image source={imageProfileSrc} style={itemStyles.profileImage} />
+      </View>
+      <View style={[itemStyles.textContainer]}>
+        <HView>
+          <Text style={[itemStyles.text, itemStyles.textTop]}>
+            {prop.index + 1}
           </Text>
-        </View>
-        <View>
-          <Pressable onPress={() => setDislike(!dislike)}>
-            <FontAwesome
-              name={`thumbs-${!dislike ? "o-" : ""}down`}
-              style={itemStyles.icon}
-            />
-          </Pressable>
-        </View>
-        <View>
-          <Menu>
-            <MenuTrigger>
-              <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
-            </MenuTrigger>
-            <MenuOptions customStyles={optionsStyles}>
-              <MenuOption onSelect={removeTrack}>
-                <MaterialIcons name="close" size={28} color="red" />
-                <Text style={optionsStyles.optionText}>Supprimer</Text>
-              </MenuOption>
-            </MenuOptions>
-          </Menu>
-        </View>
-      </HView>
-    </MenuProvider>
+          <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
+            .
+          </Text>
+          <Text style={[itemStyles.text, itemStyles.textTop]}>{title}</Text>
+        </HView>
+        <Text style={[itemStyles.text, itemStyles.textBottom]}>{artists}</Text>
+      </View>
+      <Pressable onPress={() => setDislike(!dislike)}>
+        <FontAwesome
+          name={`thumbs-${!dislike ? "o-" : ""}down`}
+          style={itemStyles.icon}
+        />
+      </Pressable>
+      <Menu>
+        <MenuTrigger>
+          <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
+        </MenuTrigger>
+        <MenuOptions customStyles={optionsStyles}>
+          <CustomMenuOption
+            onSelect={removeTrack}
+            icon={{ name: "close", size: 28, color: "red" }}
+            textStyle={optionsStyles.optionText}
+          >
+            Supprimer
+          </CustomMenuOption>
+        </MenuOptions>
+      </Menu>
+    </HView>
   );
 }
 
@@ -151,11 +140,10 @@ const optionsStyles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   optionWrapper: {
-    display: "flex",
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    padding: 0,
   },
   optionText: {
     color: "red",
