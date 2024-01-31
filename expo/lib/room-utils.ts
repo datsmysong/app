@@ -1,5 +1,5 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import { RoomUser, UserProfile } from "commons/database-types-utils";
+import { Room, RoomUser, UserProfile } from "commons/database-types-utils";
 
 import { supabase } from "./supabase";
 
@@ -53,21 +53,20 @@ export async function getRoomId(
   return { data: room.id, error: null };
 }
 
-export async function getHostId(
+export async function getHost(
   roomId: string,
   userProfile: UserProfile | null,
   isActive: boolean
-): Promise<{ data: string | null; error: PostgrestError | string | null }> {
-  if (!userProfile) return { data: null, error: "Unauthorized" };
+): Promise<{ data: Room[] | null }> {
+  if (!userProfile) return { data: null };
 
-  const { data: room, error: roomsError } = await supabase
+  const { data: room } = await supabase
     .from("rooms")
     .select("*")
     .eq("id", roomId)
     .eq("host_user_profile_id", userProfile.user_profile_id)
-    .eq("is_active", isActive)
-    .single();
+    .eq("is_active", isActive);
 
-  if (roomsError) return { data: null, error: roomsError };
-  return { data: room.host_user_profile_id, error: null };
+  if (!room) return { data: null };
+  return { data: room };
 }

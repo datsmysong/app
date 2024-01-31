@@ -14,6 +14,7 @@ export default function TrackItem(prop: {
   track: JSONTrack;
   index: number;
   roomId: string;
+  isMenuDisabled: boolean;
 }) {
   const {
     title,
@@ -60,7 +61,7 @@ export default function TrackItem(prop: {
         />
       </Pressable>
       <Menu>
-        <MenuTrigger>
+        <MenuTrigger disabled={prop.isMenuDisabled}>
           <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
         </MenuTrigger>
         <MenuOptions customStyles={optionsStyles}>
