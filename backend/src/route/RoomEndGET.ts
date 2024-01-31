@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { getUserFromRequest } from "../lib/auth-utils";
 import { adminSupabase } from "../server";
 import RoomStorage from "../RoomStorage";
+import { unauthorizedResponse } from "../room";
 
 export default async function RoomEndGET(
   req: FastifyRequest,
@@ -10,7 +11,7 @@ export default async function RoomEndGET(
   const { id: roomUuid } = (await req.params) as { id: string };
   const { data } = await getUserFromRequest(req, reply);
 
-  if (!data.user) return reply.code(404).send("user is impossible to find");
+  if (!data.user) return unauthorizedResponse(reply);
 
   const { data: queryRoom, error: queryRoomError } = await adminSupabase
     .from("rooms")
@@ -41,5 +42,5 @@ export default async function RoomEndGET(
   await req.server.ready();
   req.server.io.of(`/room/${roomUuid}`).emit("queue:deleted");
 
-  return reply;
+  return reply.code(200);
 }

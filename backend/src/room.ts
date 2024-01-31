@@ -10,7 +10,7 @@ interface Error {
   error: { message: string };
 }
 
-function unauthorizedResponse(response: FastifyReply) {
+export function unauthorizedResponse(response: FastifyReply) {
   return response.code(401).send("User not logged in");
 }
 
