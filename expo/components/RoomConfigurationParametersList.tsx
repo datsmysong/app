@@ -30,6 +30,7 @@ export default function RoomConfigurationParametersList({
   const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
 
+  // To get current room configuration id
   useEffect(() => {
     (async () => {
       const room = await fetch(baseUrl + "/rooms?id=" + roomId);
@@ -39,6 +40,7 @@ export default function RoomConfigurationParametersList({
     })();
   }, []);
 
+  // To get current room configuration
   useEffect(() => {
     if (!roomConfigurationId) return;
     (async () => {
@@ -59,6 +61,7 @@ export default function RoomConfigurationParametersList({
     })();
   }, [roomConfigurationId]);
 
+  // To update the room configuration
   const handleSave = async () => {
     const roomConfiguration = await fetch(
       baseUrl + "/room/configuration/" + roomConfigurationId + "/update",
@@ -82,8 +85,9 @@ export default function RoomConfigurationParametersList({
       );
     }
   };
-
+  // Only for canSkip checkbox
   useEffect(() => {
+    // Using this because the first time the component is mounted, it will trigger otherwise
     if (didMountRef.current) {
       handleSave();
     } else {
