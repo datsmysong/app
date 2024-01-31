@@ -8,6 +8,7 @@ import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
+import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
 import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import BoundServicesGET from "./route/BoundServicesGET";
 import RoomGET from "./route/RoomGET";
