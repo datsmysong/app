@@ -50,17 +50,42 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, liveRoom, socket }) => {
     socket.on(
       "player:updatePlaybackState",
       (message: PlayingJSONTrack | null) => {
-        console.log("[WS] Server is updating playback state");
         setCurrentPlaybackState(message);
       }
     );
 
     socket.on("player:getPlaybackState", () => {
-      console.log("[WS] Server is requesting playback state");
       onStateRequest(socket);
     });
 
-    socket.on("player:");
+    socket.on("player:playTrack", (trackId: string) => {
+      if (localPlayerRemote.current)
+        localPlayerRemote.current.playTrack(trackId);
+    });
+
+    socket.on("player:pause", async () => {
+      if (localPlayerRemote.current) {
+        localPlayerRemote.current.pause();
+      }
+    });
+
+    socket.on("player:play", async () => {
+      if (localPlayerRemote.current) {
+        localPlayerRemote.current.play();
+      }
+    });
+
+    socket.on("player:seekTo", async (position: number) => {
+      if (localPlayerRemote.current) {
+        localPlayerRemote.current.seekTo(position);
+      }
+    });
+
+    socket.on("player:setVolume", async (volume: number) => {
+      if (localPlayerRemote.current) {
+        localPlayerRemote.current.setVolume(volume);
+      }
+    });
   }, [socket]);
 
   const playCoolSong = async () => {

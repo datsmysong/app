@@ -1,6 +1,5 @@
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import { Socket } from "socket.io";
-import RoomStorage from "../../RoomStorage";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
 
@@ -15,14 +14,9 @@ export default class SoundCloudRemote extends Remote {
   }
 
   static async createRemote(
-    roomId: string,
-    musicPlatform: MusicPlatform
+    musicPlatform: MusicPlatform,
+    hostSocket: Socket | null
   ): Promise<SoundCloudRemote | null> {
-    const roomStorage = RoomStorage.getRoomStorage();
-    const room = roomStorage.getRoom(roomId);
-    if (room === null) return null;
-
-    const hostSocket = room.getHostSocket();
     if (hostSocket === null) return null;
 
     return new SoundCloudRemote(hostSocket, musicPlatform);
@@ -41,19 +35,13 @@ export default class SoundCloudRemote extends Remote {
   }
 
   getQueue(): Promise<JSONTrack[]> {
-    this.hostSocket.emit("player:getQueue");
-
     return new Promise((resolve) => {
-      this.hostSocket.on("player:getQueue", (queue: JSONTrack[]) => {
-        resolve(queue);
-      });
+      resolve([]);
     });
   }
 
   playTrack(trackId: string): Promise<{ error?: string | undefined }> {
-    this.hostSocket.emit("player:playTrack", {
-      trackId,
-    });
+    this.hostSocket.emit("player:playTrack", trackId);
 
     return new Promise((resolve) => {
       this.hostSocket.on("player:playTrack", (error: string | undefined) => {

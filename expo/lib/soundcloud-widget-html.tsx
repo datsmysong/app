@@ -1,4 +1,4 @@
-export default function useSoundCloudWidgetHtml() {
+export default function getSoundCloudWidgetHtml() {
   return `
   <html>
   <head>
@@ -55,15 +55,14 @@ export default function useSoundCloudWidgetHtml() {
               if (!currentSound) return resolve(null);
       
               const playingMusic = {
-                currentMusic: {
-                  title: currentSound.publisher_metadata.release_title,
-                  artwork: currentSound.artwork_url.replace("large", "t500x500"),
-                  artists: currentSound.publisher_metadata.artist,
-                  durationMs: currentSound.duration,
-                },
-                progressMs: position,
+                url: currentSound.permalink_url,
+                title: currentSound.publisher_metadata.release_title,
+                duration: currentSound.duration,
+                artistsName: currentSound.publisher_metadata.artist,
+                albumName: currentSound.publisher_metadata.album_title,
+                imgUrl: currentSound.artwork_url.replace("large", "t500x500"),
+                currentTime: position,
                 isPlaying: isCurrentlyPlaying,
-                volume: 100,
               };
       
               resolve(playingMusic);
@@ -73,9 +72,7 @@ export default function useSoundCloudWidgetHtml() {
           window.postMessage(
             {
               command: "currentMusic",
-              data: {
-                playingMusic,
-              },
+              data: playingMusic,
             },
             "*"
           );

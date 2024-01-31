@@ -38,7 +38,12 @@ export default class Room {
     let room = roomStorage.getRoom(uuid);
 
     if (room === null) {
-      const remote = await streamingService.getRemote(uuid);
+      const remote = await streamingService.getRemote(
+        uuid,
+        hostSocket,
+        streamingService
+      );
+
       room = new Room(uuid, streamingService, remote, hostSocket);
       roomStorage.addRoom(room);
     }

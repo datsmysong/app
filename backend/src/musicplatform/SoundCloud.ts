@@ -1,4 +1,5 @@
 import { JSONTrack } from "commons/Backend-types";
+import { Socket } from "socket.io";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
@@ -43,7 +44,12 @@ export default class SoundCloud extends MusicPlatform {
     return true;
   }
 
-  getRemote(roomId: string): Promise<Remote | null> {
-    return SoundCloudRemote.createRemote(roomId, this);
+  getRemote(
+    roomId: string,
+    hostSocket: Socket | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    musicPlatform: MusicPlatform
+  ): Promise<Remote | null> {
+    return SoundCloudRemote.createRemote(this, hostSocket);
   }
 }

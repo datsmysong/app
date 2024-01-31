@@ -24,7 +24,6 @@ export default class SpotifyRemote extends Remote {
     const { data, error } = await adminSupabase
       .from("rooms")
       .select("*, user_profile(*, bound_services(*))")
-      .eq("user_profile.bound_services.service_name", "Spotify")
       .eq("id", roomId)
       .single();
 
@@ -101,6 +100,7 @@ export default class SpotifyRemote extends Remote {
 
   async playTrack(trackId: string): Promise<{ error?: string }> {
     const state = await this.spotifyClient.player.getPlaybackState();
+
     if (state === null || state.device.id === null) {
       return { error: "No device found" };
     }
@@ -108,7 +108,7 @@ export default class SpotifyRemote extends Remote {
     await this.spotifyClient.player.startResumePlayback(
       state.device.id,
       undefined,
-      [`spotify:track:${trackId}`]
+      [`${trackId}`]
     );
 
     return {};

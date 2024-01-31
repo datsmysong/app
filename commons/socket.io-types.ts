@@ -31,4 +31,5 @@ export interface ClientToServerEvents {
   "player:updatePlaybackState": (
     playbackState: PlayingJSONTrack | null
   ) => void;
+  "player:getPlaybackState": () => void;
 }

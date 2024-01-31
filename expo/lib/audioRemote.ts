@@ -1,4 +1,8 @@
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "commons/socket.io-types";
 import { Socket } from "socket.io-client";
 
 export type AudioRemote = {
@@ -13,14 +17,16 @@ export type AudioRemote = {
   next(): Promise<void>;
 };
 
-export default function buildAudioRemote(socket: Socket): AudioRemote {
+export default function buildAudioRemote(
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>
+): AudioRemote {
   return {
     getPlaybackState(): Promise<PlayingJSONTrack | null> {
       socket.emit("player:getPlaybackState");
 
       return new Promise((resolve) => {
         socket.on(
-          "player:getPlaybackState",
+          "player:updatePlaybackState",
           (state: PlayingJSONTrack | null) => {
             resolve(state);
           }
@@ -38,9 +44,7 @@ export default function buildAudioRemote(socket: Socket): AudioRemote {
     },
 
     playTrack(trackId: string): Promise<{ error?: string | undefined }> {
-      socket.emit("player:playTrack", {
-        trackId,
-      });
+      socket.emit("player:playTrack", trackId);
 
       return new Promise((resolve) => {
         socket.on("player:playTrack", (error: string | undefined) => {
@@ -54,9 +58,7 @@ export default function buildAudioRemote(socket: Socket): AudioRemote {
     },
 
     setVolume(volume: number): Promise<void> {
-      socket.emit("player:setVolume", {
-        volume,
-      });
+      socket.emit("player:setVolume", volume);
 
       return new Promise((resolve) => {
         socket.on("player:setVolume", () => {
@@ -66,9 +68,7 @@ export default function buildAudioRemote(socket: Socket): AudioRemote {
     },
 
     seekTo(position: number): Promise<void> {
-      socket.emit("player:seekTo", {
-        position,
-      });
+      socket.emit("player:seekTo", position);
 
       return new Promise((resolve) => {
         socket.on("player:seekTo", () => {
@@ -108,10 +108,10 @@ export default function buildAudioRemote(socket: Socket): AudioRemote {
     },
 
     next(): Promise<void> {
-      socket.emit("player:next");
+      socket.emit("player:skip");
 
       return new Promise((resolve) => {
-        socket.on("player:next", () => {
+        socket.on("player:skip", () => {
           resolve();
         });
       });

@@ -168,14 +168,20 @@ server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
 });
 
+let ignoreCount = 1;
+
 setInterval(async () => {
   const allRooms = await RoomStorage.getRoomStorage().getRooms();
-  allRooms.forEach((room) => {
-    // If the active room is using a widget thats running client-side, we need to send a message to the client to update the room
-    if (room.getStreamingService().isClientSide()) {
-      const { uuid } = room;
-      server.io.of(`/room/${uuid}`).emit("player:getPlaybackState");
-    }
+  allRooms.forEach(async (room) => {
+    ignoreCount++;
+    if (!room.getStreamingService().isClientSide() && ignoreCount % 5 !== 0)
+      return;
+    if (!room.getStreamingService().isClientSide()) ignoreCount = 0;
+
+    const playbackState = (await room.getRemote()?.getPlaybackState()) ?? null;
+    server.io
+      .of(`/room/${room.uuid}`)
+      .emit("player:updatePlaybackState", playbackState);
   });
 }, 1000);
 

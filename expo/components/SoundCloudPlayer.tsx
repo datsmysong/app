@@ -10,7 +10,7 @@ import { Platform, StyleSheet } from "react-native";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 
 import { AudioRemote } from "../lib/audioRemote";
-import useSoundCloudWidgetHtml from "../lib/useSoundCloudWidgetHtml";
+import getSoundCloudWidgetHtml from "../lib/soundcloud-widget-html";
 
 const SoundCloudPlayer = forwardRef<
   AudioRemote,
@@ -148,7 +148,7 @@ const SoundCloudPlayer = forwardRef<
 
   const previous = async () => {};
 
-  const html = useSoundCloudWidgetHtml();
+  const html = getSoundCloudWidgetHtml();
 
   return Platform.OS === "web" ? (
     <iframe ref={iframeRef} srcDoc={html} style={styles.hidden} />

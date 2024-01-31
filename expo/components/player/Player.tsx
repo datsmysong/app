@@ -1,6 +1,6 @@
 import { PlayingJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type PlayerProps = {
@@ -12,15 +12,6 @@ const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 const Player: React.FC<PlayerProps> = ({ state, children }) => {
-  const [progress, setProgress] = useState(0);
-
-  // Synchronize progress and isPlaying with the music prop
-  useEffect(() => {
-    if (!state) return;
-
-    setProgress(state.currentTime);
-  }, [state]);
-
   const formatDuration = (durationMs: number) => {
     const minutes = Math.floor(durationMs / 60000);
     const seconds = Math.floor((durationMs % 60000) / 1000);
@@ -43,13 +34,13 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
               <Text>{state.artistsName}</Text>
             </View>
             <View style={styles.progressContainer}>
-              <Text>{formatDuration(progress)}</Text>
+              <Text>{formatDuration(state.currentTime)}</Text>
               <View style={styles.progressBar}>
                 <View
                   style={[
                     styles.progress,
                     {
-                      width: `${(progress / state.duration) * 100}%`,
+                      width: `${(state.currentTime / state.duration) * 100}%`,
                     },
                   ]}
                 />
