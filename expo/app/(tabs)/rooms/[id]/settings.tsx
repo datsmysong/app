@@ -1,9 +1,12 @@
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet } from "react-native";
 
-import { MusicRoomParams } from "./index";
+import RoomConfigurationParametersList from "../../../../components/RoomConfigurationParametersList";
 import { Text, View } from "../../../../components/Themed";
-import RoomConfigurationParametersList from "../../../components/RoomConfigurationParametersList";
+
+interface MusicRoomParams {
+  id: string;
+}
 
 export default function RoomSettings() {
   const { id } = useLocalSearchParams() as MusicRoomParams;
