@@ -55,7 +55,7 @@ export default function ProfileIntegration() {
 
   const getServiceIds = (boundServices: BoundService[]) => {
     const serviceIds = [];
-    for (const [key, value] of Object.entries(boundServices)) {
+    for (const [, value] of Object.entries(boundServices)) {
       if (value) {
         serviceIds.push(value.service_id);
       }
@@ -70,7 +70,6 @@ export default function ProfileIntegration() {
   };
 
   const unbindService = (serviceId: string) => {
-    // If I do a DELETE request, I get a CORS error
     fetch(baseUrl + "/streaming-service/" + serviceId, {
       method: "DELETE",
       credentials: "include",

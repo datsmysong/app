@@ -5,11 +5,12 @@ import * as Device from "expo-device";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
+
 import Alert from "../components/Alert";
-import { getApiUrl } from "./apiUrl";
-import { supabase } from "./supabase";
-import { generateRandomString, sha256, base64encode } from "./codeVerifier";
 import { getSpotifyScopes } from "../constants/Api";
+import { getApiUrl } from "./apiUrl";
+import { base64encode, generateRandomString, sha256 } from "./codeVerifier";
+import { supabase } from "./supabase";
 
 WebBrowser.maybeCompleteAuthSession(); // required for web only
 const redirectUrl = makeRedirectUri();
@@ -33,7 +34,7 @@ export const signInWithProvider = async ({
       redirectTo: encodeURI(
         baseUrl + "/auth/callback?redirect_url=" + redirectUrl
       ),
-      scopes: scopes,
+      scopes,
     },
   });
   if (error || !data || !data.url) {
@@ -96,9 +97,9 @@ export const signInWithProvider = async ({
 };
 
 export const bindServiceToAccount = async (serviceName: string) => {
-  if (serviceName == "Spotify") {
+  if (serviceName === "Spotify") {
     bindToSpotify();
-  } else if (serviceName == "SoundCloud") {
+  } else if (serviceName === "SoundCloud") {
     signInWithSoundcloud();
   } else {
     Alert.alert("Ce service n'est pas encore disponible");

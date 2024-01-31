@@ -54,6 +54,12 @@ if (!process.env.SPOTIFY_CLIENT_ID) {
     "Missing SPOTIFY_CLIENT_ID environment variable, check .env.local.example file"
   );
 }
+
+if (!process.env.BACKEND_URL && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "Missing BACKEND_URL environment variable, check .env.local.example file"
+  );
+}
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SERVICE_ROLE
