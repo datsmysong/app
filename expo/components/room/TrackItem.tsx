@@ -51,7 +51,7 @@ export default function TrackItem(prop: {
         <View style={[itemStyles.textContainer]}>
           <HView>
             <Text style={[itemStyles.text, itemStyles.textTop]}>
-              {prop.index}
+              {prop.index + 1}
             </Text>
             <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
               .

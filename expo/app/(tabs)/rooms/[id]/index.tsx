@@ -83,7 +83,7 @@ export default function MusicRoom() {
                 style={styles.list}
                 data={queue?.tracks}
                 renderItem={({ item, index }) => (
-                  <TrackItem track={item} index={index + 1} roomId={id} />
+                  <TrackItem track={item} index={index} roomId={id} />
                 )}
               />
             </View>
