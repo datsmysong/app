@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import {
   InputModeOptions,
+  StyleProp,
   StyleSheet,
   TextInput,
   TextInputProps,
+  TextStyle,
 } from "react-native";
 
 export interface CustomTextInputProps {
   placeholder?: string;
-  style?: object;
+  style?: StyleProp<TextStyle>;
   inputMode?: InputModeOptions;
   value?: string;
   onChangeText?: (text: string) => void;
