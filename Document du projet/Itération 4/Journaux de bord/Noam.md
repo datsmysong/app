@@ -22,9 +22,14 @@
 
 ## Mercredi
 
-| Horaire   | Tâche |
-| --------- | ----- |
-| 8h - 8h30 | ...   |
+| Horaire   | Tâche                                                                                                                                                                                                                                                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 8h - 9h   | J’ai effectué des changements demandés dans les reviews de ma branche et j’ai effectué un rebase pour mettre à jour ma branche avec les changements de main.                                                                                                                                                                                     |
+| 9h - 10h  | J’ai réglé un problème concernant la suppression des morceaux. En effet, l’index des morceaux était incrémenté de un lorsqu’ils étaient créés, ce qui créait des problème lorsque l’on voulait supprimer ces morceaux par index. Désormais, l’index n’est plus incrémenté à la création mais seulement lorsque le numéro du morceau est affiché. |
+| 10h - 12h | J’ai refactor mon code pour en faire quelque chose de réutilisable par la suite, notamment en créant des composants. J’ai également tenté de résoudre quelques problèmes concernant la position du menu contextuel par rapport à la maquette, en vain.                                                                                           |
+| 14h - 15h | J’ai écris une partie du document.                                                                                                                                                                                                                                                                                                               |
+| 15h - 17h | J’ai ajouté la logique et les fonctions pour vérifier si l’utilisateur voulant supprimer une musique est bien l’hôte ou non.                                                                                                                                                                                                                     |
+| 17h - 18h | J’ai review le code de mes camarades.                                                                                                                                                                                                                                                                                                            |
 
 ## Jeudi
 
