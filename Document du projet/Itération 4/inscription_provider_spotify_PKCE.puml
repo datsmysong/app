@@ -1,0 +1,43 @@
+@startuml inscription_provider_spotify
+title Première connexion à l'application via un compte Spotify flux PKCE
+!theme plain
+
+actor Participant as User
+participant App as "Application (frontend)"
+participant LogiqueMetier as "Serveur (backend)"
+participant Spotify as "Spotify (frontend)"
+participant Supabase as "Assistant d'authentification (Supabase)" 
+participant SpotifyAPI as "API Spotify"
+
+
+User -> App: Clique sur le bouton connexion avec Spotify
+activate App
+App -> Supabase: demande code d'autorisation et un code de vérification
+activate Supabase
+App <-- Supabase: Code d'autorisation et code de vérification & url de redirection vers Spotify
+deactivate Supabase
+App -> App: Ouvre une popup native vers notre backend
+App -> LogiqueMetier: Demande à l'utilisateur de s'ajouter en cookie le code de vérification
+LogiqueMetier -> App: Redirection vers l'interface Spotify avec le code d'autorisation
+App --> User: Redirection vers l'interface Spotify avec le code d'autorisation
+User -> Spotify: Autorise notre application sur l'interface Spotify
+activate Spotify
+LogiqueMetier <-- Spotify: Redirection avec un code d'autorisation vers l'application
+deactivate Spotify
+LogiqueMetier -> Supabase: Demande une session utilisateur avec le code de vérification
+activate Supabase
+Supabase -> SpotifyAPI: Demande un token d'accès avec le code d'autorisation
+activate SpotifyAPI
+SpotifyAPI --> SpotifyAPI: Vérification du code d'autorisation
+Supabase <-- SpotifyAPI: Token d'accès & authorisation
+deactivate SpotifyAPI
+Supabase --> LogiqueMetier: Token d'accès & session utilisateur
+deactivate Supabase
+LogiqueMetier -> LogiqueMetier: Création d'un compte utilisateur datsmysong
+LogiqueMetier -> LogiqueMetier: Liaison du compte utilisateur avec le compte Spotify
+App <-- LogiqueMetier : Donne un refresh token permettant de s'authentifier à l'application
+deactivate LogiqueMetier
+User <-- App : Page d'accueil de l'application (utilisateur connecté avec)
+deactivate App
+
+@enduml

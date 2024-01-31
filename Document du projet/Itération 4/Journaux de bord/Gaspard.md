@@ -26,9 +26,16 @@
 
 ## Mercredi
 
-| Horaire   | Tâche |
-| --------- | ----- |
-| 8h - 8h30 | ...   |
+| Horaire       | Tâche                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------- |
+| 8h - 10h      | Rédaction du document de l'itération (planification du déroulement).                              |
+| 10h - 11h30   | Review de la branche "Platform integration" de Thomas (rapport de bug sur mobile).                |
+| 11h30 - 12h   | Application des retours sur ma branche "feat/manage-account".                                     |
+| 14h - 14h45   | Review de la branche "QR code" et fusion (merge).                                                 |
+| 14h45 - 15h30 | Review de la branche "feat/platform-integration" et fusion (merge).                               |
+| 15h30 - 16h   | Review de "feat/remove-track" (problème pour vérifier l'utilisateur dans le canal de web-socket). |
+| 16h - 17h     | Rédaction de l'élément dont je suis fier et création d'un diagramme de séquence pour l'expliquer. |
+| 17h - 18h     | Review des autres branches non fusionnées.                                                        |
 
 ## Jeudi
 
