@@ -32,9 +32,12 @@
 
 ## Mercredi
 
-| Horaire   | Tâche |
-| --------- | ----- |
-| 8h - 8h30 | ...   |
+| Horaire     |	Tâche                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------ |
+| 8h - 12h00	| J’avance sur ma tâche de lecture des musiques, je review quelques PR que je n’avais pas encore review, daily |
+| 14h00 - 17h	| J’avance sur ma tâche de lecture des musiques et je merge + review deux PR avec Gaspard                      |
+| 17h - 17h30	| Je review quelques PRs                                                                                       |
+| 17h30 - …h	| J’avance sur ma tâche de lecture des musiques                                                                |
 
 ## Jeudi
 
