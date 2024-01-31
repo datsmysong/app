@@ -60,9 +60,7 @@ export default function PersonalInfo() {
     if (user && user.email) {
       console.log("user", user);
       console.log("Providers", user.app_metadata.providers);
-      // si l'utilisateur a un provider autre que email, on ne peut pas changer l'email
       if (user.app_metadata.provider !== "email") setEmailDisabled(true);
-
       setValue("email", user.email);
       getUserProfile(user.id).then((profile) => {
         if (profile && profile.username) {
@@ -118,9 +116,6 @@ export default function PersonalInfo() {
       })
       .eq("account_id", accountId);
     if (error) {
-      // setValue("username", "@" + initialUsername, {
-      //   shouldDirty: false,
-      // });
       const errorMessage =
         error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION
           ? "Le pseudo '" +

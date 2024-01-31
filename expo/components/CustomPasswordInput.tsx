@@ -2,8 +2,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { useTogglePasswordVisibility } from "../lib/useTogglePasswordVisibility";
 import CustomTextInput, { CustomTextInputProps } from "./CustomTextInput";
+import { useTogglePasswordVisibility } from "../lib/useTogglePasswordVisibility";
 
 interface CustomPasswordInputProps extends CustomTextInputProps {}
 
