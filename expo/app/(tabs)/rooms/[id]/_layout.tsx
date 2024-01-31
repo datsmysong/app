@@ -8,6 +8,13 @@ export default function RoomTabLayout() {
         name="invite"
         options={{ presentation: "modal", title: "Menu d'invitation" }}
       />
+      <Stack.Screen
+        name="qrcode"
+        options={{
+          title: "Rejoindre la salle",
+          presentation: "transparentModal",
+        }}
+      />
       <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
     </Stack>
   );

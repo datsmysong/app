@@ -4,7 +4,6 @@ import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
-import QRCode from "react-native-qrcode-svg";
 
 import Button from "../../../../components/Button";
 import { View } from "../../../../components/Themed";
@@ -16,7 +15,6 @@ export default function InvitationModal() {
 
   const [room, setRoom] = useState<Room>();
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [isQRCodeDisplayed, setIsQRCodeDisplayed] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +37,14 @@ export default function InvitationModal() {
   }, []);
 
   const handleShare = async () => {
-    const invitationLink = generatedInvitationLink();
+    if (!currentUrl || !room) {
+      Alert.alert("Aucun lien disponible");
+      return;
+    }
+    const invitationLink = generatedInvitationLink({
+      currentUrl,
+      roomCode: room.code,
+    });
 
     await Clipboard.setStringAsync(invitationLink);
     setIsCopied(true);
@@ -47,28 +52,6 @@ export default function InvitationModal() {
     setTimeout(() => {
       setIsCopied(false);
     }, 3000);
-  };
-
-  const generatedInvitationLink = () => {
-    if (!currentUrl) {
-      Alert.alert("Aucun lien n'a été retourné");
-      return "";
-    }
-    const roomCode = room?.code ?? "";
-
-    const production = process.env.NODE_ENV === "production";
-    if (production) {
-      return `https://datsmysong.app/join/${roomCode}`;
-    } else {
-      const mobile = Platform.OS === "ios" || Platform.OS === "android";
-      if (mobile) {
-        const baseUrl = "http://" + currentUrl.split("/").slice(2, 3).join("/");
-        return `${baseUrl}/join/${roomCode}`;
-      } else {
-        const host = currentUrl.split("/").slice(0, 3).join("/");
-        return `${host}/join/${roomCode}`;
-      }
-    }
   };
 
   return (
@@ -83,28 +66,38 @@ export default function InvitationModal() {
             Copier le lien
           </Button>
         )}
-        <Button
-          type="outline"
-          icon="qr-code"
-          onPress={() => setIsQRCodeDisplayed(true)}
-        >
+        <Button type="outline" icon="qr-code" href={`/rooms/${id}/qrcode`}>
           Afficher le QR code
         </Button>
       </View>
-      {isQRCodeDisplayed && (
-        <QRCode
-          value={generatedInvitationLink()}
-          size={200}
-          color="black"
-          backgroundColor="white"
-        />
-      )}
       <Button block href={`/rooms/${id}`} prependIcon="arrow-back">
         Retour à la salle d'écoute
       </Button>
     </View>
   );
 }
+
+export const generatedInvitationLink = ({
+  currentUrl,
+  roomCode,
+}: {
+  currentUrl: string;
+  roomCode: string;
+}) => {
+  const production = process.env.NODE_ENV === "production";
+  if (production) {
+    return `https://datsmysong.app/join/${roomCode}`;
+  } else {
+    const mobile = Platform.OS === "ios" || Platform.OS === "android";
+    if (mobile) {
+      const baseUrl = "http://" + currentUrl.split("/").slice(2, 3).join("/");
+      return `${baseUrl}/join/${roomCode}`;
+    } else {
+      const host = currentUrl.split("/").slice(0, 3).join("/");
+      return `${host}/join/${roomCode}`;
+    }
+  }
+};
 
 const styles = StyleSheet.create({
   modalContent: {
