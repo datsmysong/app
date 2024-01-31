@@ -52,3 +52,22 @@ export async function getRoomId(
   if (roomsError) return { data: null, error: roomsError };
   return { data: room.id, error: null };
 }
+
+export async function getHostId(
+  roomId: string,
+  userProfile: UserProfile | null,
+  isActive: boolean
+): Promise<{ data: string | null; error: PostgrestError | string | null }> {
+  if (!userProfile) return { data: null, error: "Unauthorized" };
+
+  const { data: room, error: roomsError } = await supabase
+    .from("rooms")
+    .select("*")
+    .eq("id", roomId)
+    .eq("host_user_profile_id", userProfile.user_profile_id)
+    .eq("is_active", isActive)
+    .single();
+
+  if (roomsError) return { data: null, error: roomsError };
+  return { data: room.host_user_profile_id, error: null };
+}
