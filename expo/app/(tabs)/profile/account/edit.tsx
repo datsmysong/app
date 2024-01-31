@@ -58,8 +58,6 @@ export default function PersonalInfo() {
 
   useEffect(() => {
     if (user && user.email) {
-      console.log("user", user);
-      console.log("Providers", user.app_metadata.providers);
       if (user.app_metadata.provider !== "email") setEmailDisabled(true);
       setValue("email", user.email);
       getUserProfile(user.id).then((profile) => {
@@ -232,7 +230,6 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingHorizontal: 18,
     flex: 1,
-    // paddingBottom: 300,
   },
   container: {
     alignItems: "stretch",

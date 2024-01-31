@@ -21,6 +21,10 @@ interface AvatarProps {
   onImageLoad: () => void;
 }
 
+/**
+ * Component with a button to select an image from the device and display it.
+ * It also has a saveImage method to upload the image to Supabase Storage.
+ */
 const Avatar = forwardRef((props: AvatarProps, ref) => {
   const { onImageLoad } = props;
   const user = useSupabaseUserHook();
@@ -40,16 +44,15 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
   }));
 
   async function downloadUserImage() {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
+
     const path = `${user.id}.jpg`;
     const { data } = supabase.storage
       .from("avatars")
       .getPublicUrl(path + "?avoidCache=" + Math.random());
 
     if (!data) {
-      console.log("no data");
+      // No image for this user
       return;
     }
     setAvatarUrl(data.publicUrl);
@@ -86,9 +89,7 @@ const Avatar = forwardRef((props: AvatarProps, ref) => {
   }
 
   async function selectAvatar() {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
     setUploading(true);
 
     const file = await ImagePicker.launchImageLibraryAsync({
