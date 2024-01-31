@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { getUserFromRequest } from "../room";
+import { getUserFromRequest } from "../lib/auth-utils";
 import { adminSupabase } from "../server";
 import RoomStorage from "../RoomStorage";
 

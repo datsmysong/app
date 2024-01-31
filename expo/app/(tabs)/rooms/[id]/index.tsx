@@ -1,7 +1,5 @@
 import { RoomJSON } from "commons/backend-types";
 import { Room } from "commons/database-types-utils";
-import * as Clipboard from "expo-clipboard";
-import * as Linking from "expo-linking";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Platform, StyleSheet } from "react-native";
@@ -69,7 +67,7 @@ export default function MusicRoom() {
       {room && (
         <>
           <View style={headerStyles.headerContainer}>
-            <Text style={headerStyles.title}>Salle "{room.name}"</Text>
+            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
             <Button
               onPress={deleteRoom}
               color="danger"
