@@ -45,6 +45,7 @@ export default function RoomIO(
       await room.add(params);
       roomSocket.emit("queue:update", Room.toJSON(room));
     });
+    // We should check the origin of the request to prevent anyone that isn't the host from removing anything
     socket.on("queue:remove", async (params: string) => {
       const number = Number.parseInt(params);
       if (Number.isSafeInteger(number)) {
