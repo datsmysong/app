@@ -1,8 +1,8 @@
 import { ScrollView } from "react-native";
 
-import Separator from "../../components/Separator";
-import SettingsOptions from "../../components/profile/SettingsOptions";
-import { supabase } from "../../lib/supabase";
+import Separator from "../../../../components/Separator";
+import SettingsOptions from "../../../../components/profile/SettingsOptions";
+import { supabase } from "../../../../lib/supabase";
 
 export default function Account() {
   return (
@@ -10,7 +10,7 @@ export default function Account() {
       <SettingsOptions
         icon="home"
         title="Informations personnelles"
-        href="/account/edit"
+        href="/(tabs)/profile/account/edit"
       />
       <Separator />
       <SettingsOptions icon="lock" title="Sécurité" href="/account/security" />
@@ -24,7 +24,7 @@ export default function Account() {
       <SettingsOptions
         icon="language"
         title="Intégrations"
-        href="/manage-account/integrations"
+        href="/(tabs)/profile/account/integration"
       />
       <Separator />
       <SettingsOptions

@@ -4,13 +4,7 @@ export default function ProfileTabLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: "Profil" }} />
-      <Stack.Screen
-        name="integration"
-        options={{
-          presentation: "modal",
-          title: "Lier ses comptes de streaming",
-        }}
-      />
+      <Stack.Screen name="account" options={{ headerShown: false }} />
     </Stack>
   );
 }

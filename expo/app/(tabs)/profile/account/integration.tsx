@@ -4,11 +4,11 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
-import Alert from "../../../components/Alert";
-import Button from "../../../components/Button";
-import { Text, View } from "../../../components/Tamed";
-import { getApiUrl } from "../../../lib/apiUrl";
-import { bindServiceToAccount } from "../../../lib/providerMethods";
+import Alert from "../../../../components/Alert";
+import Button from "../../../../components/Button";
+import { Text, View } from "../../../../components/Tamed";
+import { getApiUrl } from "../../../../lib/apiUrl";
+import { bindServiceToAccount } from "../../../../lib/providerMethods";
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([] as StreamingService[]);
@@ -204,6 +204,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     alignSelf: "stretch",
+    backgroundColor: "#fff",
   },
 
   details: {
@@ -217,6 +218,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     flexBasis: 0,
     alignSelf: "stretch",
+    backgroundColor: "#fff",
   },
 
   title: {
@@ -261,5 +263,6 @@ const styles = StyleSheet.create({
   tags: {
     flexDirection: "row",
     flexWrap: "wrap",
+    backgroundColor: "#fff",
   },
 });

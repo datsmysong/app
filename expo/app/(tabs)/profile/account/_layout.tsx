@@ -9,6 +9,13 @@ export default function AccountLayout() {
         name="edit"
         options={{ presentation: "modal", title: "Informations personnelles" }}
       />
+      <Stack.Screen
+        name="integration"
+        options={{
+          presentation: "modal",
+          title: "Lier ses comptes de streaming",
+        }}
+      />
     </Stack>
   );
 }
