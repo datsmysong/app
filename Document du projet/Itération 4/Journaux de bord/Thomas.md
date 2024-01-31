@@ -36,7 +36,7 @@
 | 15h - 15h30 | Nouveaux rebase sur ma branche feat/room-parameters-menu, puisqu'il certaines tâches ont été merge |
 | 15h30 - 16h | Résolution des problèmes suite au rebase                                                           |
 | 16h - 17h   | Rédaction du document final                                                                        |
-| 17h - 18h15 | Review des pull request de mes camarades                                                           |
+| 17h15 - 18h | Review des pull request de mes camarades                                                           |
 
 ## Jeudi
 
