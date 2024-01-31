@@ -66,35 +66,32 @@ export default function ParametersList({
         value={maxMusicDuration}
         onChangeText={setMaxMusicDuration}
       />
-          <Text style={styles.labelText}>
-            Pourcentage de votes pour passer une musique
-          </Text>
-          <CustomTextInput
-            style={[styles.input, !canVote && styles.inputDisabled]}
-            inputMode="numeric"
-            value={canVote ? percentageVoteToSkipAMusic : ""}
-            onChangeText={setPercentageVote}
-            disabled={!canVote}
-          />
-          <Text style={styles.labelText}>
-            Nombre maximum de musique par utilisateur
-          </Text>
-          <CustomTextInput
-            style={styles.input}
-            inputMode="numeric"
-            value={maxMusicPerUser}
-            onChangeText={setMaxMusicPerUser}
-          />
-          <Text style={styles.labelText}>Durée maximale d'une musique</Text>
-          <CustomTextInput
-            style={styles.input}
-            inputMode="numeric"
-            value={maxMusicDuration}
-            onChangeText={setMaxMusicDuration}
-          />
-        </View>
-      )}
-      {!isPressed && <View />}
+      <Text style={styles.labelText}>
+        Pourcentage de votes pour passer une musique
+      </Text>
+      <CustomTextInput
+        style={[styles.input, !canVote && styles.inputDisabled]}
+        inputMode="numeric"
+        value={canVote ? percentageVoteToSkipAMusic : ""}
+        onChangeText={setPercentageVote}
+        disabled={!canVote}
+      />
+      <Text style={styles.labelText}>
+        Nombre maximum de musique par utilisateur
+      </Text>
+      <CustomTextInput
+        style={styles.input}
+        inputMode="numeric"
+        value={maxMusicPerUser}
+        onChangeText={setMaxMusicPerUser}
+      />
+      <Text style={styles.labelText}>Durée maximale d'une musique</Text>
+      <CustomTextInput
+        style={styles.input}
+        inputMode="numeric"
+        value={maxMusicDuration}
+        onChangeText={setMaxMusicDuration}
+      />
     </View>
   );
 }
