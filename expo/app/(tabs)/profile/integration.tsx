@@ -171,11 +171,11 @@ export default function ProfileIntegration() {
 const styles = StyleSheet.create({
   page: {
     display: "flex",
-    maxWidth: 400,
+    width: "100%",
     paddingVertical: 32,
     paddingHorizontal: 18,
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 24,
   },
 
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
 
   layout: {
     display: "flex",
-    maxWidth: 394,
+    maxWidth: 500,
     padding: 20,
     flexDirection: "column",
     alignItems: "center",
