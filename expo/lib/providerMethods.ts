@@ -6,11 +6,11 @@ import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 
-import Alert from "../components/Alert";
-import { getSpotifyScopes } from "../constants/Api";
 import { getApiUrl } from "./apiUrl";
 import { base64encode, generateRandomString, sha256 } from "./codeVerifier";
 import { supabase } from "./supabase";
+import Alert from "../components/Alert";
+import { getSpotifyScopes } from "../constants/Api";
 
 WebBrowser.maybeCompleteAuthSession(); // required for web only
 const redirectUrl = makeRedirectUri();
