@@ -28,9 +28,15 @@
 
 ## Mercredi
 
-| Horaire   | Tâche |
-| --------- | ----- |
-| 8h - 8h30 | ...   |
+| Horaire     | Tâche                                                                                              |
+|-------------|----------------------------------------------------------------------------------------------------|
+| 8h30 - 8h45 | Rebase de la branche main sur ma branche                                                           |
+| 8h45 - 9h   | Résolution des problèmes suite au rebase                                                           |
+| 9h - 10h    | Ajustements sur les sliders de la page de paramétrage                                              |
+| 15h - 15h30 | Nouveaux rebase sur ma branche feat/room-parameters-menu, puisqu'il certaines tâches ont été merge |
+| 15h30 - 16h | Résolution des problèmes suite au rebase                                                           |
+| 16h - 17h   | Rédaction du document final                                                                        |
+| 17h15 - 18h | Review des pull request de mes camarades                                                           |
 
 ## Jeudi
 
