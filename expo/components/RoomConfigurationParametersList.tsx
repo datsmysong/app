@@ -1,11 +1,10 @@
-import Slider from "@react-native-community/slider";
 import { RoomConfiguration } from "commons/database-types-utils";
 import Checkbox from "expo-checkbox";
-import { Image } from "expo-image";
 import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
 import Alert from "./Alert";
+import CustomSlider from "./CustomSlider";
 import CustomTextInput from "./CustomTextInput";
 import { Text, View } from "./Themed";
 import { getApiUrl } from "../lib/apiUrl";
@@ -30,7 +29,6 @@ export default function RoomConfigurationParametersList({
   const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
   const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
-  const sliderPolygon = require("../assets/images/SliderPolygon.svg");
 
   useEffect(() => {
     (async () => {
@@ -96,49 +94,24 @@ export default function RoomConfigurationParametersList({
 
   return (
     <View style={styles.page}>
-      {/*All the part of this view will be a component : CustomSlider*/}
       <View style={styles.slider}>
         <Text style={styles.labelText}>
           Limite de participants <Text style={{ color: "red" }}>*</Text>
         </Text>
-        <View style={{ position: "relative" }}>
-          <Text
-            style={[
-              styles.thumbLabel,
-              {
-                left: `${sliderParticipantValue * 5 - 7}%`,
-              },
-            ]}
-          >
-            {sliderParticipantValue}
-          </Text>
-          <Image
-            source={sliderPolygon}
-            style={[
-              styles.sliderPolygon,
-              { left: `${sliderParticipantValue * 5 - 3.5}%` },
-            ]}
-          />
-          <Slider
-            style={styles.sliderBar}
-            maximumValue={20}
-            minimumValue={1}
-            maximumTrackTintColor="#CCCCCC"
-            minimumTrackTintColor="#1A1A1A"
-            // Doesn't change anything, don't really understand why, but I'll need to find a
-            // solution to this later
-            thumbImage={thumbImage}
-            value={sliderParticipantValue}
-            onValueChange={(value) => setSliderParticipantValue(value)}
-            // The column is not on the table room_configuration
-            // onSlidingComplete={handleSave}
-            step={1}
-          />
-        </View>
-        <View style={styles.sliderDuration}>
-          <Text>1</Text>
-          <Text>20</Text>
-        </View>
+        <CustomSlider
+          maximumValue={20}
+          minimumValue={2}
+          maximumTrackTintColor="#CCCCCC"
+          minimumTrackTintColor="#1A1A1A"
+          // Doesn't change anything, don't really understand why, but I'll need to find a
+          // solution to this later
+          thumbImage={thumbImage}
+          value={sliderParticipantValue}
+          setValue={(value) => setSliderParticipantValue(value)}
+          // The column is not on the table room_configuration
+          // onSlidingComplete={handleSave}
+          step={1}
+        />
       </View>
       <View style={styles.checkboxLayout}>
         <Checkbox
@@ -166,42 +139,18 @@ export default function RoomConfigurationParametersList({
         <Text style={styles.labelText}>
           Pourcentage nécessaire <Text style={{ color: "red" }}>*</Text>
         </Text>
-        <View style={{ position: "relative" }}>
-          <Text
-            style={[
-              styles.thumbLabel,
-              {
-                left: `${sliderPercentageValue - 5}%`,
-              },
-            ]}
-          >
-            {sliderPercentageValue}
-          </Text>
-          <Image
-            source={sliderPolygon}
-            style={[
-              styles.sliderPolygon,
-              { left: `${sliderPercentageValue - 1.5}%` },
-            ]}
-          />
-          <Slider
-            style={styles.sliderBar}
-            maximumValue={100}
-            minimumValue={1}
-            maximumTrackTintColor="#CCCCCC"
-            minimumTrackTintColor={canSkip ? "#1A1A1A" : "grey"}
-            thumbImage={thumbImage}
-            value={sliderPercentageValue}
-            onValueChange={(value) => setSliderPercentageValue(value)}
-            step={5}
-            onSlidingComplete={handleSave}
-            disabled={!canSkip}
-          />
-        </View>
-        <View style={styles.sliderDuration}>
-          <Text>1</Text>
-          <Text>100</Text>
-        </View>
+        <CustomSlider
+          maximumValue={100}
+          minimumValue={1}
+          maximumTrackTintColor="#CCCCCC"
+          minimumTrackTintColor={canSkip ? "#1A1A1A" : "grey"}
+          thumbImage={thumbImage}
+          value={sliderPercentageValue}
+          setValue={(value) => setSliderPercentageValue(value)}
+          step={5}
+          onSlidingComplete={handleSave}
+          disabled={!canSkip}
+        />
       </View>
       <View style={styles.separator} />
       <View style={styles.inputLayout}>
@@ -241,8 +190,8 @@ const styles = StyleSheet.create({
 
   slider: {
     justifyContent: "center",
-    marginLeft: 20,
-    width: "90%",
+    marginLeft: 10,
+    width: 350,
   },
 
   sliderBar: {
@@ -265,7 +214,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontStyle: "normal",
     maxWidth: 300,
-    marginBottom: 20,
+    marginBottom: 25,
   },
 
   checkboxLayout: {
@@ -319,7 +268,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: "100%",
     borderRadius: 16,
-    width: 34,
+    width: "10%",
     height: 19,
     backgroundColor: "#1A1A1A",
     color: "#FFF",
@@ -328,7 +277,7 @@ const styles = StyleSheet.create({
   },
 
   sliderPolygon: {
-    width: 9,
+    width: "3%",
     height: 8,
     flexShrink: 0,
   },
