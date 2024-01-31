@@ -8,10 +8,14 @@ import fastify from "fastify";
 import fastifyIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
+import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
+import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
+import BoundServicesGET from "./route/BoundServicesGET";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
+import UnbindServicePOST from "./route/UnbindServicePOST";
 import RoomIO from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
@@ -33,6 +37,27 @@ if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
 if (!process.env.FRONTEND_URL) {
   throw new Error(
     "Missing FRONTEND_URL environment variable, check .env.local.example file"
+  );
+}
+
+if (
+  !process.env.SOUNDCLOUD_CLIENT_ID ||
+  !process.env.SOUNDCLOUD_CLIENT_SECRET
+) {
+  throw new Error(
+    "Missing SOUNDCLOUD_CLIENT_ID or SOUNDCLOUD_CLIENT_SECRET environment variable"
+  );
+}
+
+if (!process.env.SPOTIFY_CLIENT_ID) {
+  throw new Error(
+    "Missing SPOTIFY_CLIENT_ID environment variable, check .env.local.example file"
+  );
+}
+
+if (!process.env.BACKEND_URL && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "Missing BACKEND_URL environment variable, check .env.local.example file"
   );
 }
 export const adminSupabase = createClient<Database>(
@@ -71,7 +96,7 @@ const corsOrigin: () => string[] | boolean[] = () => {
 
 server.register(fastifyCors, {
   origin: corsOrigin(), // or true to allow all origins
-  methods: ["*"], // or just ['*'] for all methods
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"], // or just ['*'] for all methods
   credentials: true, // or true to reflect origin
 });
 
@@ -81,6 +106,15 @@ server.register(import("@fastify/rate-limit"), {
   max: 50,
   timeWindow: "1 minute",
 });
+
+// Auth
+server.get("/", AuthCallbackSoundcloudGET); // / route is used until soundcloud change the redirection url
+server.get("/user/bound", BoundServicesGET);
+server.register(authRoutes, { prefix: "/auth" });
+server.get("/auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
+
+server.get("/streaming-services", StreamingServicesGET);
+server.delete("/streaming-service/:uuid", UnbindServicePOST);
 
 const createRoomSchema = {
   body: {
@@ -113,11 +147,6 @@ server.post<{
     error: object | null;
   };
 }>("/rooms/create", { schema: createRoomSchema }, RoomPOST);
-
-// Auth
-server.register(authRoutes, { prefix: "/auth" });
-
-server.get("/streaming-services", StreamingServicesGET);
 
 server.get("/room/:id", RoomIdGET);
 
