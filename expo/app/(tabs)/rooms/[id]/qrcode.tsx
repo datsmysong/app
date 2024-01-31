@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 
+import { generatedInvitationLink } from "./invite";
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
 import { View } from "../../../../components/Themed";
 import { supabase } from "../../../../lib/supabase";
-import { generatedInvitationLink } from "./invite";
 
-export default function InvitationModal() {
+export default function QRCodeModal() {
   const { id } = useLocalSearchParams();
   const currentUrl = Linking.useURL();
 
