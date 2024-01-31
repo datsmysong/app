@@ -1,13 +1,22 @@
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "commons/socket.io-types";
 import { Manager, Socket } from "socket.io-client";
 
 import { getApiUrl } from "./apiUrl";
 
 export default class SocketIo {
   private static singleton: SocketIo;
-  private readonly iomanager: Manager;
+  private readonly iomanager: Manager<
+    ServerToClientEvents,
+    ClientToServerEvents
+  >;
 
   private constructor() {
-    this.iomanager = new Manager(new URL(getApiUrl()));
+    this.iomanager = new Manager<ServerToClientEvents, ClientToServerEvents>(
+      new URL(getApiUrl())
+    );
   }
 
   static getInstance(): SocketIo {
@@ -17,7 +26,9 @@ export default class SocketIo {
     return this.singleton;
   }
 
-  getSocket(namespace: string): Socket {
+  getSocket(
+    namespace: string
+  ): Socket<ServerToClientEvents, ClientToServerEvents> {
     return this.iomanager.socket(namespace);
   }
 }

@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import Room from "../room";
 import RoomStorage from "../RoomStorage";
+import Room from "../socketio/Room";
 
 export interface QueryParams {
   id: string;

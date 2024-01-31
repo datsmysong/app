@@ -1,13 +1,3 @@
-export interface StreamingPlatformRemote {
-  playMusic: (musicUri: string) => Promise<void>;
-  pause: () => Promise<void>;
-  play: () => Promise<void>;
-  next: () => Promise<void>;
-  prev: () => Promise<void>;
-  setVolume: (volume: number) => Promise<void>;
-  seekTo: (position: number) => Promise<void>;
-}
-
 export type Artist = {
   name: string;
   id: string;

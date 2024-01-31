@@ -6,8 +6,8 @@ import { Socket } from "socket.io-client";
 
 import Alert from "./Alert";
 import Button from "./Button";
-import RoomPlayer from "./RoomPlayer";
 import { Text, View } from "./Themed";
+import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
 import { getApiUrl } from "../lib/apiUrl";
 import { getRoomHostedByUser } from "../lib/room-utils";
@@ -72,6 +72,10 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   useEffect(() => {
     const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
     setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
   }, []);
 
   useEffect(() => {

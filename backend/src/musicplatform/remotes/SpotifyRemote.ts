@@ -1,5 +1,5 @@
 import { SimplifiedArtist, SpotifyApi, Track } from "@spotify/web-api-ts-sdk";
-import { PlayingJSONTrack } from "commons/backend-types";
+import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import { adminSupabase } from "../../server";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
@@ -30,26 +30,27 @@ export default class SpotifyRemote extends Remote {
 
     if (error) return null;
     if (data.user_profile?.bound_services === undefined) return null;
-    if (!data.user_profile?.bound_services[0]) return null;
+    if (data.user_profile?.bound_services.length === 0) return null;
 
     const { access_token, expires_in, refresh_token } =
-      data.user_profile?.bound_services[0];
+      data.user_profile.bound_services[0];
+
+    if (access_token === null || expires_in === null || refresh_token === null)
+      return null;
+
+    const expiresIn = parseInt(expires_in);
 
     const spotifyClient = SpotifyApi.withAccessToken(
       process.env.SPOTIFY_CLIENT_ID as string,
       {
         access_token,
         refresh_token,
-        expires_in,
+        expires_in: expiresIn,
         token_type: "Bearer",
       }
     );
 
     return new SpotifyRemote(spotifyClient, musicPlatform);
-  }
-
-  getMusicPlatform(): MusicPlatform {
-    return this.musicPlatform;
   }
 
   async getPlaybackState(): Promise<PlayingJSONTrack | null> {
@@ -78,6 +79,83 @@ export default class SpotifyRemote extends Remote {
       title: playbackState.item.name,
       url: playbackState.item.external_urls.spotify,
     };
+  }
+
+  async getQueue(): Promise<JSONTrack[]> {
+    const spotifyQueue = await this.spotifyClient.player.getUsersQueue();
+
+    return spotifyQueue.queue
+      .filter((item) => item.type === "track")
+      .map((item) => item as Track)
+      .map((item) => {
+        return {
+          title: item.name,
+          albumName: item.album.name,
+          artistsName: extractArtistsName(item.album.artists),
+          duration: item.duration_ms,
+          imgUrl: item.album.images[0].url,
+          url: item.external_urls.spotify,
+        };
+      });
+  }
+
+  async playTrack(trackId: string): Promise<{ error?: string }> {
+    const state = await this.spotifyClient.player.getPlaybackState();
+    if (state === null || state.device.id === null) {
+      return { error: "No device found" };
+    }
+
+    await this.spotifyClient.player.startResumePlayback(
+      state.device.id,
+      undefined,
+      [`spotify:track:${trackId}`]
+    );
+
+    return {};
+  }
+
+  async setVolume(volume: number): Promise<void> {
+    await this.spotifyClient.player.setPlaybackVolume(volume);
+  }
+
+  async seekTo(position: number): Promise<void> {
+    await this.spotifyClient.player.seekToPosition(position);
+  }
+
+  async play(): Promise<void> {
+    const state = await this.spotifyClient.player.getPlaybackState();
+    if (state === null || state.device.id === null) {
+      return;
+    }
+
+    await this.spotifyClient.player.startResumePlayback(state.device.id);
+  }
+
+  async pause(): Promise<void> {
+    const state = await this.spotifyClient.player.getPlaybackState();
+    if (state === null || state.device.id === null) {
+      return;
+    }
+
+    await this.spotifyClient.player.pausePlayback(state.device.id);
+  }
+
+  async previous(): Promise<void> {
+    const state = await this.spotifyClient.player.getPlaybackState();
+    if (state === null || state.device.id === null) {
+      return;
+    }
+
+    await this.spotifyClient.player.skipToPrevious(state.device.id);
+  }
+
+  async next(): Promise<void> {
+    const state = await this.spotifyClient.player.getPlaybackState();
+    if (state === null || state.device.id === null) {
+      return;
+    }
+
+    await this.spotifyClient.player.skipToNext(state.device.id);
   }
 }
 

@@ -1,12 +1,11 @@
+import { Socket } from "socket.io";
 import Deezer from "./musicplatform/Deezer";
 import MusicPlatform from "./musicplatform/MusicPlatform";
 import SoundCloud from "./musicplatform/SoundCloud";
 import Spotify from "./musicplatform/Spotify";
-import Room from "./room";
 import { adminSupabase } from "./server";
-/* import SoundCloud from "./musicplatform/SoundCloud";
-import Deezer from "./musicplatform/Deezer";
- */
+import Room from "./socketio/Room";
+
 const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
   SoundCloud: "c99631a2-f06c-4076-80c2-13428944c3a8",
@@ -41,7 +40,10 @@ export default class RoomStorage {
     return this.singleton;
   }
 
-  async roomFromUuid(rawUuid: string): Promise<Room | null> {
+  async roomFromUuid(
+    rawUuid: string,
+    hostSocket: Socket | null
+  ): Promise<Room | null> {
     const { data: remoteRoom } = await adminSupabase
       .from("rooms")
       .select("*, streaming_services(*)")
@@ -61,10 +63,10 @@ export default class RoomStorage {
       return null;
     }
 
-    return Room.getOrCreate(this, remoteRoom.id, musicPlatform);
+    return Room.getOrCreate(this, remoteRoom.id, musicPlatform, hostSocket);
   }
 
-  async roomFromCode(code: string): Promise<Room | null> {
+  async roomFromCode(code: string, hostSocket: Socket): Promise<Room | null> {
     const { data: remoteRoom } = await adminSupabase
       .from("rooms")
       .select("*, streaming_services(*)")
@@ -88,7 +90,7 @@ export default class RoomStorage {
       return null;
     }
 
-    return Room.getOrCreate(this, remoteRoom.id, musicPlatform);
+    return Room.getOrCreate(this, remoteRoom.id, musicPlatform, hostSocket);
   }
 
   async getRooms(): Promise<Room[]> {

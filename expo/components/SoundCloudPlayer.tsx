@@ -1,3 +1,4 @@
+import { PlayingJSONTrack } from "commons/backend-types";
 import React, {
   forwardRef,
   useEffect,
@@ -7,24 +8,13 @@ import React, {
 } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
-import { PlaybackState, StreamingPlatformRemote } from "../lib/types";
+
+import { AudioRemote } from "../lib/audioRemote";
 import useSoundCloudWidgetHtml from "../lib/useSoundCloudWidgetHtml";
-import { Text, View } from "./Tamed";
-
-type SoundCloudPlayerProps = {};
-export interface SoundCloudPlayerRemote extends StreamingPlatformRemote {
-  fetchCurrent: () => Promise<PlaybackState>;
-}
-
-export function isSoundCloudPlayerRemote(
-  remote: any
-): remote is SoundCloudPlayerRemote {
-  return remote?.fetchCurrent !== undefined;
-}
 
 const SoundCloudPlayer = forwardRef<
-  SoundCloudPlayerRemote,
-  SoundCloudPlayerProps
+  AudioRemote,
+  React.ComponentProps<typeof WebView>
 >((props, ref) => {
   const sendMessage = (message: object) => {
     if (Platform.OS !== "web") {
@@ -51,17 +41,20 @@ const SoundCloudPlayer = forwardRef<
   }, [iframeRef.current]);
 
   useImperativeHandle(ref, () => ({
-    playMusic,
+    playTrack,
     play,
     pause,
     setVolume,
     seekTo,
-    fetchCurrent,
+    getPlaybackState,
+    getQueue: async () => {
+      return [];
+    },
     next,
-    prev,
+    previous,
   }));
 
-  const playMusic = async (url: string) => {
+  const playTrack = async (url: string) => {
     const command = {
       command: "playMusic",
       data: {
@@ -73,6 +66,8 @@ const SoundCloudPlayer = forwardRef<
       },
     };
     sendMessage(command);
+
+    return {};
   };
 
   const play = async () => {
@@ -109,21 +104,19 @@ const SoundCloudPlayer = forwardRef<
     sendMessage(command);
   };
 
-  const [resolveCurrentState, setResolveCurrentState] = useState<
-    null | (() => void)
-  >(null);
+  const [resolveCurrentState, setResolveCurrentState] = useState<() => void>();
 
   const handleWebViewMessage = (event: WebViewMessageEvent) => {
     const { data } = JSON.parse(event.nativeEvent.data);
     if (data.command === "currentMusic") {
       if (resolveCurrentState) {
         resolveCurrentState();
-        setResolveCurrentState(null);
+        setResolveCurrentState(undefined);
       }
     }
   };
 
-  const resolveCurrentStateRef = useRef<null | ((data: any) => void)>(null);
+  const resolveCurrentStateRef = useRef<(data: any) => void>();
 
   useEffect(() => {
     resolveCurrentStateRef.current = resolveCurrentState;
@@ -137,12 +130,12 @@ const SoundCloudPlayer = forwardRef<
     if (data.command === "currentMusic") {
       if (resolveCurrentStateRef.current) {
         resolveCurrentStateRef.current(data.data);
-        setResolveCurrentState(null);
+        setResolveCurrentState(undefined);
       }
     }
   };
 
-  const fetchCurrent = (): Promise<PlaybackState> => {
+  const getPlaybackState = (): Promise<PlayingJSONTrack> => {
     return new Promise((resolve) => {
       setResolveCurrentState(() => resolve);
       const command = {
@@ -153,16 +146,16 @@ const SoundCloudPlayer = forwardRef<
   };
   const next = async () => {};
 
-  const prev = async () => {};
+  const previous = async () => {};
 
   const html = useSoundCloudWidgetHtml();
 
-  return Platform.OS == "web" ? (
-    <iframe ref={iframeRef} srcDoc={html} style={styles.hidden}></iframe>
+  return Platform.OS === "web" ? (
+    <iframe ref={iframeRef} srcDoc={html} style={styles.hidden} />
   ) : (
     <WebView
-      javaScriptEnabled={true}
-      domStorageEnabled={true}
+      javaScriptEnabled
+      domStorageEnabled
       ref={webViewRef}
       originWhitelist={["*"]}
       source={{ html }}

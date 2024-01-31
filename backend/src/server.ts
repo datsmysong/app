@@ -1,15 +1,18 @@
 import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
-import { config } from "dotenv";
-import fastify from "fastify";
-import fastifyIO from "fastify-socket.io";
 import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
 import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import BoundServicesGET from "./route/BoundServicesGET";
 import UnbindServicePOST from "./route/UnbindServicePOST";
-import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "commons/socket.io-types";
+import { config } from "dotenv";
+import fastify from "fastify";
+import fastifySocketIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import RoomStorage from "./RoomStorage";
 import authRoutes from "./authRoutes";
@@ -17,9 +20,9 @@ import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
 import RoomEndGET from "./route/RoomEndGET";
-import { RoomJSON } from "commons/backend-types";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
+import { Database } from "commons/database-types";
 
 config({ path: ".env.local" });
 
@@ -76,7 +79,7 @@ export const spotify = SpotifyApi.withClientCredentials(
   process.env.SPOTIFY_CLIENT_ID,
   process.env.SPOTIFY_CLIENT_SECRET
 );
-server.register(fastifyIO, {
+server.register(fastifySocketIO, {
   cors: {
     origin: "http://localhost:8081",
     methods: ["GET", "POST"],
@@ -171,7 +174,7 @@ setInterval(async () => {
     // If the active room is using a widget thats running client-side, we need to send a message to the client to update the room
     if (room.getStreamingService().isClientSide()) {
       const { uuid } = room;
-      server.io.of(`/room/${uuid}`).emit("player:stateRequest");
+      server.io.of(`/room/${uuid}`).emit("player:getPlaybackState");
     }
   });
 }, 1000);
@@ -180,10 +183,6 @@ server.listen({ port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
   interface FastifyInstance {
-    io: Server<{
-      "queue:update": (room: RoomJSON) => void;
-      "queue:deleted": () => void;
-      "player:stateRequest": () => void;
-    }>;
+    io: Server<ClientToServerEvents, ServerToClientEvents>;
   }
 }

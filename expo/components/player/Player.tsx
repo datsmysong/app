@@ -1,10 +1,10 @@
+import { PlayingJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
-import { PlaybackState } from "../lib/types";
+import { StyleSheet, Text, View } from "react-native";
 
 type PlayerProps = {
-  state: PlaybackState;
+  state: PlayingJSONTrack | null;
   children?: React.ReactNode;
 };
 
@@ -13,14 +13,12 @@ const blurhash =
 
 const Player: React.FC<PlayerProps> = ({ state, children }) => {
   const [progress, setProgress] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   // Synchronize progress and isPlaying with the music prop
   useEffect(() => {
     if (!state) return;
 
-    setProgress(state.progressMs ?? 0);
-    setIsPlaying(state.isPlaying ?? false);
+    setProgress(state.currentTime);
   }, [state]);
 
   const formatDuration = (durationMs: number) => {
@@ -31,18 +29,18 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
 
   return (
     <View style={styles.container}>
-      {state && state.currentMusic && (
+      {state && (
         <>
           <Image
-            source={state.currentMusic.artwork}
+            source={state.imgUrl}
             placeholder={blurhash}
-            alt={state.currentMusic.title}
+            alt={state.title}
             style={styles.image}
           />
           <View>
-            <Text style={styles.title}>{state.currentMusic.title}</Text>
+            <Text style={styles.title}>{state.title}</Text>
             <View style={styles.artistContainer}>
-              <Text>{state.currentMusic.artists}</Text>
+              <Text>{state.artistsName}</Text>
             </View>
             <View style={styles.progressContainer}>
               <Text>{formatDuration(progress)}</Text>
@@ -51,22 +49,18 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
                   style={[
                     styles.progress,
                     {
-                      width: `${
-                        (progress / state.currentMusic.durationMs) * 100
-                      }%`,
+                      width: `${(progress / state.duration) * 100}%`,
                     },
                   ]}
-                ></View>
+                />
               </View>
-              <Text>{formatDuration(state.currentMusic.durationMs)}</Text>
+              <Text>{formatDuration(state.duration)}</Text>
             </View>
             {children}
           </View>
         </>
       )}
-      {(!state || !state.currentMusic) && (
-        <Text>Nothing is playing, start a song</Text>
-      )}
+      {!state && <Text>Nothing is playing, start a song</Text>}
     </View>
   );
 };
