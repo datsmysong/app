@@ -1,6 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JSONTrack } from "commons/backend-types";
 import { spotify } from "../server";
 import MusicPlatform from "./MusicPlatform";
+import Remote from "./remotes/Remote";
+import SpotifyRemote from "./remotes/SpotifyRemote";
+import Room from "../socketio/Room";
+
 export default class Spotify extends MusicPlatform {
   constructor() {
     super(
@@ -31,5 +36,16 @@ export default class Spotify extends MusicPlatform {
       albumName: data.album.name,
       imgUrl: new URL(image.url).toString(),
     };
+  }
+
+  isClientSide(): boolean {
+    return false;
+  }
+
+  async getRemote(
+    room: Room,
+    musicPlatform: MusicPlatform
+  ): Promise<Remote | null> {
+    return await SpotifyRemote.createRemote(room, this);
   }
 }

@@ -1,24 +1,28 @@
+import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { createClient } from "@supabase/supabase-js";
-import { config } from "dotenv";
-import fastify from "fastify";
-import fastifyIO from "fastify-socket.io";
-import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
-import { Server } from "socket.io";
-import authRoutes from "./authRoutes";
 import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
 import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
 import BoundServicesGET from "./route/BoundServicesGET";
-import RoomIdGET from "./route/RoomIdGET";
-import StreamingServicesGET from "./route/StreamingServicesGET";
 import UnbindServicePOST from "./route/UnbindServicePOST";
-import { Database } from "commons/database-types";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
-import RoomIO from "./socketio/RoomIO";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "commons/socket.io-types";
+import { config } from "dotenv";
+import fastify from "fastify";
+import fastifySocketIO from "fastify-socket.io";
+import { Server } from "socket.io";
+import RoomStorage from "./RoomStorage";
+import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
+import RoomIdGET from "./route/RoomIdGET";
 import RoomPOST from "./route/RoomPOST";
 import RoomEndGET from "./route/RoomEndGET";
-import { RoomJSON } from "commons/backend-types";
+import StreamingServicesGET from "./route/StreamingServicesGET";
+import RoomIO from "./socketio/RoomIO";
+import { Database } from "commons/database-types";
 
 config({ path: ".env.local" });
 
@@ -75,9 +79,11 @@ export const spotify = SpotifyApi.withClientCredentials(
   process.env.SPOTIFY_CLIENT_ID,
   process.env.SPOTIFY_CLIENT_SECRET
 );
-server.register(fastifyIO, {
+server.register(fastifySocketIO, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:8081",
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 server.register(fastifyCookie, {
@@ -162,13 +168,27 @@ server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
 });
 
+let ignoreCount = 1;
+
+setInterval(async () => {
+  const allRooms = await RoomStorage.getRoomStorage().getRooms();
+  allRooms.forEach(async (room) => {
+    ignoreCount++;
+    if (!room.getStreamingService().isClientSide() && ignoreCount % 5 !== 0)
+      return;
+    if (!room.getStreamingService().isClientSide()) ignoreCount = 0;
+
+    const playbackState = (await room.getRemote()?.getPlaybackState()) ?? null;
+    server.io
+      .of(`/room/${room.uuid}`)
+      .emit("player:updatePlaybackState", playbackState);
+  });
+}, 1000);
+
 server.listen({ port: 3000, host: "0.0.0.0" });
 
 declare module "fastify" {
   interface FastifyInstance {
-    io: Server<{
-      "queue:update": (room: RoomJSON) => void;
-      "queue:deleted": () => void;
-    }>;
+    io: Server<ClientToServerEvents, ServerToClientEvents>;
   }
 }

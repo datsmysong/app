@@ -7,7 +7,13 @@ export interface JSONTrack {
   imgUrl: string;
 }
 
+export interface PlayingJSONTrack extends JSONTrack {
+  currentTime: number;
+  isPlaying: boolean;
+}
+
 export interface RoomJSON {
+  currentlyPlaying: PlayingJSONTrack | null;
   currentActiveRoom: string;
-  tracks: JSONTrack[];
+  queue: JSONTrack[];
 }
