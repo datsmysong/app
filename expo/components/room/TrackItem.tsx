@@ -3,11 +3,19 @@ import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
+import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 
+import SocketIo from "../../lib/socketio";
+import CustomMenuOption from "../CustomMenuOption";
 import HView from "../HView";
 import { Text, View } from "../Themed";
 
-export default function TrackItem(prop: { track: JSONTrack; index: number }) {
+export default function TrackItem(prop: {
+  track: JSONTrack;
+  index: number;
+  roomId: string;
+  isMenuDisabled: boolean;
+}) {
   const {
     title,
     artistsName: artists,
@@ -22,6 +30,12 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
     "https://s3-alpha-sig.figma.com/img/942f/8c54/9dd5171d2934478c6b2e1f64eea7d81b?Expires=1706486400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QQWwtvI8wCX3aN6TZggpc-IcOeYA21PftgQkCXnuVhcMue0uffDuBhvHDIu9SSuWJYc9AGBj8L7RpwV6Yv1X7fD1A0rdOYwTpbZuP1FbYHWxFjD9uyYEo8CpOXJQEzOndM~jtj9pNysYNWzhfJ5LnX5grgKEoU1AnXR5SFu0AAfCiB4PrFYLpOlhKwMQsv7uPQA5ftH9YNYq4yzgVsSbZX69jHCTYhTO0XOwEtu6DKNOhTMzl9naajFenIAHChgKxqlDrF-UvXsVwh7dwq4-jYPlFxV8-6QB-o0ffog60CHpBsfLnYs-KgaAqeTleydiBKjtYOk1zKBp9uHAOcjOAg__"
   ).toString();
 
+  const removeTrack = () => {
+    SocketIo.getInstance()
+      .getSocket(`/room/${prop.roomId}`)
+      .emit("queue:remove", prop.index);
+  };
+
   return (
     <HView style={itemStyles.container}>
       <View style={[itemStyles.imagesContainer]}>
@@ -31,7 +45,7 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
       <View style={[itemStyles.textContainer]}>
         <HView>
           <Text style={[itemStyles.text, itemStyles.textTop]}>
-            {prop.index}
+            {prop.index + 1}
           </Text>
           <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
             .
@@ -40,19 +54,26 @@ export default function TrackItem(prop: { track: JSONTrack; index: number }) {
         </HView>
         <Text style={[itemStyles.text, itemStyles.textBottom]}>{artists}</Text>
       </View>
-      <View>
-        <Pressable onPress={() => setDislike(!dislike)}>
-          <FontAwesome
-            name={`thumbs-${!dislike ? "o-" : ""}down`}
-            style={itemStyles.icon}
-          />
-        </Pressable>
-      </View>
-      <View>
-        <Pressable>
+      <Pressable onPress={() => setDislike(!dislike)}>
+        <FontAwesome
+          name={`thumbs-${!dislike ? "o-" : ""}down`}
+          style={itemStyles.icon}
+        />
+      </Pressable>
+      <Menu>
+        <MenuTrigger disabled={prop.isMenuDisabled}>
           <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
-        </Pressable>
-      </View>
+        </MenuTrigger>
+        <MenuOptions customStyles={optionsStyles}>
+          <CustomMenuOption
+            onSelect={removeTrack}
+            icon={{ name: "close", size: 28, color: "red" }}
+            textStyle={optionsStyles.optionText}
+          >
+            Supprimer
+          </CustomMenuOption>
+        </MenuOptions>
+      </Menu>
     </HView>
   );
 }
@@ -105,5 +126,30 @@ const itemStyles = StyleSheet.create({
     height: 24,
     fontSize: 24,
     textAlign: "center",
+  },
+});
+
+const optionsStyles = StyleSheet.create({
+  optionsContainer: {
+    width: 241,
+    display: "flex",
+    alignItems: "stretch",
+    alignSelf: "stretch",
+    borderWidth: 1,
+    borderColor: "#D2D2D2",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  optionWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 0,
+  },
+  optionText: {
+    color: "red",
+    fontSize: 15,
+    fontWeight: "500",
+    letterSpacing: 0.3,
   },
 });

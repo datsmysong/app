@@ -1,5 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { NavigationState } from "@react-navigation/native";
+import { User } from "@supabase/supabase-js";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import {
@@ -9,11 +10,12 @@ import {
   useRootNavigationState,
 } from "expo-router";
 import { useEffect } from "react";
+import { MenuProvider } from "react-native-popup-menu";
 
 import Alert from "../components/Alert";
 import { createSessionFromUrl } from "../lib/authMethod";
 import { supabase } from "../lib/supabase";
-import useSupabaseUser from "../lib/useSupabaseUser";
+import { useSupabaseUserHook } from "../lib/useSupabaseUser";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -26,6 +28,7 @@ const requiredAuthPaths = ["(tabs)"];
 const authRoutes = ["auth"];
 
 export default function RootLayout() {
+  const user = useSupabaseUserHook();
   const [loaded, error] = useFonts({
     "Outfit-Thin": require("../assets/fonts/outfit/Outfit-Thin.ttf"),
     "Outfit-ExtraLight": require("../assets/fonts/outfit/Outfit-ExtraLight.ttf"),
@@ -49,7 +52,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       enforceRouteAccessControl(
-        rootNavigation.routes[rootNavigation.routes.length - 1].name
+        rootNavigation.routes[rootNavigation.routes.length - 1].name,
+        user
       ).then(() => {
         SplashScreen.hideAsync();
       });
@@ -71,6 +75,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const user = useSupabaseUserHook();
   const url = Linking.getInitialURL();
 
   url.then(async (url) => {
@@ -78,44 +83,48 @@ function RootLayoutNav() {
   });
 
   return (
-    <Stack
-      screenListeners={(navigation) => ({
-        state: async (e) => {
-          if (!e.data) return;
-          const state = (e.data as { state: NavigationState }).state;
-          const currentPage = state.routes[state.routes.length - 1];
-          url.then(async (url) => {
-            if (!url) return;
-            const user = await useSupabaseUser();
-            if (user) return enforceRouteAccessControl(currentPage.name);
+    <MenuProvider>
+      <Stack
+        screenListeners={(navigation) => ({
+          state: async (e) => {
+            if (!e.data) return;
+            const state = (e.data as { state: NavigationState }).state;
+            const currentPage = state.routes[state.routes.length - 1];
+            url.then(async (url) => {
+              if (!url) return;
+              if (user)
+                return enforceRouteAccessControl(currentPage.name, user);
 
-            const refresh_token = url.split("#refresh_token=")[1];
-            if (!refresh_token)
-              return enforceRouteAccessControl(currentPage.name);
-            const { error } = await supabase.auth.refreshSession({
-              refresh_token,
+              const refresh_token = url.split("#refresh_token=")[1];
+              if (!refresh_token)
+                return enforceRouteAccessControl(currentPage.name, user);
+              const { error } = await supabase.auth.refreshSession({
+                refresh_token,
+              });
+              if (!error) {
+                return navigation.navigation.navigate("(tabs)");
+              }
+              Alert.alert(
+                "Une erreur est survenue, impossible de refresh la session"
+              );
+              return router.replace("/auth");
             });
-            if (!error) {
-              return navigation.navigation.navigate("(tabs)");
-            }
-            Alert.alert(
-              "Une erreur est survenue, impossible de refresh la session"
-            );
-            return router.replace("/auth");
-          });
-        },
-      })}
-    >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="auth" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      <Stack.Screen name="ask-name" options={{ headerShown: false }} />
-    </Stack>
+          },
+        })}
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        <Stack.Screen name="ask-name" options={{ headerShown: false }} />
+      </Stack>
+    </MenuProvider>
   );
 }
 
-const enforceRouteAccessControl = async (currentRoute: string) => {
-  const user = await useSupabaseUser();
+const enforceRouteAccessControl = async (
+  currentRoute: string,
+  user: User | null
+) => {
   if (requiredAuthPaths.includes(currentRoute) && !user) {
     router.replace("/auth");
   }

@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import Room from "../room";
 import RoomStorage from "../RoomStorage";
+import Room from "../room";
 
 export default function RoomIO(
   socket: Socket /*, next: (err?: ExtendedError) => void*/
@@ -45,10 +45,11 @@ export default function RoomIO(
       await room.add(params);
       roomSocket.emit("queue:update", Room.toJSON(room));
     });
+    // We should check the origin of the request to prevent anyone that isn't the host from removing anything
     socket.on("queue:remove", async (params: string) => {
       const number = Number.parseInt(params);
       if (Number.isSafeInteger(number)) {
-        if (0 <= number && number < room.size()) {
+        if (number >= 0 && number < room.size()) {
           await room.removeWithIndex(number);
         }
       } else {

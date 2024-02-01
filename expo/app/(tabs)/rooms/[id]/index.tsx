@@ -9,25 +9,29 @@ import Button from "../../../../components/Button";
 import { Text, View } from "../../../../components/Themed";
 import TrackItem from "../../../../components/room/TrackItem";
 import { getApiUrl } from "../../../../lib/apiUrl";
+import { getRoomHostedByUser } from "../../../../lib/room-utils";
 import SocketIo from "../../../../lib/socketio";
 import { supabase } from "../../../../lib/supabase";
+import { useUserProfile } from "../../../../lib/userProfile";
 
 // TODO socket io which refresh playlist on live
 export default function MusicRoom() {
-  const { id } = useLocalSearchParams();
+  const { id: roomId } = useLocalSearchParams<{ id: string }>();
 
   const [room, setRoom] = useState<Room>();
-
   const [queue, setQueue] = useState<RoomJSON>();
+  const [isHost, setIsHost] = useState<boolean>(false);
 
-  const url: URL = new URL("/room/" + id, getApiUrl());
+  const userProfile = useUserProfile();
+
+  const url: URL = new URL("/room/" + roomId, getApiUrl());
 
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase
         .from("rooms")
         .select("*")
-        .eq("id", id)
+        .eq("id", roomId)
         .eq("is_active", true)
         .single();
       if (error) {
@@ -56,6 +60,17 @@ export default function MusicRoom() {
       Alert.alert(await response.text());
     }
   };
+  useEffect(() => {
+    if (!userProfile || !room) return;
+
+    const fetchHost = async () => {
+      const { data } = await getRoomHostedByUser(roomId, userProfile, true);
+
+      setIsHost((data?.length ?? 0) > 0);
+    };
+
+    fetchHost();
+  }, [userProfile, roomId]);
 
   return (
     <>
@@ -71,7 +86,7 @@ export default function MusicRoom() {
               Supprimer la salle
             </Button>
             <View style={headerStyles.buttonContainer}>
-              <Button block href={`/rooms/${id}/invite`}>
+              <Button block href={`/rooms/${roomId}/invite`}>
                 Inviter des amis
               </Button>
             </View>
@@ -83,7 +98,12 @@ export default function MusicRoom() {
                 style={styles.list}
                 data={queue?.tracks}
                 renderItem={({ item, index }) => (
-                  <TrackItem track={item} index={index + 1} />
+                  <TrackItem
+                    track={item}
+                    index={index}
+                    roomId={roomId}
+                    isMenuDisabled={!isHost}
+                  />
                 )}
               />
             </View>
