@@ -9,7 +9,7 @@ import Button from "../../../../components/Button";
 import { Text, View } from "../../../../components/Themed";
 import TrackItem from "../../../../components/room/TrackItem";
 import { getApiUrl } from "../../../../lib/apiUrl";
-import { getHost } from "../../../../lib/room-utils";
+import { getRoomHostedByUser } from "../../../../lib/room-utils";
 import SocketIo from "../../../../lib/socketio";
 import { supabase } from "../../../../lib/supabase";
 import { useUserProfile } from "../../../../lib/userProfile";
@@ -64,7 +64,7 @@ export default function MusicRoom() {
     if (!userProfile || !room) return;
 
     const fetchHost = async () => {
-      const { data } = await getHost(roomId, userProfile, true);
+      const { data } = await getRoomHostedByUser(roomId, userProfile, true);
 
       setIsHost((data?.length ?? 0) > 0);
     };

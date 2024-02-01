@@ -53,7 +53,7 @@ export async function getRoomId(
   return { data: room.id, error: null };
 }
 
-export async function getHost(
+export async function getRoomHostedByUser(
   roomId: string,
   userProfile: UserProfile | null,
   isActive: boolean
