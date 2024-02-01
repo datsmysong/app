@@ -1,0 +1,35 @@
+@startuml SoundCloudPlayer
+title Communication websocket avec le lecteur SoundCloud
+!theme plain
+
+participant Host as "Hôte (utilisateur)"
+participant App as "Application (frontend)"
+collections iframe as "iframe (ou webview)"
+collections SoundCloud as "iframe SoundCloud"
+participant Server as "Serveur WebSocket"
+participant Remote as "Télécommande du lecteur de la salle"
+participant RemoteImpl as "Télécommande SoundCloud"
+
+Host -> App: Clique sur le bouton pause
+activate App
+App -> Server: Envoie un message contenant une commande de pause
+activate Server
+Server -> Server: Reçoit le message et envoie la commande de pause à la salle active
+Server -> Remote: Appel la méthode pause de la télécommande de la salle
+Remote -> RemoteImpl: Appel la méthode pause
+activate RemoteImpl
+RemoteImpl -> App: Envoie un message de pause
+App -> iframe: Reçoit le message et envoie un message de pause
+iframe -> SoundCloud: Reçoit le message et exécute le code JavaScript du Widget SDK SoundCloud pour mettre en pause
+iframe <- SoundCloud: Renvoie un message avec le résultat de la commande
+App <- iframe: Envoie un message avec le résultat de la commande
+RemoteImpl <- App: Envoie le succès de la commande sur le serveur websocket (la télécommande SoundCloud de la salle attends un message)
+Remote <- RemoteImpl: Renvoie le succès de la commande
+Server <- Remote: Renvoie le succès de l'action pause
+Server <- App: Renvoie le succès de l'action pause
+deactivate RemoteImpl
+deactivate Server
+Host <- App: Renvoie le feedback de l'action
+deactivate App
+
+@enduml
