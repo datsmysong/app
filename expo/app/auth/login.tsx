@@ -5,18 +5,15 @@ import { StyleSheet, View } from "react-native";
 
 import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
-import Warning from "../../components/Warning";
+import Alert from "../../components/Warning";
+import { AuthErrorMessage } from "../../constants/SupabaseErrorCode";
+import { emailRules } from "../../lib/inputRestriction";
 import { supabase } from "../../lib/supabase";
 
 type LoginForm = {
   email: string;
   password: string;
 };
-
-enum AuthError {
-  EmailNotConfirmed = "Email not confirmed",
-  InvalidCredentials = "Invalid credentials",
-}
 
 export default function Login() {
   const [resendEmail, setResendEmail] = React.useState(false);
@@ -43,11 +40,11 @@ export default function Login() {
     if (error) {
       // Logic to handle when user change a input after a failed login
       reset({ email, password }, { keepDirty: false });
-      if (error.message === AuthError.EmailNotConfirmed) {
+      if (error.message === AuthErrorMessage.EmailNotConfirmed) {
         setResendEmail(true);
         return;
       }
-      if (error.message === AuthError.InvalidCredentials) {
+      if (error.message === AuthErrorMessage.InvalidCredentials) {
         return setError("password", {
           message: "Identifiants incorrects",
         });
@@ -88,26 +85,20 @@ export default function Login() {
     >
       <View style={styles.form}>
         {errors.root && errors.root.message && (
-          <Warning label={errors.root.message} />
+          <Alert label={errors.root.message} />
         )}
         {resendEmail && (
-          <Warning label="Veuillez confirmer votre compte via le lien reçu par mail.">
+          <Alert label="Veuillez confirmer votre compte via le lien reçu par mail.">
             <Button size="small" onPress={handleResendEmail} block>
               Renvoyer le mail
             </Button>
-          </Warning>
+          </Alert>
         )}
         <ControlledInput
           control={control}
           label="Adresse email"
           name="email"
-          rules={{
-            required: "Veuillez saisir votre adresse email",
-            pattern: {
-              value: /\S+@\S+\.\S+/,
-              message: "Veuillez saisir une adresse email valide",
-            },
-          }}
+          rules={emailRules}
           placeholder="votre@adresse.email"
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"

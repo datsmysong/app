@@ -6,6 +6,12 @@ import Alert from "../../components/Alert";
 import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
 import { getApiUrl } from "../../lib/apiUrl";
+import {
+  emailRules,
+  passwordConfirmationRules,
+  passwordRules,
+  usernameRules,
+} from "../../lib/inputRestriction";
 type FormData = {
   username: string;
   email: string;
@@ -74,13 +80,7 @@ export default function Register() {
           control={control}
           label="Adresse email"
           name="email"
-          rules={{
-            required: "Veuillez saisir votre adresse email",
-            pattern: {
-              value: /\S+@\S+\.\S+/,
-              message: "Veuillez saisir une adresse email valide",
-            },
-          }}
+          rules={emailRules}
           placeholder="votre@adresse.email"
           errorMessage={errors.email && errors.email.message}
           autoComplete="email"
@@ -90,14 +90,7 @@ export default function Register() {
           control={control}
           label={"Nom d'utilisateur"}
           name="username"
-          rules={{
-            required: "Un nom d'utilisateur est requis",
-            minLength: {
-              value: 3,
-              message:
-                "Le nom d'utilisateur doit contenir au moins 3 caractères",
-            },
-          }}
+          rules={usernameRules}
           placeholder={"Nom d'utilisateur"}
           errorMessage={errors.username && errors.username.message}
           autoComplete="username"
@@ -116,23 +109,7 @@ export default function Register() {
           control={control}
           label="Mot de passe"
           name="password"
-          rules={{
-            required: "Veuillez saisir votre mot de passe",
-            minLength: {
-              value: 6,
-              message: "Le mot de passe doit contenir au moins 6 caractères",
-            },
-            validate: {
-              hasNumber: (value) =>
-                /\d/.test(value) || "Le mot de passe doit contenir un chiffre",
-              hasUppercase: (value) =>
-                /[A-Z]/.test(value) ||
-                "Le mot de passe doit contenir une majuscule",
-              hasLowercase: (value) =>
-                /[a-z]/.test(value) ||
-                "Le mot de passe doit contenir une minuscule",
-            },
-          }}
+          rules={passwordRules}
           placeholder="Mon mot de passe robuste"
           errorMessage={errors.password && errors.password.message}
           autoComplete="password"
@@ -143,25 +120,7 @@ export default function Register() {
           control={control}
           label="Confirmer le mot de passe"
           name="confirmPassword"
-          rules={{
-            required: "Veuillez confirmer votre mot de passe",
-            minLength: {
-              value: 6,
-              message: "Le mot de passe doit contenir au moins 6 caractères",
-            },
-            validate: {
-              hasNumber: (value) =>
-                /\d/.test(value) || "Le mot de passe doit contenir un chiffre",
-              hasUppercase: (value) =>
-                /[A-Z]/.test(value) ||
-                "Le mot de passe doit contenir une majuscule",
-              hasLowercase: (value) =>
-                /[a-z]/.test(value) ||
-                "Le mot de passe doit contenir une minuscule",
-              sameAsPassword: (value) =>
-                value === password || "Les mots de passe ne correspondent pas",
-            },
-          }}
+          rules={passwordConfirmationRules}
           placeholder="Mon mot de passe robuste"
           errorMessage={
             errors.confirmPassword && errors.confirmPassword.message

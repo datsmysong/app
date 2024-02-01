@@ -2,19 +2,9 @@ import { Controller, RegisterOptions } from "react-hook-form";
 import { StyleSheet, Text, TextInputProps, View } from "react-native";
 
 import CustomPasswordInput from "./CustomPasswordInput";
-import CustomTextInput from "./CustomTextInput";
+import CustomTextInput, { CustomTextInputProps } from "./CustomTextInput";
 
-export default function ControlledInput({
-  control,
-  label,
-  name,
-  rules,
-  placeholder,
-  autoComplete,
-  secureTextEntry,
-  errorMessage,
-  onSubmitEditing,
-}: {
+interface ControlledInputProps extends CustomTextInputProps {
   control: any;
   label: string;
   name: string;
@@ -24,12 +14,22 @@ export default function ControlledInput({
   secureTextEntry?: boolean;
   errorMessage?: string | undefined;
   onSubmitEditing?: () => void;
-}) {
+}
+
+export default function ControlledInput({
+  control,
+  label,
+  name,
+  rules,
+  secureTextEntry,
+  errorMessage,
+  ...props
+}: ControlledInputProps) {
   return (
-    <View style={styles.vbox}>
-      <View style={styles.hbox}>
-        <Text style={styles.label}>{label}</Text>
-        {rules?.required && <Text style={styles.required}>*</Text>}
+    <View style={formStyles.vbox}>
+      <View style={formStyles.hbox}>
+        <Text style={formStyles.label}>{label}</Text>
+        {rules?.required && <Text style={formStyles.required}>*</Text>}
       </View>
       <Controller
         control={control}
@@ -37,40 +37,35 @@ export default function ControlledInput({
         render={({ field: { onChange, onBlur, value } }) =>
           !secureTextEntry ? (
             <CustomTextInput
-              placeholder={placeholder}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              autoComplete={autoComplete}
               secureTextEntry={secureTextEntry}
-              onSubmitEditing={onSubmitEditing}
+              {...props}
             />
           ) : (
             // We used two components because we can't change secureTextEntry value dynamically
             // and we don't want load many states and logical conditions in CustomTextInput
             <CustomPasswordInput
-              InputProps={{
-                placeholder,
-                onBlur,
-                onChangeText: onChange,
-                value,
-                autoComplete,
-                onSubmitEditing,
-              }}
+              {...props}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              secureTextEntry={secureTextEntry}
             />
           )
         }
         name={name}
       />
       {errorMessage && (
-        <Text style={styles.text}>
+        <Text style={formStyles.text}>
           {errorMessage ?? "Le champ est invalide"}
         </Text>
       )}
     </View>
   );
 }
-const styles = StyleSheet.create({
+export const formStyles = StyleSheet.create({
   vbox: {
     gap: 5,
     minHeight: 100,

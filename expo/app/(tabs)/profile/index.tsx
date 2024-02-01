@@ -13,12 +13,10 @@ export default function TabsProfile() {
     <>
       {user && (
         <View style={styles.elements}>
-          <Button prependIcon="details" href="/profile/integration">
-            Intégrations
-          </Button>
           <Button prependIcon="logout" onPress={() => supabase.auth.signOut()}>
             Se déconnecter
           </Button>
+          <Button href="/(tabs)/profile/account">Gérer mon compte</Button>
         </View>
       )}
     </>

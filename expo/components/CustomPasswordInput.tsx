@@ -5,17 +5,17 @@ import { Pressable, StyleSheet, View } from "react-native";
 import CustomTextInput, { CustomTextInputProps } from "./CustomTextInput";
 import { useTogglePasswordVisibility } from "../lib/useTogglePasswordVisibility";
 
+interface CustomPasswordInputProps extends CustomTextInputProps {}
+
 export default function CustomPasswordInput({
-  InputProps,
-}: {
-  InputProps: CustomTextInputProps;
-}) {
+  ...props
+}: CustomPasswordInputProps) {
   const { passwordVisibility, rightIcon, handlePasswordVisibility } =
     useTogglePasswordVisibility();
 
   return (
     <View>
-      <CustomTextInput {...InputProps} secureTextEntry={passwordVisibility} />
+      <CustomTextInput {...props} secureTextEntry={passwordVisibility} />
       <Pressable style={styles.icon} onPress={handlePasswordVisibility}>
         <MaterialCommunityIcons name={rightIcon} size={22} color="#232323" />
       </Pressable>
