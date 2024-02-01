@@ -78,13 +78,6 @@ export default function MusicRoom() {
         <>
           <View style={headerStyles.headerContainer}>
             <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
-            <Button
-              onPress={deleteRoom}
-              color="danger"
-              style={{ position: "absolute", right: 0, height: 50 }}
-            >
-              Supprimer la salle
-            </Button>
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${roomId}/invite`}>
                 Inviter des amis
@@ -108,6 +101,14 @@ export default function MusicRoom() {
               />
             </View>
           </View>
+          <Button
+            onPress={deleteRoom}
+            color="danger"
+            block
+            style={{ margin: 20, marginRight: 100 }}
+          >
+            Supprimer la salle
+          </Button>
           <Button
             icon="add"
             href={`/rooms/${room.id}/add`}
