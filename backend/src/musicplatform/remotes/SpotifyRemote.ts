@@ -59,6 +59,7 @@ export default class SpotifyRemote extends Remote {
     // If the item playing is an episode and not a music track, then we return null
     // Since we don't need support for those, for now, and they don't contain necessary information
     // such as the album name, artists name, etc.
+    if (spotifyPlaybackState === null) return null;
 
     if (spotifyPlaybackState.item.type === "episode") return null;
     const playbackState = {
@@ -101,7 +102,7 @@ export default class SpotifyRemote extends Remote {
   async playTrack(trackId: string): Promise<{ error?: string }> {
     const state = await this.spotifyClient.player.getPlaybackState();
 
-    if (state === null || state.device.id === null) {
+    if (!state || !state.device.id) {
       return { error: "No device found" };
     }
 
@@ -124,7 +125,7 @@ export default class SpotifyRemote extends Remote {
 
   async play(): Promise<void> {
     const state = await this.spotifyClient.player.getPlaybackState();
-    if (state === null || state.device.id === null) {
+    if (!state || !state.device.id) {
       return;
     }
 
@@ -133,7 +134,7 @@ export default class SpotifyRemote extends Remote {
 
   async pause(): Promise<void> {
     const state = await this.spotifyClient.player.getPlaybackState();
-    if (state === null || state.device.id === null) {
+    if (!state || !state.device.id) {
       return;
     }
 
@@ -142,7 +143,7 @@ export default class SpotifyRemote extends Remote {
 
   async previous(): Promise<void> {
     const state = await this.spotifyClient.player.getPlaybackState();
-    if (state === null || state.device.id === null) {
+    if (!state || !state.device.id) {
       return;
     }
 
@@ -151,7 +152,7 @@ export default class SpotifyRemote extends Remote {
 
   async next(): Promise<void> {
     const state = await this.spotifyClient.player.getPlaybackState();
-    if (state === null || state.device.id === null) {
+    if (!state || !state.device.id) {
       return;
     }
 

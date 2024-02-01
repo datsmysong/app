@@ -44,7 +44,7 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, liveRoom, socket }) => {
   };
 
   useEffect(() => {
-    if (socket == null) return;
+    if (!socket) return;
     setRemote(buildAudioRemote(socket));
 
     socket.on(
