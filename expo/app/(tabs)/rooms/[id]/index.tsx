@@ -44,7 +44,7 @@ export default function MusicRoom() {
 
     const namespace = SocketIo.getInstance().getSocket(url.pathname);
     namespace.on("queue:update", (data: RoomJSON) => setQueue(data));
-    namespace.on("queue:deleted", () => {
+    namespace.on("disconnect", () => {
       router.replace("/rooms");
       Alert.alert("Cette salle d'écoute vient d'être supprimée");
     });

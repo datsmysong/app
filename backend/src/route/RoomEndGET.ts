@@ -41,7 +41,7 @@ export default async function RoomEndGET(
     return reply.code(404).send("error during update room database");
 
   await req.server.ready();
-  req.server.io.of(`/room/${roomUuid}`).emit("queue:deleted");
+  req.server.io.of(`/room/${roomUuid}`).disconnectSockets(); //.emit("queue:deleted");
 
   return reply.code(200);
 }
