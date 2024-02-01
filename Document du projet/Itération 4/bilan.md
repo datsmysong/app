@@ -2,22 +2,23 @@
 
 ## Etat de la version
 
-Notre application permet de :
+### A ce stade, notre application permet de
 
 - S’authentifier à l’aide de deux providers (Google & Spotify)
 - Créer une salle d'écoute dans la base de données depuis un formulaire
 - Générer un lien vers une salle d'écoute
 - Rejoindre une salle d'écoute via un lien (seulement en tant qu'utilisateur connecté)
-- Ajouter une musique à la file d'attente (backend)
-- Créer un compte à partir d’une adresse email et d’un mot de passe
+- Consulter la file d'attente d'une salle d'écoute
+- Générer un lien vers la salle d'écoute et rejoindre une salle d'écoute grâce à ce lien
+- Menu d'intégrations des plateformes (Spotify et SoundCloud implémentés)
+- Modifier les paramètres de son profil (nom, email, avatar stocké en base de donnée)
+- Fermeture d’une salle d’écoute pour le créateur de la salle
+- Suppression d’une musique pour le créateur de la salle
+- Ecouter une musique dans une salle d’écoute
 
-Certaines fonctionnalités n'ont pas pu être terminées à temps :
+### Certaines fonctionnalités ont été reportées à la prochaine itération
 
-- Contrôle du flux de lecture via un Widget intégré ou un lecteur externe
-- Créer la logique des interactions avec les plateformes de musique
-- Implémenter la logique pour chaque plateforme de streaming
-- Gérer son compte (partie information personnels: avatar, changer de pseudo, d’email..)
-- Consulter la file d'attente d'une salle d'écoute avec une écoute en utilisant un websocket
+- Créer le menu de paramétrage d’une salle d’écoute
 
 ### Bugs
 
@@ -32,3 +33,5 @@ Toutes les fonctionnalités présentes sur le main du dépôt ont été vérifi�
 - Ajout de maquettes
   - écran de partage d'une salle active
   - page d'une salle d'écoute passée
+- Communication avec le backend
+  - Implémentation pour chaque plateforme de streaming (certaines communiquant à nouveau avec le websocket)
