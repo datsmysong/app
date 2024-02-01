@@ -1,6 +1,6 @@
 import { adminSupabase } from "./server";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { getCurrentUser } from "./lib/auth-utils";
+import { getCurrentUser, unauthorizedResponse } from "./lib/auth-utils";
 import Spotify from "./musicplatform/Spotify";
 import TrackFactory from "./musicplatform/TrackFactory";
 import { JSONTrack, RoomJSON } from "commons/backend-types";
@@ -8,10 +8,6 @@ import RoomStorage from "./RoomStorage";
 
 interface Error {
   error: { message: string };
-}
-
-export function unauthorizedResponse(response: FastifyReply) {
-  return response.code(401).send("User not logged in");
 }
 
 export async function createRoom(

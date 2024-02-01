@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { getUserFromRequest } from "../lib/auth-utils";
 import { adminSupabase } from "../server";
 import RoomStorage from "../RoomStorage";
-import { unauthorizedResponse } from "../room";
+import { unauthorizedResponse } from "../lib/auth-utils";
 
 export default async function RoomEndGET(
   req: FastifyRequest,
@@ -17,6 +17,7 @@ export default async function RoomEndGET(
     .from("rooms")
     .select("*, user_profile(*)")
     .eq("id", roomUuid)
+    .eq("is_active", true)
     .eq("user_profile.account_id", data.user.id)
     .single();
 
