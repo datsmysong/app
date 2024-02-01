@@ -40,6 +40,7 @@
 
 ## Jeudi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horaire   | Tâche                                                                                 |
+|-----------|---------------------------------------------------------------------------------------|
+| 8h - 10h  | Review des pull request de mes camarades, ainsi que résoudre mes reviews de la veille |
+| 10h - 12h | Rédaction du document final et du diaporama de la soutenance                          |
