@@ -2,7 +2,7 @@ import { RoomJSON } from "commons/backend-types";
 import { Room } from "commons/database-types-utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Platform, StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
@@ -41,11 +41,6 @@ export default function MusicRoom() {
     };
 
     fetchData();
-
-    // unused for the moment
-    // fetch(url)
-    //     .then(res => res.json())
-    //     .then((data: ActiveRoomSkeleton) => setData(data))
 
     const namespace = SocketIo.getInstance().getSocket(url.pathname);
     namespace.on("queue:update", (data: RoomJSON) => setQueue(data));
