@@ -33,6 +33,9 @@
 
 ## Jeudi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horaire   | Tâche                                                                                                                                              |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 8h - 9h   | J’ai continué à rédiger le document final.                                                                                                         |
+| 9h - 10h  | J’ai review la branche de Maxence.                                                                                                                 |
+| 10h - 11h | J’ai effectué les changements liés aux reviews sur ma branche. J’ai effectué un rebase sur ma branche. J’ai résolu un bug lié à ma fonctionnalité. |
+| 11h - 12h | J’ai réalisé le diaporama de la soutenance ainsi que les documents résumant l’itération 4.                                                         |

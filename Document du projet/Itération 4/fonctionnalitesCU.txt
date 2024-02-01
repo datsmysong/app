@@ -1,0 +1,17 @@
+Fonctionnalités et taches développées dans cette itération :
+
+Terminée
+- Ajout d’une musique en file d’attente avec un lien Spotify
+- Consulter la file d’attente d’une salle d’écoute
+- Gérer ses intégrations avec les plateformes de streaming
+- Interface pour rejoindre une salle d’écoute à l’aide d’un code
+- Afficher un QR code sur l’écran de partage d’une salle d’écoute juste après que celle-ci soit créées
+- Fermer une salle d’écoute en tant qu’hôte
+- Supprimer une musique de la file d’attente en tant qu’hôte
+- Gérer son compte
+- Faire les changements nécessaires sur la base de données
+- Créer la logique des interactions avec les plateformes de musique
+- Implémenter la logique pour chaque plateforme de streaming
+
+Non achevé lors de cette itération
+- Créer le menu de paramétrage d’une salle d’écoute

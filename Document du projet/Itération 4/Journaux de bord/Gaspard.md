@@ -39,6 +39,10 @@
 
 ## Jeudi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horaire       | Tâche                                                          |
+| ------------- | -------------------------------------------------------------- |
+| 8h - 9h       | Merge manage account                                           |
+| 9h - 10h      | Diagramme de séquence connexion avec un provider PKCE          |
+| 10h - 10h30   | Merge & test feat/close-room                                   |
+| 10h30 - 11h30 | Rédaction document (enjeu d'intégration plusieurs plateformes) |
+| 11h30 - 12h   | Merge & test                                                   |

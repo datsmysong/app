@@ -32,15 +32,15 @@
 
 ## Mercredi
 
-| Horaire     |	Tâche                                                                                                        |
+| Horaire     | Tâche                                                                                                        |
 | ----------- | ------------------------------------------------------------------------------------------------------------ |
-| 8h - 12h00	| J’avance sur ma tâche de lecture des musiques, je review quelques PR que je n’avais pas encore review, daily |
-| 14h00 - 17h	| J’avance sur ma tâche de lecture des musiques et je merge + review deux PR avec Gaspard                      |
-| 17h - 17h30	| Je review quelques PRs                                                                                       |
-| 17h30 - …h	| J’avance sur ma tâche de lecture des musiques                                                                |
+| 8h - 12h00  | J’avance sur ma tâche de lecture des musiques, je review quelques PR que je n’avais pas encore review, daily |
+| 14h00 - 17h | J’avance sur ma tâche de lecture des musiques et je merge + review deux PR avec Gaspard                      |
+| 17h - 17h30 | Je review quelques PRs                                                                                       |
+| 17h30 - …h  | J’avance sur ma tâche de lecture des musiques                                                                |
 
 ## Jeudi
 
-| Horaire  | Tâche |
-| -------- | ----- |
-| 8h - 10h | ...   |
+| Horaire  | Tâche                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 8h - 12h | Finalisation de mes tâches de lecture de musique, rebase sur main, code-reviews sur toutes les branches possibles, et merge de plusieurs branches avec Gaspard, rédaction du document |
