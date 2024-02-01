@@ -3,6 +3,7 @@ import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import { adminSupabase } from "../../server";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
+import Room from "../../socketio/Room";
 
 export default class SpotifyRemote extends Remote {
   spotifyClient: SpotifyApi;
@@ -18,13 +19,13 @@ export default class SpotifyRemote extends Remote {
   }
 
   static async createRemote(
-    roomId: string,
+    room: Room,
     musicPlatform: MusicPlatform
   ): Promise<SpotifyRemote | null> {
     const { data, error } = await adminSupabase
       .from("rooms")
       .select("*, user_profile(*, bound_services(*))")
-      .eq("id", roomId)
+      .eq("id", room.uuid)
       .single();
 
     if (error) return null;

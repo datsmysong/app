@@ -4,6 +4,7 @@ import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
 import SoundCloudRemote from "./remotes/SoundCloudRemote";
+import Room from "../socketio/Room";
 
 function extractFromTrack(track: SoundcloudTrackV2) {
   const artists = track.user.username;
@@ -45,11 +46,10 @@ export default class SoundCloud extends MusicPlatform {
   }
 
   getRemote(
-    roomId: string,
-    hostSocket: Socket | null,
+    room: Room,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     musicPlatform: MusicPlatform
   ): Promise<Remote | null> {
-    return SoundCloudRemote.createRemote(this, hostSocket);
+    return SoundCloudRemote.createRemote(this, room);
   }
 }

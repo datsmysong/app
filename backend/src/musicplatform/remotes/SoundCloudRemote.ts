@@ -1,31 +1,38 @@
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
-import { Socket } from "socket.io";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
+import Room from "../../socketio/Room";
 
 export default class SoundCloudRemote extends Remote {
-  hostSocket: Socket;
+  room: Room;
   musicPlatform: MusicPlatform;
 
-  protected constructor(socket: Socket, musicPlatform: MusicPlatform) {
+  protected constructor(room: Room, musicPlatform: MusicPlatform) {
     super();
-    this.hostSocket = socket;
+    this.room = room;
     this.musicPlatform = musicPlatform;
   }
 
   static async createRemote(
     musicPlatform: MusicPlatform,
-    hostSocket: Socket | null
+    room: Room
   ): Promise<SoundCloudRemote | null> {
-    if (hostSocket === null) return null;
-
-    return new SoundCloudRemote(hostSocket, musicPlatform);
+    return new SoundCloudRemote(room, musicPlatform);
   }
 
-  getPlaybackState(): Promise<PlayingJSONTrack | null> {
-    this.hostSocket.emit("player:getPlaybackState");
+  getHostSocket(): (typeof this.room)["hostSocket"] {
+    return this.room.getHostSocket();
+  }
+
+  async getPlaybackState(): Promise<PlayingJSONTrack | null> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return null;
+    }
+
+    hostSocket.emit("player:getPlaybackState");
     return new Promise((resolve) => {
-      this.hostSocket.on(
+      hostSocket.on(
         "player:getPlaybackState",
         (state: PlayingJSONTrack | null) => {
           resolve(state);
@@ -34,17 +41,20 @@ export default class SoundCloudRemote extends Remote {
     });
   }
 
-  getQueue(): Promise<JSONTrack[]> {
-    return new Promise((resolve) => {
-      resolve([]);
-    });
+  async getQueue(): Promise<JSONTrack[]> {
+    return [];
   }
 
-  playTrack(trackId: string): Promise<{ error?: string | undefined }> {
-    this.hostSocket.emit("player:playTrack", trackId);
+  async playTrack(trackId: string): Promise<{ error?: string | undefined }> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return { error: "Host socket not available" };
+    }
+
+    hostSocket.emit("player:playTrack", trackId);
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:playTrack", (error: string | undefined) => {
+      hostSocket.on("player:playTrack", (error: string | undefined) => {
         if (error) {
           resolve({ error });
         } else {
@@ -54,65 +64,95 @@ export default class SoundCloudRemote extends Remote {
     });
   }
 
-  setVolume(volume: number): Promise<void> {
-    this.hostSocket.emit("player:setVolume", {
+  async setVolume(volume: number): Promise<void> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return;
+    }
+
+    hostSocket.emit("player:setVolume", {
       volume,
     });
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:setVolume", () => {
+      hostSocket.on("player:setVolume", () => {
         resolve();
       });
     });
   }
 
-  seekTo(position: number): Promise<void> {
-    this.hostSocket.emit("player:seekTo", {
+  async seekTo(position: number): Promise<void> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return;
+    }
+
+    hostSocket.emit("player:seekTo", {
       position,
     });
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:seekTo", () => {
+      hostSocket.on("player:seekTo", () => {
         resolve();
       });
     });
   }
 
-  play(): Promise<void> {
-    this.hostSocket.emit("player:play");
+  async play(): Promise<void> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return;
+    }
+
+    hostSocket.emit("player:play");
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:play", () => {
+      hostSocket.on("player:play", () => {
         resolve();
       });
     });
   }
 
-  pause(): Promise<void> {
-    this.hostSocket.emit("player:pause");
+  async pause(): Promise<void> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return;
+    }
+
+    hostSocket.emit("player:pause");
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:pause", () => {
+      hostSocket.on("player:pause", () => {
         resolve();
       });
     });
   }
 
-  previous(): Promise<void> {
-    this.hostSocket.emit("player:previous");
+  async previous(): Promise<void> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return;
+    }
+
+    hostSocket.emit("player:previous");
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:previous", () => {
+      hostSocket.on("player:previous", () => {
         resolve();
       });
     });
   }
 
-  next(): Promise<void> {
-    this.hostSocket.emit("player:next");
+  async next(): Promise<void> {
+    const hostSocket = await this.getHostSocket();
+    if (!hostSocket) {
+      return;
+    }
+
+    hostSocket.emit("player:next");
 
     return new Promise((resolve) => {
-      this.hostSocket.on("player:next", () => {
+      hostSocket.on("player:next", () => {
         resolve();
       });
     });

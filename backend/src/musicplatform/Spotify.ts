@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JSONTrack } from "commons/backend-types";
 import { spotify } from "../server";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
 import SpotifyRemote from "./remotes/SpotifyRemote";
+import Room from "../socketio/Room";
 
 export default class Spotify extends MusicPlatform {
   constructor() {
@@ -40,7 +42,10 @@ export default class Spotify extends MusicPlatform {
     return false;
   }
 
-  async getRemote(roomId: string): Promise<Remote | null> {
-    return await SpotifyRemote.createRemote(roomId, this);
+  async getRemote(
+    room: Room,
+    musicPlatform: MusicPlatform
+  ): Promise<Remote | null> {
+    return await SpotifyRemote.createRemote(room, this);
   }
 }

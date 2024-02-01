@@ -10,13 +10,12 @@ export default class Room {
   private readonly queue: JSONTrack[];
   private readonly trackFactory: TrackFactory;
   private readonly streamingService: MusicPlatform;
-  private readonly remote: Remote | null;
-  private readonly hostSocket: Socket | null;
+  private remote: Remote | null = null;
+  private hostSocket: Socket | null;
 
   private constructor(
     uuid: string,
     streamingService: MusicPlatform,
-    remote: Remote | null,
     hostSocket: Socket | null
   ) {
     this.uuid = uuid;
@@ -25,7 +24,6 @@ export default class Room {
 
     this.trackFactory = new TrackFactory();
     this.trackFactory.register(this.streamingService);
-    this.remote = remote;
     this.hostSocket = hostSocket;
   }
 
@@ -38,17 +36,22 @@ export default class Room {
     let room = roomStorage.getRoom(uuid);
 
     if (room === null) {
-      const remote = await streamingService.getRemote(
-        uuid,
-        hostSocket,
-        streamingService
-      );
-
-      room = new Room(uuid, streamingService, remote, hostSocket);
+      room = new Room(uuid, streamingService, hostSocket);
+      const remote = await streamingService.getRemote(room, streamingService);
+      room.setRemote(remote);
       roomStorage.addRoom(room);
+    } else {
+      room.setHostSocket(hostSocket);
     }
 
     return room;
+  }
+  setRemote(remote: Remote | null) {
+    this.remote = remote;
+  }
+
+  setHostSocket(hostSocket: Socket | null) {
+    this.hostSocket = hostSocket;
   }
 
   static toJSON(room: Room | null | undefined): RoomJSON | Error {

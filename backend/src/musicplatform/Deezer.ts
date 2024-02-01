@@ -1,10 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { JSONTrack } from "commons/Backend-types";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
+import Room from "../socketio/Room";
 
 export default class Deezer extends MusicPlatform {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getRemote(roomId: string): Promise<Remote | null> {
+  async getRemote(
+    room: Room,
+    musicPlatform: MusicPlatform
+  ): Promise<Remote | null> {
     return null;
   }
 
@@ -12,7 +16,6 @@ export default class Deezer extends MusicPlatform {
     super(/https:\/\/deezer\.com\/(.+)/i);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getJsonTrack(id: string): Promise<JSONTrack | null> {
     // TODO: Implement Deezer
     return null;
