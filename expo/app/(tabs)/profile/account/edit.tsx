@@ -7,7 +7,7 @@ import Button from "../../../../components/Button";
 import ControlledInput from "../../../../components/ControlledInput";
 import { View } from "../../../../components/Themed";
 import Warning from "../../../../components/Warning";
-import Avatar from "../../../../components/profile/Avatar";
+import AvatarForm from "../../../../components/profile/AvatarForm";
 import {
   AuthErrorMessage,
   SupabaseErrorCode,
@@ -194,7 +194,7 @@ export default function PersonalInfo() {
             rules={usernameRules}
             errorMessage={errors.username && errors.username.message}
           />
-          <Avatar
+          <AvatarForm
             ref={avatarRef}
             onImageLoad={() => {
               setProfilePictureChanged(true);
