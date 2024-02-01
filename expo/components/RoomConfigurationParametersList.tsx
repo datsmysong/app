@@ -1,6 +1,6 @@
 import { RoomConfiguration } from "commons/database-types-utils";
 import Checkbox from "expo-checkbox";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Alert from "./Alert";
@@ -17,17 +17,15 @@ export default function RoomConfigurationParametersList({
   roomId,
 }: ParametersListProps) {
   const baseUrl = getApiUrl();
-  const didMountRef = React.useRef(false);
+  const didMountRef = useRef(false);
 
-  const [roomConfigurationId, setRoomConfigurationId] =
-    React.useState<string>();
-  const [sliderParticipantValue, setSliderParticipantValue] =
-    React.useState(10);
-  const [canBeAnonymous, setCanBeAnonymous] = React.useState(false);
-  const [canSkip, setCanSkip] = React.useState(true);
-  const [sliderPercentageValue, setSliderPercentageValue] = React.useState(70);
-  const [maxMusicDuration, setMaxMusicDuration] = React.useState("150");
-  const [maxMusicPerUser, setMaxMusicPerUser] = React.useState("5");
+  const [roomConfigurationId, setRoomConfigurationId] = useState<string>();
+  const [sliderParticipantValue, setSliderParticipantValue] = useState(10);
+  const [canBeAnonymous, setCanBeAnonymous] = useState(false);
+  const [canSkip, setCanSkip] = useState(true);
+  const [sliderPercentageValue, setSliderPercentageValue] = useState(70);
+  const [maxMusicDuration, setMaxMusicDuration] = useState("150");
+  const [maxMusicPerUser, setMaxMusicPerUser] = useState("5");
   const thumbImage = require("../assets/images/SliderElipse.svg");
 
   // To get current room configuration id
