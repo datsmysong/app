@@ -236,7 +236,7 @@ export interface Database {
       }
       rooms: {
         Row: {
-          code: string
+          code: string | null
           configuration_id: string | null
           created_at: string
           host_user_profile_id: string | null
@@ -246,7 +246,7 @@ export interface Database {
           service_id: string | null
         }
         Insert: {
-          code: string
+          code?: string | null
           configuration_id?: string | null
           created_at?: string
           host_user_profile_id?: string | null
@@ -256,7 +256,7 @@ export interface Database {
           service_id?: string | null
         }
         Update: {
-          code?: string
+          code?: string | null
           configuration_id?: string | null
           created_at?: string
           host_user_profile_id?: string | null
@@ -380,32 +380,32 @@ export interface Database {
 
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+      | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+      Database[PublicTableNameOrOptions["schema"]]["Views"])
     : never = never
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+    Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
   : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
       Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
+    ? (Database["public"]["Tables"] &
       Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+      | keyof Database["public"]["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
@@ -417,16 +417,16 @@ export type TablesInsert<
     ? I
     : never
   : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+      | keyof Database["public"]["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
@@ -438,16 +438,16 @@ export type TablesUpdate<
     ? U
     : never
   : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+      | keyof Database["public"]["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
@@ -455,5 +455,5 @@ export type Enums<
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+    ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+    : never

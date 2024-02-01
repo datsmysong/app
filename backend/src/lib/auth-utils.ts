@@ -48,3 +48,7 @@ export async function getCurrentUser(
     return response.code(500).send(userProfileIdRes.error);
   return userProfileIdRes.data;
 }
+
+export function unauthorizedResponse(response: FastifyReply) {
+  return response.code(401).send("User not logged in");
+}
