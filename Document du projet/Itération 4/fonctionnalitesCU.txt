@@ -1,0 +1,12 @@
+Fonctionnalités et taches développées dans cette itération :
+
+Terminée
+- Accéder au menu d’intégrations des plateformes (Spotify et Soundcloud implémenté)
+- Modifier les paramètres de son profil (nom, email, avatar stocké en base de donnée)
+- Fermer une salle d'écoute pour le créateur de la salle
+- Suppression d’une musique de la liste d'attente pour le créateur de la salle
+- Les tâches de maxence
+
+
+Non achevé lors de cette itération
+- Menu de paramétrage d'une salle d'écoute active
