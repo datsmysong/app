@@ -23,7 +23,7 @@
     "fastify-socket.io": "^5.0.0",
     "socket.io": "^4.7.4",
     "soundcloud.ts": "^0.5.2",
-    "supabase": "^1.131.5"
+    "supabase": "^1.136.3"
   },
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "^3.0.0",
