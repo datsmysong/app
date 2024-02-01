@@ -4,7 +4,7 @@
 
 ### A ce stade, notre application permet de
 
-- S’authentifier à l’aide de deux providers (Google & Spotify)
+- Créer un compte utilisateur à partir d’un compte Spotify, Google, ou d’un email et mot de passe
 - Créer une salle d'écoute dans la base de données depuis un formulaire
 - Générer un lien vers une salle d'écoute
 - Rejoindre une salle d'écoute via un lien (seulement en tant qu'utilisateur connecté)
