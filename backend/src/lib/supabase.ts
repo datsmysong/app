@@ -1,3 +1,4 @@
+import { CookieSerializeOptions } from "@fastify/cookie";
 import { createServerClient } from "@supabase/ssr";
 import { Database } from "commons/database-types";
 import { FastifyReply, FastifyRequest } from "fastify";
@@ -17,20 +18,20 @@ export default function createClient(context: {
     process.env.SUPABASE_ANON_KEY,
     {
       cookies: {
-        get: (key: any) => {
+        get: (key: string) => {
           const cookies = context.request.cookies;
           const cookie = cookies[key] ?? "";
           return decodeURIComponent(cookie);
         },
-        set: (key: any, value: any, options: any) => {
+        set: (key: string, value: string, options: CookieSerializeOptions) => {
           if (!context.response) return;
           context.response.cookie(key, encodeURIComponent(value), {
             ...options,
-            sameSite: "Lax",
+            sameSite: "lax",
             httpOnly: true,
           });
         },
-        remove: (key: any, options: any) => {
+        remove: (key: string, options: CookieSerializeOptions) => {
           if (!context.response) return;
           context.response.cookie(key, "", { ...options, httpOnly: true });
         },
