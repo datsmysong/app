@@ -1,6 +1,6 @@
 export const getApiUrl = (url: string): string => {
   if (process.env.NODE_ENV === "development") {
-    if (!process.env.BACKEND_URL) throw new Error("Missing FRONTEND_URL");
+    if (!process.env.BACKEND_URL) throw new Error("Missing BACKEND_URL");
     return process.env.BACKEND_URL;
   }
   return url.includes("exp://")
