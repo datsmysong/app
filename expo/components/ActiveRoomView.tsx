@@ -81,7 +81,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   useEffect(() => {
     if (!socket) return;
     socket.on("queue:update", (data: RoomJSON) => setLiveRoom(data));
-    socket.on("disconnect", () => {
+    socket.on("room:end", () => {
       router.replace("/rooms");
       Alert.alert("Cette salle d'écoute vient d'être supprimée");
     });
