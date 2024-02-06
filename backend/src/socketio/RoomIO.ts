@@ -79,11 +79,13 @@ export default function RoomIO(
     });
 
     socket.on("queue:voteSkip", async (id, userId) => {
+      console.log("config", room.getConfig());
+
       if (id === -1) {
         console.log("vote skip musique actuelle");
         return;
       }
-      room.addVoteSkip(id, userId);
+      room.addVoteSkip(id, userId); // all user are not notified of the vote skip
     });
 
     socket.on("player:playTrack", async (trackId) => {

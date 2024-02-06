@@ -4,23 +4,27 @@ import RoomStorage from "../RoomStorage";
 import MusicPlatform from "../musicplatform/MusicPlatform";
 import TrackFactory from "../musicplatform/TrackFactory";
 import Remote from "../musicplatform/remotes/Remote";
+import { RoomWithConfigDatabase } from "./RoomDatabase";
 
 export default class Room {
   public readonly uuid: string;
   private readonly queue: JSONTrack[];
   private readonly trackFactory: TrackFactory;
   private readonly streamingService: MusicPlatform;
+  private readonly room: RoomWithConfigDatabase;
   private remote: Remote | null = null;
   private hostSocket: Socket | null;
 
   private constructor(
     uuid: string,
     streamingService: MusicPlatform,
-    hostSocket: Socket | null
+    hostSocket: Socket | null,
+    roomWithConfig: RoomWithConfigDatabase
   ) {
     this.uuid = uuid;
     this.queue = [];
     this.streamingService = streamingService;
+    this.room = roomWithConfig;
 
     this.trackFactory = new TrackFactory();
     this.trackFactory.register(this.streamingService);
@@ -31,12 +35,13 @@ export default class Room {
     roomStorage: RoomStorage,
     uuid: string,
     streamingService: MusicPlatform,
-    hostSocket: Socket | null
+    hostSocket: Socket | null,
+    roomWithConfig: RoomWithConfigDatabase
   ): Promise<Room> {
     let room = roomStorage.getRoom(uuid);
 
     if (room === null) {
-      room = new Room(uuid, streamingService, hostSocket);
+      room = new Room(uuid, streamingService, hostSocket, roomWithConfig);
       const remote = await streamingService.getRemote(room, streamingService);
       room.setRemote(remote);
       roomStorage.addRoom(room);
@@ -127,6 +132,10 @@ export default class Room {
 
   size(): number {
     return this.queue.length;
+  }
+
+  getConfig() {
+    return this.room.room_configurations;
   }
 
   addVoteSkip(index: number, userId: string) {
