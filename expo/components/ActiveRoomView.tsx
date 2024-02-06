@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { RoomJSON } from "commons/Backend-types";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -123,12 +123,25 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           <View style={[headerStyles.headerContainer, { flex: 1 }]}>
             <View style={headerStyles.titleContainer}>
               <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
-              <MaterialIcons
-                name="meeting-room"
-                size={28}
-                color="black"
-                onPress={showDialog}
-              />
+              {isHost ? (
+                <Link href={`/rooms/${room.id}/settings`} asChild>
+                  <MaterialIcons
+                    name="settings"
+                    style={headerStyles.settingsIcon}
+                    size={32}
+                    color="black"
+                  />
+                </Link>
+              ) : (
+                <Link href="/rooms" asChild>
+                  <MaterialIcons
+                    name="meeting-room"
+                    size={28}
+                    color="black"
+                    onPress={showDialog}
+                  />
+                </Link>
+              )}
             </View>
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
@@ -209,6 +222,23 @@ const headerStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  settingsIcon: {
+    display: "flex",
+    width: 32,
+    height: 32,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleLayout: {
+    display: "flex",
+    flexDirection: "row",
+    paddingTop: 10,
+    paddingBottom: 10,
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 4,
   },
 });
 

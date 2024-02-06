@@ -70,6 +70,7 @@ export default function RoomTabLayout() {
           options={{ title: "Ajouter une musique" }}
         />
       </Stack>
+      <Stack.Screen name="settings" options={{ title: "Paramètres" }} />
     </WebSocketProvider>
   );
 }
