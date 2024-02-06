@@ -24,6 +24,8 @@ export default class TrackMetadata {
   }
 
   async toJSON(): Promise<JSONTrack | null> {
-    return await this.platform.getJsonTrack(this.id);
+    const JSONTrack = await this.platform.getJsonTrack(this.id);
+    if (JSONTrack) JSONTrack.votes = [];
+    return JSONTrack;
   }
 }

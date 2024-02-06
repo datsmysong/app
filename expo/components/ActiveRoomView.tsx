@@ -52,6 +52,8 @@ type ActiveRoomViewProps = {
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
+  const [voteSkipActualTrack, setVoteSkipActualTrack] =
+    useState<boolean>(false);
 
   const userProfile = useUserProfile();
 
@@ -109,6 +111,16 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     router.replace("/rooms");
   };
 
+  const handleDislike = (index: number) => {
+    if (!socket || !userProfile) return;
+    const userId = userProfile.user_profile_id;
+
+    socket.emit("queue:voteSkip", index, userId);
+    if (index === -1) {
+      setVoteSkipActualTrack(!voteSkipActualTrack);
+    }
+  };
+
   return (
     <>
       <ScrollView>
@@ -140,6 +152,16 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               </Button>
             </View>
             <RoomPlayer socket={socket} room={room} />
+            <Button
+              onPress={() => {
+                handleDislike(-1);
+              }}
+              prependIcon="thumb-down-alt"
+              size="small"
+              type={voteSkipActualTrack ? "filled" : "outline"}
+            >
+              Voter pour passer
+            </Button>
             <Text style={styles.title}>
               File d'attente ({liveRoom?.queue.length ?? 0})
             </Text>
@@ -155,6 +177,14 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                     index={index}
                     roomId={room.id}
                     isMenuDisabled={!isHost}
+                    handleDislike={() => handleDislike(index)}
+                    disliked={
+                      (item.votes &&
+                        item.votes.includes(
+                          userProfile?.user_profile_id ?? ""
+                        )) ||
+                      false
+                    }
                   />
                 )}
               />

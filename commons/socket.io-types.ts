@@ -21,6 +21,7 @@ export interface ClientToServerEvents {
   "queue:add": (rawUrl: string) => void;
   "queue:remove": (indexOrLink: string) => void;
   "queue:removeLink": (link: string) => void;
+  "queue:voteSkip": (index: number, userid: string) => void; // we found a better way to get the user id
   "player:playTrack": (trackId: string) => void;
   "player:setVolume": (volume: number) => void;
   "player:seekTo": (position: number) => void;

@@ -5,6 +5,7 @@ export interface JSONTrack {
   artistsName: string;
   albumName: string;
   imgUrl: string;
+  votes?: string[]; // array of user ids
 }
 
 export interface PlayingJSONTrack extends JSONTrack {

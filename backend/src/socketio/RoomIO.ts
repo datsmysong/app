@@ -78,6 +78,14 @@ export default function RoomIO(
       roomSocket.emit("queue:update", Room.toJSON(room));
     });
 
+    socket.on("queue:voteSkip", async (id, userId) => {
+      if (id === -1) {
+        console.log("vote skip musique actuelle");
+        return;
+      }
+      room.addVoteSkip(id, userId);
+    });
+
     socket.on("player:playTrack", async (trackId) => {
       const remote = room.getRemote();
       if (remote === null) return;

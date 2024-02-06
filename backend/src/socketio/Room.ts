@@ -128,4 +128,23 @@ export default class Room {
   size(): number {
     return this.queue.length;
   }
+
+  addVoteSkip(index: number, userId: string) {
+    const track = this.queue[index];
+    if (!track.votes) return;
+    if (index >= 0 && index < this.queue.length) {
+      console.log("on ajoute en vote skip ");
+      if (track.votes.includes(userId)) {
+        track.votes = track.votes.filter((value) => value !== userId);
+        return;
+      }
+      track.votes.push(userId);
+    }
+  }
+
+  skipActualTrack() {
+    if (this.remote !== null) {
+      this.remote.next();
+    }
+  }
 }
