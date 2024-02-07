@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { RoomJSON } from "commons/Backend-types";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -92,7 +93,10 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       {room && liveRoom && socket && (
         <>
           <View style={headerStyles.headerContainer}>
-            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+            <View style={headerStyles.titleContainer}>
+              <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+              <MaterialIcons name="meeting-room" size={28} color="black" />
+            </View>
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
                 Inviter des amis
@@ -166,6 +170,11 @@ const headerStyles = StyleSheet.create({
   headerTitle: {
     fontSize: 32,
     fontWeight: "bold",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
 
