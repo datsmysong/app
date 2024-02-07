@@ -4,14 +4,20 @@ import { Pressable, StyleSheet } from "react-native";
 
 import MinimalistTrackItem from "./MinimalistTrackItem";
 
-export default function SearchedTrackItem({ track }: { track: JSONTrack }) {
+export default function SearchedTrackItem({
+  track,
+  handleAddMusic,
+}: {
+  track: JSONTrack;
+  handleAddMusic: () => void;
+}) {
   return (
     <MinimalistTrackItem
       title={track.title}
       artistsName={track.artistsName}
       imgUrl={track.imgUrl}
     >
-      <Pressable onPress={() => console.log("oui")}>
+      <Pressable onPress={handleAddMusic}>
         <FontAwesome name="plus" style={itemStyles.icon} />
       </Pressable>
     </MinimalistTrackItem>

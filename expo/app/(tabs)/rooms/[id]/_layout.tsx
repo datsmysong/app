@@ -16,6 +16,10 @@ export default function RoomTabLayout() {
         }}
       />
       <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
+      <Stack.Screen
+        name="searchMusic"
+        options={{ title: "Ajouter une musique" }}
+      />
     </Stack>
   );
 }
