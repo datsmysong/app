@@ -1,10 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
+  ActivityIndicator,
   Pressable,
   PressableStateCallbackType,
   StyleProp,
   StyleSheet,
+  View,
   ViewStyle,
 } from "react-native";
 
@@ -24,6 +26,7 @@ export type ButtonProps = {
   children: React.ReactNode;
   onPress?: () => void;
   onLongPress?: () => void;
+  loading?: boolean;
   href?: string;
   disabled?: boolean;
   type?: "filled" | "outline";
@@ -54,6 +57,7 @@ const Button: React.FC<ButtonProps> = ({
   block,
   color = "primary",
   style,
+  loading = false,
 }) => {
   const isSmall = size === "small";
   const isFilled = type === "filled";
@@ -100,27 +104,55 @@ const Button: React.FC<ButtonProps> = ({
       style={pressableStyle}
       onPress={handlePress}
       onLongPress={onLongPress}
-      disabled={disabled}
+      disabled={disabled || loading}
       accessibilityLabel={children as string}
     >
-      {prependIcon && (
-        <MaterialIcons name={prependIcon} size={iconSize} color={iconColor} />
-      )}
-      {icon && <MaterialIcons name={icon} size={iconSize} color={iconColor} />}
-      {!icon && (
-        <Text
+      {loading && (
+        <View
           style={{
-            ...styles.buttonText,
-            fontSize: isSmall ? 16 : 24,
-            color: iconColor,
-            fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
+            width: iconSize,
+            height: iconSize,
+            justifyContent: "center",
           }}
         >
-          {children}
-        </Text>
+          <ActivityIndicator
+            size="small"
+            color={isFilled ? "white" : buttonColor}
+          />
+        </View>
       )}
-      {appendIcon && (
-        <MaterialIcons name={appendIcon} size={iconSize} color={iconColor} />
+      {!loading && (
+        <>
+          {prependIcon && (
+            <MaterialIcons
+              name={prependIcon}
+              size={iconSize}
+              color={iconColor}
+            />
+          )}
+          {icon && (
+            <MaterialIcons name={icon} size={iconSize} color={iconColor} />
+          )}
+          {!icon && (
+            <Text
+              style={{
+                ...styles.buttonText,
+                fontSize: isSmall ? 16 : 24,
+                color: iconColor,
+                fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
+              }}
+            >
+              {children}
+            </Text>
+          )}
+          {appendIcon && (
+            <MaterialIcons
+              name={appendIcon}
+              size={iconSize}
+              color={iconColor}
+            />
+          )}
+        </>
       )}
     </Pressable>
   );
