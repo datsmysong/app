@@ -24,6 +24,7 @@ import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import UnbindServicePOST from "./route/UnbindServicePOST";
 import onRoomWSConnection from "./socketio/RoomIO";
+import InactiveRoomUserIdGET from "./route/InactiveRoomUserIdGET";
 
 config({ path: ".env.local" });
 
@@ -167,6 +168,9 @@ server.post<{
 
 server.get("/room/:id", RoomIdGET);
 
+//server.get("/rooms", RoomGET);
+
+server.get("/user/room/history/:userId", InactiveRoomUserIdGET);
 server.get("/room/:id/leave", RoomLeaveGET);
 
 server.get("/room/:id/end", RoomEndGET);
