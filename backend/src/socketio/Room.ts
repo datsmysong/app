@@ -5,6 +5,7 @@ import MusicPlatform from "../musicplatform/MusicPlatform";
 import TrackFactory from "../musicplatform/TrackFactory";
 import Remote from "../musicplatform/remotes/Remote";
 import { RoomWithConfigDatabase } from "./RoomDatabase";
+import { adminSupabase } from "../server";
 
 export default class Room {
   public readonly uuid: string;
@@ -14,6 +15,7 @@ export default class Room {
   private readonly room: RoomWithConfigDatabase;
   private remote: Remote | null = null;
   private hostSocket: Socket | null;
+  private counterSkipActualTrack: string[] = [];
 
   private constructor(
     uuid: string,
@@ -138,11 +140,28 @@ export default class Room {
     return this.room.room_configurations;
   }
 
+  skipActualTrack() {
+    if (this.remote !== null) {
+      this.remote.next();
+    }
+  }
+
   addVoteSkip(index: number, userId: string) {
     const track = this.queue[index];
     if (!track.votes) return;
+    if (index === -1) {
+      if (!this.counterSkipActualTrack.includes(userId)) {
+        this.counterSkipActualTrack.push(userId);
+        this.verifyVoteSkip(index);
+        return;
+      }
+      this.counterSkipActualTrack = this.counterSkipActualTrack.filter(
+        (value) => value !== userId
+      );
+      return;
+    }
     if (index >= 0 && index < this.queue.length) {
-      console.log("on ajoute en vote skip ");
+      // If the user has already voted, we remove his vote
       if (track.votes.includes(userId)) {
         track.votes = track.votes.filter((value) => value !== userId);
         return;
@@ -151,9 +170,36 @@ export default class Room {
     }
   }
 
-  skipActualTrack() {
-    if (this.remote !== null) {
-      this.remote.next();
+  async verifyVoteSkip(index: number) {
+    const track = this.queue[index];
+    const config = this.room.room_configurations;
+    if (!track.votes || !config) return;
+
+    const nbParticipant = await this.getParticipants();
+    if (!nbParticipant) return;
+    const voteRatePercentage = (track.votes.length / nbParticipant) * 100;
+    console.log(
+      "nbParticipant",
+      nbParticipant,
+      " verificatiron ",
+      voteRatePercentage,
+      " config ",
+      config
+    );
+
+    if (voteRatePercentage >= config.vote_skipping_needed_percentage) {
+      console.log("skip");
+      // TODO
     }
+  }
+
+  async getParticipants() {
+    const { count } = await adminSupabase
+      .from("room_users")
+      .select("profile_id", {
+        count: "exact",
+      })
+      .eq("room_id", this.uuid);
+    return count;
   }
 }
