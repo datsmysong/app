@@ -9,7 +9,8 @@ export default async function InactiveRoomUserIdGET(
   const { error, status, data } = await adminSupabase
     .from("room_users")
     .select("*")
-    .eq("profile_id", userId);
+    .eq("profile_id", userId)
+    .limit(5);
 
   return response.status(status).send(error || data);
 }
