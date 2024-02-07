@@ -1,9 +1,9 @@
 import { PlayingJSONTrack } from "commons/backend-types";
-import { StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Text } from "react-native";
 
 import { AudioRemote } from "../../lib/audioRemote";
 import Button from "../Button";
-import { Text } from "../Themed";
 
 type PlayerControlsProps = {
   state: PlayingJSONTrack | null;
@@ -11,27 +11,62 @@ type PlayerControlsProps = {
 };
 
 const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
-  const handlePlayPause = () => {
+  const [loading, setLoading] = useState({
+    previous: false,
+    playPause: false,
+    next: false,
+  });
+
+  const handlePlayPause = async () => {
     if (state === null) return;
-    return state.isPlaying ? remote.pause() : remote.play();
+    setLoading((prevState) => ({ ...prevState, playPause: true }));
+
+    try {
+      if (state.isPlaying) {
+        await remote.pause();
+      } else {
+        await remote.play();
+      }
+    } catch (error) {
+      console.error("Failed to play/pause:", error);
+    } finally {
+      setLoading((prevState) => ({ ...prevState, playPause: false }));
+    }
   };
 
-  const handlePreviousTrack = () => {
-    return remote.previous();
+  const handlePreviousTrack = async () => {
+    setLoading((prevState) => ({ ...prevState, previous: true }));
+
+    try {
+      await remote.previous();
+    } catch (error) {
+      console.error("Failed to go to previous track:", error);
+    } finally {
+      setLoading((prevState) => ({ ...prevState, previous: false }));
+    }
   };
 
-  const handleNextTrack = () => {
-    return remote.next();
+  const handleNextTrack = async () => {
+    setLoading((prevState) => ({ ...prevState, next: true }));
+
+    try {
+      await remote.next();
+    } catch (error) {
+      console.error("Failed to go to next track:", error);
+    } finally {
+      setLoading((prevState) => ({ ...prevState, next: false }));
+    }
   };
 
   return (
     <View style={styles.controls}>
-      {state && (
+      {state ? (
         <>
           <Button
             onPress={handlePreviousTrack}
             type="outline"
             icon="skip-previous"
+            loading={loading.previous}
           >
             Previous
           </Button>
@@ -39,15 +74,22 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
             onPress={handlePlayPause}
             icon={state.isPlaying ? "pause" : "play-arrow"}
             type={state.isPlaying ? "outline" : "filled"}
+            loading={loading.playPause}
           >
             {state.isPlaying ? "Pause" : "Play"}
           </Button>
-          <Button onPress={handleNextTrack} type="outline" icon="skip-next">
+          <Button
+            onPress={handleNextTrack}
+            type="outline"
+            icon="skip-next"
+            loading={loading.next}
+          >
             Next
           </Button>
         </>
+      ) : (
+        <Text>Waiting for the host to play a song...</Text>
       )}
-      {!state && <Text>Waiting for the host to play a song...</Text>}
     </View>
   );
 };
