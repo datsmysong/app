@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
+import UserRoomHistory from "../../../components/UserRoomHistory";
 
 export default function RoomsPage() {
   const [roomId, setRoomId] = useState("");
   //const roomId = "956992d0-f039-47d1-9475-ccacf10104d7";
 
   return (
-    <View style={styles.headerContainer}>
+    <ScrollView contentContainerStyle={styles.headerContainer}>
       <Text style={styles.title}>Salles d'écoute</Text>
       <View style={styles.buttonContainer}>
         <Button block href="/rooms/create">
@@ -19,7 +20,8 @@ export default function RoomsPage() {
           Rejoindre une salle
         </Button>
       </View>
-    </View>
+      <UserRoomHistory />
+    </ScrollView>
   );
 }
 
