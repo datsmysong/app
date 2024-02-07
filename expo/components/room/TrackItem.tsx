@@ -54,26 +54,30 @@ export default function TrackItem(prop: {
         </HView>
         <Text style={[itemStyles.text, itemStyles.textBottom]}>{artists}</Text>
       </View>
-      <Pressable onPress={() => setDislike(!dislike)}>
-        <FontAwesome
-          name={`thumbs-${!dislike ? "o-" : ""}down`}
-          style={itemStyles.icon}
-        />
-      </Pressable>
-      <Menu>
-        <MenuTrigger disabled={prop.isMenuDisabled}>
-          <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
-        </MenuTrigger>
-        <MenuOptions customStyles={optionsStyles}>
-          <CustomMenuOption
-            onSelect={removeTrack}
-            icon={{ name: "close", size: 28, color: "red" }}
-            textStyle={optionsStyles.optionText}
-          >
-            Supprimer
-          </CustomMenuOption>
-        </MenuOptions>
-      </Menu>
+      {!prop.isMenuDisabled && (
+        <>
+          <Pressable onPress={() => setDislike(!dislike)}>
+            <FontAwesome
+              name={`thumbs-${!dislike ? "o-" : ""}down`}
+              style={itemStyles.icon}
+            />
+          </Pressable>
+          <Menu>
+            <MenuTrigger>
+              <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
+            </MenuTrigger>
+            <MenuOptions customStyles={optionsStyles}>
+              <CustomMenuOption
+                onSelect={removeTrack}
+                icon={{ name: "close", size: 28, color: "red" }}
+                textStyle={optionsStyles.optionText}
+              >
+                Supprimer
+              </CustomMenuOption>
+            </MenuOptions>
+          </Menu>
+        </>
+      )}
     </HView>
   );
 }
