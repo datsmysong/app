@@ -192,7 +192,10 @@ setInterval(async () => {
       return;
     if (!room.getStreamingService().isClientSide()) ignoreCount = 0;
 
-    const playbackState = (await room.getRemote()?.getPlaybackState()) ?? null;
+    const remote = room.getRemote();
+    if (!remote) return;
+
+    const playbackState = await remote.getPlaybackState();
     server.io
       .of(`/room/${room.uuid}`)
       .emit("player:updatePlaybackState", playbackState);

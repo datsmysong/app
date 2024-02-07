@@ -13,6 +13,7 @@ import PlayerControls from "./PlayerControls";
 import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
 import Button from "../Button";
+import Warning from "../Warning";
 
 type RoomPlayerProps = {
   room: ActiveRoom;
@@ -23,6 +24,7 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
   const isHost = true;
   const [remote, setRemote] = useState<AudioRemote>();
   const localPlayerRemote = useRef<AudioRemote | null>(null);
+  const [error, setError] = useState<string>();
 
   const [playbackState, setCurrentPlaybackState] =
     useState<PlayingJSONTrack | null>(null);
@@ -39,19 +41,24 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
     const currentPlaybackState =
       await localPlayerRemote.current.getPlaybackState();
 
-    socket.emit("player:updatePlaybackState", currentPlaybackState);
+    socket.emit("player:updatePlaybackState", {
+      data: currentPlaybackState,
+      error: null,
+    });
   };
 
   useEffect(() => {
     if (!socket) return;
     setRemote(buildAudioRemote(socket));
 
-    socket.on(
-      "player:updatePlaybackState",
-      (message: PlayingJSONTrack | null) => {
-        setCurrentPlaybackState(message);
+    socket.on("player:updatePlaybackState", (playbackState) => {
+      if (playbackState.error) {
+        setError(playbackState.error);
+        return;
       }
-    );
+
+      setCurrentPlaybackState(playbackState.data);
+    });
 
     socket.on("player:getPlaybackState", () => {
       onStateRequest(socket);
@@ -101,6 +108,7 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
 
   return (
     <>
+      {error && <Warning label={error} />}
       <View>
         {isHost && (
           <LocalPlayer

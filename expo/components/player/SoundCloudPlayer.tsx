@@ -9,8 +9,8 @@ import React, {
 import { Platform, StyleSheet } from "react-native";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 
-import { AudioRemote } from "../lib/audioRemote";
-import getSoundCloudWidgetHtml from "../lib/soundcloud-widget-html";
+import { AudioRemote } from "../../lib/audioRemote";
+import getSoundCloudWidgetHtml from "../../lib/soundcloud-widget-html";
 
 const SoundCloudPlayer = forwardRef<
   AudioRemote,

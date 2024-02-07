@@ -4,6 +4,7 @@ import { adminSupabase } from "../../server";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
 import Room from "../../socketio/Room";
+import { Response } from "commons/socket.io-types";
 
 export default class SpotifyRemote extends Remote {
   spotifyClient: SpotifyApi;
@@ -28,15 +29,18 @@ export default class SpotifyRemote extends Remote {
       .eq("id", room.uuid)
       .single();
 
-    if (error) return null;
-    if (data.user_profile?.bound_services === undefined) return null;
-    if (data.user_profile?.bound_services.length === 0) return null;
+    if (
+      error ||
+      !data ||
+      !data.user_profile ||
+      !data.user_profile.bound_services
+    )
+      return null;
 
     const { access_token, expires_in, refresh_token } =
       data.user_profile.bound_services[0];
 
-    if (access_token === null || expires_in === null || refresh_token === null)
-      return null;
+    if (!access_token || !expires_in || !refresh_token) return null;
 
     const expiresIn = parseInt(expires_in);
 
@@ -52,16 +56,13 @@ export default class SpotifyRemote extends Remote {
     return new SpotifyRemote(spotifyClient, musicPlatform);
   }
 
-  async getPlaybackState(): Promise<PlayingJSONTrack | null> {
+  async getPlaybackState(): Promise<Response<PlayingJSONTrack | null>> {
     const spotifyPlaybackState =
       await this.spotifyClient.player.getPlaybackState();
 
-    // If the item playing is an episode and not a music track, then we return null
-    // Since we don't need support for those, for now, and they don't contain necessary information
-    // such as the album name, artists name, etc.
-    if (spotifyPlaybackState === null) return null;
+    if (!spotifyPlaybackState || spotifyPlaybackState.item.type === "episode")
+      return { data: null, error: "No track is currently playing" };
 
-    if (spotifyPlaybackState.item.type === "episode") return null;
     const playbackState = {
       ...spotifyPlaybackState,
       item: spotifyPlaybackState.item as Track,
@@ -70,21 +71,24 @@ export default class SpotifyRemote extends Remote {
     const artistsName = extractArtistsName(playbackState.item.album.artists);
 
     return {
-      isPlaying: playbackState.is_playing,
-      albumName: playbackState.item.album.name,
-      artistsName: artistsName,
-      currentTime: playbackState.progress_ms,
-      duration: playbackState.item.duration_ms,
-      imgUrl: playbackState.item.album.images[0].url,
-      title: playbackState.item.name,
-      url: playbackState.item.external_urls.spotify,
+      data: {
+        isPlaying: playbackState.is_playing,
+        albumName: playbackState.item.album.name,
+        artistsName: artistsName,
+        currentTime: playbackState.progress_ms,
+        duration: playbackState.item.duration_ms,
+        imgUrl: playbackState.item.album.images[0].url,
+        title: playbackState.item.name,
+        url: playbackState.item.external_urls.spotify,
+      },
+      error: null,
     };
   }
 
-  async getQueue(): Promise<JSONTrack[]> {
+  async getQueue(): Promise<Response<JSONTrack[]>> {
     const spotifyQueue = await this.spotifyClient.player.getUsersQueue();
 
-    return spotifyQueue.queue
+    const queue = spotifyQueue.queue
       .filter((item) => item.type === "track")
       .map((item) => item as Track)
       .map((item) => {
@@ -97,13 +101,15 @@ export default class SpotifyRemote extends Remote {
           url: item.external_urls.spotify,
         };
       });
+
+    return { data: queue, error: null };
   }
 
-  async playTrack(trackId: string): Promise<{ error?: string }> {
+  async playTrack(trackId: string): Promise<Response<void>> {
     const state = await this.spotifyClient.player.getPlaybackState();
 
     if (!state || !state.device.id) {
-      return { error: "No device found" };
+      return { data: null, error: "No device found" };
     }
 
     await this.spotifyClient.player.startResumePlayback(
@@ -112,51 +118,57 @@ export default class SpotifyRemote extends Remote {
       [`${trackId}`]
     );
 
-    return {};
+    return { data: undefined, error: null };
   }
 
-  async setVolume(volume: number): Promise<void> {
+  async setVolume(volume: number): Promise<Response<void>> {
     await this.spotifyClient.player.setPlaybackVolume(volume);
+    return { data: undefined, error: null };
   }
 
-  async seekTo(position: number): Promise<void> {
+  async seekTo(position: number): Promise<Response<void>> {
     await this.spotifyClient.player.seekToPosition(position);
+    return { data: undefined, error: null };
   }
 
-  async play(): Promise<void> {
+  async play(): Promise<Response<void>> {
     const state = await this.spotifyClient.player.getPlaybackState();
     if (!state || !state.device.id) {
-      return;
+      return { data: null, error: "No device found" };
     }
 
     await this.spotifyClient.player.startResumePlayback(state.device.id);
+    return { data: undefined, error: null };
   }
 
-  async pause(): Promise<void> {
+  async pause(): Promise<Response<void>> {
     const state = await this.spotifyClient.player.getPlaybackState();
     if (!state || !state.device.id) {
-      return;
+      return { data: null, error: "No device found" };
     }
 
     await this.spotifyClient.player.pausePlayback(state.device.id);
+    return { data: undefined, error: null };
   }
 
-  async previous(): Promise<void> {
+  async previous(): Promise<Response<void>> {
     const state = await this.spotifyClient.player.getPlaybackState();
     if (!state || !state.device.id) {
-      return;
+      return { data: null, error: "No device found" };
     }
 
     await this.spotifyClient.player.skipToPrevious(state.device.id);
+    return { data: undefined, error: null };
   }
 
-  async next(): Promise<void> {
+  async next(): Promise<Response<void>> {
     const state = await this.spotifyClient.player.getPlaybackState();
     if (!state || !state.device.id) {
-      return;
+      return { data: null, error: "No device found" };
     }
 
     await this.spotifyClient.player.skipToNext(state.device.id);
+    return { data: undefined, error: null };
   }
 }
 

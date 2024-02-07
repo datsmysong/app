@@ -6,9 +6,9 @@ import {
   useState,
 } from "react";
 
+import SoundCloudPlayer from "./SoundCloudPlayer";
 import { AudioRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
-import SoundCloudPlayer from "../SoundCloudPlayer";
 
 type LocalPlayerProps = {
   streamingService: ActiveRoom["streaming_services"];

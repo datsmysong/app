@@ -1,6 +1,7 @@
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
+import { Response } from "commons/socket.io-types";
 import Room from "../../socketio/Room";
 
 export default class SoundCloudRemote extends Remote {
@@ -24,137 +25,62 @@ export default class SoundCloudRemote extends Remote {
     return this.room.getHostSocket();
   }
 
-  async getPlaybackState(): Promise<PlayingJSONTrack | null> {
-    const hostSocket = await this.getHostSocket();
+  async emitAndListen<T>(event: string, data?: unknown): Promise<Response<T>> {
+    const hostSocket = this.getHostSocket();
     if (!hostSocket) {
-      return null;
+      return { data: null, error: "Host socket not available" };
     }
 
-    hostSocket.emit("player:getPlaybackState");
     return new Promise((resolve) => {
-      hostSocket.on(
-        "player:getPlaybackState",
-        (state: PlayingJSONTrack | null) => {
-          resolve(state);
-        }
-      );
-    });
-  }
-
-  async getQueue(): Promise<JSONTrack[]> {
-    return [];
-  }
-
-  async playTrack(trackId: string): Promise<{ error?: string | undefined }> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return { error: "Host socket not available" };
-    }
-
-    hostSocket.emit("player:playTrack", trackId);
-
-    return new Promise((resolve) => {
-      hostSocket.on("player:playTrack", (error: string | undefined) => {
-        if (error) {
-          resolve({ error });
+      const listener = (response: T | Error) => {
+        hostSocket.off(event, listener);
+        if (response instanceof Error) {
+          resolve({ data: null, error: response.message });
         } else {
-          resolve({});
+          resolve({ data: response, error: null });
         }
-      });
+      };
+
+      hostSocket.on(event, listener);
+      hostSocket.emit(event, data);
     });
   }
 
-  async setVolume(volume: number): Promise<void> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return;
-    }
-
-    hostSocket.emit("player:setVolume", {
-      volume,
-    });
-
-    return new Promise((resolve) => {
-      hostSocket.on("player:setVolume", () => {
-        resolve();
-      });
-    });
+  async getPlaybackState(): Promise<Response<PlayingJSONTrack | null>> {
+    return this.emitAndListen<PlayingJSONTrack | null>(
+      "player:getPlaybackState"
+    );
   }
 
-  async seekTo(position: number): Promise<void> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return;
-    }
-
-    hostSocket.emit("player:seekTo", {
-      position,
-    });
-
-    return new Promise((resolve) => {
-      hostSocket.on("player:seekTo", () => {
-        resolve();
-      });
-    });
+  async getQueue(): Promise<Response<JSONTrack[]>> {
+    return this.emitAndListen<JSONTrack[]>("player:getQueue");
   }
 
-  async play(): Promise<void> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return;
-    }
-
-    hostSocket.emit("player:play");
-
-    return new Promise((resolve) => {
-      hostSocket.on("player:play", () => {
-        resolve();
-      });
-    });
+  async playTrack(trackId: string): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:playTrack", trackId);
   }
 
-  async pause(): Promise<void> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return;
-    }
-
-    hostSocket.emit("player:pause");
-
-    return new Promise((resolve) => {
-      hostSocket.on("player:pause", () => {
-        resolve();
-      });
-    });
+  async setVolume(volume: number): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:setVolume", { volume });
   }
 
-  async previous(): Promise<void> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return;
-    }
-
-    hostSocket.emit("player:previous");
-
-    return new Promise((resolve) => {
-      hostSocket.on("player:previous", () => {
-        resolve();
-      });
-    });
+  async seekTo(position: number): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:seekTo", { position });
   }
 
-  async next(): Promise<void> {
-    const hostSocket = await this.getHostSocket();
-    if (!hostSocket) {
-      return;
-    }
+  async play(): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:play");
+  }
 
-    hostSocket.emit("player:next");
+  async pause(): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:pause");
+  }
 
-    return new Promise((resolve) => {
-      hostSocket.on("player:next", () => {
-        resolve();
-      });
-    });
+  async previous(): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:previous");
+  }
+
+  async next(): Promise<Response<void>> {
+    return this.emitAndListen<void>("player:next");
   }
 }
