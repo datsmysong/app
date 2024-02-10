@@ -1,7 +1,10 @@
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
-import { Response } from "commons/socket.io-types";
+import {
+  LocalPlayerServerToClientEvents,
+  Response,
+} from "commons/socket.io-types";
 import Room from "../../socketio/Room";
 
 export default class SoundCloudRemote extends Remote {
@@ -25,20 +28,19 @@ export default class SoundCloudRemote extends Remote {
     return this.room.getHostSocket();
   }
 
-  async emitAndListen<T>(event: string, data?: unknown): Promise<Response<T>> {
+  async emitAndListen<T>(
+    event: keyof LocalPlayerServerToClientEvents,
+    data?: unknown
+  ): Promise<Response<T>> {
     const hostSocket = this.getHostSocket();
     if (!hostSocket) {
       return { data: null, error: "Host socket not available" };
     }
 
     return new Promise((resolve) => {
-      const listener = (response: T | Error) => {
+      const listener = (response: unknown) => {
         hostSocket.off(event, listener);
-        if (response instanceof Error) {
-          resolve({ data: null, error: response.message });
-        } else {
-          resolve({ data: response, error: null });
-        }
+        resolve(response as never);
       };
 
       hostSocket.on(event, listener);
@@ -48,39 +50,39 @@ export default class SoundCloudRemote extends Remote {
 
   async getPlaybackState(): Promise<Response<PlayingJSONTrack | null>> {
     return this.emitAndListen<PlayingJSONTrack | null>(
-      "player:getPlaybackState"
+      "player:playbackStateRequest"
     );
   }
 
   async getQueue(): Promise<Response<JSONTrack[]>> {
-    return this.emitAndListen<JSONTrack[]>("player:getQueue");
+    return this.emitAndListen<JSONTrack[]>("player:getQueueRequest");
   }
 
   async playTrack(trackId: string): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:playTrack", trackId);
+    return this.emitAndListen<void>("player:playTrackRequest", trackId);
   }
 
   async setVolume(volume: number): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:setVolume", { volume });
+    return this.emitAndListen<void>("player:setVolumeRequest", { volume });
   }
 
   async seekTo(position: number): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:seekTo", { position });
+    return this.emitAndListen<void>("player:seekToRequest", { position });
   }
 
   async play(): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:play");
+    return this.emitAndListen<void>("player:playRequest");
   }
 
   async pause(): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:pause");
+    return this.emitAndListen<void>("player:pauseRequest");
   }
 
   async previous(): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:previous");
+    return this.emitAndListen<void>("player:previousRequest");
   }
 
   async next(): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:next");
+    return this.emitAndListen<void>("player:skipRequest");
   }
 }

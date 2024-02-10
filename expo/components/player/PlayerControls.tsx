@@ -2,12 +2,12 @@ import { PlayingJSONTrack } from "commons/backend-types";
 import React, { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 
-import { AudioRemote } from "../../lib/audioRemote";
+import { PlayerRemote } from "../../lib/audioRemote";
 import Button from "../Button";
 
 type PlayerControlsProps = {
   state: PlayingJSONTrack | null;
-  remote: AudioRemote;
+  remote: PlayerRemote;
 };
 
 const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {

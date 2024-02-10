@@ -69,10 +69,15 @@ export default function getSoundCloudWidgetHtml() {
             });
           });
 
+          const response = {
+            data: playingMusic,
+            error: null,
+          }
+
           window.postMessage(
             {
               command: "currentMusic",
-              data: playingMusic,
+              data: response,
             },
             "*"
           );

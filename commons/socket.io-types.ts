@@ -4,169 +4,117 @@ export type Response<T> =
   | { data: T; error: null }
   | { data: null; error: string };
 
-export interface ServerToClientEvents {
-  /**
-   * Sends the current queue to the client
-   * @param room The room object containing the queue
-   */
-  "queue:update": (room: RoomJSON | Error) => void;
-
-  /**
-   * Sends the current playback state to the client
-   * @param playbackState The current playback state
-   */
-  "player:updatePlaybackState": (
-    playbackState: Response<PlayingJSONTrack | null>
-  ) => void;
-
-  /**
-   * Sends a request to the client to end the room
-   */
-  "room:end": () => void;
-
-  /**
-   * Sends the current queue to the client
-   * This will be sent after the client requested the queue
-   */
-  "player:getQueue": (queue: Response<Array<JSONTrack>>) => void;
-
-  /**
-   * IMPORTANT
-   * All following events will only be sent:
-   *  - to the host
-   *  - if the music player is local and therefore loaded on the host's device
-   */
-
-  /**
-   * Requests the current playback state to the client
-   */
-  "player:getPlaybackState": () => void;
-
-  /**
-   * Sends a request to the client to play a track with the given id
-   * @param trackId The id of the track to play (e.g. spotify:track:1234, https://soundcloud.com/12/34, etc.)
-   */
-  "player:playTrack": (trackId: string) => void;
-
-  /**
-   * Sends a request to the client to set the volume to the given value
-   * @param volume The volume to set
-   */
-  "player:setVolume": (volume: number) => void;
-
-  /**
-   * Sends a request to the client to seek to the given position
-   * @param position The position to seek to
-   */
-  "player:seekTo": (position: number) => void;
-
-  /**
-   * Sends a request to the client to play the current track
-   */
-  "player:play": () => void;
-
-  /**
-   * Sends a request to the client to pause the current track
-   */
-  "player:pause": () => void;
-
-  /**
-   * Sends a request to the client to skip the current track
-   */
-  "player:skip": () => void;
-
-  /**
-   * Sends a request to the client to play the previous track
-   */
-  "player:previous": () => void;
+/**
+ * Interface for events that are sent from the local player to the server.
+ * These are requests that the local player makes to the server.
+ */
+export interface LocalPlayerServerToClientEvents {
+  /** Request the current playback state */
+  "player:playbackStateRequest": () => void;
+  /** Request the current queue of the local player */
+  "player:getQueueRequest": () => void;
+  /** Request to play a specific track. */
+  "player:playTrackRequest": (trackId: string) => void;
+  /** Request to set the volume. */
+  "player:setVolumeRequest": (volume: number) => void;
+  /** Request to seek to a specific position in the track. */
+  "player:seekToRequest": (position: number) => void;
+  /** Request to play the current track. */
+  "player:playRequest": () => void;
+  /** Request to pause the current track. */
+  "player:pauseRequest": () => void;
+  /** Request to skip to the next track. */
+  "player:skipRequest": () => void;
+  /** Request to go to the previous track. */
+  "player:previousRequest": () => void;
 }
 
-export interface ClientToServerEvents {
-  /**
-   * Sends a request to the server to add a track to the queue
-   * @param rawUrl The url of the track to add
-   */
-  "queue:add": (rawUrl: string) => void;
-
-  /**
-   * Sends a request to the server to remove a track from the queue
-   * @param index The index of the track to remove
-   */
-  "queue:remove": (index: number) => void;
-
-  /**
-   * Sends a request to the server to remove a track from the queue
-   * @param link The link of the track to remove
-   */
-  "queue:removeLink": (link: string) => void;
-
-  /**
-   * We found a better way to get the user id
-   * @param index index of the track to vote skip
-   * @param userid identifier of the user who wants to vote skip
-   */
-  "queue:voteSkip": (index: number, userid: string) => void;
-
-  /**
-   * Sends a request to the server to start the playback of a track
-   * @param trackId The id of the track to play (e.g. spotify:track:1234, https://soundcloud.com/12/34, etc.)
-   */
-  "player:playTrack": (trackId: string) => void;
-
-  /**
-   * Sends a request to the server to set the volume to the given value
-   * @param volume
-   */
-  "player:setVolume": (volume: number) => void;
-
-  /**
-   * Sends a request to the server to seek to the given position
-   * @param position
-   */
-  "player:seekTo": (position: number) => void;
-
-  /**
-   * Sends a request to the server to play the current track
-   */
-  "player:play": () => void;
-
-  /**
-   * Sends a request to the server to pause the current track
-   */
-  "player:pause": () => void;
-
-  /**
-   * Sends a request to the server to skip the current track
-   */
-  "player:skip": () => void;
-
-  /**
-   * Sends a request to the server to play the previous track
-   */
-  "player:previous": () => void;
-
-  /**
-   * Sends a request to the server to get the current queue
-   */
-  "player:getQueue": () => void;
-
-  /**
-   * Returns the current playback state to the server
-   * Will only be sent:
-   *  - by the host
-   *  - if the music player is local and therefore loaded on the host's device
-   * @param playbackState The current playback state
-   */
-  "player:updatePlaybackState": (
+/**
+ * Interface for events that are sent from the client to the local player.
+ * These are responses to the requests that the local player made.
+ */
+export interface LocalPlayerClientToServerEvents {
+  /** Response to the playback state request. */
+  "player:playbackStateRequest": (
     playbackState: Response<PlayingJSONTrack | null>
   ) => void;
+  /** Response to the get queue request. */
+  "player:getQueueRequest": (queue: Response<JSONTrack[]>) => void;
+  /** Response to the play track request. */
+  "player:playTrackRequest": (trackId: string) => Response<void>;
+  /** Response to the set volume request. */
+  "player:setVolumeRequest": (volume: number) => Response<void>;
+  /** Response to the seek to request. */
+  "player:seekToRequest": (position: number) => Response<void>;
+  /** Response to the play request. */
+  "player:playRequest": () => Response<void>;
+  /** Response to the pause request. */
+  "player:pauseRequest": () => Response<void>;
+  /** Response to the skip request. */
+  "player:skipRequest": () => Response<void>;
+  /** Response to the previous track request. */
+  "player:previousRequest": () => Response<void>;
+}
 
-  /**
-   * Sends a request to the server to get the current playback state
-   */
-  "player:getPlaybackState": () => void;
+/**
+ * Interface for events that are sent from the server to the client.
+ * These are responses to client requests or updates.
+ */
+export interface ServerToClientEvents
+  extends LocalPlayerServerToClientEvents,
+    PlayerServerToClientEvents {
+  /** Update the queue. */
+  "queue:update": (room: RoomJSON | Error) => void;
+  /** End the room. */
+  "room:end": () => void;
+}
+
+/**
+ * Interface for events that are sent from the client to the server.
+ * These are requests that the client makes to the server.
+ */
+export interface ClientToServerEvents
+  extends LocalPlayerClientToServerEvents,
+    PlayerClientToServerEvents {
+  /** Add a track to the queue. */
+  "queue:add": (rawUrl: string) => void;
+  /** Remove a track from the queue by its index. */
+  "queue:remove": (index: number) => void;
+  /** Remove a track from the queue by its link. */
+  "queue:removeLink": (link: string) => void;
+  /** Search for tracks. */
   "utils:search": (
     text: string,
     resultCallback: (args: JSONTrack[]) => void
+  ) => void;
+}
+
+/**
+ * Interface for events that are sent from the client to the server that are related to the player.
+ * These are requests that the client makes to the server.
+ */
+interface PlayerClientToServerEvents {
+  "player:playTrack": (trackId: string) => void;
+  "player:pause": () => void;
+  "player:play": () => void;
+  "player:seekTo": (position: number) => void;
+  "player:setVolume": (volume: number) => void;
+  "player:skip": () => void;
+  "player:previous": () => void;
+}
+/**
+ * Interface for events that are sent from the server to the client that are related to the player.
+ * These are responses to client requests or updates.
+ */
+interface PlayerServerToClientEvents {
+  "player:playTrack": (response: Response<void>) => void;
+  "player:pause": (response: Response<void>) => void;
+  "player:play": (response: Response<void>) => void;
+  "player:seekTo": (response: Response<void>) => void;
+  "player:setVolume": (response: Response<void>) => void;
+  "player:skip": (response: Response<void>) => void;
+  "player:previous": (response: Response<void>) => void;
+  "player:updatePlaybackState": (
+    playbackState: Response<PlayingJSONTrack | null>
   ) => void;
 }

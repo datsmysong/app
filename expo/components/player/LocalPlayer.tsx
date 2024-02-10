@@ -7,19 +7,19 @@ import {
 } from "react";
 
 import SoundCloudPlayer from "./SoundCloudPlayer";
-import { AudioRemote } from "../../lib/audioRemote";
+import { LocalPlayerRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
 
 type LocalPlayerProps = {
   streamingService: ActiveRoom["streaming_services"];
 };
 
-const LocalPlayer = forwardRef<AudioRemote | null, LocalPlayerProps>(
+const LocalPlayer = forwardRef<LocalPlayerRemote | null, LocalPlayerProps>(
   ({ streamingService }, ref) => {
-    // Storing the ref of the SoundCloudPlayer component that returns a SoundCloudPlayerRemote
-    const soundCloudRef: React.RefObject<AudioRemote> = useRef(null);
+    // Storing the ref of the SoundCloudPlayer component that returns a LocalPlayerRemote
+    const soundCloudRef: React.RefObject<LocalPlayerRemote> = useRef(null);
 
-    const [remote, setRemote] = useState<AudioRemote | null>(null);
+    const [remote, setRemote] = useState<LocalPlayerRemote | null>(null);
 
     useEffect(() => {
       const remote = soundCloudRef.current;
@@ -27,7 +27,7 @@ const LocalPlayer = forwardRef<AudioRemote | null, LocalPlayerProps>(
     }, [soundCloudRef]);
 
     useImperativeHandle(ref, () => {
-      return remote as AudioRemote;
+      return remote as LocalPlayerRemote;
     });
 
     return (

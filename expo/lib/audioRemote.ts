@@ -5,114 +5,93 @@ import {
 } from "commons/socket.io-types";
 import { Socket } from "socket.io-client";
 
-export type AudioRemote = {
-  getPlaybackState(): Promise<PlayingJSONTrack | null>;
-  getQueue(): Promise<JSONTrack[]>;
-  playTrack(trackId: string): Promise<{ error?: string }>;
-  setVolume(volume: number): Promise<void>;
-  seekTo(position: number): Promise<void>;
-  play(): Promise<void>;
-  pause(): Promise<void>;
-  previous(): Promise<void>;
-  next(): Promise<void>;
+type Response<T> = { data: T; error: null } | { data: null; error: string };
+
+export type LocalPlayerRemote = PlayerRemote & {
+  getPlaybackState(): Promise<Response<PlayingJSONTrack | null>>;
+  getQueue(): Promise<Response<JSONTrack[]>>;
+};
+
+export type PlayerRemote = {
+  playTrack(trackId: string): Promise<Response<void>>;
+  setVolume(volume: number): Promise<Response<void>>;
+  seekTo(position: number): Promise<Response<void>>;
+  play(): Promise<Response<void>>;
+  pause(): Promise<Response<void>>;
+  previous(): Promise<Response<void>>;
+  next(): Promise<Response<void>>;
 };
 
 export default function buildAudioRemote(
   socket: Socket<ServerToClientEvents, ClientToServerEvents>
-): AudioRemote {
+): PlayerRemote {
   return {
-    getPlaybackState(): Promise<PlayingJSONTrack | null> {
-      socket.emit("player:getPlaybackState");
-
-      return new Promise((resolve) => {
-        socket.on(
-          "player:updatePlaybackState",
-          (state: PlayingJSONTrack | null) => {
-            resolve(state);
-          }
-        );
-      });
-    },
-    getQueue(): Promise<JSONTrack[]> {
-      socket.emit("player:getQueue");
-
-      return new Promise((resolve) => {
-        socket.on("player:getQueue", (queue: JSONTrack[]) => {
-          resolve(queue);
-        });
-      });
-    },
-
-    playTrack(trackId: string): Promise<{ error?: string | undefined }> {
+    playTrack(trackId: string): Promise<Response<void>> {
       socket.emit("player:playTrack", trackId);
 
       return new Promise((resolve) => {
-        socket.on("player:playTrack", (error: string | undefined) => {
-          if (error) {
-            resolve({ error });
-          } else {
-            resolve({});
-          }
+        socket.on("player:playTrack", (a) => {
+          resolve(a);
         });
       });
     },
 
-    setVolume(volume: number): Promise<void> {
+    setVolume(volume: number): Promise<Response<void>> {
       socket.emit("player:setVolume", volume);
 
       return new Promise((resolve) => {
-        socket.on("player:setVolume", () => {
-          resolve();
+        socket.on("player:setVolume", (response) => {
+          resolve(response);
         });
       });
     },
 
-    seekTo(position: number): Promise<void> {
+    seekTo(position: number): Promise<Response<void>> {
       socket.emit("player:seekTo", position);
 
       return new Promise((resolve) => {
-        socket.on("player:seekTo", () => {
-          resolve();
+        socket.on("player:seekTo", (response) => {
+          resolve(response);
         });
       });
     },
 
-    play(): Promise<void> {
+    play(): Promise<Response<void>> {
       socket.emit("player:play");
 
       return new Promise((resolve) => {
-        socket.on("player:play", () => {
-          resolve();
+        socket.on("player:play", (response) => {
+          resolve(response);
         });
       });
     },
 
-    pause(): Promise<void> {
+    pause(): Promise<Response<void>> {
       socket.emit("player:pause");
 
       return new Promise((resolve) => {
-        socket.on("player:pause", () => {
-          resolve();
+        socket.on("player:pause", (response) => {
+          resolve(response);
         });
       });
     },
 
-    previous(): Promise<void> {
+    previous(): Promise<Response<void>> {
       socket.emit("player:previous");
 
       return new Promise((resolve) => {
-        socket.on("player:previous", () => {
-          resolve();
+        socket.on("player:previous", (response) => {
+          resolve(response);
         });
       });
     },
 
-    next(): Promise<void> {
+    next(): Promise<Response<void>> {
       socket.emit("player:skip");
 
       return new Promise((resolve) => {
-        socket.on("player:skip", () => {
-          resolve();
+        socket.on("player:skip", (response) => {
+          resolve(response);
         });
       });
     },

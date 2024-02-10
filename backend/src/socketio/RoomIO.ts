@@ -99,70 +99,68 @@ export default function RoomIO(
       const remote = room.getRemote();
       if (remote === null) return;
 
-      await remote.playTrack(trackId);
-      await updatePlaybackState(socket, remote);
-    });
+      const response = await remote.playTrack(trackId);
+      socket.emit("player:playTrack", response);
 
-    socket.on("player:getQueue", async () => {
-      const remote = room.getRemote();
-      if (remote === null) return;
-
-      const queue = await remote.getQueue();
-      socket.emit("player:getQueue", queue);
+      if (!response.error) await updatePlaybackState(socket, remote);
     });
 
     socket.on("player:pause", async () => {
       const remote = room.getRemote();
       if (remote === null) return;
 
-      await remote.pause();
-      await updatePlaybackState(socket, remote);
+      const response = await remote.pause();
+      socket.emit("player:pause", response);
+
+      if (!response.error) await updatePlaybackState(socket, remote);
     });
 
     socket.on("player:play", async () => {
       const remote = room.getRemote();
       if (remote === null) return;
 
-      await remote.play();
-      await updatePlaybackState(socket, remote);
+      const response = await remote.play();
+      if (!response.error) await updatePlaybackState(socket, remote);
+
+      socket.emit("player:play", response);
     });
 
     socket.on("player:skip", async () => {
       const remote = room.getRemote();
       if (remote === null) return;
 
-      await remote.next();
-      await updatePlaybackState(socket, remote);
+      const response = await remote.next();
+      socket.emit("player:skip", response);
+
+      if (!response.error) await updatePlaybackState(socket, remote);
     });
 
     socket.on("player:previous", async () => {
       const remote = room.getRemote();
       if (remote === null) return;
 
-      await remote.previous();
-      await updatePlaybackState(socket, remote);
+      const response = await remote.previous();
+      socket.emit("player:previous", response);
+
+      if (!response.error) await updatePlaybackState(socket, remote);
     });
 
     socket.on("player:setVolume", async (volume) => {
       const remote = room.getRemote();
       if (remote === null) return;
 
-      remote.setVolume(volume);
+      const response = await remote.setVolume(volume);
+      socket.emit("player:setVolume", response);
     });
 
     socket.on("player:seekTo", async (position) => {
       const remote = room.getRemote();
       if (remote === null) return;
 
-      await remote.seekTo(position);
-      await updatePlaybackState(socket, remote);
-    });
+      const response = await remote.seekTo(position);
+      socket.emit("player:seekTo", response);
 
-    /**
-     * When we receive the new playback state, we send it to all clients
-     */
-    socket.on("player:updatePlaybackState", async (playbackState) => {
-      socket.nsp.emit("player:updatePlaybackState", playbackState);
+      if (!response.error) await updatePlaybackState(socket, remote);
     });
 
     socket.on(

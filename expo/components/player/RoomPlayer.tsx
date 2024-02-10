@@ -10,7 +10,10 @@ import { Socket } from "socket.io-client";
 import LocalPlayer from "./LocalPlayer";
 import Player from "./Player";
 import PlayerControls from "./PlayerControls";
-import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
+import buildAudioRemote, {
+  LocalPlayerRemote,
+  PlayerRemote,
+} from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
 import Button from "../Button";
 import Warning from "../Warning";
@@ -22,30 +25,12 @@ type RoomPlayerProps = {
 
 const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
   const isHost = true;
-  const [remote, setRemote] = useState<AudioRemote>();
-  const localPlayerRemote = useRef<AudioRemote | null>(null);
+  const [remote, setRemote] = useState<PlayerRemote>();
+  const localPlayerRemote = useRef<LocalPlayerRemote | null>(null);
   const [error, setError] = useState<string>();
 
   const [playbackState, setCurrentPlaybackState] =
     useState<PlayingJSONTrack | null>(null);
-
-  /**
-   * When receiving a state request from the server, it means that the music platform in use
-   * uses a local player (eg. SoundCloud) and that the server needs to know the current playback
-   * state of the player.
-   */
-  const onStateRequest = async (socket: RoomPlayerProps["socket"]) => {
-    if (!isHost) return;
-    if (!localPlayerRemote.current) return;
-
-    const currentPlaybackState =
-      await localPlayerRemote.current.getPlaybackState();
-
-    socket.emit("player:updatePlaybackState", {
-      data: currentPlaybackState,
-      error: null,
-    });
-  };
 
   useEffect(() => {
     if (!socket) return;
@@ -60,34 +45,45 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
       setCurrentPlaybackState(playbackState.data);
     });
 
-    socket.on("player:getPlaybackState", () => {
-      onStateRequest(socket);
+    /**
+     * When receiving a state request from the server, it means that the music platform in use
+     * uses a local player (eg. SoundCloud) and that the server needs to know the current playback
+     * state of the player.
+     */
+    socket.on("player:playbackStateRequest", async () => {
+      if (!isHost) return;
+      if (!localPlayerRemote.current) return;
+
+      const currentPlaybackState =
+        await localPlayerRemote.current.getPlaybackState();
+
+      socket.emit("player:playbackStateRequest", currentPlaybackState);
     });
 
-    socket.on("player:playTrack", (trackId: string) => {
+    socket.on("player:playTrackRequest", (trackId: string) => {
       if (localPlayerRemote.current)
         localPlayerRemote.current.playTrack(trackId);
     });
 
-    socket.on("player:pause", async () => {
+    socket.on("player:pauseRequest", async () => {
       if (localPlayerRemote.current) {
         localPlayerRemote.current.pause();
       }
     });
 
-    socket.on("player:play", async () => {
+    socket.on("player:playRequest", async () => {
       if (localPlayerRemote.current) {
         localPlayerRemote.current.play();
       }
     });
 
-    socket.on("player:seekTo", async (position: number) => {
+    socket.on("player:seekToRequest", async (position: number) => {
       if (localPlayerRemote.current) {
         localPlayerRemote.current.seekTo(position);
       }
     });
 
-    socket.on("player:setVolume", async (volume: number) => {
+    socket.on("player:setVolumeRequest", async (volume: number) => {
       if (localPlayerRemote.current) {
         localPlayerRemote.current.setVolume(volume);
       }
