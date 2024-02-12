@@ -8,8 +8,9 @@ export default async function InactiveRoomUserIdGET(
   const { userId } = request.params as { userId: string };
   const { error, status, data } = await adminSupabase
     .from("room_users")
-    .select("*")
+    .select("*, rooms(*)")
     .eq("profile_id", userId)
+    .order("rooms(created_at)", { ascending: false })
     .limit(5);
 
   return response.status(status).send(error || data);

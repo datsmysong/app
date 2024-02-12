@@ -19,7 +19,6 @@ export default function RoomHistoryInfoCard({
 
   const getUsername = async (userProfileId: string) => {
     const user = await getUserProfileFromUserProfileId(userProfileId);
-    console.log(user);
     if (!user) {
       Alert.alert("Erreur lors de la récupération de l'utilisateur");
       return;
