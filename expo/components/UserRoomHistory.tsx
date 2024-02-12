@@ -6,12 +6,14 @@ import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { Text, View } from "./Themed";
 import { getApiUrl } from "../lib/apiUrl";
-import { getRoom } from "../lib/room";
 import { useUserProfile } from "../lib/userProfile";
+
+type RoomUserAndRoom = { rooms: Room } & RoomUser;
 
 export default function UserRoomHistory() {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [roomUser, setRoomUser] = useState<RoomUser[]>([]);
+  const [roomUser, setRoomUser] = useState<RoomUserAndRoom[]>([]);
+  const [loading, setLoading] = useState(true);
   const baseUrl = getApiUrl();
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function UserRoomHistory() {
       }
 
       setRoomUser(historyJson);
+      setLoading(false);
     })();
   }, []);
 
@@ -41,13 +44,7 @@ export default function UserRoomHistory() {
     (async () => {
       const tmpRooms: Room[] = [];
       for (const userRoom of roomUser) {
-        const room = await getRoom(userRoom.room_id);
-        if (!room) {
-          Alert.alert("Erreur lors de la récupération de la salle d'écoute");
-          return;
-        }
-
-        tmpRooms.push(room);
+        tmpRooms.push(userRoom.rooms);
       }
       setRooms(tmpRooms);
     })();
