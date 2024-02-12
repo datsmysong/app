@@ -8,6 +8,7 @@ import CustomTextInput from "../../../../components/CustomTextInput";
 import HView from "../../../../components/HView";
 import { Text, View } from "../../../../components/Themed";
 import TrackItem from "../../../../components/room/TrackItem";
+import TrackItemAdd from "../../../../components/room/TrackItemAdd";
 import SocketIo from "../../../../lib/socketio";
 
 export default function AddTrack() {
@@ -16,10 +17,10 @@ export default function AddTrack() {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<JSONTrack[]>([]);
 
-  const addMusic = () => {
-    SocketIo.getInstance()
-      .getSocket(`/room/${id}`)
-      .emit("queue:add", new URL(value).toString());
+  const socket = SocketIo.getInstance().getSocket(`/room/${id}`);
+
+  const addMusic = (value: string) => {
+    socket.emit("queue:add", new URL(value).toString());
 
     router.back();
   };
@@ -30,9 +31,7 @@ export default function AddTrack() {
       setResult(result);
     };
 
-    SocketIo.getInstance()
-      .getSocket(`/room/${id}`)
-      .emit("utils:search", value, updateList);
+    socket.emit("utils:search", value, updateList);
   };
 
   return (
@@ -43,13 +42,18 @@ export default function AddTrack() {
           onChangeText={setValue}
           style={{ flexShrink: 0, flexGrow: 1, minWidth: 0, flexBasis: 0 }}
         />
-        <Button onPress={addMusic}>Ajouter</Button>
+        <Button onPress={() => addMusic(value)}>Ajouter</Button>
         <Button onPress={searchMusic}>Chercher</Button>
       </HView>
       <FlatList
         data={result}
         renderItem={({ item, index }) => (
-          <TrackItem track={item} index={index} roomId={id} isMenuDisabled />
+          <TrackItemAdd
+            track={item}
+            index={index}
+            roomId={id}
+            action={addMusic}
+          />
         )}
       />
     </View>
