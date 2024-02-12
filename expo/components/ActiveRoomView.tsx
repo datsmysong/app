@@ -128,13 +128,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     }
   };
 
-  const deleteRoom = async () => {
-    const response = await fetch(url + "/end", { credentials: "include" });
-    if (!response.ok && process.env.NODE_ENV !== "production") {
-      Alert.alert(await response.text());
-    }
-  };
-
   return (
     <>
       <ScrollView>
