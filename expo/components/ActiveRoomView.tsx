@@ -3,6 +3,7 @@ import { RoomJSON } from "commons/Backend-types";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Platform, StyleSheet } from "react-native";
+import Dialog from "react-native-dialog";
 import { Socket } from "socket.io-client";
 
 import Alert from "./Alert";
@@ -47,10 +48,12 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket>();
+  const [showDialog, setShowDialog] = useState<boolean>(false);
 
   const userProfile = useUserProfile();
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
+  const isOnMobile = Platform.OS !== "web";
 
   const deleteRoom = async () => {
     const response = await fetch(url + "/end", { credentials: "include" });
@@ -88,6 +91,11 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     });
   }, [socket]);
 
+  const leaveRoom = () => {
+    setShowDialog(false);
+    Alert.alert("Vous avez quitté la salle :p");
+  };
+
   return (
     <>
       {room && liveRoom && socket && (
@@ -95,7 +103,12 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           <View style={headerStyles.headerContainer}>
             <View style={headerStyles.titleContainer}>
               <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
-              <MaterialIcons name="meeting-room" size={28} color="black" />
+              <MaterialIcons
+                name="meeting-room"
+                size={28}
+                color="black"
+                onPress={() => setShowDialog(true)}
+              />
             </View>
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
@@ -136,6 +149,16 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           >
             Ajouter une musique
           </Button>
+          {isOnMobile && (
+            <Dialog.Container visible={showDialog}>
+              <Dialog.Title>Quitter la salle</Dialog.Title>
+              <Dialog.Description>
+                Voulez-vous vraiment quitter la salle d'écoute ?
+              </Dialog.Description>
+              <Dialog.Button label="Non" onPress={() => setShowDialog(false)} />
+              <Dialog.Button label="Oui" onPress={leaveRoom} />
+            </Dialog.Container>
+          )}
         </>
       )}
     </>
@@ -159,7 +182,6 @@ const floatingStyle = StyleSheet.create({
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
-    flex: 1,
     marginHorizontal: 24,
     marginVertical: 14,
     gap: 10,
