@@ -57,6 +57,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       Alert.alert(await response.text());
     }
   };
+
   useEffect(() => {
     if (!userProfile || !room) return;
 

@@ -1,15 +1,11 @@
-import { FontAwesome } from "@expo/vector-icons";
 import { JSONTrack } from "commons/backend-types";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, ScrollView } from "react-native";
 
 import CustomTextInput from "../../../../components/CustomTextInput";
-import { View } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
-import MinimalistTrackItem from "../../../../components/room/MinimalistTrackItem";
 import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
-import TrackItem from "../../../../components/room/TrackItem";
 import SocketIo from "../../../../lib/socketio";
 import { useDebounce } from "../../../../lib/useDebounce";
 
@@ -52,7 +48,7 @@ export default function AddTrack() {
   const { id } = useLocalSearchParams() as { id: string };
 
   const [value, setValue] = useState("");
-  const [result, setResult] = useState<JSONTrack[]>(mockTracks);
+  const [result, setResult] = useState<JSONTrack[]>([]);
 
   const debouncedSearchMusic = useDebounce(value, 1000);
 
@@ -70,6 +66,7 @@ export default function AddTrack() {
 
   const searchMusic = () => {
     console.log("Seach ", value);
+    setResult(mockTracks);
 
     // SocketIo.getInstance()
     //   .getSocket(`/room/${id}`)
