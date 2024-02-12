@@ -113,6 +113,7 @@ const Button: React.FC<ButtonProps> = ({
             width: iconSize,
             height: iconSize,
             justifyContent: "center",
+            position: "absolute",
           }}
         >
           <ActivityIndicator
@@ -121,39 +122,39 @@ const Button: React.FC<ButtonProps> = ({
           />
         </View>
       )}
-      {!loading && (
-        <>
-          {prependIcon && (
-            <MaterialIcons
-              name={prependIcon}
-              size={iconSize}
-              color={iconColor}
-            />
-          )}
-          {icon && (
-            <MaterialIcons name={icon} size={iconSize} color={iconColor} />
-          )}
-          {!icon && (
-            <Text
-              style={{
-                ...styles.buttonText,
-                fontSize: isSmall ? 16 : 24,
-                color: iconColor,
-                fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
-              }}
-            >
-              {children}
-            </Text>
-          )}
-          {appendIcon && (
-            <MaterialIcons
-              name={appendIcon}
-              size={iconSize}
-              color={iconColor}
-            />
-          )}
-        </>
-      )}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          alignSelf: "flex-start",
+          gap: 8,
+          borderCurve: "continuous",
+          opacity: loading ? 0 : 1,
+        }}
+      >
+        {prependIcon && (
+          <MaterialIcons name={prependIcon} size={iconSize} color={iconColor} />
+        )}
+        {icon && (
+          <MaterialIcons name={icon} size={iconSize} color={iconColor} />
+        )}
+        {!icon && (
+          <Text
+            style={{
+              ...styles.buttonText,
+              fontSize: isSmall ? 16 : 24,
+              color: iconColor,
+              fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
+            }}
+          >
+            {children}
+          </Text>
+        )}
+        {appendIcon && (
+          <MaterialIcons name={appendIcon} size={iconSize} color={iconColor} />
+        )}
+      </View>
     </Pressable>
   );
 };
