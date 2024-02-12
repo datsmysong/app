@@ -124,13 +124,9 @@ const Button: React.FC<ButtonProps> = ({
       )}
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          alignSelf: "flex-start",
-          gap: 8,
-          borderCurve: "continuous",
+          ...styles.button,
           opacity: loading ? 0 : 1,
+          maxWidth: "100%",
         }}
       >
         {prependIcon && (
