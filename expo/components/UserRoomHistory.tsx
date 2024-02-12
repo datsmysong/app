@@ -43,9 +43,9 @@ export default function UserRoomHistory() {
     if (roomUser.length === 0) return;
     (async () => {
       const tmpRooms: Room[] = [];
-      for (const userRoom of roomUser) {
+      roomUser.forEach((userRoom) => {
         tmpRooms.push(userRoom.rooms);
-      }
+      });
       setRooms(tmpRooms);
     })();
   }, [roomUser]);

@@ -16,6 +16,7 @@ export default function RoomHistoryInfoCard({
 }: RoomHistoryInfoCardProps) {
   const [username, setUsername] = useState("");
   const [formatedDate, setFormatedDate] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const getUsername = async (userProfileId: string) => {
     const user = await getUserProfileFromUserProfileId(userProfileId);
@@ -29,7 +30,7 @@ export default function RoomHistoryInfoCard({
     (async () => {
       const username = await getUsername(room.host_user_profile_id || "");
       if (!username) {
-        Alert.alert("Erreur lors de la récupération de l'utilisateur");
+        Alert.alert("Erreur lors de la récupération du nom d'utilisateur");
         return;
       }
       const formattedDate = new Date(room.created_at).toLocaleDateString(
@@ -43,6 +44,7 @@ export default function RoomHistoryInfoCard({
 
       setUsername(username);
       setFormatedDate(formattedDate);
+      setLoading(false);
     })();
   }, []);
 
