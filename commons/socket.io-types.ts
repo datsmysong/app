@@ -36,24 +36,24 @@ export interface LocalPlayerServerToClientEvents {
 export interface LocalPlayerClientToServerEvents {
   /** Response to the playback state request. */
   "player:playbackStateRequest": (
-    playbackState: Response<PlayingJSONTrack | null>
+    response: Response<PlayingJSONTrack | null>
   ) => void;
   /** Response to the get queue request. */
-  "player:getQueueRequest": (queue: Response<JSONTrack[]>) => void;
+  "player:getQueueRequest": (response: Response<void>) => void;
   /** Response to the play track request. */
-  "player:playTrackRequest": (trackId: string) => Response<void>;
+  "player:playTrackRequest": (response: Response<void>) => void;
   /** Response to the set volume request. */
-  "player:setVolumeRequest": (volume: number) => Response<void>;
+  "player:setVolumeRequest": (response: Response<void>) => void;
   /** Response to the seek to request. */
-  "player:seekToRequest": (position: number) => Response<void>;
+  "player:seekToRequest": (response: Response<void>) => void;
   /** Response to the play request. */
-  "player:playRequest": () => Response<void>;
+  "player:playRequest": (response: Response<void>) => void;
   /** Response to the pause request. */
-  "player:pauseRequest": () => Response<void>;
+  "player:pauseRequest": (response: Response<void>) => void;
   /** Response to the skip request. */
-  "player:skipRequest": () => Response<void>;
+  "player:skipRequest": (response: Response<void>) => void;
   /** Response to the previous track request. */
-  "player:previousRequest": () => Response<void>;
+  "player:previousRequest": (response: Response<void>) => void;
 }
 
 /**
