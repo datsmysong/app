@@ -42,6 +42,9 @@ export default function RoomIO(
     const hostSocket = isHostSocket ? socket : null;
     const room = await roomStorage.roomFromUuid(activeRoomId, hostSocket);
 
+    // Fetch participant of room at every connection for now
+    room?.updateParticipant();
+
     if (room === null) {
       socket.disconnect();
       return;
@@ -57,7 +60,7 @@ export default function RoomIO(
 
     socket.on("queue:add", async (params: string) => {
       await room.add(params);
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueueUpdated();
     });
 
     // We should check the origin of the request to prevent anyone that isn't the host from removing anything
@@ -70,22 +73,27 @@ export default function RoomIO(
       } else {
         await room.removeWithLink(params);
       }
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueueUpdated();
     });
 
     socket.on("queue:removeLink", async (link) => {
       await room.removeWithLink(link);
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueueUpdated();
     });
 
-    socket.on("queue:voteSkip", async (id, userId) => {
+    socket.on("queue:voteSkip", async (index, userId) => {
       console.log("config", room.getConfig());
 
-      if (id === -1) {
-        console.log("vote skip musique actuelle");
-        return;
+      const addedVote = room.addVoteSkip(index, userId); // all user are not notified of the vote skip
+      if (!addedVote) return;
+
+      const skiped = await room.verifyVoteSkip(index);
+      if (skiped === "queueTrackSkiped") sendQueueUpdated();
+      if (skiped === "actualTrackSkiped") {
+        const remote = room.getRemote();
+        if (!remote) return;
+        updatePlaybackState(socket, remote);
       }
-      room.addVoteSkip(id, userId); // all user are not notified of the vote skip
     });
 
     socket.on("player:playTrack", async (trackId) => {
@@ -157,15 +165,6 @@ export default function RoomIO(
     socket.on("player:updatePlaybackState", async (playbackState) => {
       socket.nsp.emit("player:updatePlaybackState", playbackState);
     });
-
-    socket.on(
-      "utils:search",
-      async (input: string, resultCallback: (t: JSONTrack[]) => void) => {
-        const data = await room.getStreamingService().searchTrack(input);
-
-        resultCallback(data);
-      }
-    );
   }
 
   registerHandlers();

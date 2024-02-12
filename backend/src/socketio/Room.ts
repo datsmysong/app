@@ -16,6 +16,7 @@ export default class Room {
   private remote: Remote | null = null;
   private hostSocket: Socket | null;
   private counterSkipActualTrack: string[] = [];
+  private participants: string[] = [];
 
   private constructor(
     uuid: string,
@@ -146,60 +147,74 @@ export default class Room {
     }
   }
 
+  /**
+   *
+   * @param index index of music (-1 for actual)
+   * @param userId voter id
+   * @returns true if added a vote
+   */
   addVoteSkip(index: number, userId: string) {
-    const track = this.queue[index];
-    if (!track.votes) return;
     if (index === -1) {
+      // Actual music
       if (!this.counterSkipActualTrack.includes(userId)) {
         this.counterSkipActualTrack.push(userId);
-        this.verifyVoteSkip(index);
-        return;
+        return true;
       }
       this.counterSkipActualTrack = this.counterSkipActualTrack.filter(
         (value) => value !== userId
       );
-      return;
+      return false;
     }
-    if (index >= 0 && index < this.queue.length) {
-      // If the user has already voted, we remove his vote
-      if (track.votes.includes(userId)) {
-        track.votes = track.votes.filter((value) => value !== userId);
-        return;
-      }
-      track.votes.push(userId);
+    if (index < 0 || index >= this.queue.length) return false;
+
+    const track = this.queue[index];
+    if (!track.votes) return false;
+    // If the user has already voted, we remove his vote
+    if (track.votes.includes(userId)) {
+      track.votes = track.votes.filter((value) => value !== userId);
+      return false;
     }
+
+    track.votes.push(userId);
+    return true;
   }
 
-  async verifyVoteSkip(index: number) {
-    const track = this.queue[index];
+  async verifyVoteSkip(
+    index: number
+  ): Promise<"actualTrackSkiped" | "queueTrackSkiped" | undefined> {
+    const voteTrack = this.getVoteTrack(index);
     const config = this.room.room_configurations;
-    if (!track.votes || !config) return;
 
-    const nbParticipant = await this.getParticipants();
-    if (!nbParticipant) return;
-    const voteRatePercentage = (track.votes.length / nbParticipant) * 100;
-    console.log(
-      "nbParticipant",
-      nbParticipant,
-      " verificatiron ",
-      voteRatePercentage,
-      " config ",
-      config
-    );
+    if (!voteTrack || !config) return;
+
+    const nbParticipant = this.participants.length;
+    const voteRatePercentage = (voteTrack.length / nbParticipant) * 100;
 
     if (voteRatePercentage >= config.vote_skipping_needed_percentage) {
       console.log("skip");
-      // TODO
+      if (index === -1) {
+        this.skipActualTrack();
+        return "actualTrackSkiped";
+      }
+      this.removeWithIndex(index);
+      return "queueTrackSkiped";
     }
+    return;
   }
 
-  async getParticipants() {
-    const { count } = await adminSupabase
+  getVoteTrack(index: number): string[] | undefined {
+    if (index === -1) {
+      return this.counterSkipActualTrack;
+    }
+    return this.queue[index].votes;
+  }
+
+  async updateParticipant() {
+    const { data } = await adminSupabase
       .from("room_users")
-      .select("profile_id", {
-        count: "exact",
-      })
+      .select("profile_id")
       .eq("room_id", this.uuid);
-    return count;
+    if (!data) return;
+    this.participants = data.map((value) => value.profile_id);
   }
 }
