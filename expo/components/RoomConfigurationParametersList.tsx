@@ -96,6 +96,7 @@ export default function RoomConfigurationParametersList({
 
   return (
     <View style={styles.page}>
+      <Text style={styles.title}>Paramètres de la salle</Text>
       <View style={styles.slider}>
         <Text style={styles.labelText}>
           Limite de participants <Text style={{ color: "red" }}>*</Text>
@@ -184,16 +185,26 @@ export default function RoomConfigurationParametersList({
 
 const styles = StyleSheet.create({
   page: {
-    maxWidth: 394,
+    maxWidth: 700,
+    width: "80%",
     gap: 12,
     paddingBottom: 20,
     paddingTop: 20,
+    flex: 1,
   },
-
+  title: {
+    color: "#000",
+    fontFamily: "Outfit-Regular",
+    fontSize: 24,
+    fontStyle: "normal",
+    fontWeight: "700",
+    letterSpacing: 0.48,
+    padding: 10,
+  },
   slider: {
     justifyContent: "center",
     marginLeft: 10,
-    width: 350,
+    flex: 1,
   },
 
   sliderBar: {
@@ -215,7 +226,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Bold",
     fontSize: 17,
     fontStyle: "normal",
-    maxWidth: 300,
     marginBottom: 25,
   },
 
