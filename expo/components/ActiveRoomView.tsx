@@ -89,6 +89,20 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     });
   }, [socket]);
 
+  const showDialog = () => {
+    if (isHost) {
+      return Alert.alert(
+        "Pour quitter une salle en tant qu'hôte, veuillez la supprimer."
+      );
+    }
+
+    return Confirm.confirm(
+      "Quitter la salle",
+      "Voulez-vous vraiment quitter la salle d'écoute ?",
+      leaveRoom
+    );
+  };
+
   const leaveRoom = async () => {
     if (!userProfile || !room) return;
 
@@ -115,13 +129,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 name="meeting-room"
                 size={28}
                 color="black"
-                onPress={() =>
-                  Confirm.confirm(
-                    "Quitter la salle",
-                    "Voulez-vous vraiment quitter la salle d'écoute ?",
-                    leaveRoom
-                  )
-                }
+                onPress={showDialog}
               />
             </View>
             <View style={headerStyles.buttonContainer}>
