@@ -12,7 +12,7 @@ import { Text, View } from "./Themed";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
 import { getApiUrl } from "../lib/apiUrl";
-import { getRoomHostedByUser } from "../lib/room-utils";
+import { getRoomHostedByUser, removeUserFromRoom } from "../lib/room-utils";
 import SocketIo from "../lib/socketio";
 import { ActiveRoom } from "../lib/useRoom";
 import { useUserProfile } from "../lib/userProfile";
@@ -89,8 +89,19 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     });
   }, [socket]);
 
-  const leaveRoom = () => {
-    Alert.alert("Vous avez quitté la salle :p");
+  const leaveRoom = async () => {
+    if (!userProfile || !room) return;
+
+    const { error: roomUsersError } = await removeUserFromRoom(
+      room.id,
+      userProfile
+    );
+
+    if (roomUsersError) {
+      return Alert.alert("Impossible de quitter la salle d'écoute.");
+    }
+
+    router.replace("/rooms");
   };
 
   return (
