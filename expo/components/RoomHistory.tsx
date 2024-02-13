@@ -2,11 +2,12 @@ import { User } from "@supabase/supabase-js";
 import type { ProcessedRoom } from "commons/room-types";
 import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
 import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
 import { Text, View } from "./Tamed";
+import Avatar from "./profile/Avatar";
 import H2 from "./text/H2";
 import { getApiUrl } from "../lib/apiUrl";
 import useSupabaseUser from "../lib/useSupabaseUser";
@@ -53,8 +54,6 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
         title: processedRoomData.name,
       });
     };
-    console.log("roomId", roomId);
-    console.log("user", user);
 
     if (!roomId || !user) return;
     fetchProcessedRoomData();
@@ -93,6 +92,22 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
               return <InactiveMusic key={song.name} music={song} />;
             })}
           </View>
+          <View>
+            <H2>Participants ( {processedRoom.participants.length + " "})</H2>
+            <FlatList
+              data={processedRoom.participants}
+              horizontal
+              renderItem={({ item: participant }) => (
+                <View style={styles.avatars}>
+                  <Avatar id={participant.profile.account_id} />
+                  <Text style={{ fontFamily: "Outfit-Regular" }}>
+                    {participant.profile.nickname}
+                  </Text>
+                </View>
+              )}
+              ItemSeparatorComponent={() => <View style={{ width: 10 }} />} // This will create a 10px gap between items
+            />
+          </View>
         </>
       )}
       {!processedRoom && !error && <Text>Chargement...</Text>}
@@ -125,6 +140,12 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  avatars: {
+    width: 80,
+    alignItems: "center",
+    gap: 4,
+    marginVertical: 8,
   },
 });
 
