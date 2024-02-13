@@ -1,6 +1,6 @@
 import Slider from "@react-native-community/slider";
 import { Image } from "expo-image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ImageURISource, StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";
@@ -32,16 +32,19 @@ export default function CustomSlider({
 }: ParametersListProps) {
   const sliderPolygon = require("../assets/images/SliderPolygon.svg");
 
+  const [width, setWidth] = useState<number>(0);
+
   return (
-    <View>
+    <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
       <Text
         style={[
           styles.thumbLabel,
           {
             left:
               (value - minimumValue) *
-                ((350 - 20) / Math.floor(maximumValue - minimumValue)) -
+                ((width - 20) / Math.floor(maximumValue - minimumValue)) -
               6,
+            top: 0,
           },
         ]}
       >
@@ -54,13 +57,13 @@ export default function CustomSlider({
           {
             left:
               (value - minimumValue) *
-                ((350 - 20) / Math.floor(maximumValue - minimumValue)) +
+                ((width - 20) / Math.floor(maximumValue - minimumValue)) +
               5.5,
           },
         ]}
       />
       <Slider
-        style={styles.sliderBar}
+        style={[styles.sliderBar, { width }]}
         maximumValue={maximumValue}
         minimumValue={minimumValue}
         maximumTrackTintColor={maximumTrackTintColor}
@@ -83,7 +86,6 @@ export default function CustomSlider({
 const styles = StyleSheet.create({
   slider: {
     justifyContent: "center",
-    width: 350,
   },
 
   sliderBar: {
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Bold",
     fontSize: 17,
     fontStyle: "normal",
-    maxWidth: 300,
+    // maxWidth: 300,
     marginBottom: 25,
   },
 
