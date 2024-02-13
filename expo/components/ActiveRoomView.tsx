@@ -73,6 +73,14 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   }, [userProfile, room]);
 
   useEffect(() => {
+    if (liveRoom && liveRoom.voteSkipActualTrack && userProfile) {
+      setVoteSkipActualTrack(
+        liveRoom.voteSkipActualTrack.includes(userProfile.user_profile_id)
+      );
+    }
+  }, [liveRoom]);
+
+  useEffect(() => {
     if (!socket) return;
     socket.emit("queue:get", (data: RoomJSON) => {
       setLiveRoom(data);

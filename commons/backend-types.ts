@@ -17,4 +17,5 @@ export interface RoomJSON {
   currentlyPlaying: PlayingJSONTrack | null;
   currentActiveRoom: string;
   queue: JSONTrack[];
+  voteSkipActualTrack: string[];
 }

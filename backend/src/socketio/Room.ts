@@ -15,7 +15,7 @@ export default class Room {
   private readonly room: RoomWithConfigDatabase;
   private remote: Remote | null = null;
   private hostSocket: Socket | null;
-  private counterSkipActualTrack: string[] = [];
+  private voteSkipActualTrack: string[] = [];
   private participants: string[] = [];
 
   private constructor(
@@ -32,6 +32,7 @@ export default class Room {
     this.trackFactory = new TrackFactory();
     this.trackFactory.register(this.streamingService);
     this.hostSocket = hostSocket;
+    this.updateParticipant();
   }
 
   static async getOrCreate(
@@ -68,6 +69,7 @@ export default class Room {
         currentActiveRoom: room.uuid,
         queue: room.getQueue(),
         currentlyPlaying: null,
+        voteSkipActualTrack: room.voteSkipActualTrack,
       };
     } else {
       return {
@@ -156,11 +158,11 @@ export default class Room {
   addVoteSkip(index: number, userId: string) {
     if (index === -1) {
       // Actual music
-      if (!this.counterSkipActualTrack.includes(userId)) {
-        this.counterSkipActualTrack.push(userId);
+      if (!this.voteSkipActualTrack.includes(userId)) {
+        this.voteSkipActualTrack.push(userId);
         return true;
       }
-      this.counterSkipActualTrack = this.counterSkipActualTrack.filter(
+      this.voteSkipActualTrack = this.voteSkipActualTrack.filter(
         (value) => value !== userId
       );
       return false;
@@ -179,6 +181,11 @@ export default class Room {
     return true;
   }
 
+  /**
+   *
+   * @param index index of music (-1 for actual)
+   * @returns  "actualTrackSkiped" | "queueTrackSkiped" | undefined if the track not skiped
+   */
   async verifyVoteSkip(
     index: number
   ): Promise<"actualTrackSkiped" | "queueTrackSkiped" | undefined> {
@@ -204,7 +211,7 @@ export default class Room {
 
   getVoteTrack(index: number): string[] | undefined {
     if (index === -1) {
-      return this.counterSkipActualTrack;
+      return this.voteSkipActualTrack;
     }
     return this.queue[index].votes;
   }

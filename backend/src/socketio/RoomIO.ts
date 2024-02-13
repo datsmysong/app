@@ -82,8 +82,6 @@ export default function RoomIO(
     });
 
     socket.on("queue:voteSkip", async (index, userId) => {
-      console.log("config", room.getConfig());
-
       const addedVote = room.addVoteSkip(index, userId); // all user are not notified of the vote skip
       if (!addedVote) return;
 
