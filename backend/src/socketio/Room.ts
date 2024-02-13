@@ -1,4 +1,4 @@
-import { JSONTrack, RoomJSON } from "commons/backend-types";
+import { JSONTrack, PlayingJSONTrack, RoomJSON } from "commons/backend-types";
 import { Socket } from "socket.io";
 import RoomStorage from "../RoomStorage";
 import MusicPlatform from "../musicplatform/MusicPlatform";
@@ -17,6 +17,8 @@ export default class Room {
   private hostSocket: Socket | null;
   private voteSkipActualTrack: string[] = [];
   private participants: string[] = [];
+  private playbackState: PlayingJSONTrack | null = null;
+  private previousPlaybackState: typeof this.playbackState = this.playbackState;
 
   private constructor(
     uuid: string,
@@ -228,5 +230,18 @@ export default class Room {
       .eq("room_id", this.uuid);
     if (!data) return;
     this.participants = data.map((value) => value.profile_id);
+  }
+
+  setPlaybackState(newPlaybackState: typeof this.playbackState) {
+    this.previousPlaybackState = this.playbackState;
+    this.playbackState = newPlaybackState;
+  }
+
+  getPlaybackState(): typeof this.playbackState {
+    return this.playbackState;
+  }
+
+  getPreviousPlaybackState(): typeof this.previousPlaybackState {
+    return this.previousPlaybackState;
   }
 }
