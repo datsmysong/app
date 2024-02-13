@@ -6,6 +6,7 @@ import { Socket } from "socket.io";
 import RoomStorage from "../RoomStorage";
 import Remote from "../musicplatform/remotes/Remote";
 import Room from "./Room";
+import { JSONTrack } from "commons/backend-types";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
@@ -25,7 +26,7 @@ export default function RoomIO(
   //     return
   // }
 
-  // remove first element which contains the whole tested string, then get the first group (surround with parenthesis)
+  // remove a first element which contains the whole tested string, then get the first group (surround with parenthesis)
 
   const rawUrlMatchGroups = pattern.exec(roomSocket.name);
   if (rawUrlMatchGroups === null) {
@@ -147,6 +148,15 @@ export default function RoomIO(
     socket.on("player:updatePlaybackState", async (playbackState) => {
       socket.nsp.emit("player:updatePlaybackState", playbackState);
     });
+
+    socket.on(
+      "utils:search",
+      async (input: string, resultCallback: (t: JSONTrack[]) => void) => {
+        const data = await room.getStreamingService().searchTrack(input);
+
+        resultCallback(data);
+      }
+    );
   }
 
   registerHandlers();
