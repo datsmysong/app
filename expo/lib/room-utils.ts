@@ -88,18 +88,3 @@ export async function getRoomHostedByUser(
   if (!room) return { data: null };
   return { data: room };
 }
-
-export async function removeUserFromRoom(
-  roomId: string,
-  userProfile: UserProfile | null
-): Promise<{ error: string | PostgrestError | null }> {
-  if (!userProfile) return { error: "Unauthorized" };
-
-  const { error: roomUsersError } = await supabase
-    .from("room_users")
-    .update({ has_left: true })
-    .eq("room_id", roomId)
-    .eq("profile_id", userProfile.user_profile_id);
-
-  return { error: roomUsersError };
-}

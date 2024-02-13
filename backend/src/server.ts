@@ -23,6 +23,7 @@ import RoomEndGET from "./route/RoomEndGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
 import { Database } from "commons/database-types";
+import RoomLeaveGET from "./route/RoomLeaveGET";
 
 config({ path: ".env.local" });
 
@@ -157,6 +158,8 @@ server.post<{
 }>("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
 server.get("/room/:id", RoomIdGET);
+
+server.get("/room/:id/leave", RoomLeaveGET);
 
 server.get("/room/:id/end", RoomEndGET);
 
