@@ -3,11 +3,11 @@ import { RoomJSON } from "commons/Backend-types";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Platform, StyleSheet } from "react-native";
-import Dialog from "react-native-dialog";
 import { Socket } from "socket.io-client";
 
 import Alert from "./Alert";
 import Button from "./Button";
+import Confirm from "./Confirm";
 import { Text, View } from "./Themed";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
@@ -48,12 +48,10 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket>();
-  const [showDialog, setShowDialog] = useState<boolean>(false);
 
   const userProfile = useUserProfile();
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
-  const isOnMobile = Platform.OS !== "web";
 
   const deleteRoom = async () => {
     const response = await fetch(url + "/end", { credentials: "include" });
@@ -92,7 +90,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   }, [socket]);
 
   const leaveRoom = () => {
-    setShowDialog(false);
     Alert.alert("Vous avez quitté la salle :p");
   };
 
@@ -107,7 +104,13 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 name="meeting-room"
                 size={28}
                 color="black"
-                onPress={() => setShowDialog(true)}
+                onPress={() =>
+                  Confirm.confirm(
+                    "Quitter la salle",
+                    "Voulez-vous vraiment quitter la salle d'écoute ?",
+                    leaveRoom
+                  )
+                }
               />
             </View>
             <View style={headerStyles.buttonContainer}>
@@ -149,16 +152,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           >
             Ajouter une musique
           </Button>
-          {isOnMobile && (
-            <Dialog.Container visible={showDialog}>
-              <Dialog.Title>Quitter la salle</Dialog.Title>
-              <Dialog.Description>
-                Voulez-vous vraiment quitter la salle d'écoute ?
-              </Dialog.Description>
-              <Dialog.Button label="Non" onPress={() => setShowDialog(false)} />
-              <Dialog.Button label="Oui" onPress={leaveRoom} />
-            </Dialog.Container>
-          )}
         </>
       )}
     </>
