@@ -1,8 +1,10 @@
 import { Alert as ReactNativeAlert, Platform } from "react-native";
 
 function alert(content: string) {
-  Platform.OS === "web"
-    ? window.alert(content)
-    : ReactNativeAlert.alert(content);
+  if (Platform.OS === "web") {
+    return window.alert(content);
+  } else {
+    return ReactNativeAlert.alert(content);
+  }
 }
 export default { alert };
