@@ -15,9 +15,7 @@ export type InactiveRoomMusic = MusicMetadata & {
 };
 
 export type Participant = {
-  profile: Profile & {
-    userProfile?: UserProfile;
-  };
+  profile: Profile & UserProfile;
   joinedAt: string;
   roomId: string;
   banned: boolean;
