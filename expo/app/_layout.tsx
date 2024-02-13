@@ -1,12 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import * as Linking from "expo-linking";
 import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 
 import { Text } from "../components/Themed";
-import { createSessionFromUrl } from "../lib/authMethod";
 import { supabase } from "../lib/supabase";
 
 export const unstable_settings = {
@@ -56,12 +54,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  // const url = Linking.getInitialURL();
-
-  // url.then(async (url) => {
-  // if (url) createSessionFromUrl(url);
-  // });
-
   return (
     <MenuProvider>
       <Stack>
