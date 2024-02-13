@@ -1,21 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { NavigationState } from "@react-navigation/native";
-import { User } from "@supabase/supabase-js";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
-import {
-  SplashScreen,
-  Stack,
-  router,
-  useRootNavigationState,
-} from "expo-router";
+import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 
-import Alert from "../components/Alert";
+import { Text } from "../components/Themed";
 import { createSessionFromUrl } from "../lib/authMethod";
 import { supabase } from "../lib/supabase";
-import { useSupabaseUserHook } from "../lib/useSupabaseUser";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -24,11 +16,7 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-const requiredAuthPaths = ["(tabs)"];
-const authRoutes = ["auth"];
-
 export default function RootLayout() {
-  const user = useSupabaseUserHook();
   const [loaded, error] = useFonts({
     "Outfit-Thin": require("../assets/fonts/outfit/Outfit-Thin.ttf"),
     "Outfit-ExtraLight": require("../assets/fonts/outfit/Outfit-ExtraLight.ttf"),
@@ -47,16 +35,9 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  const rootNavigation = useRootNavigationState();
-
   useEffect(() => {
     if (loaded) {
-      enforceRouteAccessControl(
-        rootNavigation.routes[rootNavigation.routes.length - 1].name,
-        user
-      ).then(() => {
-        SplashScreen.hideAsync();
-      });
+      SplashScreen.hideAsync();
 
       supabase.auth.onAuthStateChange((_event, session) => {
         // user session is automatically refresh, but middlewares are called only on page refresh/change
@@ -68,50 +49,22 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Text>Loading..</Text>;
   }
 
   return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
-  const user = useSupabaseUserHook();
-  const url = Linking.getInitialURL();
+  // const url = Linking.getInitialURL();
 
-  url.then(async (url) => {
-    if (url) createSessionFromUrl(url);
-  });
+  // url.then(async (url) => {
+  // if (url) createSessionFromUrl(url);
+  // });
 
   return (
     <MenuProvider>
-      <Stack
-        screenListeners={(navigation) => ({
-          state: async (e) => {
-            if (!e.data) return;
-            const state = (e.data as { state: NavigationState }).state;
-            const currentPage = state.routes[state.routes.length - 1];
-            url.then(async (url) => {
-              if (!url) return;
-              if (user)
-                return enforceRouteAccessControl(currentPage.name, user);
-
-              const refresh_token = url.split("#refresh_token=")[1];
-              if (!refresh_token)
-                return enforceRouteAccessControl(currentPage.name, user);
-              const { error } = await supabase.auth.refreshSession({
-                refresh_token,
-              });
-              if (!error) {
-                return navigation.navigation.navigate("(tabs)");
-              }
-              Alert.alert(
-                "Une erreur est survenue, impossible de refresh la session"
-              );
-              return router.replace("/auth");
-            });
-          },
-        })}
-      >
+      <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="auth" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
@@ -120,15 +73,3 @@ function RootLayoutNav() {
     </MenuProvider>
   );
 }
-
-const enforceRouteAccessControl = async (
-  currentRoute: string,
-  user: User | null
-) => {
-  if (requiredAuthPaths.includes(currentRoute) && !user) {
-    router.replace("/auth");
-  }
-  if (authRoutes.includes(currentRoute) && user) {
-    router.replace("/(tabs)");
-  }
-};

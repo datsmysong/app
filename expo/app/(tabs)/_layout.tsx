@@ -1,8 +1,9 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { useColorScheme } from "react-native";
 
 import { Text } from "../../components/Tamed";
+import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -34,6 +35,12 @@ function TabBarLabel(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  const user = useSupabaseUserHook();
+
+  if (user === undefined) return <Text>Loading..</Text>;
+
+  if (!user) return <Redirect href="/auth/" />;
 
   return (
     <Tabs

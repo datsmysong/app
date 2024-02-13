@@ -13,10 +13,10 @@ export default async function useSupabaseUser() {
 }
 
 // create real hook
-export function useSupabaseUserHook(): User | null {
-  const [user, setUser] = useState<User | null>(null);
+export function useSupabaseUserHook(): User | null | undefined {
+  const [user, setUser] = useState<User | null | undefined>(undefined);
 
-  const prevUserRef = useRef<User | null>(null);
+  const prevUserRef = useRef<User | null | undefined>(undefined);
 
   useEffect(() => {
     prevUserRef.current = user;

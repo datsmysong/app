@@ -1,6 +1,14 @@
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
+
+import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
 export default function TabLayout() {
+  const user = useSupabaseUserHook();
+
+  if (user === undefined) return null;
+
+  if (user) return <Redirect href="/(tabs)/" />;
+
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
