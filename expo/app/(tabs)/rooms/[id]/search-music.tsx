@@ -1,60 +1,28 @@
 import { JSONTrack } from "commons/backend-types";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import CustomTextInput from "../../../../components/CustomTextInput";
+import { Text } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
 import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
 import SocketIo from "../../../../lib/socketio";
 import { useDebounce } from "../../../../lib/useDebounce";
 
-const mockTracks: JSONTrack[] = [
-  {
-    title: "Le titre",
-    artistsName: "Les artistes",
-    albumName: "L'album",
-    imgUrl: "https://i.scdn.co/image/ab67616d00001e02fea24c51add2ba6e1f4af25a",
-    url: "http1s",
-    duration: 120,
-  },
-  {
-    title: "Le titre",
-    artistsName: "Les artistes",
-    albumName: "L'album",
-    imgUrl: "https://i.scdn.co/image/ab67616d00001e02fea24c51add2ba6e1f4af25a",
-    url: "http2s",
-    duration: 120,
-  },
-  {
-    title: "Le titre",
-    artistsName: "Les artistes",
-    albumName: "L'album",
-    imgUrl: "https://i.scdn.co/image/ab67616d00001e02fea24c51add2ba6e1f4af25a",
-    url: "http3s",
-    duration: 120,
-  },
-  {
-    title: "Le titre",
-    artistsName: "Les artistes",
-    albumName: "L'album",
-    imgUrl: "https://i.scdn.co/image/ab67616d00001e02fea24c51add2ba6e1f4af25a",
-    url: "http4s",
-    duration: 120,
-  },
-];
-
 export default function AddTrack() {
   const { id } = useLocalSearchParams() as { id: string };
 
-  const [value, setValue] = useState("");
+  const [searchBar, setSearchBar] = useState("");
   const [result, setResult] = useState<JSONTrack[]>([]);
 
-  const debouncedSearchMusic = useDebounce(value, 1000);
+  const debouncedSearchMusic = useDebounce(searchBar, 670);
 
   useEffect(() => {
     if (debouncedSearchMusic) searchMusic();
   }, [debouncedSearchMusic]);
+
+  const socket = SocketIo.getInstance().getSocket(`/room/${id}`);
 
   const addMusic = (value: string) => {
     SocketIo.getInstance()
@@ -65,12 +33,9 @@ export default function AddTrack() {
   };
 
   const searchMusic = () => {
-    console.log("Seach ", value);
-    setResult(mockTracks);
-
-    // SocketIo.getInstance()
-    //   .getSocket(`/room/${id}`)
-    //   .emit("utils:search", value, (result: JSONTrack[]) => setResult(result));
+    socket.emit("utils:search", searchBar, (result: JSONTrack[]) =>
+      setResult(result)
+    );
   };
 
   return (
@@ -78,27 +43,33 @@ export default function AddTrack() {
       style={{
         paddingHorizontal: 24,
         paddingTop: 24,
+        flex: 1,
+        flexDirection: "column",
       }}
     >
       <CustomTextInput
-        onChangeText={setValue}
+        onChangeText={setSearchBar}
         placeholder="Rechercher"
         onSubmitEditing={searchMusic}
         style={{ marginBottom: 24 }}
       />
-      {value ? (
-        <FlatList
-          data={result}
-          renderItem={({ item }) => (
-            <SearchedTrackItem
-              track={item}
-              handleAddMusic={() => {
-                addMusic(item.url);
-              }}
-            />
-          )}
-          keyExtractor={(item) => item.url}
-        />
+      {searchBar ? (
+        result.length === 0 ? (
+          <Text>Loading...</Text>
+        ) : (
+          <FlatList
+            data={result}
+            renderItem={({ item }) => (
+              <SearchedTrackItem
+                track={item}
+                handleAddMusic={() => {
+                  addMusic(item.url);
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.url}
+          />
+        )
       ) : (
         <Library />
       )}

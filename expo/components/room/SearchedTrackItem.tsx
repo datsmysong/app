@@ -12,15 +12,15 @@ export default function SearchedTrackItem({
   handleAddMusic: () => void;
 }) {
   return (
-    <MinimalistTrackItem
-      title={track.title}
-      artistsName={track.artistsName}
-      imgUrl={track.imgUrl}
-    >
-      <Pressable onPress={handleAddMusic}>
+    <Pressable onPress={handleAddMusic}>
+      <MinimalistTrackItem
+        title={track.title}
+        artistsName={track.artistsName}
+        imgUrl={track.imgUrl}
+      >
         <MaterialIcons name="add" style={itemStyles.icon} />
-      </Pressable>
-    </MinimalistTrackItem>
+      </MinimalistTrackItem>
+    </Pressable>
   );
 }
 
