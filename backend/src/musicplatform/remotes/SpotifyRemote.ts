@@ -80,6 +80,7 @@ export default class SpotifyRemote extends Remote {
         imgUrl: playbackState.item.album.images[0].url,
         title: playbackState.item.name,
         url: playbackState.item.external_urls.spotify,
+        updated_at: Date.now(),
       },
       error: null,
     };
@@ -168,6 +169,11 @@ export default class SpotifyRemote extends Remote {
     }
 
     await this.spotifyClient.player.skipToNext(state.device.id);
+    return { data: undefined, error: null };
+  }
+
+  async addToQueue(trackId: string): Promise<Response<void>> {
+    await this.spotifyClient.player.addItemToPlaybackQueue(trackId);
     return { data: undefined, error: null };
   }
 }
