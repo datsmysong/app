@@ -33,4 +33,8 @@ export interface ClientToServerEvents {
     playbackState: PlayingJSONTrack | null
   ) => void;
   "player:getPlaybackState": () => void;
+  "utils:search": (
+    text: string,
+    resultCallback: (args: JSONTrack[]) => void
+  ) => void;
 }

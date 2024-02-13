@@ -5,6 +5,7 @@ import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
 import SpotifyRemote from "./remotes/SpotifyRemote";
 import Room from "../socketio/Room";
+import { Track } from "@spotify/web-api-ts-sdk";
 
 export default class Spotify extends MusicPlatform {
   constructor() {
@@ -21,6 +22,10 @@ export default class Spotify extends MusicPlatform {
       return null;
     }
 
+    return this.toJSON(data);
+  }
+
+  toJSON(data: Track) {
     const image = data.album.images.reduce((acc, current) => {
       return current.width < acc.width && current.width >= 46 ? current : acc;
     });
@@ -47,5 +52,11 @@ export default class Spotify extends MusicPlatform {
     musicPlatform: MusicPlatform
   ): Promise<Remote | null> {
     return await SpotifyRemote.createRemote(room, this);
+  }
+
+  async searchTrack(text: string): Promise<JSONTrack[]> {
+    const rawSearch = await spotify.search(text, ["track"]);
+
+    return rawSearch.tracks.items.map((rawTracks) => this.toJSON(rawTracks));
   }
 }

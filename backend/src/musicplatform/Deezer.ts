@@ -24,4 +24,12 @@ export default class Deezer extends MusicPlatform {
   isClientSide(): boolean {
     return false;
   }
+
+  searchTrack(text: string): Promise<JSONTrack[]> {
+    return Promise.resolve([]);
+  }
+
+  toJSON(rawTracks: never): JSONTrack {
+    throw new Error("Deezer.toJSON()");
+  }
 }
