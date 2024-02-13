@@ -63,11 +63,11 @@ export default class SoundCloudRemote extends Remote {
   }
 
   async setVolume(volume: number): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:setVolumeRequest", { volume });
+    return this.emitAndListen<void>("player:setVolumeRequest", volume);
   }
 
   async seekTo(position: number): Promise<Response<void>> {
-    return this.emitAndListen<void>("player:seekToRequest", { position });
+    return this.emitAndListen<void>("player:seekToRequest", position);
   }
 
   async play(): Promise<Response<void>> {
