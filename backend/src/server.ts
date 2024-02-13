@@ -14,7 +14,6 @@ import { config } from "dotenv";
 import fastify from "fastify";
 import fastifySocketIO from "fastify-socket.io";
 import { Server } from "socket.io";
-import RoomStorage from "./RoomStorage";
 import authRoutes from "./authRoutes";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
@@ -44,7 +43,7 @@ const corsOrigin: (devValue?: string | boolean) => (string | boolean)[] = (
   return ["https://datsmysong.app", "https://api.datsmysong.app/"];
 };
 
-const server = fastify({
+export const server = fastify({
   logger: {
     transport: {
       target: "pino-pretty",
@@ -181,26 +180,6 @@ server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
 });
-
-let ignoreCount = 1;
-
-setInterval(async () => {
-  const allRooms = await RoomStorage.getRoomStorage().getRooms();
-  allRooms.forEach(async (room) => {
-    ignoreCount++;
-    if (!room.getStreamingService().isClientSide() && ignoreCount % 5 !== 0)
-      return;
-    if (!room.getStreamingService().isClientSide()) ignoreCount = 0;
-
-    const remote = room.getRemote();
-    if (!remote) return;
-
-    const playbackState = await remote.getPlaybackState();
-    server.io
-      .of(`/room/${room.uuid}`)
-      .emit("player:updatePlaybackState", playbackState);
-  });
-}, 1000);
 
 server.listen({ port: 3000, host: "0.0.0.0" });
 

@@ -3,15 +3,17 @@ import Deezer from "./musicplatform/Deezer";
 import MusicPlatform from "./musicplatform/MusicPlatform";
 import SoundCloud from "./musicplatform/SoundCloud";
 import Spotify from "./musicplatform/Spotify";
-import { adminSupabase } from "./server";
+import { adminSupabase, server } from "./server";
 import Room from "./socketio/Room";
 import { RoomWithForeignTable } from "./socketio/RoomDatabase";
+import SpotifyRemote from "./musicplatform/remotes/SpotifyRemote";
 
 const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
   SoundCloud: "c99631a2-f06c-4076-80c2-13428944c3a8",
   Deezer: "4f619f5d-4028-4724-87c4-f440df4659fe",
 };
+const MUSIC_ENDING_SOON_DELAY = 10000;
 
 function getMusicPlatform(serviceId: string): MusicPlatform | null {
   switch (serviceId) {
@@ -29,14 +31,77 @@ function getMusicPlatform(serviceId: string): MusicPlatform | null {
 export default class RoomStorage {
   private static singleton: RoomStorage;
   private readonly data: Map<string, Room>;
+  private readonly endingSoon: Map<string, boolean>;
 
   private constructor() {
     this.data = new Map();
+    this.endingSoon = new Map();
+  }
+
+  startTimer() {
+    setInterval(async () => {
+      const allRooms = await RoomStorage.getRoomStorage().getRooms();
+      allRooms.forEach(async (room) => {
+        const remote = room.getRemote();
+        if (!remote) return;
+
+        const playbackState = room.getPlaybackState();
+        // Avoid spamming REST APIs
+        if (
+          playbackState !== null &&
+          !room.getStreamingService().isClientSide()
+        ) {
+          if (Date.now() - playbackState.updated_at < 5000) return;
+        }
+
+        const newPlaybackState = await remote.getPlaybackState();
+        const music = newPlaybackState.data;
+
+        server.io
+          .of(`/room/${room.uuid}`)
+          .emit("player:updatePlaybackState", newPlaybackState);
+        room.setPlaybackState(newPlaybackState.data);
+
+        if (!music) return;
+
+        const previousPlaybackState = room.getPreviousPlaybackState();
+
+        const remainingTime = music.duration - music.currentTime;
+        const hasTriggeredEndingSoonValue = this.endingSoon.get(room.uuid);
+
+        if (
+          remainingTime < MUSIC_ENDING_SOON_DELAY &&
+          !hasTriggeredEndingSoonValue
+        ) {
+          this.endingSoon.set(room.uuid, true);
+
+          setTimeout(() => {
+            if (!newPlaybackState.data?.isPlaying) return;
+
+            const nextTrack = room.getQueue().shift();
+            if (!nextTrack) return;
+            console.log("Playing next track: ", nextTrack);
+            remote.playTrack(nextTrack.url);
+          }, remainingTime);
+        }
+        if (music.url != previousPlaybackState?.url) {
+          const nextTrack = room.getQueue().shift();
+          this.endingSoon.set(room.uuid, false);
+
+          if (remote instanceof SpotifyRemote) {
+            if (!nextTrack) return;
+
+            remote.addToQueue(nextTrack.url);
+          }
+        }
+      });
+    }, 1000);
   }
 
   static getRoomStorage(): RoomStorage {
     if (this.singleton === undefined) {
       this.singleton = new RoomStorage();
+      this.singleton.startTimer();
     }
     return this.singleton;
   }
