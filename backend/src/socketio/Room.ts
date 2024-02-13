@@ -95,7 +95,7 @@ export default class Room {
 
   async removeWithLink(rawUrl: string) {
     // try to get the uniform URL of track from lambda url
-    let trackURL = null;
+    let trackURL: string | null = null;
     const trackMetadata = this.trackFactory.fromUrl(rawUrl);
     if (trackMetadata !== null) {
       const track = await trackMetadata.toJSON();
@@ -104,13 +104,10 @@ export default class Room {
       }
     }
 
-    let track;
-    for (track of this.queue) {
-      if (trackURL !== null) {
-        if (track.url === trackURL) {
-          return await this.removeWithIndex(this.queue.indexOf(track));
-        }
-      }
+    if (!trackURL) return false;
+    const trackIndex = this.queue.findIndex((track) => track.url === trackURL);
+    if (trackIndex !== -1) {
+      return await this.removeWithIndex(trackIndex);
     }
     return false;
   }
@@ -150,14 +147,14 @@ export default class Room {
   }
 
   /**
-   *
-   * @param index index of music (-1 for actual)
-   * @param userId voter id
-   * @returns true if added a vote
+   * Add a vote to skip a track
+   * @param index index of music (-1 for actual playing track)
+   * @param userId voter uuid (It should be the user uuid automatically retrieved from the token in the future)
+   * @returns boolean : if the vote has been added or removed
    */
   addVoteSkip(index: number, userId: string) {
+    // If the index is -1, we are voting to skip the actual track
     if (index === -1) {
-      // Actual music
       if (!this.voteSkipActualTrack.includes(userId)) {
         this.voteSkipActualTrack.push(userId);
         return true;
@@ -167,22 +164,22 @@ export default class Room {
       );
       return false;
     }
+    // Range check of the index
     if (index < 0 || index >= this.queue.length) return false;
 
     const track = this.queue[index];
     if (!track.votes) return false;
-    // If the user has already voted, we remove his vote
+
     if (track.votes.includes(userId)) {
       track.votes = track.votes.filter((value) => value !== userId);
       return false;
     }
-
     track.votes.push(userId);
     return true;
   }
 
   /**
-   *
+   * Verify if the track should be skiped and skip it if needed
    * @param index index of music (-1 for actual)
    * @returns  "actualTrackSkiped" | "queueTrackSkiped" | undefined if the track not skiped
    */
@@ -193,22 +190,26 @@ export default class Room {
     const config = this.room.room_configurations;
 
     if (!voteTrack || !config) return;
+    if (!config.vote_skipping) return;
 
     const nbParticipant = this.participants.length;
     const voteRatePercentage = (voteTrack.length / nbParticipant) * 100;
 
-    if (voteRatePercentage >= config.vote_skipping_needed_percentage) {
-      console.log("skip");
-      if (index === -1) {
-        this.skipActualTrack();
-        return "actualTrackSkiped";
-      }
-      this.removeWithIndex(index);
-      return "queueTrackSkiped";
+    if (voteRatePercentage < config.vote_skipping_needed_percentage) return;
+
+    if (index === -1) {
+      this.skipActualTrack();
+      return "actualTrackSkiped";
     }
-    return;
+    this.removeWithIndex(index);
+    return "queueTrackSkiped";
   }
 
+  /**
+   * Method to get the vote track of a specific track or the actual track
+   * @param index  index of music (-1 for actual)
+   * @returns uuid string of the voters
+   */
   getVoteTrack(index: number): string[] | undefined {
     if (index === -1) {
       return this.voteSkipActualTrack;
@@ -216,6 +217,10 @@ export default class Room {
     return this.queue[index].votes;
   }
 
+  /**
+   * Fetch the participants of the room & update the participants list
+   * @returns void
+   */
   async updateParticipant() {
     const { data } = await adminSupabase
       .from("room_users")
