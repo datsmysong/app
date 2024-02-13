@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Bold",
     fontSize: 20,
     color: "white",
-    width: "100%",
   },
   text: {
     color: "white",
@@ -49,6 +48,8 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
 });
 

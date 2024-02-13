@@ -1,4 +1,4 @@
-import { FontAwesome } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { JSONTrack } from "commons/backend-types";
 import { Pressable, StyleSheet } from "react-native";
 
@@ -18,7 +18,7 @@ export default function SearchedTrackItem({
       imgUrl={track.imgUrl}
     >
       <Pressable onPress={handleAddMusic}>
-        <FontAwesome name="plus" style={itemStyles.icon} />
+        <MaterialIcons name="add" style={itemStyles.icon} />
       </Pressable>
     </MinimalistTrackItem>
   );

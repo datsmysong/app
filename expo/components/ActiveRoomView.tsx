@@ -99,7 +99,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 Inviter des amis
               </Button>
             </View>
-            <RoomPlayer socket={socket} room={room} liveRoom={liveRoom} />
+            {/* <RoomPlayer socket={socket} room={room} liveRoom={liveRoom} /> */}
             <View style={styles.container}>
               <Text style={styles.title}>
                 File d'attente ({liveRoom.queue.length})
@@ -128,7 +128,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           </Button>
           <Button
             icon="add"
-            href={`/rooms/${room.id}/searchMusic`}
+            href={`/rooms/${room.id}/search-music`}
             style={floatingStyle.container}
           >
             Ajouter une musique
@@ -156,7 +156,7 @@ const floatingStyle = StyleSheet.create({
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
-    flex: 1,
+    // flex: 1,
     marginHorizontal: 24,
     marginVertical: 14,
     gap: 10,

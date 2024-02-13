@@ -1,7 +1,7 @@
 import { JSONTrack } from "commons/backend-types";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, ScrollView } from "react-native";
+import { FlatList, ScrollView, View } from "react-native";
 
 import CustomTextInput from "../../../../components/CustomTextInput";
 import Library from "../../../../components/room/Library";
@@ -74,7 +74,7 @@ export default function AddTrack() {
   };
 
   return (
-    <ScrollView
+    <View
       style={{
         paddingHorizontal: 24,
         paddingTop: 24,
@@ -102,6 +102,6 @@ export default function AddTrack() {
       ) : (
         <Library />
       )}
-    </ScrollView>
+    </View>
   );
 }

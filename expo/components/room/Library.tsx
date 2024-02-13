@@ -27,7 +27,6 @@ const Library = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     rowGap: 8,
   },
   title: {

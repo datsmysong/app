@@ -8,8 +8,6 @@ import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import MinimalistTrackItem from "./MinimalistTrackItem";
 import SocketIo from "../../lib/socketio";
 import CustomMenuOption from "../CustomMenuOption";
-import HView from "../HView";
-import { Text, View } from "../Themed";
 
 export default function TrackItem(prop: {
   track: JSONTrack;

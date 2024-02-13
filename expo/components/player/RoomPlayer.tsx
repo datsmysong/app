@@ -7,12 +7,12 @@ import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Socket } from "socket.io-client";
 
-import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
-import { ActiveRoom } from "../../lib/useRoom";
-import Button from "../Button";
 import LocalPlayer from "./LocalPlayer";
 import Player from "./Player";
 import PlayerControls from "./PlayerControls";
+import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
+import { ActiveRoom } from "../../lib/useRoom";
+import Button from "../Button";
 
 type RoomPlayerProps = {
   room: ActiveRoom;
