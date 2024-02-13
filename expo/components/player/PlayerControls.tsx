@@ -16,6 +16,11 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
     playPause: false,
     next: false,
   });
+  const formatDuration = (durationMs: number) => {
+    const minutes = Math.floor(durationMs / 60000);
+    const seconds = Math.floor((durationMs % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   const handlePlayPause = async () => {
     if (state === null) return;
@@ -58,38 +63,56 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
     }
   };
 
+  if (!state) return <></>;
+
+  function skipTo90() {
+    if (!state) return;
+    remote.seekTo(0.9 * state.duration);
+  }
+
   return (
-    <View style={styles.controls}>
-      {state ? (
-        <>
-          <Button
-            onPress={handlePreviousTrack}
-            type="outline"
-            icon="skip-previous"
-            loading={loading.previous}
-          >
-            Previous
-          </Button>
-          <Button
-            onPress={handlePlayPause}
-            icon={state.isPlaying ? "pause" : "play-arrow"}
-            type={state.isPlaying ? "outline" : "filled"}
-            loading={loading.playPause}
-          >
-            {state.isPlaying ? "Pause" : "Play"}
-          </Button>
-          <Button
-            onPress={handleNextTrack}
-            type="outline"
-            icon="skip-next"
-            loading={loading.next}
-          >
-            Next
-          </Button>
-        </>
-      ) : (
-        <Text>Waiting for the host to play a song...</Text>
-      )}
+    <View>
+      <Button onPress={skipTo90}>Aller à 90%</Button>
+      <View style={styles.progressContainer}>
+        <Text>{formatDuration(state.currentTime)}</Text>
+        <View style={styles.progressBar}>
+          <View
+            style={[
+              styles.progress,
+              {
+                width: `${(state.currentTime / state.duration) * 100}%`,
+              },
+            ]}
+          />
+        </View>
+        <Text>{formatDuration(state.duration)}</Text>
+      </View>
+      <View style={styles.controls}>
+        <Button
+          onPress={handlePreviousTrack}
+          type="outline"
+          icon="skip-previous"
+          loading={loading.previous}
+        >
+          Previous
+        </Button>
+        <Button
+          onPress={handlePlayPause}
+          icon={state.isPlaying ? "pause" : "play-arrow"}
+          type={state.isPlaying ? "outline" : "filled"}
+          loading={loading.playPause}
+        >
+          {state.isPlaying ? "Pause" : "Play"}
+        </Button>
+        <Button
+          onPress={handleNextTrack}
+          type="outline"
+          icon="skip-next"
+          loading={loading.next}
+        >
+          Next
+        </Button>
+      </View>
     </View>
   );
 };
@@ -100,6 +123,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 3,
+  },
+  progressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  progressBar: {
+    flex: 1,
+    height: 4,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 9999,
+  },
+  progress: {
+    height: "100%",
+    backgroundColor: "#000000",
+    borderRadius: 9999,
+    transition: "all 1s linear",
   },
 });
 

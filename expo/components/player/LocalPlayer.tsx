@@ -23,8 +23,6 @@ const LocalPlayer = forwardRef<LocalPlayerRemote | null, LocalPlayerProps>(
 
     useEffect(() => {
       const remote = soundCloudRef.current;
-      console.log("soundCloudRef loaded!", remote);
-
       setRemote(remote);
     }, [soundCloudRef]);
 
@@ -39,13 +37,6 @@ const LocalPlayer = forwardRef<LocalPlayerRemote | null, LocalPlayerProps>(
       };
 
       const playTrackRequest = async (trackId: string) => {
-        console.log(
-          "received request to play track with id",
-          trackId,
-          ", here's the current remote: ",
-          remote
-        );
-
         if (!remote) return noLocalRemote("player:playTrackRequest", socket);
 
         const response = await remote.playTrack(trackId);
