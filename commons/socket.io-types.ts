@@ -15,7 +15,6 @@ export interface ServerToClientEvents {
   "player:skip": () => void;
   "player:previous": () => void;
   "room:end": () => void;
-  "room:leave": () => void;
 }
 
 export interface ClientToServerEvents {

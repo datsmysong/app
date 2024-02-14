@@ -106,10 +106,15 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const leaveRoom = async () => {
     if (!userProfile || !room) return;
 
+    console.log("Sending request to URL:", url + "/leave");
     const response = await fetch(url + "/leave", { credentials: "include" });
-    if (!response.ok && process.env.NODE_ENV !== "production") {
-      Alert.alert(await response.text());
+    console.log("The response has arrived");
+    if (!response.ok) {
+      return Alert.alert(await response.text());
     }
+
+    if (!socket) return Alert.alert("Impossible de trouver le socket.");
+    socket.disconnect();
 
     router.replace("/rooms");
   };
