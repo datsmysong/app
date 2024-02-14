@@ -1,9 +1,11 @@
 import { RoomConfiguration } from "commons/database-types-utils";
 import Checkbox from "expo-checkbox";
+import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Alert from "./Alert";
+import Button from "./Button";
 import CustomSlider from "./CustomSlider";
 import CustomTextInput from "./CustomTextInput";
 import { Text, View } from "./Themed";
@@ -81,18 +83,10 @@ export default function RoomConfigurationParametersList({
       Alert.alert(
         "Une erreur est survenue lors de la sauvegarde des paramètres"
       );
+      return;
     }
+    router.back();
   };
-  // Only for canSkip checkbox
-  useEffect(() => {
-    // Using this because the first time the component is mounted, it will trigger otherwise
-    if (didMountRef.current) {
-      handleSave();
-    } else {
-      didMountRef.current = true;
-    }
-    // canBeAnonymous is not on the table room_configuration
-  }, [canSkip]);
 
   return (
     <View style={styles.page}>
@@ -151,7 +145,6 @@ export default function RoomConfigurationParametersList({
           value={sliderPercentageValue}
           setValue={(value) => setSliderPercentageValue(value)}
           step={5}
-          onSlidingComplete={handleSave}
           disabled={!canSkip}
         />
       </View>
@@ -163,7 +156,6 @@ export default function RoomConfigurationParametersList({
         <CustomTextInput
           value={maxMusicDuration}
           onChangeText={setMaxMusicDuration}
-          onSubmitEditing={handleSave}
           style={styles.input}
         />
       </View>
@@ -175,10 +167,17 @@ export default function RoomConfigurationParametersList({
         <CustomTextInput
           value={maxMusicPerUser}
           onChangeText={setMaxMusicPerUser}
-          onSubmitEditing={handleSave}
           style={styles.input}
         />
       </View>
+      <Button
+        type="filled"
+        onPress={handleSave}
+        style={{ alignSelf: "center" }}
+      >
+        {" "}
+        Sauvegarder{" "}
+      </Button>
     </View>
   );
 }
