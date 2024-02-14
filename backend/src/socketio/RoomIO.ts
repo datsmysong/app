@@ -63,6 +63,22 @@ export default function RoomIO(
       sendQueueUpdated();
     });
 
+    socket.on("queue:add", async (rawUrl: string) => {
+      const queue = room.getQueue();
+      // If the queue is currently empty, we can play the track immediately
+      if (queue.length === 0) {
+        const remote = room.getRemote();
+        if (remote === null) return;
+        const response = await remote.playTrack(rawUrl);
+        if (!response.error) await updatePlaybackState(socket, remote);
+        return;
+      }
+
+      // Otherwise, we just add the track to the queue
+      await room.add(rawUrl);
+      roomSocket.emit("queue:update", Room.toJSON(room));
+    });
+
     // We should check the origin of the request to prevent anyone that isn't the host from removing anything
     socket.on("queue:remove", async (index: number) => {
       if (Number.isSafeInteger(index)) {

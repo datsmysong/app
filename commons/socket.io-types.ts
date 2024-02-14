@@ -82,6 +82,8 @@ export interface ClientToServerEvents
   "queue:remove": (index: number) => void;
   /** Remove a track from the queue by its link. */
   "queue:removeLink": (link: string) => void;
+  // we found a better way to get the user id
+  "queue:voteSkip": (index: number, userid: string) => void;
   /** Search for tracks. */
   "utils:search": (
     text: string,
