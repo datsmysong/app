@@ -91,21 +91,19 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
             {processedRoom.playedSongs.map((song) => {
               return <InactiveMusic key={song.name} music={song} />;
             })}
-          </View>
-          <View>
-            <H2>Participants ( {processedRoom.participants.length + " "})</H2>
+            <H2>Participants ({processedRoom.participants.length + ""})</H2>
             <FlatList
               data={processedRoom.participants}
               horizontal
               renderItem={({ item: participant }) => (
                 <View style={styles.avatars}>
-                  <Avatar id={participant.profile.account_id} />
-                  <Text style={{ fontFamily: "Outfit-Regular" }}>
+                  <Avatar id={participant.profile.userProfile?.account_id} />
+                  <Text style={{ fontFamily: "Outfit-Medium" }}>
                     {participant.profile.nickname}
                   </Text>
                 </View>
               )}
-              ItemSeparatorComponent={() => <View style={{ width: 10 }} />} // This will create a 10px gap between items
+              ItemSeparatorComponent={() => <View style={{ width: 25 }} />} // This will create a 25px gap between items
             />
           </View>
         </>
@@ -142,10 +140,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   avatars: {
-    width: 80,
+    width: 90,
+    maxWidth: 200,
     alignItems: "center",
     gap: 4,
-    marginVertical: 8,
+    marginVertical: 20,
   },
 });
 
