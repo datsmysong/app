@@ -6,6 +6,7 @@ import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { Text, View } from "./Themed";
 import { getApiUrl } from "../lib/apiUrl";
+import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
 
 type RoomUserAndRoom = { rooms: Room } & RoomUser;
@@ -26,15 +27,23 @@ export default function UserRoomHistory() {
       }
       const userId = user.user_profile_id;
 
-      const history = await fetch(baseUrl + "/user/room/history/" + userId);
-      const historyJson = await history.json();
+      const { error, data } = await supabase
+        .from("room_users")
+        .select("*, rooms(*)")
+        .eq("profile_id", userId)
+        .order("rooms(created_at)", { ascending: false })
+        .limit(5);
 
-      if (historyJson.error) {
+      if (error) {
         Alert.alert("Erreur lors de la récupération des salles d'écoute");
-        return;
       }
 
-      setRoomUser(historyJson);
+      const history: RoomUserAndRoom[] =
+        (data?.filter((roomUser) => {
+          return roomUser.rooms?.is_active === false;
+        }) as RoomUserAndRoom[]) ?? [];
+
+      setRoomUser(history);
       setLoading(false);
     })();
   }, []);
