@@ -65,8 +65,9 @@ export default function RoomIO(
 
     socket.on("queue:add", async (rawUrl: string) => {
       const queue = room.getQueue();
+      const playbackState = room.getPlaybackState();
       // If the queue is currently empty, we can play the track immediately
-      if (queue.length === 0) {
+      if (queue.length === 0 && playbackState === null) {
         const remote = room.getRemote();
         if (remote === null) return;
         const response = await remote.playTrack(rawUrl);
