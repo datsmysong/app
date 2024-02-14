@@ -114,7 +114,7 @@ function getParticipants(
           id: participantProfile.id,
           nickname: participantProfile.nickname,
           created_at: participantProfile.created_at,
-          ...participantProfile.user_profile,
+          userProfile: participantProfile.user_profile,
         },
         joinedAt: participant.joined_at,
         roomId: participant.room_id,
@@ -173,10 +173,13 @@ const useProcessRoom = (
 
   const genresPlayCount = playedSongs
     .map((song) => song.genre)
-    .reduce((acc, genre) => {
-      acc[genre] = acc[genre] ? acc[genre] + 1 : 1;
-      return acc;
-    }, {} as Record<string, number>);
+    .reduce(
+      (acc, genre) => {
+        acc[genre] = acc[genre] ? acc[genre] + 1 : 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   const mostPlayedGenre = Object.entries(genresPlayCount).reduce(
     (acc, [genre, count]) => {
       if (count > acc.count) {
