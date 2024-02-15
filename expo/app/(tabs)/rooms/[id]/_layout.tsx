@@ -32,7 +32,8 @@ const WebSocketProvider = ({
     console.log("Socket connecté");
 
     return () => {
-      if (webSocket) webSocket.disconnect();
+      socketInstance.disconnect();
+      console.log("Socket déconnecté");
     };
   }, [roomId]);
 

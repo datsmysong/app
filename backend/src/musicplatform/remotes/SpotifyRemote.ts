@@ -49,37 +49,41 @@ export default class SpotifyRemote extends Remote {
         token_type: "Bearer",
       }
     );
-
     return new SpotifyRemote(spotifyClient, musicPlatform);
   }
 
   async getPlaybackState(): Promise<PlayingJSONTrack | null> {
-    const spotifyPlaybackState =
-      await this.spotifyClient.player.getPlaybackState();
+    try {
+      const spotifyPlaybackState =
+        await this.spotifyClient.player.getPlaybackState();
 
-    // If the item playing is an episode and not a music track, then we return null
-    // Since we don't need support for those, for now, and they don't contain necessary information
-    // such as the album name, artists name, etc.
-    if (spotifyPlaybackState === null) return null;
+      // If the item playing is an episode and not a music track, then we return null
+      // Since we don't need support for those, for now, and they don't contain necessary information
+      // such as the album name, artists name, etc.
+      if (spotifyPlaybackState === null) return null;
 
-    if (spotifyPlaybackState.item.type === "episode") return null;
-    const playbackState = {
-      ...spotifyPlaybackState,
-      item: spotifyPlaybackState.item as Track,
-    };
+      if (spotifyPlaybackState.item.type === "episode") return null;
+      const playbackState = {
+        ...spotifyPlaybackState,
+        item: spotifyPlaybackState.item as Track,
+      };
 
-    const artistsName = extractArtistsName(playbackState.item.album.artists);
+      const artistsName = extractArtistsName(playbackState.item.album.artists);
 
-    return {
-      isPlaying: playbackState.is_playing,
-      albumName: playbackState.item.album.name,
-      artistsName: artistsName,
-      currentTime: playbackState.progress_ms,
-      duration: playbackState.item.duration_ms,
-      imgUrl: playbackState.item.album.images[0].url,
-      title: playbackState.item.name,
-      url: playbackState.item.external_urls.spotify,
-    };
+      return {
+        isPlaying: playbackState.is_playing,
+        albumName: playbackState.item.album.name,
+        artistsName: artistsName,
+        currentTime: playbackState.progress_ms,
+        duration: playbackState.item.duration_ms,
+        imgUrl: playbackState.item.album.images[0].url,
+        title: playbackState.item.name,
+        url: playbackState.item.external_urls.spotify,
+      };
+    } catch (e) {
+      console.error("Impossible to get playback state");
+      return null;
+    }
   }
 
   async getQueue(): Promise<JSONTrack[]> {
