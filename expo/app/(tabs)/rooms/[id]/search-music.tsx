@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
+import { useWebSocket } from "./_layout";
 import CustomTextInput from "../../../../components/CustomTextInput";
 import { Text } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
@@ -15,14 +16,15 @@ export default function AddTrack() {
 
   const [searchBar, setSearchBar] = useState("");
   const [result, setResult] = useState<JSONTrack[]>([]);
+  const socket = useWebSocket();
 
-  const debouncedSearchMusic = useDebounce(searchBar, 670);
+  const debouncedSearchMusic = useDebounce(searchBar, 300);
 
   useEffect(() => {
     if (debouncedSearchMusic) searchMusic();
   }, [debouncedSearchMusic]);
 
-  const socket = SocketIo.getInstance().getSocket(`/room/${id}`);
+  // const socket = SocketIo.getInstance().getSocket(`/room/${id}`);
 
   const addMusic = (value: string) => {
     SocketIo.getInstance()
@@ -33,6 +35,7 @@ export default function AddTrack() {
   };
 
   const searchMusic = () => {
+    if (!socket) return;
     socket.emit("utils:search", searchBar, (result: JSONTrack[]) =>
       setResult(result)
     );

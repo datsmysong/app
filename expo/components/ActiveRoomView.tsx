@@ -9,6 +9,7 @@ import Button from "./Button";
 import { Text, View } from "./Themed";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
+import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import { getApiUrl } from "../lib/apiUrl";
 import { getRoomHostedByUser } from "../lib/room-utils";
 import SocketIo from "../lib/socketio";
@@ -45,9 +46,15 @@ type ActiveRoomViewProps = {
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [socket, setSocket] = useState<Socket>();
+  // const [socket, setSocket] = useState<Socket>();
 
   const userProfile = useUserProfile();
+
+  const socketTest = useWebSocket();
+
+  // useEffect(() => {
+  //   console.log("nouveausocket", socket);
+  // }, [socket]);
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
 
@@ -70,27 +77,51 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     fetchHost();
   }, [userProfile, room]);
 
-  useEffect(() => {
-    const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
-    setSocket(socketInstance);
+  // useEffect(() => {
+  //   const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
+  //   setSocket(socketInstance);
+  //   console.log("Comparaison", socketInstance);
 
-    return () => {
-      socketInstance.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     console.log("disconnect ");
+
+  //     socketInstance.disconnect();
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+  //   console.log("Socket", socket);
+
+  //   socket.on("queue:update", (data: RoomJSON) => {
+  //     console.log("Queue update", data.queue.length);
+
+  //     // setLiveRoom(data);
+  //   });
+
+  //   socket.on("room:end", () => {
+  //     router.replace("/rooms");
+  //     Alert.alert("Cette salle d'écoute vient d'être supprimée");
+  //   });
+  // }, [socket]);
 
   useEffect(() => {
-    if (!socket) return;
-    socket.on("queue:update", (data: RoomJSON) => setLiveRoom(data));
-    socket.on("room:end", () => {
-      router.replace("/rooms");
-      Alert.alert("Cette salle d'écoute vient d'être supprimée");
+    if (!socketTest) return;
+    console.log("Socket test", socketTest);
+    socketTest.emit("queue:get", (data: RoomJSON) => {
+      console.log("queue get", data.queue.length);
+      setLiveRoom(data);
     });
-  }, [socket]);
+
+    socketTest.on("queue:update", (data: RoomJSON) => {
+      console.log("Queue update socket test", data.queue.length);
+      setLiveRoom(data);
+    });
+  }, [socketTest]);
 
   return (
     <>
-      {room && liveRoom && socket && (
+      {room && socketTest && (
         <>
           <View style={headerStyles.headerContainer}>
             <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
@@ -99,23 +130,27 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 Inviter des amis
               </Button>
             </View>
-            {/* <RoomPlayer socket={socket} room={room} liveRoom={liveRoom} /> */}
+            <RoomPlayer socket={socketTest} room={room} />
             <View style={styles.container}>
               <Text style={styles.title}>
-                File d'attente ({liveRoom.queue.length})
+                File d'attente ({liveRoom?.queue.length ?? 0})
               </Text>
-              <FlatList
-                style={styles.list}
-                data={liveRoom.queue}
-                renderItem={({ item, index }) => (
-                  <TrackItem
-                    track={item}
-                    index={index}
-                    roomId={room.id}
-                    isMenuDisabled={!isHost}
-                  />
-                )}
-              />
+              {liveRoom === undefined ? (
+                <Text>Chargement...</Text>
+              ) : (
+                <FlatList
+                  style={styles.list}
+                  data={liveRoom.queue}
+                  renderItem={({ item, index }) => (
+                    <TrackItem
+                      track={item}
+                      index={index}
+                      roomId={room.id}
+                      isMenuDisabled={!isHost}
+                    />
+                  )}
+                />
+              )}
             </View>
           </View>
           <Button

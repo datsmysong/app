@@ -16,11 +16,10 @@ import Button from "../Button";
 
 type RoomPlayerProps = {
   room: ActiveRoom;
-  liveRoom: RoomJSON;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 };
 
-const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, liveRoom, socket }) => {
+const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
   const isHost = true;
   const [remote, setRemote] = useState<AudioRemote>();
   const localPlayerRemote = useRef<AudioRemote | null>(null);
