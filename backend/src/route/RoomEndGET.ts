@@ -47,5 +47,5 @@ export default async function RoomEndGET(
   });
   req.server.io.of(`/room/${roomUuid}`).disconnectSockets();
 
-  return reply.code(200);
+  return reply.code(200).send();
 }

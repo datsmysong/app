@@ -21,5 +21,5 @@ export default async function RoomLeaveGET(
   if (roomUsersError)
     return reply.code(404).send("Couldn't make the user leave the room.");
 
-  return reply.code(200);
+  return reply.code(200).send();
 }
