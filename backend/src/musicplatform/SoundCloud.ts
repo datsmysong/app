@@ -47,7 +47,7 @@ export default class SoundCloud extends MusicPlatform {
     const { title, artists } = extractFromTrack(track);
 
     return {
-      url: track.permalink,
+      url: track.permalink_url,
       title: title,
       duration: track.duration,
       albumName: track.title,
@@ -57,8 +57,10 @@ export default class SoundCloud extends MusicPlatform {
   }
 
   async searchTrack(text: string): Promise<JSONTrack[]> {
-    const rawData = await this.soundCloud.tracks.searchV2({ q: text });
+    // TODO keep only track available free (without paid)
+    const rawData = await this.soundCloud.tracks.searchAlt(text); // await this.soundCloud.tracks.searchV2({ q: text });
 
-    return rawData.collection.map((track) => this.toJSON(track));
+    return rawData /*.collection*/
+      .map((track) => this.toJSON(track));
   }
 }
