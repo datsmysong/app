@@ -36,48 +36,6 @@ export default function TrackItem(prop: {
   };
 
   return (
-    // <HView style={itemStyles.container}>
-    //   <View style={[itemStyles.imagesContainer]}>
-    //     <Image source={imageSrc} style={itemStyles.mainImage} />
-    //     <Image source={imageProfileSrc} style={itemStyles.profileImage} />
-    //   </View>
-    //   <View style={[itemStyles.textContainer]}>
-    //     <HView>
-    //       <Text style={[itemStyles.text, itemStyles.textTop]}>
-    //         {prop.index + 1}
-    //       </Text>
-    //       <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
-    //         .
-    //       </Text>
-    //       <Text style={[itemStyles.text, itemStyles.textTop]}>{title}</Text>
-    //     </HView>
-    //     <Text style={[itemStyles.text, itemStyles.textBottom]}>{artists}</Text>
-    //   </View>
-    //   {!prop.isMenuDisabled && (
-    //     <>
-    //       <Pressable onPress={() => setDislike(!dislike)}>
-    //         <FontAwesome
-    //           name={`thumbs-${!dislike ? "o-" : ""}down`}
-    //           style={itemStyles.icon}
-    //         />
-    //       </Pressable>
-    //       <Menu>
-    //         <MenuTrigger>
-    //           <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
-    //         </MenuTrigger>
-    //         <MenuOptions customStyles={optionsStyles}>
-    //           <CustomMenuOption
-    //             onSelect={removeTrack}
-    //             icon={{ name: "close", size: 28, color: "red" }}
-    //             textStyle={optionsStyles.optionText}
-    //           >
-    //             Supprimer
-    //           </CustomMenuOption>
-    //         </MenuOptions>
-    //       </Menu>
-    //     </>
-    //   )}
-    // </HView>
     <MinimalistTrackItem
       title={prop.index + 1 + ". " + title}
       artistsName={artists}
@@ -86,14 +44,14 @@ export default function TrackItem(prop: {
         <Image source={imageProfileSrc} style={itemStyles.profileImage} />
       }
     >
+      <Pressable onPress={() => setDislike(!dislike)}>
+        <FontAwesome
+          name={`thumbs-${!dislike ? "o-" : ""}down`}
+          style={itemStyles.icon}
+        />
+      </Pressable>
       {!prop.isMenuDisabled && (
         <>
-          <Pressable onPress={() => setDislike(!dislike)}>
-            <FontAwesome
-              name={`thumbs-${!dislike ? "o-" : ""}down`}
-              style={itemStyles.icon}
-            />
-          </Pressable>
           <Menu>
             <MenuTrigger>
               <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
