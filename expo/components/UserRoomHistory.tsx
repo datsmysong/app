@@ -14,11 +14,10 @@ export default function UserRoomHistory() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomUser, setRoomUser] = useState<RoomUserAndRoom[]>([]);
   const [loading, setLoading] = useState(true);
+  const user = useUserProfile();
 
   useEffect(() => {
     (async () => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const user = await useUserProfile();
       if (!user) {
         Alert.alert("Erreur lors de la récupération de l'utilisateur");
         return;
