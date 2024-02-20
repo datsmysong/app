@@ -16,8 +16,10 @@ export default function TabLayout() {
   useEffect(() => {
     (async () => {
       if (!url || !navigation || !router) return;
-      const refresh_token = url.split("#refresh_token=")[1];
-      if (!refresh_token) return;
+
+      const tokens = url.split("#tokens=")[1];
+      if (!tokens) return;
+      const [refresh_token, access_token] = tokens.split(";");
       // clear the url history to avoid the user to go back to the login page & delete the refresh_token from the url
       // router.replace clear not the history
       const state = navigation.getState();
@@ -26,8 +28,9 @@ export default function TabLayout() {
         routes: state.routes.map((route) => ({ ...route, state: undefined })),
       });
 
-      const { error } = await supabase.auth.refreshSession({
-        refresh_token,
+      const { error } = await supabase.auth.setSession({
+        access_token: decodeURIComponent(access_token),
+        refresh_token: decodeURIComponent(refresh_token),
       });
 
       if (error) {

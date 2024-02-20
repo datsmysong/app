@@ -95,12 +95,16 @@ export default async function AuthCallbackGET(
     }
   }
 
-  const refresh_token = data.session.refresh_token;
+  const { refresh_token, access_token } = data.session;
   const redirectUrl = decodeURIComponent(request.url).split("redirect_url=")[1];
 
   // redirect user to the redirect url with the refresh token
   return response.redirect(
-    redirectUrl + "#refresh_token=" + encodeURIComponent(refresh_token)
+    redirectUrl +
+      "#tokens=" +
+      encodeURIComponent(refresh_token) +
+      ";" +
+      encodeURIComponent(access_token)
   );
 }
 
