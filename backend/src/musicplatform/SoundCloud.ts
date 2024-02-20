@@ -18,7 +18,7 @@ export default class SoundCloud extends MusicPlatform {
   protected soundCloud: Soundcloud;
 
   constructor() {
-    super(/https:\/\/soundcloud\.com\/(.+)/i);
+    super(/(https?:\/\/soundcloud\.com\/[^?]+)(?:\?.*)?/i);
     this.soundCloud = new Soundcloud({
       clientId: process.env.SOUNDCLOUD_CLIENT_ID ?? "",
       oauthToken: process.env.SOUNDCLOUD_CLIENT_SECRET ?? "",
@@ -26,7 +26,7 @@ export default class SoundCloud extends MusicPlatform {
   }
 
   async getJsonTrack(id: string): Promise<JSONTrack | null> {
-    const track = await this.soundCloud.tracks.getV2(id);
+    const track = await this.soundCloud.tracks.getAlt(id);
 
     return this.toJSON(track);
   }
