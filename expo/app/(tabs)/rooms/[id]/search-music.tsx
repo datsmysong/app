@@ -4,18 +4,18 @@ import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
 import { useWebSocket } from "./_layout";
+import Alert from "../../../../components/Alert";
 import CustomTextInput from "../../../../components/CustomTextInput";
 import { Text } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
 import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
-import SocketIo from "../../../../lib/socketio";
 import { useDebounce } from "../../../../lib/useDebounce";
 
 export default function AddTrack() {
-  const { id } = useLocalSearchParams() as { id: string };
+  const { id } = useLocalSearchParams();
 
   const [searchBar, setSearchBar] = useState("");
-  const [result, setResult] = useState<JSONTrack[]>([]);
+  const [result, setResult] = useState<JSONTrack[] | null>(null);
   const socket = useWebSocket();
 
   const debouncedSearchMusic = useDebounce(searchBar, 300);
@@ -24,21 +24,26 @@ export default function AddTrack() {
     if (debouncedSearchMusic) searchMusic();
   }, [debouncedSearchMusic]);
 
-  // const socket = SocketIo.getInstance().getSocket(`/room/${id}`);
-
   const addMusic = (value: string) => {
-    SocketIo.getInstance()
-      .getSocket(`/room/${id}`)
-      .emit("queue:add", new URL(value).toString());
-
-    router.back();
+    if (!socket) return;
+    try {
+      socket.emit("queue:add", new URL(value).toString());
+    } catch {
+      setSearchBar("");
+      setResult(null);
+      Alert.alert("Erreur, impossible d'ajouter la musique");
+    }
+    if (router.canGoBack()) return router.back();
+    const url = ("/(tabs)/rooms/" + id) as any;
+    router.push(url);
   };
 
   const searchMusic = () => {
+    setResult(null);
     if (!socket) return;
-    socket.emit("utils:search", searchBar, (result: JSONTrack[]) =>
-      setResult(result)
-    );
+    socket.emit("utils:search", searchBar, (result: JSONTrack[]) => {
+      setResult(result);
+    });
   };
 
   return (
@@ -57,8 +62,10 @@ export default function AddTrack() {
         style={{ marginBottom: 24 }}
       />
       {searchBar ? (
-        result.length === 0 ? (
+        result === null ? (
           <Text>Loading...</Text>
+        ) : result.length === 0 ? (
+          <Text>Aucun résultat</Text>
         ) : (
           <FlatList
             data={result}

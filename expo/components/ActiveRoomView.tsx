@@ -46,15 +46,10 @@ type ActiveRoomViewProps = {
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
-  // const [socket, setSocket] = useState<Socket>();
 
   const userProfile = useUserProfile();
 
-  const socketTest = useWebSocket();
-
-  // useEffect(() => {
-  //   console.log("nouveausocket", socket);
-  // }, [socket]);
+  const socket = useWebSocket();
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
 
@@ -70,58 +65,26 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
     const fetchHost = async () => {
       const { data } = await getRoomHostedByUser(room.id, userProfile, true);
-
       setIsHost((data?.length ?? 0) > 0);
     };
 
     fetchHost();
   }, [userProfile, room]);
 
-  // useEffect(() => {
-  //   const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
-  //   setSocket(socketInstance);
-  //   console.log("Comparaison", socketInstance);
-
-  //   return () => {
-  //     console.log("disconnect ");
-
-  //     socketInstance.disconnect();
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!socket) return;
-  //   console.log("Socket", socket);
-
-  //   socket.on("queue:update", (data: RoomJSON) => {
-  //     console.log("Queue update", data.queue.length);
-
-  //     // setLiveRoom(data);
-  //   });
-
-  //   socket.on("room:end", () => {
-  //     router.replace("/rooms");
-  //     Alert.alert("Cette salle d'écoute vient d'être supprimée");
-  //   });
-  // }, [socket]);
-
   useEffect(() => {
-    if (!socketTest) return;
-    console.log("Socket test", socketTest);
-    socketTest.emit("queue:get", (data: RoomJSON) => {
-      console.log("queue get", data.queue.length);
+    if (!socket) return;
+    socket.emit("queue:get", (data: RoomJSON) => {
       setLiveRoom(data);
     });
 
-    socketTest.on("queue:update", (data: RoomJSON) => {
-      console.log("Queue update socket test", data.queue.length);
+    socket.on("queue:update", (data: RoomJSON) => {
       setLiveRoom(data);
     });
-  }, [socketTest]);
+  }, [socket]);
 
   return (
     <>
-      {room && socketTest && (
+      {room && socket && (
         <>
           <View style={headerStyles.headerContainer}>
             <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
@@ -130,7 +93,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 Inviter des amis
               </Button>
             </View>
-            <RoomPlayer socket={socketTest} room={room} />
+            <RoomPlayer socket={socket} room={room} />
             <View style={styles.container}>
               <Text style={styles.title}>
                 File d'attente ({liveRoom?.queue.length ?? 0})
@@ -191,7 +154,6 @@ const floatingStyle = StyleSheet.create({
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
-    // flex: 1,
     marginHorizontal: 24,
     marginVertical: 14,
     gap: 10,

@@ -1,4 +1,3 @@
-import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 
@@ -18,12 +17,12 @@ export default function MinimalistTrackItem({
   children?: React.ReactNode;
   profilePictureImage?: React.ReactNode;
 }) {
-  const imageSrc = new URL(imgUrl).toString();
+  if (!imgUrl) imgUrl = require("../../assets/images/album-cover.jpg");
 
   return (
     <HView style={itemStyles.container}>
       <View style={[itemStyles.imagesContainer]}>
-        <Image source={imageSrc} style={itemStyles.mainImage} />
+        <Image source={imgUrl} style={itemStyles.mainImage} />
         {profilePictureImage}
       </View>
       <View style={[itemStyles.textContainer]}>
