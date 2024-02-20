@@ -1,5 +1,6 @@
-import { Redirect, Stack, useNavigation, useRouter } from "expo-router";
-import { Alert, Linking } from "react-native";
+import * as Linking from "expo-linking";
+import { Redirect, Stack, useRootNavigation, useRouter } from "expo-router";
+import { useEffect } from "react";
 
 import { Text, View } from "../../components/Themed";
 import { supabase } from "../../lib/supabase";
@@ -7,18 +8,16 @@ import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
 export default function TabLayout() {
   const user = useSupabaseUserHook();
-  const url = Linking.getInitialURL();
 
   const router = useRouter();
-  const navigation = useNavigation();
+  const navigation = useRootNavigation();
+  const url = Linking.useURL();
 
-  url.then(async (url) => {
-    if (!url) return;
-    const refresh_token = url.split("#refresh_token=")[1];
-    if (refresh_token) {
-      const { error } = await supabase.auth.refreshSession({
-        refresh_token,
-      });
+  useEffect(() => {
+    (async () => {
+      if (!url || !navigation || !router) return;
+      const refresh_token = url.split("#refresh_token=")[1];
+      if (!refresh_token) return;
       // clear the url history to avoid the user to go back to the login page & delete the refresh_token from the url
       // router.replace clear not the history
       const state = navigation.getState();
@@ -26,12 +25,17 @@ export default function TabLayout() {
         ...state,
         routes: state.routes.map((route) => ({ ...route, state: undefined })),
       });
+
+      const { error } = await supabase.auth.refreshSession({
+        refresh_token,
+      });
+
       if (error) {
-        router.replace("/auth");
+        return router.replace("/auth");
       }
-      router.push("/(tabs)");
-    }
-  });
+      router.replace("/(tabs)");
+    })();
+  }, [url]);
 
   if (user === undefined)
     return (
