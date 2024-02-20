@@ -1,13 +1,11 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import {
-  createContext,
-  useEffect,
-  useRef,
   ReactNode,
+  createContext,
   useContext,
+  useEffect,
   useState,
 } from "react";
-import { set } from "react-hook-form";
 import { Socket } from "socket.io-client";
 
 import { getApiUrl } from "../../../../lib/apiUrl";
