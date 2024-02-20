@@ -5,7 +5,6 @@ import { FlatList, StyleSheet } from "react-native";
 import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { Text, View } from "./Themed";
-import { getApiUrl } from "../lib/apiUrl";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
 
@@ -15,7 +14,6 @@ export default function UserRoomHistory() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomUser, setRoomUser] = useState<RoomUserAndRoom[]>([]);
   const [loading, setLoading] = useState(true);
-  const baseUrl = getApiUrl();
 
   useEffect(() => {
     (async () => {
