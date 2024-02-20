@@ -164,7 +164,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           </Button>
           <Button
             icon="add"
-            href={`/rooms/${room.id}/search-music`}
+            href={`/rooms/${room.id}/add`}
             style={floatingStyle.container}
           >
             Ajouter une musique

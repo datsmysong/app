@@ -1,61 +1,88 @@
 import { JSONTrack } from "commons/backend-types";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { FlatList } from "react-native";
+import { useEffect, useState } from "react";
+import { FlatList, View } from "react-native";
 
-import Button from "../../../../components/Button";
+import { useWebSocket } from "./_layout";
+import Alert from "../../../../components/Alert";
 import CustomTextInput from "../../../../components/CustomTextInput";
-import HView from "../../../../components/HView";
-import { View } from "../../../../components/Themed";
-import TrackItem from "../../../../components/room/TrackItem";
-import TrackItemAdd from "../../../../components/room/TrackItemAdd";
-import SocketIo from "../../../../lib/socketio";
+import { Text } from "../../../../components/Themed";
+import Library from "../../../../components/room/Library";
+import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
+import { useDebounce } from "../../../../lib/useDebounce";
 
 export default function AddTrack() {
-  const { id } = useLocalSearchParams() as { id: string };
+  const { id } = useLocalSearchParams();
 
-  const [value, setValue] = useState("");
-  const [result, setResult] = useState<JSONTrack[]>([]);
+  const [searchBar, setSearchBar] = useState("");
+  const [result, setResult] = useState<JSONTrack[] | null>(null);
+  const socket = useWebSocket();
 
-  const socket = SocketIo.getInstance().getSocket(`/room/${id}`);
+  const debouncedSearchMusic = useDebounce(searchBar, 300);
+
+  useEffect(() => {
+    if (debouncedSearchMusic) searchMusic();
+  }, [debouncedSearchMusic]);
 
   const addMusic = (value: string) => {
-    socket.emit("queue:add", new URL(value).toString());
-
-    router.back();
+    if (!socket) return;
+    try {
+      socket.emit("queue:add", new URL(value).toString());
+    } catch {
+      setSearchBar("");
+      setResult(null);
+      Alert.alert("Erreur, impossible d'ajouter la musique");
+    }
+    if (router.canGoBack()) return router.back();
+    const url = ("/(tabs)/rooms/" + id) as any;
+    router.push(url);
   };
 
   const searchMusic = () => {
-    const updateList = (result: JSONTrack[]) => {
-      console.log(result);
+    setResult(null);
+    if (!socket) return;
+    socket.emit("utils:search", searchBar, (result: JSONTrack[]) => {
       setResult(result);
-    };
-
-    socket.emit("utils:search", value, updateList);
+    });
   };
 
   return (
-    <View>
-      <HView>
-        <CustomTextInput
-          placeholder="Recherche"
-          onChangeText={setValue}
-          style={{ flexShrink: 0, flexGrow: 1, minWidth: 0, flexBasis: 0 }}
-        />
-        <Button onPress={() => addMusic(value)}>Ajouter</Button>
-        <Button onPress={searchMusic}>Chercher</Button>
-      </HView>
-      <FlatList
-        data={result}
-        renderItem={({ item, index }) => (
-          <TrackItemAdd
-            track={item}
-            index={index}
-            roomId={id}
-            action={addMusic}
-          />
-        )}
+    <View
+      style={{
+        paddingHorizontal: 24,
+        paddingTop: 24,
+        flex: 1,
+        flexDirection: "column",
+      }}
+    >
+      <CustomTextInput
+        onChangeText={setSearchBar}
+        placeholder="Rechercher"
+        onSubmitEditing={searchMusic}
+        style={{ marginBottom: 24 }}
       />
+      {searchBar ? (
+        result === null ? (
+          <Text>Loading...</Text>
+        ) : result.length === 0 ? (
+          <Text>Aucun résultat</Text>
+        ) : (
+          <FlatList
+            data={result}
+            renderItem={({ item }) => (
+              <SearchedTrackItem
+                track={item}
+                handleAddMusic={() => {
+                  addMusic(item.url);
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.url}
+          />
+        )
+      ) : (
+        <Library />
+      )}
     </View>
   );
 }
