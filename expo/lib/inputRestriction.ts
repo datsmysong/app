@@ -6,8 +6,7 @@ import { RegisterOptions } from "react-hook-form";
 const usernameRules: RegisterOptions = {
   required: "Un nom d'utilisateur est requis",
   minLength: {
-    // 4 because we restrict the first character to be @
-    value: 4,
+    value: 3,
     message: "Le nom d'utilisateur doit contenir au moins 3 caractères",
   },
   maxLength: {
@@ -40,11 +39,4 @@ const passwordRules: RegisterOptions = {
   },
 };
 
-// No need to check other rules, because confirm password is always need to be the same as password
-const passwordConfirmationRules: RegisterOptions = {
-  required: "Veuillez confirmer votre mot de passe",
-  validate: (value) =>
-    value === passwordRules || "Les mots de passe ne correspondent pas",
-};
-
-export { emailRules, passwordConfirmationRules, passwordRules, usernameRules };
+export { emailRules, passwordRules, usernameRules };
