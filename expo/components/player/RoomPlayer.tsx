@@ -7,20 +7,19 @@ import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Socket } from "socket.io-client";
 
-import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
-import { ActiveRoom } from "../../lib/useRoom";
-import Button from "../Button";
 import LocalPlayer from "./LocalPlayer";
 import Player from "./Player";
 import PlayerControls from "./PlayerControls";
+import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
+import { ActiveRoom } from "../../lib/useRoom";
+import Button from "../Button";
 
 type RoomPlayerProps = {
   room: ActiveRoom;
-  liveRoom: RoomJSON;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 };
 
-const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, liveRoom, socket }) => {
+const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
   const isHost = true;
   const [remote, setRemote] = useState<AudioRemote>();
   const localPlayerRemote = useRef<AudioRemote | null>(null);

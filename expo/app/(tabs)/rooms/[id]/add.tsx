@@ -1,12 +1,12 @@
 import { JSONTrack } from "commons/backend-types";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FlatList } from "react-native";
 
 import Button from "../../../../components/Button";
 import CustomTextInput from "../../../../components/CustomTextInput";
 import HView from "../../../../components/HView";
-import { Text, View } from "../../../../components/Themed";
+import { View } from "../../../../components/Themed";
 import TrackItem from "../../../../components/room/TrackItem";
 import TrackItemAdd from "../../../../components/room/TrackItemAdd";
 import SocketIo from "../../../../lib/socketio";

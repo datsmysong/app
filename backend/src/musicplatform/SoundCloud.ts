@@ -26,9 +26,13 @@ export default class SoundCloud extends MusicPlatform {
   }
 
   async getJsonTrack(id: string): Promise<JSONTrack | null> {
-    const track = await this.soundCloud.tracks.getAlt(id);
-
-    return this.toJSON(track);
+    try {
+      const track = await this.soundCloud.tracks.getAlt(id);
+      return this.toJSON(track);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   isClientSide(): boolean {
@@ -58,9 +62,13 @@ export default class SoundCloud extends MusicPlatform {
 
   async searchTrack(text: string): Promise<JSONTrack[]> {
     // TODO keep only track available free (without paid)
-    const rawData = await this.soundCloud.tracks.searchAlt(text); // await this.soundCloud.tracks.searchV2({ q: text });
-
-    return rawData /*.collection*/
-      .map((track) => this.toJSON(track));
+    try {
+      const rawData = await this.soundCloud.tracks.searchAlt(text); // await this.soundCloud.tracks.searchV2({ q: text });
+      return rawData /*.collection*/
+        .map((track) => this.toJSON(track));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 }

@@ -11,6 +11,7 @@ import Confirm from "./Confirm";
 import { Text, View } from "./Themed";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
+import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import { getApiUrl } from "../lib/apiUrl";
 import { getRoomHostedByUser } from "../lib/room-utils";
 import SocketIo from "../lib/socketio";
@@ -47,9 +48,10 @@ type ActiveRoomViewProps = {
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
-  const [socket, setSocket] = useState<Socket>();
 
   const userProfile = useUserProfile();
+
+  const socket = useWebSocket();
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
 
@@ -59,12 +61,12 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       Alert.alert(await response.text());
     }
   };
+
   useEffect(() => {
     if (!userProfile || !room) return;
 
     const fetchHost = async () => {
       const { data } = await getRoomHostedByUser(room.id, userProfile, true);
-
       setIsHost((data?.length ?? 0) > 0);
     };
 
@@ -72,20 +74,13 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   }, [userProfile, room]);
 
   useEffect(() => {
-    const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
-    setSocket(socketInstance);
-
-    return () => {
-      socketInstance.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     if (!socket) return;
-    socket.on("queue:update", (data: RoomJSON) => setLiveRoom(data));
-    socket.on("room:end", () => {
-      router.replace("/rooms");
-      Alert.alert("Cette salle d'écoute vient d'être supprimée");
+    socket.emit("queue:get", (data: RoomJSON) => {
+      setLiveRoom(data);
+    });
+
+    socket.on("queue:update", (data: RoomJSON) => {
+      setLiveRoom(data);
     });
   }, [socket]);
 
@@ -119,7 +114,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   return (
     <>
-      {room && liveRoom && socket && (
+      {room && socket && (
         <>
           <View style={headerStyles.headerContainer}>
             <View style={headerStyles.titleContainer}>
@@ -136,23 +131,27 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 Inviter des amis
               </Button>
             </View>
-            <RoomPlayer socket={socket} room={room} liveRoom={liveRoom} />
+            <RoomPlayer socket={socket} room={room} />
             <View style={styles.container}>
               <Text style={styles.title}>
-                File d'attente ({liveRoom.queue.length})
+                File d'attente ({liveRoom?.queue.length ?? 0})
               </Text>
-              <FlatList
-                style={styles.list}
-                data={liveRoom.queue}
-                renderItem={({ item, index }) => (
-                  <TrackItem
-                    track={item}
-                    index={index}
-                    roomId={room.id}
-                    isMenuDisabled={!isHost}
-                  />
-                )}
-              />
+              {liveRoom === undefined ? (
+                <Text>Chargement...</Text>
+              ) : (
+                <FlatList
+                  style={styles.list}
+                  data={liveRoom.queue}
+                  renderItem={({ item, index }) => (
+                    <TrackItem
+                      track={item}
+                      index={index}
+                      roomId={room.id}
+                      isMenuDisabled={!isHost}
+                    />
+                  )}
+                />
+              )}
             </View>
           </View>
           <Button
@@ -165,7 +164,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           </Button>
           <Button
             icon="add"
-            href={`/rooms/${room.id}/add`}
+            href={`/rooms/${room.id}/search-music`}
             style={floatingStyle.container}
           >
             Ajouter une musique
