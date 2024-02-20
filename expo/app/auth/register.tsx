@@ -8,10 +8,10 @@ import ControlledInput from "../../components/ControlledInput";
 import { getApiUrl } from "../../lib/apiUrl";
 import {
   emailRules,
-  passwordConfirmationRules,
   passwordRules,
   usernameRules,
 } from "../../lib/inputRestriction";
+
 type FormData = {
   username: string;
   email: string;
@@ -120,7 +120,11 @@ export default function Register() {
           control={control}
           label="Confirmer le mot de passe"
           name="confirmPassword"
-          rules={passwordConfirmationRules}
+          rules={{
+            required: "Veuillez confirmer votre mot de passe",
+            validate: (value) =>
+              value === password || "Les mots de passe ne correspondent pas",
+          }}
           placeholder="Mon mot de passe robuste"
           errorMessage={
             errors.confirmPassword && errors.confirmPassword.message
