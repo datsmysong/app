@@ -6,8 +6,8 @@ import Room from "../socketio/Room";
 
 export default class Deezer extends MusicPlatform {
   async getRemote(
-    _room: Room,
-    _musicPlatform: MusicPlatform
+    room: Room,
+    musicPlatform: MusicPlatform
   ): Promise<Remote | null> {
     return null;
   }
@@ -25,7 +25,7 @@ export default class Deezer extends MusicPlatform {
     return false;
   }
 
-  searchTrack(_text: string): Promise<JSONTrack[]> {
+  searchTrack(text: string): Promise<JSONTrack[]> {
     return Promise.resolve([]);
   }
 

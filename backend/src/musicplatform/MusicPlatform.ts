@@ -30,7 +30,7 @@ export default abstract class MusicPlatform {
     return this.constructor;
   }
 
-  abstract toJSON(rawTracks: never): JSONTrack;
+  abstract toJSON(rawTracks: never): JSONTrack | null;
   abstract getJsonTrack(id: string): Promise<JSONTrack | null>;
   abstract searchTrack(text: string): Promise<JSONTrack[]>;
   abstract isClientSide(): boolean;

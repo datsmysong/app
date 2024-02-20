@@ -54,13 +54,6 @@ export default function RoomIO(
      * so that the client can update its state accordingly
      */
     roomSocket.emit("queue:update", Room.toJSON(room));
-    console.log("Connexion", Room.toJSON(room));
-    console.log(
-      "Socket link to room",
-      roomSocket.name,
-      "number of clients",
-      roomSocket.sockets.size
-    );
 
     socket.on("queue:add", async (params: string) => {
       await room.add(params);
