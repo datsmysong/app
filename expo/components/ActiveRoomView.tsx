@@ -2,8 +2,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { RoomJSON } from "commons/Backend-types";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Platform, StyleSheet } from "react-native";
-import { Socket } from "socket.io-client";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 
 import Alert from "./Alert";
 import Button from "./Button";
@@ -14,7 +19,6 @@ import TrackItem from "./room/TrackItem";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import { getApiUrl } from "../lib/apiUrl";
 import { getRoomHostedByUser } from "../lib/room-utils";
-import SocketIo from "../lib/socketio";
 import { ActiveRoom } from "../lib/useRoom";
 import { useUserProfile } from "../lib/userProfile";
 
@@ -114,63 +118,53 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   return (
     <>
-      {room && socket && (
-        <>
-          <View style={headerStyles.headerContainer}>
-            <View style={headerStyles.titleContainer}>
-              <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
-              <MaterialIcons
-                name="meeting-room"
-                size={28}
-                color="black"
-                onPress={showDialog}
-              />
-            </View>
+      <ScrollView>
+        {room && socket && (
+          <View style={[headerStyles.headerContainer, { flex: 1 }]}>
+            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
                 Inviter des amis
               </Button>
             </View>
             <RoomPlayer socket={socket} room={room} />
-            <View style={styles.container}>
-              <Text style={styles.title}>
-                File d'attente ({liveRoom?.queue.length ?? 0})
-              </Text>
-              {liveRoom === undefined ? (
-                <Text>Chargement...</Text>
-              ) : (
-                <FlatList
-                  style={styles.list}
-                  data={liveRoom.queue}
-                  renderItem={({ item, index }) => (
-                    <TrackItem
-                      track={item}
-                      index={index}
-                      roomId={room.id}
-                      isMenuDisabled={!isHost}
-                    />
-                  )}
-                />
-              )}
-            </View>
+            <Text style={styles.title}>
+              File d'attente ({liveRoom?.queue.length ?? 0})
+            </Text>
+            {liveRoom === undefined ? (
+              <Text>Chargement...</Text>
+            ) : (
+              <FlatList
+                style={styles.list}
+                data={liveRoom.queue}
+                renderItem={({ item, index }) => (
+                  <TrackItem
+                    track={item}
+                    index={index}
+                    roomId={room.id}
+                    isMenuDisabled={!isHost}
+                  />
+                )}
+              />
+            )}
+            <Button
+              onPress={deleteRoom}
+              color="danger"
+              block
+              style={{ margin: 20, marginRight: 100 }}
+            >
+              Supprimer la salle
+            </Button>
           </View>
-          <Button
-            onPress={deleteRoom}
-            color="danger"
-            block
-            style={{ margin: 20, marginRight: 100 }}
-          >
-            Supprimer la salle
-          </Button>
-          <Button
-            icon="add"
-            href={`/rooms/${room.id}/add`}
-            style={floatingStyle.container}
-          >
-            Ajouter une musique
-          </Button>
-        </>
-      )}
+        )}
+      </ScrollView>
+      <Button
+        icon="add"
+        href={`/rooms/${room.id}/add`}
+        style={floatingStyle.container}
+      >
+        Ajouter une musique
+      </Button>
     </>
   );
 };
@@ -214,6 +208,8 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 32,
     paddingHorizontal: 20,
+    flex: 1,
+    flexDirection: "column",
   },
   title: {
     color: "#000",

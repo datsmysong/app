@@ -9,7 +9,7 @@ export default function RoomView() {
   const room = useRoom(id);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       {room && room.is_active && <ActiveRoomView room={room} />}
       {room && !room.is_active && <Text>TODO</Text>}
       {!room && (
