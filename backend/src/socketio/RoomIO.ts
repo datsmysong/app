@@ -85,14 +85,18 @@ export default function RoomIO(
       const addedVote = room.addVoteSkip(index, userId); // all user are not notified of the vote skip
       if (!addedVote) return;
 
-      const skiped = await room.verifyVoteSkip(index);
-      if (skiped === "queueTrackSkiped") sendQueueUpdated();
-      if (skiped === "actualTrackSkiped") {
+      const skipped = await room.verifyVoteSkip(index);
+      if (skipped === "queueTrackSkiped") sendQueueUpdated();
+      if (skipped === "actualTrackSkiped") {
         const remote = room.getRemote();
         if (!remote) return;
         updatePlaybackState(socket, remote);
       }
     });
+
+    const sendQueueUpdated = () => {
+      roomSocket.emit("queue:update", Room.toJSON(room));
+    };
 
     socket.on("player:playTrack", async (trackId) => {
       const remote = room.getRemote();
@@ -163,6 +167,15 @@ export default function RoomIO(
     socket.on("player:updatePlaybackState", async (playbackState) => {
       socket.nsp.emit("player:updatePlaybackState", playbackState);
     });
+
+    socket.on(
+      "utils:search",
+      async (input: string, resultCallback: (t: JSONTrack[]) => void) => {
+        const data = await room.getStreamingService().searchTrack(input);
+
+        resultCallback(data);
+      }
+    );
   }
 
   registerHandlers();

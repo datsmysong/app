@@ -15,6 +15,8 @@ export default function TabLayout() {
 
   useEffect(() => {
     (async () => {
+      console.log("url", url);
+
       if (!url || !navigation || !router) return;
 
       const tokens = url.split("#tokens=")[1];
@@ -27,6 +29,8 @@ export default function TabLayout() {
         ...state,
         routes: state.routes.map((route) => ({ ...route, state: undefined })),
       });
+
+      console.log("tokens", refresh_token, access_token);
 
       const { error } = await supabase.auth.setSession({
         access_token: decodeURIComponent(access_token),

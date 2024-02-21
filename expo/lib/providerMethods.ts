@@ -86,6 +86,7 @@ export const signInWithProvider = async ({
       access_token: decodeURIComponent(access_token),
       refresh_token: decodeURIComponent(refresh_token),
     });
+
     if (!error) {
       router.replace("/(tabs)");
       return;
