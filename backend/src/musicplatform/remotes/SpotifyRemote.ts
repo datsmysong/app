@@ -49,7 +49,6 @@ export default class SpotifyRemote extends Remote {
         token_type: "Bearer",
       }
     );
-
     return new SpotifyRemote(spotifyClient, musicPlatform);
   }
 

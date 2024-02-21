@@ -1,5 +1,4 @@
 import { JSONTrack } from "commons/Backend-types";
-import { Socket } from "socket.io";
 import Remote from "./remotes/Remote";
 import Room from "../socketio/Room";
 
@@ -31,7 +30,9 @@ export default abstract class MusicPlatform {
     return this.constructor;
   }
 
+  abstract toJSON(rawTracks: never): JSONTrack | null;
   abstract getJsonTrack(id: string): Promise<JSONTrack | null>;
+  abstract searchTrack(text: string): Promise<JSONTrack[]>;
   abstract isClientSide(): boolean;
   abstract getRemote(
     room: Room,

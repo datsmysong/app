@@ -1,6 +1,5 @@
 import { JSONTrack } from "commons/Backend-types";
-import { Socket } from "socket.io";
-import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
+import { Soundcloud, SoundcloudTrackV2 } from "soundcloud.ts";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
 import SoundCloudRemote from "./remotes/SoundCloudRemote";
@@ -19,7 +18,7 @@ export default class SoundCloud extends MusicPlatform {
   protected soundCloud: Soundcloud;
 
   constructor() {
-    super(/https:\/\/soundcloud\.com\/(.+)/i);
+    super(/(https?:\/\/soundcloud\.com\/[^?]+)(?:\?.*)?/i);
     this.soundCloud = new Soundcloud({
       clientId: process.env.SOUNDCLOUD_CLIENT_ID ?? "",
       oauthToken: process.env.SOUNDCLOUD_CLIENT_SECRET ?? "",
@@ -27,18 +26,13 @@ export default class SoundCloud extends MusicPlatform {
   }
 
   async getJsonTrack(id: string): Promise<JSONTrack | null> {
-    const track = await this.soundCloud.tracks.getV2(id);
-
-    const { title, artists } = extractFromTrack(track);
-
-    return {
-      url: track.permalink,
-      title: title,
-      duration: track.duration,
-      albumName: track.title,
-      artistsName: artists,
-      imgUrl: track.artwork_url,
-    };
+    try {
+      const track = await this.soundCloud.tracks.getAlt(id);
+      return this.toJSON(track);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   isClientSide(): boolean {
@@ -51,5 +45,30 @@ export default class SoundCloud extends MusicPlatform {
     musicPlatform: MusicPlatform
   ): Promise<Remote | null> {
     return SoundCloudRemote.createRemote(this, room);
+  }
+
+  toJSON(track: SoundcloudTrackV2): JSONTrack {
+    const { title, artists } = extractFromTrack(track);
+
+    return {
+      url: track.permalink_url,
+      title: title,
+      duration: track.duration,
+      albumName: track.title,
+      artistsName: artists,
+      imgUrl: track.artwork_url,
+    };
+  }
+
+  async searchTrack(text: string): Promise<JSONTrack[]> {
+    // TODO keep only track available free (without paid)
+    try {
+      const rawData = await this.soundCloud.tracks.searchAlt(text); // await this.soundCloud.tracks.searchV2({ q: text });
+      return rawData /*.collection*/
+        .map((track) => this.toJSON(track));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 }
