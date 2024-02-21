@@ -2,7 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet } from "react-native";
 
 import RoomConfigurationParametersList from "../../../../components/RoomConfigurationParametersList";
-import { Text, View } from "../../../../components/Themed";
+import { View } from "../../../../components/Themed";
 
 interface MusicRoomParams {
   id: string;

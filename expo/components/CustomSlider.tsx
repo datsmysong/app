@@ -1,6 +1,6 @@
 import Slider from "@react-native-community/slider";
 import { Image } from "expo-image";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ImageURISource, StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";

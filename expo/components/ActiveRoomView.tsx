@@ -133,14 +133,12 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                   />
                 </Link>
               ) : (
-                <Link href="/rooms" asChild>
-                  <MaterialIcons
-                    name="meeting-room"
-                    size={28}
-                    color="black"
-                    onPress={showDialog}
-                  />
-                </Link>
+                <MaterialIcons
+                  name="meeting-room"
+                  size={28}
+                  color="black"
+                  onPress={showDialog}
+                />
               )}
             </View>
             <View style={headerStyles.buttonContainer}>
