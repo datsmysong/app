@@ -1,7 +1,7 @@
-import { RoomConfiguration } from "commons/database-types-utils";
+import { Room, RoomConfiguration } from "commons/database-types-utils";
 import Checkbox from "expo-checkbox";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Alert from "./Alert";
@@ -10,18 +10,21 @@ import CustomSlider from "./CustomSlider";
 import CustomTextInput from "./CustomTextInput";
 import { Text, View } from "./Themed";
 import { getApiUrl } from "../lib/apiUrl";
+import { supabase } from "../lib/supabase";
 
 interface ParametersListProps {
   roomId: string;
 }
 
+type RoomAndConfiguration = Room & {
+  room_configurations: RoomConfiguration;
+};
+
 export default function RoomConfigurationParametersList({
   roomId,
 }: ParametersListProps) {
   const baseUrl = getApiUrl();
-  const didMountRef = useRef(false);
-
-  const [roomConfigurationId, setRoomConfigurationId] = useState<string>();
+  const [roomConfigurationId, setRoomConfigurationId] = useState<string>("");
   const [sliderParticipantValue, setSliderParticipantValue] = useState(10);
   const [canBeAnonymous, setCanBeAnonymous] = useState(false);
   const [canSkip, setCanSkip] = useState(true);
@@ -33,38 +36,42 @@ export default function RoomConfigurationParametersList({
   // To get current room configuration id
   useEffect(() => {
     (async () => {
-      const room = await fetch(baseUrl + "/rooms?id=" + roomId);
+      const { error, data } = await supabase
+        .from("rooms")
+        .select("*, room_configurations(*)")
+        .eq("id", roomId)
+        .single();
 
-      const roomJSON = await room.json();
-      setRoomConfigurationId(roomJSON.configuration_id);
+      if (error) {
+        Alert.alert(
+          "Une erreur est survenue lors de la récupération des paramètres de la salle"
+        );
+        return;
+      }
+      if (!data) {
+        Alert.alert("Aucune salle trouvée");
+        return;
+      }
+      if (!data.room_configurations) {
+        Alert.alert("Aucune configuration trouvée pour cette salle");
+        return;
+      }
+
+      const config = data.room_configurations;
+      setRoomConfigurationId(data.configuration_id ?? "");
+      setCanSkip(config.vote_skipping);
+      setSliderPercentageValue(config.vote_skipping_needed_percentage);
+      setMaxMusicDuration(config.max_music_duration.toString());
+      setMaxMusicPerUser(
+        config.max_music_count_in_queue_per_participant.toString()
+      );
     })();
   }, []);
-
-  // To get current room configuration
-  useEffect(() => {
-    if (!roomConfigurationId) return;
-    (async () => {
-      const roomConfiguration = await fetch(
-        baseUrl + "/room/configuration/" + roomConfigurationId
-      );
-
-      const roomConfigurationJSON: RoomConfiguration =
-        await roomConfiguration.json();
-      setCanSkip(roomConfigurationJSON.vote_skipping);
-      setSliderPercentageValue(
-        roomConfigurationJSON.vote_skipping_needed_percentage
-      );
-      setMaxMusicDuration(roomConfigurationJSON.max_music_duration.toString());
-      setMaxMusicPerUser(
-        roomConfigurationJSON.max_music_count_in_queue_per_participant.toString()
-      );
-    })();
-  }, [roomConfigurationId]);
 
   // To update the room configuration
   const handleSave = async () => {
     const roomConfiguration = await fetch(
-      baseUrl + "/room/configuration/" + roomConfigurationId + "/update",
+      baseUrl + "/room/configuration/" + roomConfigurationId,
       {
         method: "POST",
         headers: {
