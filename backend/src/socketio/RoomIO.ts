@@ -1,20 +1,12 @@
-import {
-  ClientToServerEvents,
-  ServerToClientEvents,
-} from "commons/socket.io-types";
-import { Socket } from "socket.io";
+import { Response } from "commons/socket.io-types";
 import RoomStorage from "../RoomStorage";
-import Remote from "../musicplatform/remotes/Remote";
-import Room from "./Room";
 import { JSONTrack } from "commons/backend-types";
+import Room, { TypedSocket } from "./Room";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
 export default function RoomIO(
-  socket: Socket<
-    ClientToServerEvents,
-    ServerToClientEvents
-  > /*, next: (err?: ExtendedError) => void*/
+  socket: TypedSocket /*, next: (err?: ExtendedError) => void*/
 ) {
   const roomSocket = socket.nsp;
   /*regex uuid [0-9a-f]{8}-([0-9a-f]{4}){3}-[0-9a-f]{12}*/
@@ -64,18 +56,6 @@ export default function RoomIO(
     });
 
     socket.on("queue:add", async (rawUrl: string) => {
-      const queue = room.getQueue();
-      const playbackState = room.getPlaybackState();
-      // If the queue is currently empty, we can play the track immediately
-      if (queue.length === 0 && playbackState === null) {
-        const remote = room.getRemote();
-        if (remote === null) return;
-        const response = await remote.playTrack(rawUrl);
-        if (!response.error) await updatePlaybackState(socket, remote);
-        return;
-      }
-
-      // Otherwise, we just add the track to the queue
       await room.add(rawUrl);
       roomSocket.emit("queue:update", Room.toJSON(room));
     });
@@ -104,7 +84,7 @@ export default function RoomIO(
       if (skipped === "actualTrackSkiped") {
         const remote = room.getRemote();
         if (!remote) return;
-        updatePlaybackState(socket, remote);
+        room.updatePlaybackState();
       }
     });
 
@@ -119,7 +99,7 @@ export default function RoomIO(
       const response = await remote.playTrack(trackId);
       socket.emit("player:playTrack", response);
 
-      if (!response.error) await updatePlaybackState(socket, remote);
+      if (!response.error) await room.updatePlaybackState();
     });
 
     socket.on("player:pause", async () => {
@@ -129,7 +109,7 @@ export default function RoomIO(
       const response = await remote.pause();
       socket.emit("player:pause", response);
 
-      if (!response.error) await updatePlaybackState(socket, remote);
+      if (!response.error) await room.updatePlaybackState();
     });
 
     socket.on("player:play", async () => {
@@ -137,19 +117,35 @@ export default function RoomIO(
       if (remote === null) return;
 
       const response = await remote.play();
-      if (!response.error) await updatePlaybackState(socket, remote);
+      if (!response.error) await room.updatePlaybackState();
 
       socket.emit("player:play", response);
     });
 
     socket.on("player:skip", async () => {
       const remote = room.getRemote();
-      if (remote === null) return;
+      if (remote === null)
+        return socket.emit("player:skip", {
+          error: "No remote",
+          data: null,
+        });
 
-      const response = await remote.next();
+      let response: Response<void>;
+      const nextTrack = room.shiftQueue();
+      if (!nextTrack)
+        return socket.emit("player:skip", {
+          error: "No track to skip to",
+          data: null,
+        });
+
+      if (room.getStreamingService().isClientSide()) {
+        response = await remote.playTrack(nextTrack.url);
+      } else {
+        response = await remote.next();
+      }
+
       socket.emit("player:skip", response);
-
-      if (!response.error) await updatePlaybackState(socket, remote);
+      if (!response.error) await room.updatePlaybackState();
     });
 
     socket.on("player:previous", async () => {
@@ -159,7 +155,7 @@ export default function RoomIO(
       const response = await remote.previous();
       socket.emit("player:previous", response);
 
-      if (!response.error) await updatePlaybackState(socket, remote);
+      if (!response.error) await room.updatePlaybackState();
     });
 
     socket.on("player:setVolume", async (volume) => {
@@ -177,7 +173,7 @@ export default function RoomIO(
       const response = await remote.seekTo(position);
       socket.emit("player:seekTo", response);
 
-      if (!response.error) await updatePlaybackState(socket, remote);
+      if (!response.error) await room.updatePlaybackState();
     });
 
     socket.on(
@@ -191,11 +187,4 @@ export default function RoomIO(
   }
 
   registerHandlers();
-}
-
-async function updatePlaybackState(socket: Socket, remote: Remote) {
-  setTimeout(async () => {
-    const playbackState = await remote.getPlaybackState();
-    socket.nsp.emit("player:updatePlaybackState", playbackState);
-  }, 100);
 }

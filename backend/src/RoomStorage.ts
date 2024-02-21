@@ -6,7 +6,7 @@ import Spotify from "./musicplatform/Spotify";
 import { adminSupabase, server } from "./server";
 import Room from "./socketio/Room";
 import { RoomWithForeignTable } from "./socketio/RoomDatabase";
-import SpotifyRemote from "./musicplatform/remotes/SpotifyRemote";
+import { QueueableRemote } from "./musicplatform/remotes/Remote";
 
 const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
@@ -31,11 +31,11 @@ function getMusicPlatform(serviceId: string): MusicPlatform | null {
 export default class RoomStorage {
   private static singleton: RoomStorage;
   private readonly data: Map<string, Room>;
-  private readonly endingSoon: Map<string, boolean>;
+  private readonly startedTimer: Map<string, boolean>;
 
   private constructor() {
     this.data = new Map();
-    this.endingSoon = new Map();
+    this.startedTimer = new Map();
   }
 
   startTimer() {
@@ -45,53 +45,69 @@ export default class RoomStorage {
         const remote = room.getRemote();
         if (!remote) return;
 
-        const playbackState = room.getPlaybackState();
+        const lastKnownPlaybackState = room.getPlaybackState();
         // Avoid spamming REST APIs
         if (
-          playbackState !== null &&
+          lastKnownPlaybackState !== null &&
           !room.getStreamingService().isClientSide()
         ) {
-          if (Date.now() - playbackState.updated_at < 5000) return;
+          if (Date.now() - lastKnownPlaybackState.updated_at < 5000) return;
         }
 
-        const newPlaybackState = await remote.getPlaybackState();
-        const music = newPlaybackState.data;
-
+        // Fetching newest playback state and sending it to the room
+        const newPlaybackStateResponse = await remote.getPlaybackState();
         server.io
           .of(`/room/${room.uuid}`)
-          .emit("player:updatePlaybackState", newPlaybackState);
-        room.setPlaybackState(newPlaybackState.data);
+          .emit("player:updatePlaybackState", newPlaybackStateResponse);
 
-        if (!music) return;
+        const newPlaybackState = newPlaybackStateResponse.data;
+        room.setPlaybackState(newPlaybackState);
 
-        const previousPlaybackState = room.getPreviousPlaybackState();
+        if (!newPlaybackState) return console.log("No music is playing");
 
-        const remainingTime = music.duration - music.currentTime;
-        const hasTriggeredEndingSoonValue = this.endingSoon.get(room.uuid);
+        const remainingTime =
+          newPlaybackState.duration - newPlaybackState.currentTime;
+        const hasTriggeredEndingSoonValue = this.startedTimer.get(room.uuid);
 
         if (
           remainingTime < MUSIC_ENDING_SOON_DELAY &&
-          !hasTriggeredEndingSoonValue
+          !hasTriggeredEndingSoonValue &&
+          !(remote instanceof QueueableRemote)
         ) {
-          this.endingSoon.set(room.uuid, true);
+          console.log(
+            `The track of the room ${room.uuid} is ending soon, and it doesn't support queueing`
+          );
+          this.startedTimer.set(room.uuid, true);
 
           setTimeout(() => {
-            if (!newPlaybackState.data?.isPlaying) return;
+            if (!newPlaybackStateResponse.data?.isPlaying)
+              return console.log("The track is not playing anymore");
+            this.startedTimer.set(room.uuid, false);
 
-            const nextTrack = room.getQueue().shift();
-            if (!nextTrack) return;
-            console.log("Playing next track: ", nextTrack);
+            const nextTrack = room.shiftQueue();
+            if (!nextTrack) return console.log("No more tracks in the queue");
+
             remote.playTrack(nextTrack.url);
+            console.log(`The player will now play ${nextTrack.url}`);
           }, remainingTime);
         }
-        if (music.url != previousPlaybackState?.url) {
-          const nextTrack = room.getQueue().shift();
-          this.endingSoon.set(room.uuid, false);
 
-          if (remote instanceof SpotifyRemote) {
-            if (!nextTrack) return;
+        const previousPlaybackState = room.getPreviousPlaybackState();
+
+        // If the track has changed, we add the next track to the queue of the player
+        if (newPlaybackState.url != previousPlaybackState?.url) {
+          console.log(`The track of room ${room.uuid} has changed`);
+
+          if (remote instanceof QueueableRemote) {
+            let nextTrack = room.getQueue().at(0);
+
+            if (nextTrack?.url === newPlaybackState.url) {
+              nextTrack = room.shiftQueue();
+            }
+            if (!nextTrack) return console.log("No more tracks in the queue");
 
             remote.addToQueue(nextTrack.url);
+            console.log(`Just added ${nextTrack.url} to the queue`);
           }
         }
       });

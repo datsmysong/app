@@ -1,5 +1,5 @@
 import { JSONTrack } from "commons/backend-types";
-import Remote from "./remotes/Remote";
+import { Remote } from "./remotes/Remote";
 import Room from "../socketio/Room";
 
 export default abstract class MusicPlatform {

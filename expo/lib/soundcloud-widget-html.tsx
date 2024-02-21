@@ -53,18 +53,29 @@ export default function getSoundCloudWidgetHtml() {
           const playingMusic = await new Promise((resolve, reject) => {
             widget.getCurrentSound((currentSound) => {
               if (!currentSound) return resolve(null);
+
+              let [title, artistsName, albumName] = [
+                currentSound.publisher_metadata.release_title,
+                currentSound.publisher_metadata.artist,
+                currentSound.publisher_metadata.album_title
+              ];
+              if (currentSound.publisher_metadata.release_title === undefined){
+                title = currentSound.title.split(" - ")[1];
+                artistsName = currentSound.title.split(" - ")[0];
+                albumName = currentSound.title;
+              }
       
               const playingMusic = {
                 url: currentSound.permalink_url,
-                title: currentSound.publisher_metadata.release_title,
+                title,
                 duration: currentSound.duration,
-                artistsName: currentSound.publisher_metadata.artist,
-                albumName: currentSound.publisher_metadata.album_title,
+                artistsName,
+                albumName,
                 imgUrl: currentSound.artwork_url.replace("large", "t500x500"),
                 currentTime: position,
                 isPlaying: isCurrentlyPlaying,
               };
-      
+
               resolve(playingMusic);
             });
           });

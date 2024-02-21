@@ -2,7 +2,7 @@
 import { JSONTrack } from "commons/backend-types";
 import { spotify } from "../server";
 import MusicPlatform from "./MusicPlatform";
-import Remote from "./remotes/Remote";
+import { Remote } from "./remotes/Remote";
 import SpotifyRemote from "./remotes/SpotifyRemote";
 import Room from "../socketio/Room";
 import { Track } from "@spotify/web-api-ts-sdk";

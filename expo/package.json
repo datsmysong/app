@@ -60,7 +60,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.2.2",
-    "socket.io-client": "^4.7.4"
+    "socket.io-client": "^4.7.4",
+    "@react-native-community/netinfo": "9.3.10"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

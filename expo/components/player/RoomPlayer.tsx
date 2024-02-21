@@ -48,17 +48,17 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
     if (!remote) return;
 
     if (room.streaming_services?.service_name === "Spotify") {
-      await remote.playTrack("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
+      await remote.playTrack("spotify:track:6afdNrotJ1PCt9DoFiHpLj");
     } else if (room.streaming_services?.service_name === "SoundCloud") {
       await remote.playTrack(
-        "https://soundcloud.com/dukeandjones/call-me-chill-mix"
+        "https://soundcloud.com/martingarrix/martin-garrix-lloyiso-real-love"
       );
     }
   };
 
   return (
     <>
-      {error && <Warning label={error} />}
+      {error && <Warning label={error} variant="error" />}
       <View>
         {isHost && (
           <LocalPlayer
@@ -74,7 +74,7 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
       </View>
 
       <Button type="outline" onPress={playCoolSong}>
-        play Duke & Jones - Call Me (Chill Mix)
+        play Martin Garrix & Lloyiso - Real Love
       </Button>
     </>
   );

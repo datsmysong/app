@@ -1,7 +1,7 @@
 import { JSONTrack } from "commons/Backend-types";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
 import MusicPlatform from "./MusicPlatform";
-import Remote from "./remotes/Remote";
+import { Remote } from "./remotes/Remote";
 import SoundCloudRemote from "./remotes/SoundCloudRemote";
 import Room from "../socketio/Room";
 

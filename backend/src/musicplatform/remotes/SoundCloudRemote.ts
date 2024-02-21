@@ -1,6 +1,6 @@
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import MusicPlatform from "../MusicPlatform";
-import Remote from "./Remote";
+import { Remote } from "./Remote";
 import {
   LocalPlayerServerToClientEvents,
   Response,
@@ -44,7 +44,7 @@ export default class SoundCloudRemote extends Remote {
       };
 
       hostSocket.on(event, listener);
-      hostSocket.emit(event, data);
+      hostSocket.emit(event, data as never);
     });
   }
 
@@ -52,10 +52,6 @@ export default class SoundCloudRemote extends Remote {
     return this.emitAndListen<PlayingJSONTrack | null>(
       "player:playbackStateRequest"
     );
-  }
-
-  async getQueue(): Promise<Response<JSONTrack[]>> {
-    return this.emitAndListen<JSONTrack[]>("player:getQueueRequest");
   }
 
   async playTrack(trackId: string): Promise<Response<void>> {
