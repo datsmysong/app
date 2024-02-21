@@ -13,6 +13,7 @@
 - Menu d'intégrations des plateformes (Spotify et SoundCloud implémentés)
 - Modifier les paramètres de son profil (nom, email, avatar stocké en base de donnée)
 - Fermeture d’une salle d’écoute pour le créateur de la salle
+- Génération d'un QR code redirigeant vers la salle d'écoute
 - Suppression d’une musique pour le créateur de la salle
 - Ecouter une musique dans une salle d’écoute
 - Recherche de musiques
