@@ -79,11 +79,12 @@ export const signInWithProvider = async ({
 
   // At end, if all is good, user come back to the app with a refresh_token to fetch new session
   if (webBrowser.type === "success" && webBrowser.url) {
-    const refreshToken = decodeURIComponent(
-      webBrowser.url.split("#refresh_token=")[1]
-    );
-    const { error } = await supabase.auth.refreshSession({
-      refresh_token: refreshToken,
+    const tokens = webBrowser.url.split("#tokens=")[1];
+    const [refresh_token, access_token] = tokens.split(";");
+
+    const { error } = await supabase.auth.setSession({
+      access_token: decodeURIComponent(access_token),
+      refresh_token: decodeURIComponent(refresh_token),
     });
     if (!error) {
       router.replace("/(tabs)");
