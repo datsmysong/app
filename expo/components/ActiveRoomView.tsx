@@ -121,7 +121,15 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       <ScrollView>
         {room && socket && (
           <View style={[headerStyles.headerContainer, { flex: 1 }]}>
-            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+            <View style={headerStyles.titleContainer}>
+              <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+              <MaterialIcons
+                name="meeting-room"
+                size={28}
+                color="black"
+                onPress={showDialog}
+              />
+            </View>
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
                 Inviter des amis
