@@ -16,9 +16,10 @@ export async function joinRoom(
 
   if (isParticipant) return { error: null };
 
-  const { error: roomUsersError } = await supabase.from("room_users").insert({
+  const { error: roomUsersError } = await supabase.from("room_users").upsert({
     room_id: roomId,
     profile_id: userProfile.user_profile_id,
+    has_left: false,
   });
 
   return { error: roomUsersError };
@@ -34,7 +35,8 @@ export async function getParticipant(
     .from("room_users")
     .select("*")
     .eq("profile_id", userProfile.user_profile_id)
-    .eq("room_id", roomId);
+    .eq("room_id", roomId)
+    .eq("has_left", false);
 
   return { data: participant };
 }
