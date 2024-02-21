@@ -1,11 +1,11 @@
 import { Room, RoomConfiguration } from "commons/database-types-utils";
-import Checkbox from "expo-checkbox";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Alert from "./Alert";
 import Button from "./Button";
+import CustomCheckbox from "./CustomCheckbox";
 import CustomSlider from "./CustomSlider";
 import CustomTextInput from "./CustomTextInput";
 import { Text, View } from "./Themed";
@@ -117,28 +117,17 @@ export default function RoomConfigurationParametersList({
           step={1}
         />
       </View>
-      <View style={styles.checkboxLayout}>
-        <Checkbox
-          value={canBeAnonymous}
-          onValueChange={setCanBeAnonymous}
-          style={styles.checkbox}
-          color="black"
-        />
-        <Text style={styles.checkboxText}>
-          Autoriser les participants anonymes
-        </Text>
-        <View />
-      </View>
+      <CustomCheckbox
+        value={canBeAnonymous}
+        setValue={setCanBeAnonymous}
+        label="Autoriser les utilisateurs anonymes"
+      />
       <View style={styles.separator} />
-      <View style={styles.checkboxLayout}>
-        <Checkbox
-          value={canSkip}
-          onValueChange={setCanSkip}
-          style={styles.checkbox}
-          color="black"
-        />
-        <Text style={styles.checkboxText}>Activer le vote skipping</Text>
-      </View>
+      <CustomCheckbox
+        value={canSkip}
+        setValue={setCanSkip}
+        label="Activer le vote skipping"
+      />
       <View style={styles.slider}>
         <Text style={styles.labelText}>
           Pourcentage nécessaire <Text style={{ color: "red" }}>*</Text>
@@ -233,29 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontStyle: "normal",
     marginBottom: 25,
-  },
-
-  checkboxLayout: {
-    display: "flex",
-    flexDirection: "row",
-    padding: 10,
-    marginLeft: 10,
-    alignItems: "center",
-    gap: 10,
-    alignSelf: "stretch",
-  },
-
-  checkboxText: {
-    fontFamily: "Outfit-Regular",
-    fontSize: 17,
-  },
-  checkbox: {
-    width: 25,
-    height: 25,
-    borderRadius: 7,
-    borderWidth: 2,
-    borderColor: "#1A1A1A",
-    backgroundColor: "#FFF",
   },
   separator: {
     height: 2,
