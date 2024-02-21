@@ -185,6 +185,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               <FlatList
                 style={styles.list}
                 data={liveRoom.queue}
+                keyExtractor={(item) => item.url}
                 renderItem={({ item, index }) => (
                   <TrackItem
                     track={item}
