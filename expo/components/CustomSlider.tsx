@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Bold",
     fontSize: 17,
     fontStyle: "normal",
-    // maxWidth: 300,
     marginBottom: 25,
   },
 

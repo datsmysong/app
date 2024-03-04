@@ -117,7 +117,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
             <View style={headerStyles.titleContainer}>
               <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
               {isHost ? (
-                <Link href={`/rooms/${room.id}/settings`} asChild>
+                <Link href={`/rooms/${room.id}/settings`}>
                   <MaterialIcons
                     name="settings"
                     style={headerStyles.settingsIcon}

@@ -1,4 +1,3 @@
-import { Room, RoomConfiguration } from "commons/database-types-utils";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
@@ -88,7 +87,8 @@ export default function RoomConfigurationParametersList({
       );
       return;
     }
-    router.back();
+    if (router.canGoBack()) router.back();
+    router.push(("/rooms/" + roomId) as any);
   };
 
   const deleteRoom = async () => {
