@@ -20,25 +20,6 @@ export interface QueryParams {
 
 type ReturnedRoomData = QueryData<ReturnType<typeof query>>[0];
 
-/*
- * This function is a workaround for the lack of support for the Intl.DurationFormat API in Expo
- * See https://www.30secondsofcode.org/js/s/format-duration/
- */
-const formatDuration = (ms: number) => {
-  if (ms < 0) ms = -ms;
-  const time = {
-    d: Math.floor(ms / 86400000),
-    h: Math.floor(ms / 3600000) % 24,
-    m: Math.floor(ms / 60000) % 60,
-    s: Math.floor(ms / 1000) % 60,
-    ms: Math.floor(ms) % 1000,
-  };
-  return Object.entries(time)
-    .filter((val) => val[1] !== 0)
-    .map(([key, val]) => `${val}${key}`)
-    .join(" ");
-};
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isLiked(song: RoomHistory, user: User): boolean {
   return false;
@@ -164,11 +145,11 @@ const useProcessRoom = (
 
   let averageSongDuration = "0s";
   if (playedSongs.length >= 1) {
-    averageSongDuration = formatDuration(
+    averageSongDuration = (
       (playedSongs.reduce((acc, song) => acc + song.duration, 0) /
         playedSongs.length) *
-        1000
-    );
+      1000
+    ).toString();
   }
 
   const genresPlayCount = playedSongs
