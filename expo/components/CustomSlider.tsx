@@ -13,7 +13,8 @@ interface ParametersListProps {
   maximumTrackTintColor: string;
   minimumTrackTintColor: string;
   step: number;
-  thumbImage: ImageURISource | undefined;
+  // Watch out for the `thumbImage` prop (on expo android)
+  thumbImage?: ImageURISource;
   onSlidingComplete?: () => void;
   disabled?: boolean;
 }
@@ -68,7 +69,6 @@ export default function CustomSlider({
         minimumValue={minimumValue}
         maximumTrackTintColor={maximumTrackTintColor}
         minimumTrackTintColor={minimumTrackTintColor}
-        // thumbImage={thumbImage}
         thumbTintColor="#1A1A1A"
         value={value}
         onValueChange={setValue}

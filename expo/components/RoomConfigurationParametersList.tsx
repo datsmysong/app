@@ -119,7 +119,6 @@ export default function RoomConfigurationParametersList({
             minimumTrackTintColor="#1A1A1A"
             // Doesn't change anything, don't really understand why, but I'll need to find a
             // solution to this later
-            thumbImage={thumbImage}
             value={sliderParticipantValue}
             setValue={(value) => setSliderParticipantValue(value)}
             // The column is not on the table room_configuration
