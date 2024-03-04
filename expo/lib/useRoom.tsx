@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 
 import { supabase } from "./supabase";
 
-const fetchData = supabase
-  .from("rooms")
-  .select("*, streaming_services(*)")
-  .eq("is_active", true);
+const fetchData = supabase.from("rooms").select("*, streaming_services(*)");
 export type ActiveRoom = QueryData<typeof fetchData>[0];
 
 export default function useRoom(roomId: string) {
@@ -15,8 +12,7 @@ export default function useRoom(roomId: string) {
   /** This is temporary, since the query is duplicated */
   const conditionalFetchData = supabase
     .from("rooms")
-    .select("*, streaming_services(*)")
-    .eq("is_active", true);
+    .select("*, streaming_services(*)");
 
   useEffect(() => {
     async function fetchRoom() {

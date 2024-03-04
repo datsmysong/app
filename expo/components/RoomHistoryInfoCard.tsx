@@ -56,7 +56,7 @@ export default function RoomHistoryInfoCard({
           par {username} le {formatedDate}
         </Text>
       </View>
-      <Link href={`/rooms/${room.id}/history`}>
+      <Link href={`/rooms/${room.id}`}>
         <MaterialIcons name="keyboard-arrow-right" size={32} color="black" />
       </Link>
     </View>

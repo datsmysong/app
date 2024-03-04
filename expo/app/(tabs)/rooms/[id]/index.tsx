@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 
 import ActiveRoomView from "../../../../components/ActiveRoomView";
+import RoomHistory from "../../../../components/RoomHistory";
 import { Text, View } from "../../../../components/Themed";
 import useRoom from "../../../../lib/useRoom";
 
@@ -11,7 +12,7 @@ export default function RoomView() {
   return (
     <View style={{ flex: 1, height: "100%" }}>
       {room && room.is_active && <ActiveRoomView room={room} />}
-      {room && !room.is_active && <Text>TODO</Text>}
+      {room && !room.is_active && <RoomHistory roomId={id} />}
       {!room && (
         <Text>
           Vous semblez perdu, la salle à laquelle vous essayez d'accéder
