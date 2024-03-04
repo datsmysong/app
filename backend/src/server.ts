@@ -24,6 +24,7 @@ import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
 import { Database } from "commons/database-types";
 import RoomLeaveGET from "./route/RoomLeaveGET";
+import RoomConfigurationUpdatePOST from "./route/RoomConfigurationUpdatePOST";
 
 config({ path: ".env.local" });
 
@@ -164,6 +165,8 @@ server.get("/room/:id/leave", RoomLeaveGET);
 server.get("/room/:id/end", RoomEndGET);
 
 server.get("/rooms", RoomGET);
+
+server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 
 // server.get("/track/spotify/:id", SpotifyGET);
 
