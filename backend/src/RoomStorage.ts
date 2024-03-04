@@ -102,7 +102,8 @@ export default class RoomStorage {
             let nextTrack = room.getQueue().at(0);
 
             if (nextTrack?.url === newPlaybackState.url) {
-              nextTrack = room.shiftQueue();
+              room.shiftQueue();
+              nextTrack = room.getQueue().at(0);
             }
             if (!nextTrack) return console.log("No more tracks in the queue");
 
