@@ -63,12 +63,13 @@ export default function CustomSlider({
         ]}
       />
       <Slider
-        style={[styles.sliderBar, { width }]}
+        style={[styles.sliderBar, { width, borderColor: "red" }]}
         maximumValue={maximumValue}
         minimumValue={minimumValue}
         maximumTrackTintColor={maximumTrackTintColor}
         minimumTrackTintColor={minimumTrackTintColor}
-        thumbImage={thumbImage}
+        // thumbImage={thumbImage}
+        thumbTintColor="#1A1A1A"
         value={value}
         onValueChange={setValue}
         step={step}
