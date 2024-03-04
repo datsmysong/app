@@ -37,7 +37,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
 
   useEffect(() => {
     const fetchProcessedRoomData = async () => {
-      const data = await fetch(`${apiUrl}/rooms/${roomId}`, {
+      const data = await fetch(`${apiUrl}/room/${roomId}`, {
         method: "GET",
         credentials: "include",
         headers: {
