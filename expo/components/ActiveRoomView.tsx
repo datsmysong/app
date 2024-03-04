@@ -59,13 +59,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
 
-  const deleteRoom = async () => {
-    const response = await fetch(url + "/end", { credentials: "include" });
-    if (!response.ok && process.env.NODE_ENV !== "production") {
-      Alert.alert(await response.text());
-    }
-  };
-
   useEffect(() => {
     if (!userProfile || !room) return;
 
@@ -166,14 +159,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 )}
               />
             )}
-            <Button
-              onPress={deleteRoom}
-              color="danger"
-              block
-              style={{ margin: 20, marginRight: 100 }}
-            >
-              Supprimer la salle
-            </Button>
           </View>
         )}
       </ScrollView>

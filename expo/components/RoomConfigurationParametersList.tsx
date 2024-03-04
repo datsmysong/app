@@ -16,10 +16,6 @@ interface ParametersListProps {
   roomId: string;
 }
 
-type RoomAndConfiguration = Room & {
-  room_configurations: RoomConfiguration;
-};
-
 export default function RoomConfigurationParametersList({
   roomId,
 }: ParametersListProps) {
@@ -95,84 +91,97 @@ export default function RoomConfigurationParametersList({
     router.back();
   };
 
+  const deleteRoom = async () => {
+    const url: URL = new URL("/room/" + roomId, getApiUrl());
+
+    const response = await fetch(url + "/end", { credentials: "include" });
+    if (!response.ok && process.env.NODE_ENV !== "production") {
+      Alert.alert(await response.text());
+    }
+  };
+
   return (
     <View style={styles.page}>
       <Text style={styles.title}>Paramètres de la salle</Text>
-      <View style={styles.slider}>
-        <Text style={styles.labelText}>
-          Limite de participants <Text style={{ color: "red" }}>*</Text>
-        </Text>
-        <CustomSlider
-          maximumValue={20}
-          minimumValue={2}
-          maximumTrackTintColor="#CCCCCC"
-          minimumTrackTintColor="#1A1A1A"
-          // Doesn't change anything, don't really understand why, but I'll need to find a
-          // solution to this later
-          thumbImage={thumbImage}
-          value={sliderParticipantValue}
-          setValue={(value) => setSliderParticipantValue(value)}
-          // The column is not on the table room_configuration
-          // onSlidingComplete={handleSave}
-          step={1}
-        />
-      </View>
-      <CustomCheckbox
-        value={canBeAnonymous}
-        setValue={setCanBeAnonymous}
-        label="Autoriser les utilisateurs anonymes"
-      />
-      <View style={styles.separator} />
-      <CustomCheckbox
-        value={canSkip}
-        setValue={setCanSkip}
-        label="Activer le vote skipping"
-      />
-      <View style={styles.slider}>
-        <Text style={styles.labelText}>
-          Pourcentage nécessaire <Text style={{ color: "red" }}>*</Text>
-        </Text>
-        <CustomSlider
-          maximumValue={100}
-          minimumValue={1}
-          maximumTrackTintColor="#CCCCCC"
-          minimumTrackTintColor={canSkip ? "#1A1A1A" : "grey"}
-          thumbImage={thumbImage}
-          value={sliderPercentageValue}
-          setValue={(value) => setSliderPercentageValue(value)}
-          step={5}
-          disabled={!canSkip}
-        />
-      </View>
-      <View style={styles.separator} />
-      <View style={styles.inputLayout}>
-        <Text style={styles.labelText}>
-          Durée maximale d'une musique <Text style={{ color: "red" }}>*</Text>
-        </Text>
-        <CustomTextInput
-          value={maxMusicDuration}
-          onChangeText={setMaxMusicDuration}
-          style={styles.input}
-        />
-      </View>
-      <View style={styles.inputLayout}>
-        <Text style={styles.labelText}>
-          Nombre de musiques maximal par participant{" "}
-          <Text style={{ color: "red" }}>*</Text>
-        </Text>
-        <CustomTextInput
-          value={maxMusicPerUser}
-          onChangeText={setMaxMusicPerUser}
-          style={styles.input}
-        />
-      </View>
-      <Button
-        type="filled"
-        onPress={handleSave}
-        style={{ alignSelf: "center" }}
+      <View
+        style={{
+          gap: 16,
+        }}
       >
-        {" "}
-        Sauvegarder{" "}
+        <View style={styles.slider}>
+          <Text style={styles.labelText}>
+            Limite de participants <Text style={{ color: "red" }}>*</Text>
+          </Text>
+          <CustomSlider
+            maximumValue={20}
+            minimumValue={2}
+            maximumTrackTintColor="#CCCCCC"
+            minimumTrackTintColor="#1A1A1A"
+            // Doesn't change anything, don't really understand why, but I'll need to find a
+            // solution to this later
+            thumbImage={thumbImage}
+            value={sliderParticipantValue}
+            setValue={(value) => setSliderParticipantValue(value)}
+            // The column is not on the table room_configuration
+            // onSlidingComplete={handleSave}
+            step={1}
+          />
+        </View>
+        <CustomCheckbox
+          value={canBeAnonymous}
+          setValue={setCanBeAnonymous}
+          label="Autoriser les utilisateurs anonymes"
+        />
+        <View style={styles.separator} />
+        <CustomCheckbox
+          value={canSkip}
+          setValue={setCanSkip}
+          label="Activer le vote skipping"
+        />
+        <View style={styles.slider}>
+          <Text style={styles.labelText}>
+            Pourcentage nécessaire <Text style={{ color: "red" }}>*</Text>
+          </Text>
+          <CustomSlider
+            maximumValue={100}
+            minimumValue={1}
+            maximumTrackTintColor="#CCCCCC"
+            minimumTrackTintColor={canSkip ? "#1A1A1A" : "grey"}
+            thumbImage={thumbImage}
+            value={sliderPercentageValue}
+            setValue={(value) => setSliderPercentageValue(value)}
+            step={5}
+            disabled={!canSkip}
+          />
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.inputLayout}>
+          <Text style={styles.labelText}>
+            Durée maximale d'une musique <Text style={{ color: "red" }}>*</Text>
+          </Text>
+          <CustomTextInput
+            value={maxMusicDuration}
+            onChangeText={setMaxMusicDuration}
+            style={styles.input}
+          />
+        </View>
+        <View style={styles.inputLayout}>
+          <Text style={styles.labelText}>
+            Nombre de musiques maximal par participant{" "}
+            <Text style={{ color: "red" }}>*</Text>
+          </Text>
+          <CustomTextInput
+            value={maxMusicPerUser}
+            onChangeText={setMaxMusicPerUser}
+            style={styles.input}
+          />
+        </View>
+      </View>
+      <Button type="filled" onPress={handleSave} block>
+        Sauvegarder
+      </Button>
+      <Button onPress={deleteRoom} color="danger" block prependIcon="delete">
+        Supprimer la salle
       </Button>
     </View>
   );
@@ -182,9 +191,8 @@ const styles = StyleSheet.create({
   page: {
     maxWidth: 700,
     width: "80%",
-    gap: 12,
-    paddingBottom: 20,
-    paddingTop: 20,
+    gap: 30,
+    paddingVertical: 20,
     flex: 1,
   },
   title: {
@@ -221,7 +229,6 @@ const styles = StyleSheet.create({
     fontFamily: "Outfit-Bold",
     fontSize: 17,
     fontStyle: "normal",
-    marginBottom: 25,
   },
   separator: {
     height: 2,
@@ -237,17 +244,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-start",
     alignSelf: "stretch",
-    gap: 10,
-    marginLeft: 20,
+    gap: 8,
   },
-
   input: {
     color: "grey",
-    width: "90%",
-    marginRight: "10%",
     fontSize: 14,
+    width: "100%",
   },
-
   thumbLabel: {
     position: "absolute",
     bottom: "100%",
