@@ -52,7 +52,7 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
       });
 
     if (error) {
-      console.log("error", error);
+      console.error("error", error);
       return {
         error: error.message,
       };

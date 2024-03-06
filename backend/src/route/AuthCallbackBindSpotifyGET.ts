@@ -61,7 +61,6 @@ export default async function AuthCallbackBindSpotifyGET(
   }
 
   const token = await tokenRes.json();
-  console.log("token", token);
 
   const accessToken = token.access_token;
   const refreshToken = token.refresh_token;

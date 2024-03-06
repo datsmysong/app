@@ -128,7 +128,6 @@ export default function CreateRoom() {
         body: JSON.stringify(body),
         credentials: "include",
       });
-      console.log(response);
 
       if (!response.ok) {
         if (response.status === 409)
