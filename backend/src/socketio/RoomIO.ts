@@ -57,8 +57,8 @@ export default function onRoomWSConnection(socket: TypedSocket) {
       sendQueue(socket, room);
     });
 
-    socket.on("queue:add", async (rawUrl: string) => {
-      await room.add(rawUrl);
+    socket.on("queue:add", async (rawUrl: string, userProfileId: string) => {
+      await room.add(rawUrl, userProfileId);
       roomSocket.emit("queue:update", Room.toJSON(room));
     });
 
