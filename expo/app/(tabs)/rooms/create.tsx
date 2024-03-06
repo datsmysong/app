@@ -38,7 +38,6 @@ export default function CreateRoom() {
   const [maxMusicDuration, setMaxMusicDuration] = useState("300");
   const [canVote, setCanVote] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [services, setServices] = useState<StreamingService[]>([]);
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
   const [isPressed, setIsPressed] = useState(false);
@@ -52,22 +51,6 @@ export default function CreateRoom() {
   const TriangleDown = () => {
     return <View style={[styles.triangle, styles.triangleDown]} />;
   };
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      const response = await fetch(baseUrl + "/streaming-services");
-      const data = await response.json();
-
-      const services: StreamingService[] = [];
-
-      data.forEach((service: StreamingService) => {
-        services.push(service);
-      });
-      setServices(services);
-    };
-
-    fetchServices();
-  }, []);
 
   useEffect(() => {
     if (roomName && roomCode && selectedService) {
@@ -161,10 +144,7 @@ export default function CreateRoom() {
         onChangeText={setRoomCode}
       />
       <Text style={styles.labelText}>Plateforme de streaming à utiliser</Text>
-      <ServiceList
-        availableServices={services}
-        handleServiceChange={setSelectedService}
-      />
+      <ServiceList handleServiceChange={setSelectedService} />
 
       <TouchableOpacity
         onPress={() => {
