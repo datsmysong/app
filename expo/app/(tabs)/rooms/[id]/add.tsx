@@ -60,6 +60,7 @@ export default function AddTrack() {
         placeholder="Rechercher"
         onSubmitEditing={searchMusic}
         style={{ marginBottom: 24 }}
+        autofocus
       />
       {searchBar ? (
         result === null ? (

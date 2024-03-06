@@ -19,6 +19,7 @@ export interface CustomTextInputProps {
   autoComplete?: TextInputProps["autoComplete"];
   secureTextEntry?: boolean;
   onSubmitEditing?: () => void;
+  autofocus?: boolean;
 }
 
 export default function CustomTextInput({
@@ -32,6 +33,7 @@ export default function CustomTextInput({
   autoComplete,
   secureTextEntry,
   onSubmitEditing,
+  autofocus,
 }: CustomTextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -43,6 +45,7 @@ export default function CustomTextInput({
       onBlur={() => {
         onBlur ? onBlur() : setIsFocused(false);
       }}
+      autoFocus={autofocus}
       placeholder={placeholder}
       placeholderTextColor="#949494"
       inputMode={inputMode}
