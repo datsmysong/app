@@ -80,7 +80,7 @@ export interface ClientToServerEvents
   extends LocalPlayerClientToServerEvents,
     PlayerClientToServerEvents {
   /** Add a track to the queue. */
-  "queue:add": (rawUrl: string) => void;
+  "queue:add": (rawUrl: string, userProfileId: string) => void;
   /** Remove a track from the queue by its index. */
   "queue:remove": (index: number) => void;
   /** Remove a track from the queue by its link. */
