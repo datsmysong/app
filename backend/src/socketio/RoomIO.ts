@@ -42,6 +42,9 @@ export default function RoomIO(
     const hostSocket = isHostSocket ? socket : null;
     const room = await roomStorage.roomFromUuid(activeRoomId, hostSocket);
 
+    // Fetch participant of room at every connection for now
+    room?.updateParticipant();
+
     if (room === null) {
       socket.disconnect();
       return;
@@ -57,7 +60,7 @@ export default function RoomIO(
 
     socket.on("queue:add", async (params: string) => {
       await room.add(params);
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueueUpdated();
     });
 
     // We should check the origin of the request to prevent anyone that isn't the host from removing anything
@@ -70,13 +73,30 @@ export default function RoomIO(
       } else {
         await room.removeWithLink(params);
       }
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueueUpdated();
     });
 
     socket.on("queue:removeLink", async (link) => {
       await room.removeWithLink(link);
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueueUpdated();
     });
+
+    socket.on("queue:voteSkip", async (index, userId) => {
+      const addedVote = room.addVoteSkip(index, userId); // all user are not notified of the vote skip
+      if (!addedVote) return;
+
+      const skipped = await room.verifyVoteSkip(index);
+      if (skipped === "queueTrackSkiped") sendQueueUpdated();
+      if (skipped === "actualTrackSkiped") {
+        const remote = room.getRemote();
+        if (!remote) return;
+        updatePlaybackState(socket, remote);
+      }
+    });
+
+    const sendQueueUpdated = () => {
+      roomSocket.emit("queue:update", Room.toJSON(room));
+    };
 
     socket.on("player:playTrack", async (trackId) => {
       const remote = room.getRemote();

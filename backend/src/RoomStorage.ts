@@ -5,6 +5,7 @@ import SoundCloud from "./musicplatform/SoundCloud";
 import Spotify from "./musicplatform/Spotify";
 import { adminSupabase } from "./server";
 import Room from "./socketio/Room";
+import { RoomWithForeignTable } from "./socketio/RoomDatabase";
 
 const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
@@ -46,51 +47,47 @@ export default class RoomStorage {
   ): Promise<Room | null> {
     const { data: remoteRoom } = await adminSupabase
       .from("rooms")
-      .select("*, streaming_services(*)")
+      .select("*, streaming_services(*), room_configurations(*)")
       .eq("id", rawUuid)
       .eq("is_active", true)
       .single();
 
-    const streamingService = remoteRoom?.streaming_services;
+    if (!remoteRoom) return null;
 
-    if (remoteRoom === null || !streamingService) {
-      return null;
-    }
+    const parseRemote = parseRemoteRoom(remoteRoom);
+    if (!parseRemote) return null;
+    const { musicPlatform, roomWithConfig } = parseRemote;
 
-    const musicPlatform = getMusicPlatform(streamingService?.service_id);
-
-    if (!musicPlatform) {
-      return null;
-    }
-
-    return Room.getOrCreate(this, remoteRoom.id, musicPlatform, hostSocket);
+    return Room.getOrCreate(
+      this,
+      remoteRoom.id,
+      musicPlatform,
+      hostSocket,
+      roomWithConfig
+    );
   }
 
   async roomFromCode(code: string, hostSocket: Socket): Promise<Room | null> {
     const { data: remoteRoom } = await adminSupabase
       .from("rooms")
-      .select("*, streaming_services(*)")
+      .select("*, streaming_services(*), room_configurations(*)")
       .eq("code", code)
       .eq("is_active", true)
       .single();
 
-    const streamingService = remoteRoom?.streaming_services;
+    if (!remoteRoom) return null;
 
-    if (remoteRoom === null || !streamingService) {
-      return null;
-    }
+    const parseRemote = parseRemoteRoom(remoteRoom);
+    if (!parseRemote) return null;
+    const { musicPlatform, roomWithConfig } = parseRemote;
 
-    const musicPlatform = getMusicPlatform(streamingService?.service_id);
-
-    if (!musicPlatform) {
-      return null;
-    }
-
-    if (remoteRoom === null) {
-      return null;
-    }
-
-    return Room.getOrCreate(this, remoteRoom.id, musicPlatform, hostSocket);
+    return Room.getOrCreate(
+      this,
+      remoteRoom.id,
+      musicPlatform,
+      hostSocket,
+      roomWithConfig
+    );
   }
 
   async getRooms(): Promise<Room[]> {
@@ -113,3 +110,22 @@ export default class RoomStorage {
     return this.data.get(activeRoomId) ?? null;
   }
 }
+
+const parseRemoteRoom = (remoteRoom: RoomWithForeignTable | null) => {
+  if (remoteRoom === null || !remoteRoom.streaming_services) {
+    return null;
+  }
+  const { streaming_services: streamingService, ...roomWithConfig } =
+    remoteRoom;
+
+  const musicPlatform = getMusicPlatform(streamingService?.service_id);
+
+  if (!musicPlatform || !roomWithConfig) {
+    return null;
+  }
+
+  return {
+    musicPlatform,
+    roomWithConfig,
+  };
+};

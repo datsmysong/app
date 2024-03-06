@@ -14,6 +14,8 @@ export default function TrackItem(prop: {
   index: number;
   roomId: string;
   isMenuDisabled: boolean;
+  handleDislike: () => void;
+  disliked: boolean;
 }) {
   const {
     title,
@@ -21,12 +23,18 @@ export default function TrackItem(prop: {
     albumName: album,
     imgUrl: rawImageUrl,
   } = prop.track;
-  const [dislike, setDislike] = useState(false);
+  const [dislike, setDislike] = useState(prop.disliked);
 
   const removeTrack = () => {
     SocketIo.getInstance()
       .getSocket(`/room/${prop.roomId}`)
       .emit("queue:remove", prop.index);
+  };
+
+  const handleDislike = () => {
+    const disliked = !dislike;
+    setDislike(disliked);
+    prop.handleDislike();
   };
 
   return (
@@ -41,7 +49,7 @@ export default function TrackItem(prop: {
         />
       }
     >
-      <Pressable onPress={() => setDislike(!dislike)}>
+      <Pressable onPress={handleDislike}>
         <FontAwesome
           name={`thumbs-${!dislike ? "o-" : ""}down`}
           style={itemStyles.icon}

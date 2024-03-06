@@ -69,8 +69,3 @@ export async function createRoom(
   // If we managed to create the room
   return rep.code(201).send(response);
 }
-
-export function endRoom(roomId: string) {
-  // TODO: Properly end room
-  // This will set the join code of this room to null, and set is_active to false
-}

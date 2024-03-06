@@ -2,13 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { RoomJSON } from "commons/Backend-types";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { FlatList, Platform, ScrollView, StyleSheet } from "react-native";
 
 import Alert from "./Alert";
 import Button from "./Button";
@@ -52,6 +46,8 @@ type ActiveRoomViewProps = {
 const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [liveRoom, setLiveRoom] = useState<RoomJSON>();
   const [isHost, setIsHost] = useState<boolean>(false);
+  const [voteSkipActualTrack, setVoteSkipActualTrack] =
+    useState<boolean>(false);
 
   const userProfile = useUserProfile();
 
@@ -69,6 +65,14 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
     fetchHost();
   }, [userProfile, room]);
+
+  useEffect(() => {
+    if (liveRoom && liveRoom.voteSkipActualTrack && userProfile) {
+      setVoteSkipActualTrack(
+        liveRoom.voteSkipActualTrack.includes(userProfile.user_profile_id)
+      );
+    }
+  }, [liveRoom]);
 
   useEffect(() => {
     if (!socket) return;
@@ -109,6 +113,28 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     router.replace("/rooms");
   };
 
+  /**
+   * Handle the dislike of a track
+   * @param index -1 for actual track, otherwise the index of the track in the queue
+   * @returns void
+   */
+  const handleDislike = (index: number) => {
+    if (!socket || !userProfile) return;
+    const userId = userProfile.user_profile_id;
+
+    socket.emit("queue:voteSkip", index, userId);
+    if (index === -1) {
+      setVoteSkipActualTrack(!voteSkipActualTrack);
+    }
+  };
+
+  const deleteRoom = async () => {
+    const response = await fetch(url + "/end", { credentials: "include" });
+    if (!response.ok && process.env.NODE_ENV !== "production") {
+      Alert.alert(await response.text());
+    }
+  };
+
   return (
     <>
       <ScrollView>
@@ -140,6 +166,16 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               </Button>
             </View>
             <RoomPlayer socket={socket} room={room} />
+            <Button
+              onPress={() => {
+                handleDislike(-1);
+              }}
+              prependIcon="thumb-down-alt"
+              size="small"
+              type={voteSkipActualTrack ? "filled" : "outline"}
+            >
+              Voter pour passer
+            </Button>
             <Text style={styles.title}>
               File d'attente ({liveRoom?.queue.length ?? 0})
             </Text>
@@ -149,12 +185,21 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               <FlatList
                 style={styles.list}
                 data={liveRoom.queue}
+                keyExtractor={(item) => item.url}
                 renderItem={({ item, index }) => (
                   <TrackItem
                     track={item}
                     index={index}
                     roomId={room.id}
                     isMenuDisabled={!isHost}
+                    handleDislike={() => handleDislike(index)}
+                    disliked={
+                      (item.votes &&
+                        item.votes.includes(
+                          userProfile?.user_profile_id ?? ""
+                        )) ||
+                      false
+                    }
                   />
                 )}
               />
