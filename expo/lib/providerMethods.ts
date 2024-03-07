@@ -88,6 +88,7 @@ export const signInWithProvider = async ({
     });
 
     if (!error) {
+      WebBrowser.maybeCompleteAuthSession(); // required for web only
       router.replace("/(tabs)");
       return;
     }
