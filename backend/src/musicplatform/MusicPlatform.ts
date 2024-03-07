@@ -1,4 +1,4 @@
-import { JSONTrack } from "commons/Backend-types";
+import { JSONTrack } from "commons/backend-types";
 import Remote from "./remotes/Remote";
 import Room from "../socketio/Room";
 
