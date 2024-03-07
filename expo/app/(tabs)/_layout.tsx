@@ -1,12 +1,9 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect, Tabs } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import { useColorScheme } from "react-native";
 
 import { Text } from "../../components/Tamed";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
-
-WebBrowser.maybeCompleteAuthSession();
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -37,8 +34,6 @@ function TabBarLabel(props: {
 }
 
 export default function TabLayout() {
-  WebBrowser.maybeCompleteAuthSession(); // required for web only
-
   const colorScheme = useColorScheme();
 
   const user = useSupabaseUserHook();
