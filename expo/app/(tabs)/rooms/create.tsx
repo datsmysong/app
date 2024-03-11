@@ -1,17 +1,12 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import Alert from "../../../components/Alert";
 import CustomTextInput from "../../../components/CustomTextInput";
 import ParametersList from "../../../components/ParametersList";
 import ServiceList from "../../../components/ServicesList";
+import Warning from "../../../components/Warning";
 import { getApiUrl } from "../../../lib/apiUrl";
 
 type CreateRoomFormBody = {
@@ -33,24 +28,17 @@ export type StreamingService = {
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState("");
   const [roomCode, setRoomCode] = useState("");
-  const [percentageVoteToSkipAMusic, setPercentageVote] = useState("70");
+  const [percentageVoteToSkipAMusic, setPercentageVote] = useState(70);
   const [maxMusicPerUser, setMaxMusicPerUser] = useState("3");
   const [maxMusicDuration, setMaxMusicDuration] = useState("300");
   const [canVote, setCanVote] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
-  const [isPressed, setIsPressed] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const baseUrl = getApiUrl();
-
-  const TriangleRight = () => {
-    return <View style={[styles.triangle, styles.triangleRight]} />;
-  };
-
-  const TriangleDown = () => {
-    return <View style={[styles.triangle, styles.triangleDown]} />;
-  };
 
   useEffect(() => {
     if (roomName && roomCode && selectedService) {
@@ -60,9 +48,21 @@ export default function CreateRoom() {
     }
   }, [roomName, roomCode, selectedService]);
 
+  useEffect(() => {
+    console.log(error);
+    if (error) {
+      setTimeout(() => {
+        setError(false);
+        setErrorMessage("");
+        router.replace("/rooms/create");
+      }, 3000);
+    }
+  }, []);
+
   function checkConstraints(body: CreateRoomFormBody): { error: true | null } {
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
-      Alert.alert(
+      setError(true);
+      setErrorMessage(
         "Mauvais pourcentage : Le pourcentage doit être entre 0 et 100"
       );
       return { error: true };
@@ -92,7 +92,7 @@ export default function CreateRoom() {
       code: roomCode,
       service: selectedService,
       voteSkipping: canVote,
-      voteSkippingNeeded: parseInt(percentageVoteToSkipAMusic, 10),
+      voteSkippingNeeded: percentageVoteToSkipAMusic,
       maxMusicPerUser: parseInt(maxMusicPerUser, 10),
       maxMusicDuration: parseInt(maxMusicDuration, 10),
     };
@@ -113,10 +113,15 @@ export default function CreateRoom() {
       });
 
       if (!response.ok) {
-        if (response.status === 409)
-          return Alert.alert("Ce code de salle est déjà utilisé");
+        if (response.status === 409) {
+          setError(true);
+          setErrorMessage("Ce code de salle est déjà utilisé");
+          return;
+        }
 
-        return Alert.alert(response.statusText);
+        setError(true);
+        setErrorMessage(response.statusText);
+        return;
       }
 
       const jsonResponse = await response.json();
@@ -125,13 +130,21 @@ export default function CreateRoom() {
       router.push(`/rooms/${roomId}`);
     } catch (error) {
       console.error(error);
-      Alert.alert("Une erreur est survenue lors de la création de la salle");
+      setError(true);
+      setErrorMessage(
+        "Une erreur est survenue lors de la création de la salle"
+      );
     }
   };
 
-  return (
+  return error ? (
+    <Warning label={errorMessage} variant="warning" />
+  ) : (
     <ScrollView contentContainerStyle={styles.page}>
-      <Text style={styles.labelText}>Nom de la salle</Text>
+      <Text style={styles.labelText}>
+        Nom de la salle
+        <Text style={[{ color: "red" }, styles.labelText]}>*</Text>
+      </Text>
       <CustomTextInput
         placeholder="Ma salle"
         value={roomName}
@@ -145,30 +158,16 @@ export default function CreateRoom() {
       />
       <Text style={styles.labelText}>Plateforme de streaming à utiliser</Text>
       <ServiceList handleServiceChange={setSelectedService} />
-
-      <TouchableOpacity
-        onPress={() => {
-          setIsPressed(!isPressed);
-        }}
-      >
-        <View style={styles.items}>
-          {isPressed ? <TriangleDown /> : <TriangleRight />}
-          <Text style={styles.item}>Paramètres supplémentaires</Text>
-        </View>
-      </TouchableOpacity>
-
-      {isPressed && (
-        <ParametersList
-          percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
-          setPercentageVote={setPercentageVote}
-          maxMusicDuration={maxMusicDuration}
-          setMaxMusicDuration={setMaxMusicDuration}
-          maxMusicPerUser={maxMusicPerUser}
-          setMaxMusicPerUser={setMaxMusicPerUser}
-          canVote={canVote}
-          setCanVote={setCanVote}
-        />
-      )}
+      <ParametersList
+        percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
+        setPercentageVote={setPercentageVote}
+        maxMusicDuration={maxMusicDuration}
+        setMaxMusicDuration={setMaxMusicDuration}
+        maxMusicPerUser={maxMusicPerUser}
+        setMaxMusicPerUser={setMaxMusicPerUser}
+        canSkip={canVote}
+        setCanSkip={setCanVote}
+      />
       <TouchableOpacity
         style={[styles.button, !isFormValid && styles.buttonDisabled]}
         onPress={onSubmit}
@@ -181,27 +180,6 @@ export default function CreateRoom() {
 }
 
 const styles = StyleSheet.create({
-  triangle: {
-    width: 0,
-    height: 0,
-    backgroundColor: "transparent",
-    borderStyle: "solid",
-    borderLeftWidth: 7,
-    borderRightWidth: 7,
-    borderBottomWidth: 14,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderBottomColor: "black",
-  },
-
-  triangleRight: {
-    transform: "rotateZ(90deg)",
-  },
-
-  triangleDown: {
-    transform: "rotateX(180deg)",
-  },
-
   items: {
     flexDirection: "row",
     alignItems: "center",
@@ -240,9 +218,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   labelText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 5,
+    fontSize: 20,
+    fontFamily: "Outfit-Bold",
+    marginVertical: 10,
   },
   buttonDisabled: {
     backgroundColor: "#7f7f7f",
