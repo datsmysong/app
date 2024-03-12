@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { ErrorBoundaryProps, Stack, useLocalSearchParams } from "expo-router";
 import {
   ReactNode,
   createContext,
@@ -6,12 +6,22 @@ import {
   useEffect,
   useState,
 } from "react";
+import { View, Text } from "react-native";
 import { Socket } from "socket.io-client";
 
+import ErrorBoundary from "../../../../components/ErrorBoundary";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import SocketIo from "../../../../lib/socketio";
 
 const WebSocketContext = createContext<Socket | null>(null);
+
+// export function ErrorBoundary(props: ErrorBoundaryProps) {
+//   return (
+//     <View>
+//       <Text>Enfaite faut dans le layout oyuuuu</Text>;
+//     </View>
+//   );
+// }
 
 const WebSocketProvider = ({
   children,
@@ -64,7 +74,11 @@ export default function RoomTabLayout() {
             presentation: "transparentModal",
           }}
         />
-        <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
+        {/* <ErrorBoundary fallback="test2"> */}
+        <ErrorBoundary>
+          <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
+        </ErrorBoundary>
+        {/* </ErrorBoundary> */}
         <Stack.Screen name="settings" options={{ title: "Paramètres" }} />
       </Stack>
     </WebSocketProvider>

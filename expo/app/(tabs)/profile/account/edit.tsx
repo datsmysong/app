@@ -55,17 +55,17 @@ export default function PersonalInfo() {
   });
 
   const inputsChange = watch();
-
   useEffect(() => {
     if (user && user.email) {
       if (user.app_metadata.provider !== "email") setEmailDisabled(true);
       setValue("email", user.email);
-      getUserProfile(user.id).then((profile) => {
-        if (profile && profile.username) {
-          setValue("username", profile.username);
-          setInitialUsername(profile.username);
-        }
-      });
+      throw new Error("Impossible de charger l'utilisateur courant");
+      // getUserProfile(user.id).then((profile) => {
+      //   if (profile && profile.username) {
+      //     setValue("username", profile.username);
+      //     setInitialUsername(profile.username);
+      //   }
+      // });
     }
   }, [user]);
 

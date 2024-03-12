@@ -7,7 +7,6 @@ import { useWebSocket } from "./_layout";
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
 import CustomTextInput from "../../../../components/CustomTextInput";
-import ErrorBoudary from "../../../../components/ErrorBoundary";
 import { Text } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
 import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
@@ -64,15 +63,6 @@ export default function AddTrack() {
         style={{ marginBottom: 24 }}
         autofocus
       />
-      <ErrorBoudary fallback="test">
-        <Button
-          onPress={() => {
-            throw new Error("test");
-          }}
-        >
-          Generate error
-        </Button>
-      </ErrorBoudary>
       {searchBar ? (
         result === null ? (
           <Text>Loading...</Text>
