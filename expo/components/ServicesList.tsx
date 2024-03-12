@@ -26,13 +26,15 @@ export default function ServicesList({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const user = await useSupabaseUser();
       if (!user) {
-        Alert.alert("Erreur lors de la récupération de l'utilisateur");
+        Alert.alert(
+          "Une erreur est survenue lors, veuillez réessayer plus tard"
+        );
         return;
       }
       const userProfile = await getUserProfile(user.id);
       if (!userProfile) {
         Alert.alert(
-          "Erreur lors de la récupération du profil de l'utilisateur"
+          "Une erreur est survenue lors, veuillez réessayer plus tard"
         );
         return;
       }
@@ -45,7 +47,7 @@ export default function ServicesList({
 
       if (error) {
         Alert.alert(
-          "Une erreur est survenue lors de la récupération des paramètres de la salle"
+          "Une erreur est survenue lors, veuillez réessayer plus tard"
         );
         return;
       }

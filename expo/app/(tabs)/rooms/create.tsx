@@ -35,8 +35,8 @@ export default function CreateRoom() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [error, setError] = useState<boolean>();
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const baseUrl = getApiUrl();
 
@@ -69,14 +69,16 @@ export default function CreateRoom() {
     }
 
     if (body.maxMusicPerUser <= 0) {
-      Alert.alert(
+      setError(true);
+      setErrorMessage(
         "Mauvais nombre de musique : Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
       );
       return { error: true };
     }
 
     if (body.maxMusicDuration <= 0) {
-      Alert.alert(
+      setError(true);
+      setErrorMessage(
         "Mauvaise durée de musique : La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
       );
       return { error: true };
@@ -118,9 +120,7 @@ export default function CreateRoom() {
           setErrorMessage("Ce code de salle est déjà utilisé");
           return;
         }
-
-        setError(true);
-        setErrorMessage(response.statusText);
+        Alert.alert("Une erreur est survenue lors de la création de la salle");
         return;
       }
 
@@ -137,9 +137,7 @@ export default function CreateRoom() {
     }
   };
 
-  return error ? (
-    <Warning label={errorMessage} variant="warning" />
-  ) : (
+  return (
     <ScrollView contentContainerStyle={styles.page}>
       <Text style={styles.labelText}>
         Nom de la salle
@@ -168,6 +166,7 @@ export default function CreateRoom() {
         canSkip={canVote}
         setCanSkip={setCanVote}
       />
+      {error && <Warning label={errorMessage || ""} variant="warning" />}
       <TouchableOpacity
         style={[styles.button, !isFormValid && styles.buttonDisabled]}
         onPress={onSubmit}
