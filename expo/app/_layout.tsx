@@ -4,6 +4,7 @@ import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import { Text } from "../components/Themed";
 import { supabase } from "../lib/supabase";
 
@@ -55,13 +56,15 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <MenuProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen name="ask-name" options={{ headerShown: false }} />
-      </Stack>
-    </MenuProvider>
+    <ErrorBoundary>
+      <MenuProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+          <Stack.Screen name="ask-name" options={{ headerShown: false }} />
+        </Stack>
+      </MenuProvider>
+    </ErrorBoundary>
   );
 }
