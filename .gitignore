@@ -6,6 +6,9 @@ node_modules/
 dist/
 web-build/
 
+# Expo build
+android/
+
 # Metro
 .metro-health-check*
 
