@@ -1,4 +1,5 @@
-import { ErrorBoundaryProps, Stack, useLocalSearchParams } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Stack, useLocalSearchParams } from "expo-router";
 import {
   ReactNode,
   createContext,
@@ -6,22 +7,14 @@ import {
   useEffect,
   useState,
 } from "react";
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 import { Socket } from "socket.io-client";
 
-import ErrorBoundary from "../../../../components/ErrorBoundary";
+import Button from "../../../../components/Button";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import SocketIo from "../../../../lib/socketio";
 
 const WebSocketContext = createContext<Socket | null>(null);
-
-// export function ErrorBoundary(props: ErrorBoundaryProps) {
-//   return (
-//     <View>
-//       <Text>Enfaite faut dans le layout oyuuuu</Text>;
-//     </View>
-//   );
-// }
 
 const WebSocketProvider = ({
   children,
@@ -32,6 +25,8 @@ const WebSocketProvider = ({
 }) => {
   const [webSocket, setWebSocket] = useState<Socket | null>(null);
 
+  const [socketError, setSockerError] = useState<Error | null>(null);
+
   useEffect(() => {
     const url: URL = new URL("/room/" + roomId, getApiUrl());
 
@@ -39,14 +34,51 @@ const WebSocketProvider = ({
     setWebSocket(socketInstance);
     console.debug("Socket connecté");
 
+    socketInstance.on("connect_error", (error) => {
+      setSockerError(error);
+    });
+
+    socketInstance.on("connect", () => {
+      setSockerError(null);
+    });
+
     return () => {
       socketInstance.disconnect();
-      console.debug("Socket déconnecté");
     };
   }, [roomId]);
 
+  const handleReconnect = () => {
+    setSockerError(null);
+    webSocket?.disconnect();
+    webSocket?.connect();
+  };
+
   return (
     <WebSocketContext.Provider value={webSocket}>
+      {socketError && (
+        <View
+          style={{
+            backgroundColor: "#fffbe6",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              padding: 10,
+              gap: 20,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <MaterialIcons name="warning" size={24} color="red" />
+            <Text>Vous n'êtes plus connecté au serveur</Text>
+            <Button type="outline" size="small" onPress={handleReconnect}>
+              Ressayer
+            </Button>
+          </View>
+        </View>
+      )}
       {children}
     </WebSocketContext.Provider>
   );
@@ -74,11 +106,7 @@ export default function RoomTabLayout() {
             presentation: "transparentModal",
           }}
         />
-        {/* <ErrorBoundary fallback="test2"> */}
-        <ErrorBoundary>
-          <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
-        </ErrorBoundary>
-        {/* </ErrorBoundary> */}
+        <Stack.Screen name="add" options={{ title: "Ajouter une musique" }} />
         <Stack.Screen name="settings" options={{ title: "Paramètres" }} />
       </Stack>
     </WebSocketProvider>
