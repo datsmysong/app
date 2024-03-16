@@ -7,12 +7,14 @@ import { ScrollView, StyleSheet } from "react-native";
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
 import { Text, View } from "../../../../components/Tamed";
+import { useAsyncError } from "../../../../lib/AsyncError";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import { bindServiceToAccount } from "../../../../lib/providerMethods";
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([] as StreamingService[]);
   const [boundServices, setBoundServices] = useState([] as BoundService[]); // To know which services are bound to the currrent user
+  const throwError = useAsyncError();
 
   const baseUrl = getApiUrl();
 
@@ -29,9 +31,7 @@ export default function ProfileIntegration() {
       setServicesData(data);
     };
 
-    fetchStreamingServicesData().catch((err) => {
-      Alert.alert(err);
-    });
+    fetchStreamingServicesData().catch(throwError);
 
     const fetchBoundServices = async () => {
       const responseBoundServices = await fetch(baseUrl + "/user/bound", {
@@ -48,9 +48,7 @@ export default function ProfileIntegration() {
       setBoundServices(dataBoundServices);
     };
 
-    fetchBoundServices().catch((err) => {
-      Alert.alert(err);
-    });
+    fetchBoundServices().catch(throwError);
   }, []);
 
   const getServiceIds = (boundServices: BoundService[]) => {
