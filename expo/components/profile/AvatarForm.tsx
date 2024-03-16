@@ -1,7 +1,13 @@
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Alert, Platform, Pressable, View } from "react-native";
 
 import Avatar, { AvatarRemote } from "./Avatar";

@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet } from "react-native";
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
 import ControlledInput from "../../../../components/ControlledInput";
+import ErrorBoundary from "../../../../components/ErrorBoundary";
 import { View } from "../../../../components/Themed";
 import Warning from "../../../../components/Warning";
 import AvatarForm from "../../../../components/profile/AvatarForm";
@@ -59,13 +60,12 @@ export default function PersonalInfo() {
     if (user && user.email) {
       if (user.app_metadata.provider !== "email") setEmailDisabled(true);
       setValue("email", user.email);
-      throw new Error("Impossible de charger l'utilisateur courant");
-      // getUserProfile(user.id).then((profile) => {
-      //   if (profile && profile.username) {
-      //     setValue("username", profile.username);
-      //     setInitialUsername(profile.username);
-      //   }
-      // });
+      getUserProfile(user.id).then((profile) => {
+        if (profile && profile.username) {
+          setValue("username", profile.username);
+          setInitialUsername(profile.username);
+        }
+      });
     }
   }, [user]);
 
@@ -194,12 +194,23 @@ export default function PersonalInfo() {
             rules={usernameRules}
             errorMessage={errors.username && errors.username.message}
           />
-          <AvatarForm
-            ref={avatarRef}
-            onImageLoad={() => {
-              setProfilePictureChanged(true);
+          <ErrorBoundary
+            fallback={() => {
+              return (
+                <Warning
+                  label="Impossible de charger la photo de profil"
+                  variant="warning"
+                />
+              );
             }}
-          />
+          >
+            <AvatarForm
+              ref={avatarRef}
+              onImageLoad={() => {
+                setProfilePictureChanged(true);
+              }}
+            />
+          </ErrorBoundary>
           <Button
             block
             onPress={handleSubmit(onSubmit)}
