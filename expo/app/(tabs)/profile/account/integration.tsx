@@ -38,10 +38,9 @@ export default function ProfileIntegration() {
         credentials: "include",
       });
       if (!responseBoundServices.ok) {
-        Alert.alert(
-          "Erreur serveur, revenez plus tard ou contactez un administrateur"
+        throw new Error(
+          "Impossible de récupérer les services liés à votre compte"
         );
-        return;
       }
       const dataBoundServices = await responseBoundServices.json();
 

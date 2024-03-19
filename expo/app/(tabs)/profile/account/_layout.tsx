@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 
 import ErrorBoundary from "../../../../components/ErrorBoundary";
-import profileErrorBoundary from "../../../../components/ErrorBoundary/ProfileErrorBoundary";
+import profileErrorBoundary from "../../../../components/ErrorComponent/ProfileErrorBoundary";
 
 export default function AccountLayout() {
   return (
