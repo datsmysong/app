@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 
 import { ErrorBoundary } from "../components/ErrorBoundary";
+import { RootErrorBoundary } from "../components/ErrorComponent/RootError";
 import { Text } from "../components/Themed";
 import { supabase } from "../lib/supabase";
 
@@ -56,7 +57,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallback={RootErrorBoundary}>
       <MenuProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
