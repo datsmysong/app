@@ -1,22 +1,32 @@
-name: Android Deployment
+name: Android Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  Compile:
+  build:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./expo
     environment: preview
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+
       - run: npm install
+
       - run: npx expo prebuild
+
       - name: Build with Gradle
         run: ./gradlew assembleRelease
         working-directory: ./expo/android
@@ -26,6 +36,7 @@ jobs:
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
           EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID }}
           EXPO_PUBLIC_SPOTIFY_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_SPOTIFY_CLIENT_ID }}
+
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
