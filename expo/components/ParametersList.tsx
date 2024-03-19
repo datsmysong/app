@@ -14,6 +14,7 @@ interface ParametersListProps {
   setMaxMusicDuration: (text: string) => void;
   canSkip: boolean;
   setCanSkip: (value: boolean) => void;
+  create: boolean;
 }
 
 export default function ParametersList({
@@ -25,6 +26,7 @@ export default function ParametersList({
   setMaxMusicDuration,
   canSkip,
   setCanSkip,
+  create,
 }: ParametersListProps) {
   const [canBeAnonymous, setCanBeAnonymous] = useState(false);
   const [sliderParticipantValue, setSliderParticipantValue] = useState(10);
@@ -37,7 +39,8 @@ export default function ParametersList({
       >
         <View style={styles.slider}>
           <Text style={styles.labelText}>
-            Limite de participants <Text style={{ color: "red" }}>*</Text>
+            Limite de participants{" "}
+            {!create && <Text style={{ color: "red" }}>*</Text>}
           </Text>
           <CustomSlider
             maximumValue={20}
@@ -66,7 +69,8 @@ export default function ParametersList({
         />
         <View style={styles.slider}>
           <Text style={styles.labelText}>
-            Pourcentage nécessaire <Text style={{ color: "red" }}>*</Text>
+            Pourcentage nécessaire{" "}
+            {!create && <Text style={{ color: "red" }}>*</Text>}
           </Text>
           <CustomSlider
             maximumValue={100}
@@ -82,7 +86,8 @@ export default function ParametersList({
         <View style={styles.separator} />
         <View style={styles.inputLayout}>
           <Text style={styles.labelText}>
-            Durée maximale d'une musique <Text style={{ color: "red" }}>*</Text>
+            Durée maximale d'une musique{" "}
+            {!create && <Text style={{ color: "red" }}>*</Text>}
           </Text>
           <CustomTextInput
             value={maxMusicDuration}
@@ -93,7 +98,7 @@ export default function ParametersList({
         <View style={styles.inputLayout}>
           <Text style={styles.labelText}>
             Nombre de musiques maximal par participant{" "}
-            <Text style={{ color: "red" }}>*</Text>
+            {!create && <Text style={{ color: "red" }}>*</Text>}
           </Text>
           <CustomTextInput
             value={maxMusicPerUser}

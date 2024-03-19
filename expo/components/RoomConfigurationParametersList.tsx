@@ -107,6 +107,7 @@ export default function RoomConfigurationParametersList({
         setMaxMusicDuration={setMaxMusicDuration}
         canSkip={canSkip}
         setCanSkip={setCanSkip}
+        create={false}
       />
       <Button type="filled" onPress={handleSave} block>
         Sauvegarder
