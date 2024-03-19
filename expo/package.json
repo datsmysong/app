@@ -23,8 +23,6 @@
     "@spotify/web-api-ts-sdk": "^1.1.2",
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.39.2",
-    "@types/uuid": "^9.0.7",
-    "@unimodules/core": "^7.1.2",
     "aes-js": "^3.1.2",
     "base64-arraybuffer": "^1.0.2",
     "expo": "~49.0.15",
