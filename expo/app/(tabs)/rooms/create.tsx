@@ -61,7 +61,6 @@ export default function CreateRoom() {
 
   function checkConstraints(body: CreateRoomFormBody): { error: true | null } {
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
-      setError(true);
       setErrorMessage(
         "Mauvais pourcentage : Le pourcentage doit être entre 0 et 100"
       );
@@ -69,7 +68,6 @@ export default function CreateRoom() {
     }
 
     if (body.maxMusicPerUser <= 0) {
-      setError(true);
       setErrorMessage(
         "Mauvais nombre de musique : Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
       );
@@ -77,7 +75,6 @@ export default function CreateRoom() {
     }
 
     if (body.maxMusicDuration <= 0) {
-      setError(true);
       setErrorMessage(
         "Mauvaise durée de musique : La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
       );
@@ -100,7 +97,10 @@ export default function CreateRoom() {
     };
 
     const { error } = checkConstraints(body);
-    if (error !== null) return;
+    if (error !== null) {
+      setError(true);
+      return;
+    }
 
     if (!body.voteSkipping) body.voteSkippingNeeded = 0;
 
@@ -148,13 +148,19 @@ export default function CreateRoom() {
         value={roomName}
         onChangeText={setRoomName}
       />
-      <Text style={styles.labelText}>Code de la salle</Text>
+      <Text style={styles.labelText}>
+        Code de la salle{" "}
+        <Text style={[{ color: "red" }, styles.labelText]}>*</Text>{" "}
+      </Text>
       <CustomTextInput
         placeholder="ABC123"
         value={roomCode}
         onChangeText={setRoomCode}
       />
-      <Text style={styles.labelText}>Plateforme de streaming à utiliser</Text>
+      <Text style={styles.labelText}>
+        Platform de streaming à utiliser{" "}
+        <Text style={[{ color: "red" }, styles.labelText]}>*</Text>
+      </Text>
       <ServiceList handleServiceChange={setSelectedService} />
       <ParametersList
         percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
@@ -165,6 +171,7 @@ export default function CreateRoom() {
         setMaxMusicPerUser={setMaxMusicPerUser}
         canSkip={canVote}
         setCanSkip={setCanVote}
+        create
       />
       {error && <Warning label={errorMessage || ""} variant="warning" />}
       <TouchableOpacity
