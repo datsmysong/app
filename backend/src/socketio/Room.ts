@@ -90,19 +90,21 @@ export default class Room {
   async add(rawUrl: string) {
     if (!this.remote) return;
 
-    // If the queue is currently empty and no track is playing, we can play the track immediately
-    const playbackState = this.remote.getPlaybackState();
-    if (this.queue.length === 0 && playbackState === null) {
-      const response = await this.remote.playTrack(rawUrl);
-      if (!response.error) await this.updatePlaybackState();
-      return;
-    }
-
     const trackMetadata = this.trackFactory.fromUrl(rawUrl);
     if (trackMetadata === null) return;
 
     const track = await trackMetadata.toJSON();
     if (track === null) return;
+
+    // If the queue is currently empty and no track is playing, we can play the track immediately
+    const { data: playbackState } = await this.remote.getPlaybackState();
+    console.log(playbackState, this.queue.length);
+
+    if (this.queue.length === 0 && playbackState === null) {
+      const response = await this.remote.playTrack(track.url);
+      if (!response.error) await this.updatePlaybackState();
+      return;
+    }
 
     if (this.queue.map((value) => value.url).includes(track.url)) return;
 
