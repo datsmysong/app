@@ -1,16 +1,11 @@
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import {
-  FlatList,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text
-} from "react-native";
+import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
+
 import { StreamingService } from "../app/(tabs)/rooms/create";
 
 interface ServicesListProps {
-  availableServices: Array<StreamingService>;
+  availableServices: StreamingService[];
   handleServiceChange: (serviceId: string) => void;
 }
 
@@ -36,7 +31,7 @@ export default function ServicesList({
       showsHorizontalScrollIndicator={Platform.OS === "web"}
       data={availableServices}
       columnWrapperStyle={styles.list}
-      numColumns={2}
+      numColumns={3}
       renderItem={({ item }) => (
         <Pressable
           onPress={() => toggleSelect(item)}
@@ -47,7 +42,7 @@ export default function ServicesList({
         >
           <Image
             style={styles.image}
-            contentFit={"contain"}
+            contentFit="contain"
             source={item.image_url}
             alt={item.service_name}
           />

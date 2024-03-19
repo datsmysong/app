@@ -1,4 +1,4 @@
-import { Href, router } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -38,12 +38,20 @@ export default function CreateRoom() {
   const [maxMusicDuration, setMaxMusicDuration] = useState("300");
   const [canVote, setCanVote] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
-
   const [services, setServices] = useState<StreamingService[]>([]);
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
+  const [isPressed, setIsPressed] = useState(false);
 
   const baseUrl = getApiUrl();
+
+  const TriangleRight = () => {
+    return <View style={[styles.triangle, styles.triangleRight]} />;
+  };
+
+  const TriangleDown = () => {
+    return <View style={[styles.triangle, styles.triangleDown]} />;
+  };
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -120,7 +128,6 @@ export default function CreateRoom() {
         body: JSON.stringify(body),
         credentials: "include",
       });
-      console.log(response);
 
       if (!response.ok) {
         if (response.status === 409)
@@ -158,16 +165,30 @@ export default function CreateRoom() {
         availableServices={services}
         handleServiceChange={setSelectedService}
       />
-      <ParametersList
-        percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
-        setPercentageVote={setPercentageVote}
-        maxMusicDuration={maxMusicDuration}
-        setMaxMusicDuration={setMaxMusicDuration}
-        maxMusicPerUser={maxMusicPerUser}
-        setMaxMusicPerUser={setMaxMusicPerUser}
-        canVote={canVote}
-        setCanVote={setCanVote}
-      />
+
+      <TouchableOpacity
+        onPress={() => {
+          setIsPressed(!isPressed);
+        }}
+      >
+        <View style={styles.items}>
+          {isPressed ? <TriangleDown /> : <TriangleRight />}
+          <Text style={styles.item}>Paramètres supplémentaires</Text>
+        </View>
+      </TouchableOpacity>
+
+      {isPressed && (
+        <ParametersList
+          percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
+          setPercentageVote={setPercentageVote}
+          maxMusicDuration={maxMusicDuration}
+          setMaxMusicDuration={setMaxMusicDuration}
+          maxMusicPerUser={maxMusicPerUser}
+          setMaxMusicPerUser={setMaxMusicPerUser}
+          canVote={canVote}
+          setCanVote={setCanVote}
+        />
+      )}
       <TouchableOpacity
         style={[styles.button, !isFormValid && styles.buttonDisabled]}
         onPress={onSubmit}
@@ -180,6 +201,39 @@ export default function CreateRoom() {
 }
 
 const styles = StyleSheet.create({
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: "transparent",
+    borderStyle: "solid",
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderBottomWidth: 14,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: "black",
+  },
+
+  triangleRight: {
+    transform: "rotateZ(90deg)",
+  },
+
+  triangleDown: {
+    transform: "rotateX(180deg)",
+  },
+
+  items: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 20,
+    paddingLeft: 10,
+  },
+
+  item: {
+    marginLeft: 10,
+  },
+
   input: {
     height: 40,
     width: 200,

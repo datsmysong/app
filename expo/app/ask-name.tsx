@@ -1,7 +1,8 @@
-import { router, useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { router } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "react-native-screens";
+
 import Alert from "../components/Alert";
 import Button from "../components/Button";
 import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
@@ -21,7 +22,7 @@ export default function AskName() {
     }
     const { error } = await supabase
       .from("user_profile")
-      .update({ username: username })
+      .update({ username })
       .eq("account_id", user?.id);
     if (error) {
       if (error.code === SupabaseErrorCode.CONSTRAINT_VIOLATION) {

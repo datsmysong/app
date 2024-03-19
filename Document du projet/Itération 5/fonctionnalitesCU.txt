@@ -1,0 +1,12 @@
+Fonctionnalités et taches développées dans cette itération :
+
+Terminée
+- Recherche de musiques
+- Quitter une salle en tant que participant
+
+Non achevé lors de cette itération
+- Gestion de la musique en cours de lecture
+- Créer le menu de paramétrage d’une salle d’écoute 
+- Consulter l’historique et les détails d’une salle d’écoute passée 
+- Ajouter l'identifiant de l'utilisateur ayant ajouté une musique dans la file d'attente d'une salle
+- Voter pour passer une musique en cours

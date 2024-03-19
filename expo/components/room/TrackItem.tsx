@@ -5,16 +5,17 @@ import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 
+import MinimalistTrackItem from "./MinimalistTrackItem";
 import SocketIo from "../../lib/socketio";
 import CustomMenuOption from "../CustomMenuOption";
-import HView from "../HView";
-import { Text, View } from "../Themed";
 
 export default function TrackItem(prop: {
   track: JSONTrack;
   index: number;
   roomId: string;
   isMenuDisabled: boolean;
+  handleDislike: () => void;
+  disliked: boolean;
 }) {
   const {
     title,
@@ -22,13 +23,7 @@ export default function TrackItem(prop: {
     albumName: album,
     imgUrl: rawImageUrl,
   } = prop.track;
-  const [dislike, setDislike] = useState(false);
-
-  const imageSrc = new URL(rawImageUrl).toString();
-  // mock image
-  const imageProfileSrc = new URL(
-    "https://s3-alpha-sig.figma.com/img/942f/8c54/9dd5171d2934478c6b2e1f64eea7d81b?Expires=1706486400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QQWwtvI8wCX3aN6TZggpc-IcOeYA21PftgQkCXnuVhcMue0uffDuBhvHDIu9SSuWJYc9AGBj8L7RpwV6Yv1X7fD1A0rdOYwTpbZuP1FbYHWxFjD9uyYEo8CpOXJQEzOndM~jtj9pNysYNWzhfJ5LnX5grgKEoU1AnXR5SFu0AAfCiB4PrFYLpOlhKwMQsv7uPQA5ftH9YNYq4yzgVsSbZX69jHCTYhTO0XOwEtu6DKNOhTMzl9naajFenIAHChgKxqlDrF-UvXsVwh7dwq4-jYPlFxV8-6QB-o0ffog60CHpBsfLnYs-KgaAqeTleydiBKjtYOk1zKBp9uHAOcjOAg__"
-  ).toString();
+  const [dislike, setDislike] = useState(prop.disliked);
 
   const removeTrack = () => {
     SocketIo.getInstance()
@@ -36,45 +31,49 @@ export default function TrackItem(prop: {
       .emit("queue:remove", prop.index);
   };
 
+  const handleDislike = () => {
+    const disliked = !dislike;
+    setDislike(disliked);
+    prop.handleDislike();
+  };
+
   return (
-    <HView style={itemStyles.container}>
-      <View style={[itemStyles.imagesContainer]}>
-        <Image source={imageSrc} style={itemStyles.mainImage} />
-        <Image source={imageProfileSrc} style={itemStyles.profileImage} />
-      </View>
-      <View style={[itemStyles.textContainer]}>
-        <HView>
-          <Text style={[itemStyles.text, itemStyles.textTop]}>
-            {prop.index + 1}
-          </Text>
-          <Text style={[itemStyles.text, itemStyles.textTop, { width: 10 }]}>
-            .
-          </Text>
-          <Text style={[itemStyles.text, itemStyles.textTop]}>{title}</Text>
-        </HView>
-        <Text style={[itemStyles.text, itemStyles.textBottom]}>{artists}</Text>
-      </View>
-      <Pressable onPress={() => setDislike(!dislike)}>
+    <MinimalistTrackItem
+      title={prop.index + 1 + ". " + title}
+      artistsName={artists}
+      imgUrl={rawImageUrl}
+      profilePictureImage={
+        <Image
+          source={require("../../assets/images/album-cover.jpg")}
+          style={itemStyles.profileImage}
+        />
+      }
+    >
+      <Pressable onPress={handleDislike}>
         <FontAwesome
           name={`thumbs-${!dislike ? "o-" : ""}down`}
           style={itemStyles.icon}
         />
       </Pressable>
-      <Menu>
-        <MenuTrigger disabled={prop.isMenuDisabled}>
-          <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
-        </MenuTrigger>
-        <MenuOptions customStyles={optionsStyles}>
-          <CustomMenuOption
-            onSelect={removeTrack}
-            icon={{ name: "close", size: 28, color: "red" }}
-            textStyle={optionsStyles.optionText}
-          >
-            Supprimer
-          </CustomMenuOption>
-        </MenuOptions>
-      </Menu>
-    </HView>
+      {!prop.isMenuDisabled && (
+        <>
+          <Menu>
+            <MenuTrigger>
+              <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
+            </MenuTrigger>
+            <MenuOptions customStyles={optionsStyles}>
+              <CustomMenuOption
+                onSelect={removeTrack}
+                icon={{ name: "close", size: 28, color: "red" }}
+                textStyle={optionsStyles.optionText}
+              >
+                Supprimer
+              </CustomMenuOption>
+            </MenuOptions>
+          </Menu>
+        </>
+      )}
+    </MinimalistTrackItem>
   );
 }
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { JSONTrack } from "commons/Backend-types";
+import { JSONTrack } from "commons/backend-types";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
 import Room from "../socketio/Room";
@@ -23,5 +23,13 @@ export default class Deezer extends MusicPlatform {
 
   isClientSide(): boolean {
     return false;
+  }
+
+  searchTrack(text: string): Promise<JSONTrack[]> {
+    return Promise.resolve([]);
+  }
+
+  toJSON(rawTracks: never): JSONTrack {
+    throw new Error("Deezer.toJSON()");
   }
 }

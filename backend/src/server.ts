@@ -23,8 +23,26 @@ import RoomEndGET from "./route/RoomEndGET";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import RoomIO from "./socketio/RoomIO";
 import { Database } from "commons/database-types";
+import RoomLeaveGET from "./route/RoomLeaveGET";
+import RoomConfigurationUpdatePOST from "./route/RoomConfigurationUpdatePOST";
 
 config({ path: ".env.local" });
+
+/**
+ * If we set the CORS origin to ["*"], it tells the client that all origins are accepted
+ * This won't work if the client fetches our backend with credentials, because it's simply unauthorized by the CORS spec
+ * To fix this, we return [true], which sets the CORS origin header to the request origin, which means it will trick the client to believe only its origin is allowed to fetch the URL
+
+ * Returns an array of allowed CORS origins based on the current environment.
+ * @param devValue - The value to use when inside a development environment.
+ * @returns An array of allowed CORS origins.
+ */
+const corsOrigin: (devValue?: string | boolean) => (string | boolean)[] = (
+  devValue = true
+) => {
+  if (process.env.NODE_ENV === "development") return [devValue];
+  return ["https://datsmysong.app", "https://api.datsmysong.app/"];
+};
 
 const server = fastify({
   logger: {
@@ -81,31 +99,21 @@ export const spotify = SpotifyApi.withClientCredentials(
 );
 server.register(fastifySocketIO, {
   cors: {
-    origin: "http://localhost:8081",
+    origin: corsOrigin(),
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 server.register(fastifyCookie, {
-  secret: process.env.FASTIFY_COOKIE_SECRET ?? "", // for cookies signature
-  hook: "onRequest", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
-  parseOptions: {}, // options for parsing cookies
+  secret: process.env.FASTIFY_COOKIE_SECRET ?? "",
+  hook: "onRequest",
+  parseOptions: {},
 } as FastifyCookieOptions);
 
-/**
-If we set the CORS origin to ["*"], it tells the client that all origins are accepted
-This won't work if the client fetches our backend with credentials, because it's simply unauthorized by the CORS spec
-To fix this, we return [true], which sets the CORS origin header to the request origin, which means it will trick the client to believe only its origin is allowed to fetch the URL
-*/
-const corsOrigin: () => string[] | boolean[] = () => {
-  if (process.env.NODE_ENV === "development") return [true];
-  return ["https://datsmysong.app", "https://api.datsmysong.app/"];
-};
-
 server.register(fastifyCors, {
-  origin: corsOrigin(), // or true to allow all origins
-  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"], // or just ['*'] for all methods
-  credentials: true, // or true to reflect origin
+  origin: corsOrigin(),
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+  credentials: true,
 });
 
 // timeWindow : It can be expressed in milliseconds or as a string (in the ms format)
@@ -116,7 +124,9 @@ server.register(import("@fastify/rate-limit"), {
 });
 
 // Auth
-server.get("/", AuthCallbackSoundcloudGET); // / route is used until soundcloud change the redirection url
+
+// This route that handles SoundCloud auth is on the root route because we are awaiting SoundCloud to change the redirection URL
+server.get("/", AuthCallbackSoundcloudGET);
 server.get("/user/bound", BoundServicesGET);
 server.register(authRoutes, { prefix: "/auth" });
 server.get("/auth/callback/bind/spotify", AuthCallbackBindSpotifyGET);
@@ -158,9 +168,13 @@ server.post<{
 
 server.get("/room/:id", RoomIdGET);
 
+server.get("/room/:id/leave", RoomLeaveGET);
+
 server.get("/room/:id/end", RoomEndGET);
 
 server.get("/rooms", RoomGET);
+
+server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 
 // server.get("/track/spotify/:id", SpotifyGET);
 

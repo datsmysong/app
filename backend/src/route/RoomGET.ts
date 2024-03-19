@@ -18,6 +18,7 @@ export default function RoomGET(req: FastifyRequest, reply: FastifyReply) {
     .from("rooms")
     .select("*")
     .eq("id", id)
+    .single()
     .then((res) => {
       if (res.error) {
         reply.code(500).send({ error: res.error });

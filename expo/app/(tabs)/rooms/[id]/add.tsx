@@ -1,32 +1,89 @@
+import { JSONTrack } from "commons/backend-types";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FlatList, View } from "react-native";
 
-import Button from "../../../../components/Button";
+import { useWebSocket } from "./_layout";
+import Alert from "../../../../components/Alert";
 import CustomTextInput from "../../../../components/CustomTextInput";
-import HView from "../../../../components/HView";
-import SocketIo from "../../../../lib/socketio";
+import { Text } from "../../../../components/Themed";
+import Library from "../../../../components/room/Library";
+import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
+import { useDebounce } from "../../../../lib/useDebounce";
 
 export default function AddTrack() {
   const { id } = useLocalSearchParams();
 
-  const [value, setValue] = useState("");
+  const [searchBar, setSearchBar] = useState("");
+  const [result, setResult] = useState<JSONTrack[] | null>(null);
+  const socket = useWebSocket();
 
-  const addMusic = () => {
-    SocketIo.getInstance()
-      .getSocket(`/room/${id}`)
-      .emit("queue:add", new URL(value).toString());
+  const debouncedSearchMusic = useDebounce(searchBar, 300);
 
-    router.back();
+  useEffect(() => {
+    if (debouncedSearchMusic) searchMusic();
+  }, [debouncedSearchMusic]);
+
+  const addMusic = (value: string) => {
+    if (!socket) return;
+    try {
+      socket.emit("queue:add", new URL(value).toString());
+    } catch {
+      setSearchBar("");
+      setResult(null);
+      Alert.alert("Erreur, impossible d'ajouter la musique");
+    }
+    if (router.canGoBack()) return router.back();
+    const url = ("/(tabs)/rooms/" + id) as any;
+    router.push(url);
+  };
+
+  const searchMusic = () => {
+    setResult(null);
+    if (!socket) return;
+    socket.emit("utils:search", searchBar, (result: JSONTrack[]) => {
+      setResult(result);
+    });
   };
 
   return (
-    <HView>
+    <View
+      style={{
+        paddingHorizontal: 24,
+        paddingTop: 24,
+        flex: 1,
+        flexDirection: "column",
+      }}
+    >
       <CustomTextInput
-        placeholder="URL Spotify"
-        onChangeText={setValue}
-        style={{ flexShrink: 0, flexGrow: 1, minWidth: 0, flexBasis: 0 }}
+        onChangeText={setSearchBar}
+        placeholder="Rechercher"
+        onSubmitEditing={searchMusic}
+        style={{ marginBottom: 24 }}
+        autofocus
       />
-      <Button onPress={addMusic}>Ajouter</Button>
-    </HView>
+      {searchBar ? (
+        result === null ? (
+          <Text>Loading...</Text>
+        ) : result.length === 0 ? (
+          <Text>Aucun résultat</Text>
+        ) : (
+          <FlatList
+            data={result}
+            renderItem={({ item }) => (
+              <SearchedTrackItem
+                track={item}
+                handleAddMusic={() => {
+                  addMusic(item.url);
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.url}
+          />
+        )
+      ) : (
+        <Library />
+      )}
+    </View>
   );
 }
