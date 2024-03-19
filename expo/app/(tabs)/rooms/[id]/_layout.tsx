@@ -1,4 +1,3 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
 import {
   ReactNode,
@@ -7,10 +6,9 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Text, View } from "react-native";
 import { Socket } from "socket.io-client";
 
-import Button from "../../../../components/Button";
+import WebsocketError from "../../../../components/ErrorComponent/WebsocketError";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import SocketIo from "../../../../lib/socketio";
 
@@ -47,38 +45,9 @@ const WebSocketProvider = ({
     };
   }, [roomId]);
 
-  const handleReconnect = () => {
-    setSockerError(null);
-    webSocket?.disconnect();
-    webSocket?.connect();
-  };
-
   return (
     <WebSocketContext.Provider value={webSocket}>
-      {socketError && (
-        <View
-          style={{
-            backgroundColor: "#fffbe6",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              padding: 10,
-              gap: 20,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <MaterialIcons name="warning" size={24} color="red" />
-            <Text>Vous n'êtes plus connecté au serveur</Text>
-            <Button type="outline" size="small" onPress={handleReconnect}>
-              Ressayer
-            </Button>
-          </View>
-        </View>
-      )}
+      {socketError && <WebsocketError />}
       {children}
     </WebSocketContext.Provider>
   );
