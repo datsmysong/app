@@ -7,6 +7,7 @@ import { QueueableRemote } from "./musicplatform/remotes/Remote";
 import { adminSupabase, server } from "./server";
 import Room from "./socketio/Room";
 import { RoomWithForeignTable } from "./socketio/RoomDatabase";
+import { Response } from "commons/socket.io-types";
 
 const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
@@ -126,7 +127,7 @@ export default class RoomStorage {
   async roomFromUuid(
     rawUuid: string,
     hostSocket: Socket | null
-  ): Promise<Room | null> {
+  ): Promise<Response<Room>> {
     const { data: remoteRoom } = await adminSupabase
       .from("rooms")
       .select("*, streaming_services(*), room_configurations(*)")
@@ -134,10 +135,18 @@ export default class RoomStorage {
       .eq("is_active", true)
       .single();
 
-    if (!remoteRoom) return null;
+    if (!remoteRoom)
+      return {
+        data: null,
+        error: "Room not found",
+      };
 
     const parseRemote = parseRemoteRoom(remoteRoom);
-    if (!parseRemote) return null;
+    if (!parseRemote)
+      return {
+        data: null,
+        error: "Error parsing remote room",
+      };
     const { musicPlatform, roomWithConfig } = parseRemote;
 
     return Room.getOrCreate(
@@ -149,7 +158,10 @@ export default class RoomStorage {
     );
   }
 
-  async roomFromCode(code: string, hostSocket: Socket): Promise<Room | null> {
+  async roomFromCode(
+    code: string,
+    hostSocket: Socket
+  ): Promise<Response<Room>> {
     const { data: remoteRoom } = await adminSupabase
       .from("rooms")
       .select("*, streaming_services(*), room_configurations(*)")
@@ -157,10 +169,18 @@ export default class RoomStorage {
       .eq("is_active", true)
       .single();
 
-    if (!remoteRoom) return null;
+    if (!remoteRoom)
+      return {
+        data: null,
+        error: "Room not found",
+      };
 
     const parseRemote = parseRemoteRoom(remoteRoom);
-    if (!parseRemote) return null;
+    if (!parseRemote)
+      return {
+        data: null,
+        error: "Error parsing remote room",
+      };
     const { musicPlatform, roomWithConfig } = parseRemote;
 
     return Room.getOrCreate(

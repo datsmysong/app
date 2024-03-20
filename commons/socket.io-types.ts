@@ -67,6 +67,9 @@ export interface ServerToClientEvents
   "queue:update": (room: RoomJSON | Error) => void;
   /** End the room. */
   "room:end": () => void;
+  // error events are handled by the client in layout of rooms/[id]
+  // it displays a error page with a button to go back to the home page
+  "room:error": (error: string) => void;
 }
 
 /**

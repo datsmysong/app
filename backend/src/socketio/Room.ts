@@ -12,6 +12,7 @@ import { adminSupabase } from "../server";
 import { RoomWithConfigDatabase } from "./RoomDatabase";
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+import { Response } from "commons/socket.io-types";
 
 export default class Room {
   public readonly uuid: string;
@@ -49,20 +50,27 @@ export default class Room {
     streamingService: MusicPlatform,
     hostSocket: Socket | null,
     roomWithConfig: RoomWithConfigDatabase
-  ): Promise<Room> {
+  ): Promise<Response<Room>> {
     let room = roomStorage.getRoom(uuid);
 
     if (room === null) {
       room = new Room(uuid, streamingService, hostSocket, roomWithConfig);
-      const remote = await streamingService.getRemote(room, streamingService);
+      const { data: remote, error } = await streamingService.getRemote(
+        room,
+        streamingService
+      );
+      if (error) {
+        return { data: null, error };
+      }
       room.setRemote(remote);
       roomStorage.addRoom(room);
     } else {
       room.setHostSocket(hostSocket);
     }
 
-    return room;
+    return { data: room, error: null };
   }
+
   setRemote(remote: Remote | null) {
     this.remote = remote;
   }

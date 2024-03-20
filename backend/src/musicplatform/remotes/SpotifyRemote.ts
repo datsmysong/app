@@ -2,7 +2,7 @@ import { SimplifiedArtist, SpotifyApi, Track } from "@spotify/web-api-ts-sdk";
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import { adminSupabase } from "../../server";
 import MusicPlatform from "../MusicPlatform";
-import { QueueableRemote } from "./Remote";
+import { QueueableRemote, Remote } from "./Remote";
 import Room from "../../socketio/Room";
 import { Response } from "commons/socket.io-types";
 
@@ -22,39 +22,61 @@ export default class SpotifyRemote extends QueueableRemote {
   static async createRemote(
     room: Room,
     musicPlatform: MusicPlatform
-  ): Promise<SpotifyRemote | null> {
+  ): Promise<Response<Remote>> {
     const { data, error } = await adminSupabase
       .from("rooms")
       .select("*, user_profile(*, bound_services(*))")
       .eq("id", room.uuid)
+      .eq(
+        "user_profile.bound_services.service_id",
+        "a2d17b25-d87e-42af-9e79-fd4df6b59222"
+      )
       .single();
 
+    if (error)
+      return {
+        data: null,
+        error: "Impossible to get owner Spotify account",
+      };
     if (
-      error ||
-      !data ||
-      !data.user_profile ||
-      !data.user_profile.bound_services
+      data.user_profile?.bound_services === undefined ||
+      data.user_profile?.bound_services.length === 0
     )
-      return null;
+      return {
+        data: null,
+        error: "Owner Spotify account is not connected",
+      };
 
     const { access_token, expires_in, refresh_token } =
       data.user_profile.bound_services[0];
 
-    if (!access_token || !expires_in || !refresh_token) return null;
+    if (access_token === null || expires_in === null || refresh_token === null)
+      return {
+        data: null,
+        error: "Owner Spotify account is not connected",
+      };
 
     const expiresIn = parseInt(expires_in);
-
-    // TODO: https://github.com/spotify/spotify-web-api-ts-sdk/issues/79
-    const spotifyClient = SpotifyApi.withAccessToken(
-      process.env.SPOTIFY_CLIENT_ID as string,
-      {
-        access_token,
-        refresh_token,
-        expires_in: expiresIn,
-        token_type: "Bearer",
-      }
-    );
-    return new SpotifyRemote(spotifyClient, musicPlatform);
+    try {
+      const spotifyClient = SpotifyApi.withAccessToken(
+        process.env.SPOTIFY_CLIENT_ID as string,
+        {
+          access_token,
+          refresh_token,
+          expires_in: expiresIn,
+          token_type: "Bearer",
+        }
+      );
+      return {
+        data: new SpotifyRemote(spotifyClient, musicPlatform),
+        error: null,
+      };
+    } catch (e) {
+      return {
+        data: null,
+        error: "Impossible to use owner Spotify account",
+      };
+    }
   }
 
   async getPlaybackState(): Promise<Response<PlayingJSONTrack | null>> {
