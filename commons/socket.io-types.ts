@@ -1,5 +1,9 @@
 import { JSONTrack, PlayingJSONTrack, RoomJSON } from "./backend-types";
 
+export type Response<T> =
+  | { data: T; error: null }
+  | { data: null; error: string };
+
 export interface ServerToClientEvents {
   "queue:update": (room: RoomJSON | Error) => void;
   "player:updatePlaybackState": (
@@ -15,6 +19,10 @@ export interface ServerToClientEvents {
   "player:skip": () => void;
   "player:previous": () => void;
   "room:end": () => void;
+
+  // error events are handled by the client in layout of rooms/[id]
+  // it displays a error page with a button to go back to the home page
+  "room:error": (error: string) => void;
 }
 
 export interface ClientToServerEvents {
