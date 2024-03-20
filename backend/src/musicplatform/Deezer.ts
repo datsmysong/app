@@ -3,13 +3,17 @@ import { JSONTrack } from "commons/Backend-types";
 import MusicPlatform from "./MusicPlatform";
 import Remote from "./remotes/Remote";
 import Room from "../socketio/Room";
+import { Response } from "commons/socket.io-types";
 
 export default class Deezer extends MusicPlatform {
   async getRemote(
     room: Room,
     musicPlatform: MusicPlatform
-  ): Promise<Remote | null> {
-    return null;
+  ): Promise<Response<Remote>> {
+    return {
+      data: null,
+      error: "Deezer is not implemented",
+    };
   }
 
   constructor() {

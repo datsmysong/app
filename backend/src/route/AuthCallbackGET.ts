@@ -181,7 +181,10 @@ export const createAccount = async ({
 const upsertService = async (
   service: BoundService
 ): Promise<PostgrestError | null> => {
+  console.log("Upsert le token");
   const { error } = await adminSupabase.from("bound_services").upsert(service);
+  console.log("ça a marché ? ", error);
+
   return error;
 };
 

@@ -40,12 +40,17 @@ export default function RoomIO(
 
   async function registerHandlers() {
     const hostSocket = isHostSocket ? socket : null;
-    const room = await roomStorage.roomFromUuid(activeRoomId, hostSocket);
+    const { data: room, error } = await roomStorage.roomFromUuid(
+      activeRoomId,
+      hostSocket
+    );
 
     // Fetch participant of room at every connection for now
     room?.updateParticipant();
 
     if (room === null) {
+      // Errors are handled by the client, with a redirect to the home page
+      socket.emit("room:error", error);
       socket.disconnect();
       return;
     }

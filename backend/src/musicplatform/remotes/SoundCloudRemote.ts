@@ -2,6 +2,7 @@ import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
 import Room from "../../socketio/Room";
+import { Response } from "commons/socket.io-types";
 
 export default class SoundCloudRemote extends Remote {
   room: Room;
@@ -16,8 +17,8 @@ export default class SoundCloudRemote extends Remote {
   static async createRemote(
     musicPlatform: MusicPlatform,
     room: Room
-  ): Promise<SoundCloudRemote | null> {
-    return new SoundCloudRemote(room, musicPlatform);
+  ): Promise<Response<Remote>> {
+    return { data: new SoundCloudRemote(room, musicPlatform), error: null };
   }
 
   getHostSocket(): (typeof this.room)["hostSocket"] {
