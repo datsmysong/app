@@ -4,6 +4,7 @@ import { adminSupabase } from "../../server";
 import MusicPlatform from "../MusicPlatform";
 import Remote from "./Remote";
 import Room from "../../socketio/Room";
+import { Response } from "commons/socket.io-types";
 
 export default class SpotifyRemote extends Remote {
   spotifyClient: SpotifyApi;
@@ -21,64 +22,95 @@ export default class SpotifyRemote extends Remote {
   static async createRemote(
     room: Room,
     musicPlatform: MusicPlatform
-  ): Promise<SpotifyRemote | null> {
+  ): Promise<Response<Remote>> {
     const { data, error } = await adminSupabase
       .from("rooms")
       .select("*, user_profile(*, bound_services(*))")
       .eq("id", room.uuid)
+      .eq(
+        "user_profile.bound_services.service_id",
+        "a2d17b25-d87e-42af-9e79-fd4df6b59222"
+      )
       .single();
 
-    if (error) return null;
-    if (data.user_profile?.bound_services === undefined) return null;
-    if (data.user_profile?.bound_services.length === 0) return null;
+    if (error)
+      return {
+        data: null,
+        error: "Impossible to get owner Spotify account",
+      };
+    if (
+      data.user_profile?.bound_services === undefined ||
+      data.user_profile?.bound_services.length === 0
+    )
+      return {
+        data: null,
+        error: "Owner Spotify account is not connected",
+      };
 
     const { access_token, expires_in, refresh_token } =
       data.user_profile.bound_services[0];
 
     if (access_token === null || expires_in === null || refresh_token === null)
-      return null;
+      return {
+        data: null,
+        error: "Owner Spotify account is not connected",
+      };
 
     const expiresIn = parseInt(expires_in);
-
-    const spotifyClient = SpotifyApi.withAccessToken(
-      process.env.SPOTIFY_CLIENT_ID as string,
-      {
-        access_token,
-        refresh_token,
-        expires_in: expiresIn,
-        token_type: "Bearer",
-      }
-    );
-    return new SpotifyRemote(spotifyClient, musicPlatform);
+    try {
+      const spotifyClient = SpotifyApi.withAccessToken(
+        process.env.SPOTIFY_CLIENT_ID as string,
+        {
+          access_token,
+          refresh_token,
+          expires_in: expiresIn,
+          token_type: "Bearer",
+        }
+      );
+      return {
+        data: new SpotifyRemote(spotifyClient, musicPlatform),
+        error: null,
+      };
+    } catch (e) {
+      return {
+        data: null,
+        error: "Impossible to use owner Spotify account",
+      };
+    }
   }
 
   async getPlaybackState(): Promise<PlayingJSONTrack | null> {
-    const spotifyPlaybackState =
-      await this.spotifyClient.player.getPlaybackState();
+    try {
+      const spotifyPlaybackState =
+        await this.spotifyClient.player.getPlaybackState();
 
-    // If the item playing is an episode and not a music track, then we return null
-    // Since we don't need support for those, for now, and they don't contain necessary information
-    // such as the album name, artists name, etc.
-    if (spotifyPlaybackState === null) return null;
+      // If the item playing is an episode and not a music track, then we return null
+      // Since we don't need support for those, for now, and they don't contain necessary information
+      // such as the album name, artists name, etc.
+      if (spotifyPlaybackState === null) return null;
 
-    if (spotifyPlaybackState.item.type === "episode") return null;
-    const playbackState = {
-      ...spotifyPlaybackState,
-      item: spotifyPlaybackState.item as Track,
-    };
+      if (spotifyPlaybackState.item.type === "episode") return null;
+      const playbackState = {
+        ...spotifyPlaybackState,
+        item: spotifyPlaybackState.item as Track,
+      };
 
-    const artistsName = extractArtistsName(playbackState.item.album.artists);
+      const artistsName = extractArtistsName(playbackState.item.album.artists);
 
-    return {
-      isPlaying: playbackState.is_playing,
-      albumName: playbackState.item.album.name,
-      artistsName: artistsName,
-      currentTime: playbackState.progress_ms,
-      duration: playbackState.item.duration_ms,
-      imgUrl: playbackState.item.album.images[0].url,
-      title: playbackState.item.name,
-      url: playbackState.item.external_urls.spotify,
-    };
+      return {
+        isPlaying: playbackState.is_playing,
+        albumName: playbackState.item.album.name,
+        artistsName: artistsName,
+        currentTime: playbackState.progress_ms,
+        duration: playbackState.item.duration_ms,
+        imgUrl: playbackState.item.album.images[0].url,
+        title: playbackState.item.name,
+        url: playbackState.item.external_urls.spotify,
+      };
+    } catch (e) {
+      console.error("erreur sur getPlaybackState", e);
+      return null;
+    }
   }
 
   async getQueue(): Promise<JSONTrack[]> {
