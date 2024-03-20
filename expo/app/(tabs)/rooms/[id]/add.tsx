@@ -1,11 +1,10 @@
 import { JSONTrack } from "commons/backend-types";
-import { ErrorBoundaryProps, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
 import { useWebSocket } from "./_layout";
 import Alert from "../../../../components/Alert";
-import Button from "../../../../components/Button";
 import CustomTextInput from "../../../../components/CustomTextInput";
 import { Text } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
