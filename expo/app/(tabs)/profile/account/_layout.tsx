@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
 
 import ErrorBoundary from "../../../../components/ErrorBoundary";
-import profileErrorBoundary from "../../../../components/ErrorComponent/ProfileErrorBoundary";
+import ProfileErrorBoundary from "../../../../components/ErrorComponent/ProfileError";
 
 export default function AccountLayout() {
   return (
-    <ErrorBoundary fallback={profileErrorBoundary}>
+    <ErrorBoundary fallback={<ProfileErrorBoundary />}>
       <Stack>
         <Stack.Screen name="index" options={{ title: "Gérer mon compte" }} />
         <Stack.Screen

@@ -4,22 +4,24 @@ import { StyleSheet } from "react-native";
 import Button from "../Button";
 import { View, Text } from "../Themed";
 
-export default function profileErrorBoundary(): JSX.Element {
+export default function RoomErrorBoundary(): JSX.Element {
   return (
     <View style={errorStyle.page}>
       <View style={errorStyle.title}>
-        <MaterialIcons name="network-check" size={60} color="red" />
+        <MaterialIcons name="music-off" size={60} color="red" />
         <Text
           style={{
             fontSize: 30,
             fontFamily: "Outfit-Regular",
           }}
         >
-          Impossible de charger les données de votre compte
+          Erreur dans votre salle d'écoute
         </Text>
       </View>
 
-      <Button href="/profile">Retourner à votre page de profil</Button>
+      <Button href="/profile" block>
+        Retour à l'accueil
+      </Button>
     </View>
   );
 }

@@ -5,7 +5,7 @@ import FontAwesome from "react-native-vector-icons/Ionicons";
 import Button from "./Button";
 
 type ErrorBoundaryProps = {
-  fallback?: () => JSX.Element;
+  fallback?: JSX.Element;
   children: React.ReactNode;
 };
 
@@ -14,11 +14,6 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, any> {
     error: false,
   };
 
-  // static getDerivedStateFromError(error: any) {
-  //   // Update state so the next render will show the fallback UI.
-  //   return { error: true };
-  // }
-
   static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI.
     return { error: true };
@@ -26,15 +21,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, any> {
 
   componentDidCatch(error: any, errorInfo: any) {
     // deal with errorInfo if needed
-    console.log("les props sont" + JSON.stringify(this.props));
-    console.log("il ya le fallback ?" + this.props.fallback);
-    console.log("Les erreurs sont" + error);
-    console.log("les erreurs info sont" + errorInfo);
+    console.error("Error catch : ", error, errorInfo);
   }
 
   render() {
     if (this.state.error) {
-      if (this.props.fallback) return this.props.fallback();
+      if (this.props.fallback) return this.props.fallback;
       return (
         <View
           style={{
