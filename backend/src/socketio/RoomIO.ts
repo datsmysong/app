@@ -1,13 +1,15 @@
+import { JSONTrack } from "commons/backend-types";
 import { Response } from "commons/socket.io-types";
 import RoomStorage from "../RoomStorage";
-import { JSONTrack } from "commons/backend-types";
 import Room, { TypedSocket } from "./Room";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
-export default function RoomIO(
-  socket: TypedSocket /*, next: (err?: ExtendedError) => void*/
-) {
+const sendQueue = (socket: TypedSocket, room: Room) => {
+  socket.emit("queue:update", Room.toJSON(room));
+};
+
+export default function onRoomWSConnection(socket: TypedSocket) {
   const roomSocket = socket.nsp;
   /*regex uuid [0-9a-f]{8}-([0-9a-f]{4}){3}-[0-9a-f]{12}*/
   const pattern = /^\/room\/(.*)$/;
@@ -34,13 +36,13 @@ export default function RoomIO(
     const hostSocket = isHostSocket ? socket : null;
     const room = await roomStorage.roomFromUuid(activeRoomId, hostSocket);
 
-    // Fetch participant of room at every connection for now
-    room?.updateParticipant();
-
     if (room === null) {
       socket.disconnect();
       return;
     }
+
+    // Fetch participant of room at every connection for now
+    room.updateParticipant();
 
     /**
      * TODO
@@ -48,11 +50,11 @@ export default function RoomIO(
      * Instead of sending the whole state, we should only send the actions taken by other users
      * so that the client can update its state accordingly
      */
-    roomSocket.emit("queue:update", Room.toJSON(room));
+    sendQueue(socket, room);
 
     socket.on("queue:add", async (params: string) => {
       await room.add(params);
-      sendQueueUpdated();
+      sendQueue(socket, room);
     });
 
     socket.on("queue:add", async (rawUrl: string) => {
@@ -67,12 +69,12 @@ export default function RoomIO(
           await room.removeWithIndex(index);
         }
       }
-      sendQueueUpdated();
+      sendQueue(socket, room);
     });
 
     socket.on("queue:removeLink", async (link) => {
       await room.removeWithLink(link);
-      sendQueueUpdated();
+      sendQueue(socket, room);
     });
 
     socket.on("queue:voteSkip", async (index, userId) => {
@@ -80,17 +82,13 @@ export default function RoomIO(
       if (!addedVote) return;
 
       const skipped = await room.verifyVoteSkip(index);
-      if (skipped === "queueTrackSkiped") sendQueueUpdated();
+      if (skipped === "queueTrackSkiped") sendQueue(socket, room);
       if (skipped === "actualTrackSkiped") {
         const remote = room.getRemote();
         if (!remote) return;
         room.updatePlaybackState();
       }
     });
-
-    const sendQueueUpdated = () => {
-      roomSocket.emit("queue:update", Room.toJSON(room));
-    };
 
     socket.on("player:playTrack", async (trackId) => {
       const remote = room.getRemote();
