@@ -195,14 +195,12 @@ export default function PersonalInfo() {
             errorMessage={errors.username && errors.username.message}
           />
           <ErrorBoundary
-            fallback={() => {
-              return (
-                <Warning
-                  label="Impossible de charger la photo de profil"
-                  variant="warning"
-                />
-              );
-            }}
+            fallback={
+              <Warning
+                label="Impossible de charger la photo de profil"
+                variant="warning"
+              />
+            }
           >
             <AvatarForm
               ref={avatarRef}
