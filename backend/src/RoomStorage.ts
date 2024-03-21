@@ -3,10 +3,10 @@ import Deezer from "./musicplatform/Deezer";
 import MusicPlatform from "./musicplatform/MusicPlatform";
 import SoundCloud from "./musicplatform/SoundCloud";
 import Spotify from "./musicplatform/Spotify";
+import { QueueableRemote } from "./musicplatform/remotes/Remote";
 import { adminSupabase, server } from "./server";
 import Room from "./socketio/Room";
 import { RoomWithForeignTable } from "./socketio/RoomDatabase";
-import { QueueableRemote } from "./musicplatform/remotes/Remote";
 
 const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
@@ -63,7 +63,7 @@ export default class RoomStorage {
         const newPlaybackState = newPlaybackStateResponse.data;
         room.setPlaybackState(newPlaybackState);
 
-        if (!newPlaybackState) return console.log("No music is playing");
+        if (!newPlaybackState) return console.debug("No music is playing");
 
         const remainingTime =
           newPlaybackState.duration - newPlaybackState.currentTime;
@@ -74,21 +74,21 @@ export default class RoomStorage {
           !hasTriggeredEndingSoonValue &&
           !(remote instanceof QueueableRemote)
         ) {
-          console.log(
+          console.debug(
             `The track of the room ${room.uuid} is ending soon, and it doesn't support queueing`
           );
           this.startedTimer.set(room.uuid, true);
 
           setTimeout(() => {
             if (!newPlaybackStateResponse.data?.isPlaying)
-              return console.log("The track is not playing anymore");
+              return console.debug("The track is not playing anymore");
             this.startedTimer.set(room.uuid, false);
 
             const nextTrack = room.shiftQueue();
-            if (!nextTrack) return console.log("No more tracks in the queue");
+            if (!nextTrack) return console.debug("No more tracks in the queue");
 
             remote.playTrack(nextTrack.url);
-            console.log(`The player will now play ${nextTrack.url}`);
+            console.debug(`The player will now play ${nextTrack.url}`);
           }, remainingTime);
         }
 
@@ -96,7 +96,7 @@ export default class RoomStorage {
 
         // If the track has changed, we add the next track to the queue of the player
         if (newPlaybackState.url != previousPlaybackState?.url) {
-          console.log(`The track of room ${room.uuid} has changed`);
+          console.debug(`The track of room ${room.uuid} has changed`);
 
           if (remote instanceof QueueableRemote) {
             let nextTrack = room.getQueue().at(0);
@@ -105,10 +105,10 @@ export default class RoomStorage {
               room.shiftQueue();
               nextTrack = room.getQueue().at(0);
             }
-            if (!nextTrack) return console.log("No more tracks in the queue");
+            if (!nextTrack) return console.debug("No more tracks in the queue");
 
             remote.addToQueue(nextTrack.url);
-            console.log(`Just added ${nextTrack.url} to the queue`);
+            console.debug(`Just added ${nextTrack.url} to the queue`);
           }
         }
       });

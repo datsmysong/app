@@ -27,11 +27,11 @@ const WebSocketProvider = ({
 
     const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
     setWebSocket(socketInstance);
-    console.log("Socket connecté");
+    console.debug("Socket connecté");
 
     return () => {
       socketInstance.disconnect();
-      console.log("Socket déconnecté");
+      console.debug("Socket déconnecté");
     };
   }, [roomId]);
 

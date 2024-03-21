@@ -1,15 +1,15 @@
 import { JSONTrack, PlayingJSONTrack, RoomJSON } from "commons/backend-types";
-import { Socket } from "socket.io";
-import RoomStorage from "../RoomStorage";
-import MusicPlatform from "../musicplatform/MusicPlatform";
-import TrackFactory from "../musicplatform/TrackFactory";
-import { RoomWithConfigDatabase } from "./RoomDatabase";
-import { adminSupabase } from "../server";
-import { QueueableRemote, Remote } from "../musicplatform/remotes/Remote";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "commons/socket.io-types";
+import { Socket } from "socket.io";
+import RoomStorage from "../RoomStorage";
+import MusicPlatform from "../musicplatform/MusicPlatform";
+import TrackFactory from "../musicplatform/TrackFactory";
+import { QueueableRemote, Remote } from "../musicplatform/remotes/Remote";
+import { adminSupabase } from "../server";
+import { RoomWithConfigDatabase } from "./RoomDatabase";
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
@@ -98,7 +98,6 @@ export default class Room {
 
     // If the queue is currently empty and no track is playing, we can play the track immediately
     const { data: playbackState } = await this.remote.getPlaybackState();
-    console.log(playbackState, this.queue.length);
 
     if (this.queue.length === 0 && playbackState === null) {
       const response = await this.remote.playTrack(track.url);
