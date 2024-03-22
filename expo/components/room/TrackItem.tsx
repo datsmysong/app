@@ -17,7 +17,7 @@ export default function TrackItem(prop: {
   isMenuDisabled: boolean;
   handleDislike?: () => void;
   disliked?: boolean;
-  profilePicture: any;
+  profilePicture: string;
 }) {
   const {
     title,
@@ -46,7 +46,10 @@ export default function TrackItem(prop: {
       artistsName={artists}
       imgUrl={rawImageUrl}
       profilePictureImage={
-        <Image source={prop.profilePicture} style={itemStyles.profileImage} />
+        <Image
+          source={{ uri: prop.profilePicture }}
+          style={itemStyles.profileImage}
+        />
       }
     >
       <Pressable onPress={handleDislike}>
