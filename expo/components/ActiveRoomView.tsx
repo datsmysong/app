@@ -66,6 +66,8 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
 
+  const profilePicture: string | Blob = "../../assets/images/album-cover.jpg";
+
   useEffect(() => {
     if (!userProfile || !room) return;
 
@@ -91,7 +93,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       setLiveRoom(data);
     });
 
-    socket.on("queue:update", (room: RoomJSON, userProfileId: string) => {
+    socket.on("queue:update", async (room: RoomJSON, accountId: string) => {
       setLiveRoom(room);
     });
   }, [socket]);
@@ -221,6 +223,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                         )) ||
                       false
                     }
+                    profilePicture={profilePicture}
                   />
                 )}
               />
