@@ -9,10 +9,11 @@ export type AvatarRemote = {
 type AvatarProps = {
   id: string | undefined;
   tempoAvatarImage?: string; // if we want to pass an image url directly (on edit profile)
+  trackItemStyle?: any;
 };
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
-  ({ id, tempoAvatarImage }, ref) => {
+  ({ id, tempoAvatarImage, trackItemStyle }, ref) => {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
     useImperativeHandle(ref, () => ({
@@ -49,6 +50,7 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
               { aspectRatio: 1, width: "100%" },
               styles.avatar,
               styles.image,
+              trackItemStyle ?? {},
             ]}
           />
         ) : (
@@ -57,6 +59,7 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
               { aspectRatio: 1, width: "100%" },
               styles.avatar,
               styles.noImage,
+              trackItemStyle ?? {},
             ]}
           />
         )}
