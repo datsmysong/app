@@ -64,7 +64,7 @@ export interface ServerToClientEvents
   extends LocalPlayerServerToClientEvents,
     PlayerServerToClientEvents {
   /** Update the queue. */
-  "queue:update": (room: RoomJSON | Error, accountId?: string) => void;
+  "queue:update": (room: RoomJSON | Error) => void;
   /** End the room. */
   "room:end": () => void;
   // error events are handled by the client in layout of rooms/[id]
