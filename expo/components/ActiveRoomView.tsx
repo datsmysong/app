@@ -61,14 +61,15 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [isHost, setIsHost] = useState<boolean>(false);
   const [voteSkipActualTrack, setVoteSkipActualTrack] =
     useState<boolean>(false);
+  const [lastAddedTrackAccountId, setLastAddedTrackAccountId] = useState<
+    string | null
+  >(null);
 
   const userProfile = useUserProfile();
 
   const socket = useWebSocket();
 
   const url: URL = new URL("/room/" + room.id, getApiUrl());
-
-  const profilePicture: string | Blob = "../../assets/images/album-cover.jpg";
 
   useEffect(() => {
     if (!userProfile || !room) return;
@@ -97,6 +98,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
     socket.on("queue:update", async (room: RoomJSON, accountId: string) => {
       setLiveRoom(room);
+      setLastAddedTrackAccountId(accountId);
     });
   }, [socket]);
 
@@ -225,7 +227,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                         )) ||
                       false
                     }
-                    profilePicture={profilePicture}
+                    accountId={lastAddedTrackAccountId}
                   />
                 )}
               />
