@@ -99,7 +99,7 @@ export default class Room {
     }
   }
 
-  async add(rawUrl: string, userProfileId: string) {
+  async add(rawUrl: string) {
     if (!this.remote) return;
     const trackMetadata = this.trackFactory.fromUrl(rawUrl);
     if (trackMetadata === null) return;
