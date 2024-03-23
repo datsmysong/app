@@ -16,7 +16,6 @@ export default function RoomHistoryInfoCard({
 }: RoomHistoryInfoCardProps) {
   const [username, setUsername] = useState("");
   const [formatedDate, setFormatedDate] = useState("");
-  const [loading, setLoading] = useState(true);
 
   const getUsername = async (userProfileId: string) => {
     const user = await getUserProfileFromUserProfileId(userProfileId);
@@ -44,22 +43,21 @@ export default function RoomHistoryInfoCard({
 
       setUsername(username);
       setFormatedDate(formattedDate);
-      setLoading(false);
     })();
   }, []);
 
   return (
-    <View style={styles.layout}>
-      <View style={styles.infos}>
-        <Text style={styles.roomName}>{room.name}</Text>
-        <Text style={styles.roomInfo}>
-          par {username} le {formatedDate}
-        </Text>
-      </View>
-      <Link href={`/rooms/${room.id}`}>
+    <Link href={`/rooms/${room.id}`}>
+      <View style={styles.layout}>
+        <View style={styles.infos}>
+          <Text style={styles.roomName}>{room.name}</Text>
+          <Text style={styles.roomInfo}>
+            par {username} le {formatedDate}
+          </Text>
+        </View>
         <MaterialIcons name="keyboard-arrow-right" size={32} color="black" />
-      </Link>
-    </View>
+      </View>
+    </Link>
   );
 }
 
@@ -68,6 +66,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    width: "100%",
   },
 
   infos: {

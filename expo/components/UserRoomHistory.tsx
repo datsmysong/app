@@ -6,35 +6,17 @@ import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { Text, View } from "./Themed";
 import { supabase } from "../lib/supabase";
-import useSupabaseUser from "../lib/useSupabaseUser";
-import { getUserProfile } from "../lib/userProfile";
+import { useUserProfile } from "../lib/userProfile";
 
 type RoomUserAndRoom = { rooms: Room } & RoomUser;
 
 export default function UserRoomHistory() {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [roomUser, setRoomUser] = useState<RoomUserAndRoom[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  const user = useUserProfile();
   useEffect(() => {
     (async () => {
-      // If I have use the method useUserProfileUser, I have an error,
-      // so the only way I find to fix it is to use the method useSupabaseUser
-
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const user = await useSupabaseUser();
-      if (!user) {
-        Alert.alert("Erreur lors de la récupération de l'utilisateur");
-        return;
-      }
-      const userProfile = await getUserProfile(user.id);
-      if (!userProfile) {
-        Alert.alert(
-          "Erreur lors de la récupération du profil de l'utilisateur"
-        );
-        return;
-      }
-      const userId = userProfile.user_profile_id;
+      if (!user) return;
+      const userId = user.user_profile_id;
 
       const { error, data } = await supabase
         .from("room_users")
@@ -52,21 +34,13 @@ export default function UserRoomHistory() {
           return roomUser.rooms?.is_active === false;
         }) as RoomUserAndRoom[]) ?? [];
 
-      setRoomUser(history);
-      setLoading(false);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (roomUser.length === 0) return;
-    (async () => {
       const tmpRooms: Room[] = [];
-      roomUser.forEach((userRoom) => {
+      history.forEach((userRoom) => {
         tmpRooms.push(userRoom.rooms);
       });
       setRooms(tmpRooms);
     })();
-  }, [roomUser]);
+  }, [user]);
 
   return (
     <View>
