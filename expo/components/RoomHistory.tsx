@@ -1,16 +1,15 @@
-import { User } from "@supabase/supabase-js";
 import type { ProcessedRoom } from "commons/room-types";
 import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
+import Button from "./Button";
 import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
 import { Text, View } from "./Tamed";
 import Avatar from "./profile/Avatar";
 import H2 from "./text/H2";
 import { getApiUrl } from "../lib/apiUrl";
-import useSupabaseUser from "../lib/useSupabaseUser";
 
 type RoomHistoryProps = {
   roomId: string;
@@ -21,17 +20,6 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
 
   const [processedRoom, setProcessedRoom] = useState<ProcessedRoom>();
   const [error, setError] = useState<string>();
-  const [user, setUser] = useState<User>();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const user = await useSupabaseUser();
-      if (!user) return;
-      setUser(user);
-    };
-    fetchUser();
-  }, []);
 
   const apiUrl = getApiUrl();
 
@@ -55,9 +43,9 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
       });
     };
 
-    if (!roomId || !user) return;
+    if (!roomId) return;
     fetchProcessedRoomData();
-  }, [roomId, user]);
+  }, [roomId]);
 
   return (
     <View style={styles.header}>
@@ -109,6 +97,9 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
         </>
       )}
       {!processedRoom && !error && <Text>Chargement...</Text>}
+      <Button href="/rooms" block>
+        Retour à l'accueil
+      </Button>
     </View>
   );
 };
@@ -126,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     alignSelf: "stretch",
-    overflow: "scroll",
+    overflowx: "scroll",
   },
   infoCard: {
     height: "auto",
