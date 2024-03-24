@@ -25,6 +25,14 @@ export default function RootLayout() {
     "Outfit-Bold": require("../assets/fonts/outfit/Outfit-Bold.ttf"),
     "Outfit-ExtraBold": require("../assets/fonts/outfit/Outfit-ExtraBold.ttf"),
     "Outfit-Black": require("../assets/fonts/outfit/Outfit-Black.ttf"),
+    "Unbounded-Black": require("../assets/fonts/unbounded/Unbounded-Black.ttf"),
+    "Unbounded-Bold": require("../assets/fonts/unbounded/Unbounded-Bold.ttf"),
+    "Unbounded-ExtraBold": require("../assets/fonts/unbounded/Unbounded-ExtraBold.ttf"),
+    "Unbounded-ExtraLight": require("../assets/fonts/unbounded/Unbounded-ExtraLight.ttf"),
+    "Unbounded-Light": require("../assets/fonts/unbounded/Unbounded-Light.ttf"),
+    "Unbounded-Medium": require("../assets/fonts/unbounded/Unbounded-Medium.ttf"),
+    "Unbounded-Regular": require("../assets/fonts/unbounded/Unbounded-Regular.ttf"),
+    "Unbounded-SemiBold": require("../assets/fonts/unbounded/Unbounded-SemiBold.ttf"),
     ...FontAwesome.font,
   });
 
