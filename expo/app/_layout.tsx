@@ -3,6 +3,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Text, View } from "../components/Themed";
 import { supabase } from "../lib/supabase";
@@ -78,14 +79,16 @@ function RootLayoutNav() {
           borderRadius: 40,
         }}
       >
-        <MenuProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-            <Stack.Screen name="ask-name" options={{ headerShown: false }} />
-          </Stack>
-        </MenuProvider>
+        <SafeAreaProvider>
+          <MenuProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+              <Stack.Screen name="ask-name" options={{ headerShown: false }} />
+            </Stack>
+          </MenuProvider>
+        </SafeAreaProvider>
       </View>
     </View>
   );

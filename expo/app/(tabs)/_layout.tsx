@@ -5,6 +5,7 @@ import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import User from "phosphor-react-native/src/icons/User";
 import Users from "phosphor-react-native/src/icons/Users";
 import { useColorScheme } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Text } from "../../components/Tamed";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
@@ -41,81 +42,86 @@ export default function TabLayout() {
   if (!user) return <Redirect href="/auth/" />;
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: "black",
-        tabBarStyle: {
-          height: 100,
-        },
-        tabBarItemStyle: {
-          flexDirection: "column",
-          height: 85,
-          display: "flex",
-          paddingHorizontal: 4,
-          paddingVertical: 10,
-          alignItems: "center",
-        },
-      }}
-      backBehavior="initialRoute"
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "#ffffff", paddingBottom: 0 }}
+      edges={["right", "bottom", "left"]}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Accueil",
-          tabBarLabel: ({ color, focused, children }) => (
-            <TabBarLabel color={color} focused={focused}>
-              {children}
-            </TabBarLabel>
-          ),
-          tabBarIcon: ({ color, focused }) => (
-            <House size={32} weight={focused ? "fill" : "regular"} />
-          ),
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: "black",
+          tabBarStyle: {
+            height: 100,
+          },
+          tabBarItemStyle: {
+            flexDirection: "column",
+            height: 85,
+            display: "flex",
+            paddingHorizontal: 4,
+            paddingVertical: 10,
+            alignItems: "center",
+          },
         }}
-      />
-      <Tabs.Screen
-        name="rooms"
-        options={{
-          title: "Salles",
-          headerShown: false,
-          tabBarLabel: ({ color, focused, children }) => (
-            <TabBarLabel color={color} focused={focused}>
-              {children}
-            </TabBarLabel>
-          ),
-          tabBarIcon: ({ color, focused }) => (
-            <MusicNote size={32} weight={focused ? "fill" : "regular"} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="Friends"
-        options={{
-          title: "Amis",
-          tabBarLabel: ({ color, focused, children }) => (
-            <TabBarLabel color={color} focused={focused}>
-              {children}
-            </TabBarLabel>
-          ),
-          tabBarIcon: ({ color, focused }) => (
-            <Users size={32} weight={focused ? "fill" : "regular"} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profil",
-          headerShown: false,
-          tabBarLabel: ({ color, focused, children }) => (
-            <TabBarLabel color={color} focused={focused}>
-              {children}
-            </TabBarLabel>
-          ),
-          tabBarIcon: ({ color, focused }) => (
-            <User size={32} weight={focused ? "fill" : "regular"} />
-          ),
-        }}
-      />
-    </Tabs>
+        backBehavior="initialRoute"
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Accueil",
+            tabBarLabel: ({ color, focused, children }) => (
+              <TabBarLabel color={color} focused={focused}>
+                {children}
+              </TabBarLabel>
+            ),
+            tabBarIcon: ({ color, focused }) => (
+              <House size={32} weight={focused ? "fill" : "regular"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="rooms"
+          options={{
+            title: "Salles",
+            headerShown: false,
+            tabBarLabel: ({ color, focused, children }) => (
+              <TabBarLabel color={color} focused={focused}>
+                {children}
+              </TabBarLabel>
+            ),
+            tabBarIcon: ({ color, focused }) => (
+              <MusicNote size={32} weight={focused ? "fill" : "regular"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="Friends"
+          options={{
+            title: "Amis",
+            tabBarLabel: ({ color, focused, children }) => (
+              <TabBarLabel color={color} focused={focused}>
+                {children}
+              </TabBarLabel>
+            ),
+            tabBarIcon: ({ color, focused }) => (
+              <Users size={32} weight={focused ? "fill" : "regular"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profil",
+            headerShown: false,
+            tabBarLabel: ({ color, focused, children }) => (
+              <TabBarLabel color={color} focused={focused}>
+                {children}
+              </TabBarLabel>
+            ),
+            tabBarIcon: ({ color, focused }) => (
+              <User size={32} weight={focused ? "fill" : "regular"} />
+            ),
+          }}
+        />
+      </Tabs>
+    </SafeAreaView>
   );
 }
