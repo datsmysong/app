@@ -141,7 +141,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
         {room && socket && (
           <View style={[headerStyles.headerContainer, { flex: 1 }]}>
             <View style={headerStyles.titleContainer}>
-              <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+              <Text style={headerStyles.headerTitle}>{room.name}</Text>
               {isHost ? (
                 <Link href={`/rooms/${room.id}/settings`}>
                   <MaterialIcons
@@ -243,8 +243,8 @@ const headerStyles = StyleSheet.create({
     gap: 8,
   },
   headerTitle: {
+    fontFamily: "Unbounded-Bold",
     fontSize: 32,
-    fontWeight: "bold",
   },
   titleContainer: {
     flexDirection: "row",

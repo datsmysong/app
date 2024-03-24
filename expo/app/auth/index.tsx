@@ -9,7 +9,7 @@ export default function Onboarding() {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Datsmysong</Text>
+        <Text style={styles.title}>datsmysong</Text>
       </View>
       <View
         style={[styles.container, { maxWidth: 400, alignItems: "stretch" }]}
@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
+    fontFamily: "Unbounded-Bold",
+    fontSize: 33,
   },
   titleContainer: {
     marginVertical: 50,
