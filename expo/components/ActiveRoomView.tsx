@@ -235,9 +235,9 @@ const floatingStyle = StyleSheet.create({
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
-    marginHorizontal: 24,
-    marginVertical: 14,
-    gap: 10,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    rowGap: 10,
   },
   buttonContainer: {
     gap: 8,
@@ -245,11 +245,14 @@ const headerStyles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Unbounded-Bold",
     fontSize: 32,
+    marginRight: 10,
   },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    columnGap: 4,
+    paddingVertical: 10,
   },
   settingsIcon: {
     display: "flex",
