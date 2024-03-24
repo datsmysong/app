@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
+    fontFamily: "Unbounded-Bold",
     fontSize: 32,
-    fontWeight: "bold",
   },
 });

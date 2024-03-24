@@ -171,7 +171,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       {room && liveRoom && socket && socket.connected && (
         <>
           <View style={headerStyles.headerContainer}>
-            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+            <Text style={headerStyles.headerTitle}>"{room.name}"</Text>
             {isHost ? (
               <Link href={`/rooms/${room.id}/settings`}>
                 <Gear size={32} color="black" />
@@ -257,21 +257,24 @@ const floatingStyle = StyleSheet.create({
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
-    marginHorizontal: 24,
-    marginVertical: 14,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
     gap: 10,
   },
   buttonContainer: {
     gap: 8,
   },
   headerTitle: {
-    fontSize: 32,
     fontWeight: "bold",
+    fontSize: 32,
+    fontFamily: "Unbounded-Bold",
   },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 4,
+    paddingVertical: 10,
   },
   settingsIcon: {
     display: "flex",
