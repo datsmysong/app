@@ -5,8 +5,7 @@ import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
 
 import Alert from "./Alert";
 import { supabase } from "../lib/supabase";
-import useSupabaseUser from "../lib/useSupabaseUser";
-import { getUserProfile } from "../lib/userProfile";
+import { useUserProfile } from "../lib/userProfile";
 
 interface ServicesListProps {
   handleServiceChange: (serviceId: string) => void;
@@ -20,35 +19,19 @@ export default function ServicesList({
   const [availableServices, setAvailableServices] = useState<
     StreamingService[]
   >([]);
+  const user = useUserProfile();
 
   useEffect(() => {
+    if (!user) return;
+    const userId = user.user_profile_id;
     (async () => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const user = await useSupabaseUser();
-      if (!user) {
-        Alert.alert(
-          "Une erreur est survenue lors, veuillez réessayer plus tard"
-        );
-        return;
-      }
-      const userProfile = await getUserProfile(user.id);
-      if (!userProfile) {
-        Alert.alert(
-          "Une erreur est survenue lors, veuillez réessayer plus tard"
-        );
-        return;
-      }
-      const userId = userProfile.user_profile_id;
-
       const { error, data } = await supabase
         .from("bound_services")
         .select("streaming_services(*)")
         .eq("user_profile_id", userId);
 
       if (error) {
-        Alert.alert(
-          "Une erreur est survenue lors, veuillez réessayer plus tard"
-        );
+        Alert.alert("Une erreur est survenue, veuillez réessayer plus tard");
         return;
       }
       if (!data) {
@@ -62,7 +45,7 @@ export default function ServicesList({
       });
       setAvailableServices(services);
     })();
-  }, []);
+  }, [user]);
 
   const toggleSelect = (item: StreamingService) => {
     if (item.service_id === selectedService) {
