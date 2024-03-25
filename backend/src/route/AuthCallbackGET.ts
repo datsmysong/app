@@ -117,24 +117,6 @@ const getUserProfile = async (userId: string): Promise<string | null> => {
   return userData?.user_profile_id ?? null;
 };
 
-const alreadyBoundService = async ({
-  service,
-  user_profile_id,
-}: {
-  service: StreamingService;
-  user_profile_id: string;
-}): Promise<{ alreadyBound: boolean; error: PostgrestError | null }> => {
-  const { data, error } = await adminSupabase
-    .from("bound_services")
-    .select("*")
-    .eq("user_profile_id", user_profile_id)
-    .eq("service_id", service);
-  return {
-    alreadyBound: data !== null && data.length > 0,
-    error: error,
-  };
-};
-
 export const createAccount = async ({
   displayName,
   accountId,
@@ -181,10 +163,7 @@ export const createAccount = async ({
 const upsertService = async (
   service: BoundService
 ): Promise<PostgrestError | null> => {
-  console.log("Upsert le token");
   const { error } = await adminSupabase.from("bound_services").upsert(service);
-  console.log("ça a marché ? ", error);
-
   return error;
 };
 

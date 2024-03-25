@@ -36,25 +36,23 @@ export default class SpotifyRemote extends QueueableRemote {
     if (error)
       return {
         data: null,
-        error: "Impossible to get owner Spotify account",
+        error: "Failed to fetch host's Spotify credentials",
       };
     if (
       data.user_profile?.bound_services === undefined ||
-      data.user_profile?.bound_services.length === 0
+      data.user_profile?.bound_services.length === 0 ||
+      !data.user_profile.bound_services[0].access_token ||
+      !data.user_profile.bound_services[0].expires_in ||
+      !data.user_profile.bound_services[0].refresh_token
     )
       return {
         data: null,
-        error: "Owner Spotify account is not connected",
+        error:
+          "Couldn't find Spotify credentials. Please double check that your Spotify account is linked in your account settings under 'Integrations'",
       };
 
     const { access_token, expires_in, refresh_token } =
       data.user_profile.bound_services[0];
-
-    if (access_token === null || expires_in === null || refresh_token === null)
-      return {
-        data: null,
-        error: "Owner Spotify account is not connected",
-      };
 
     const expiresIn = parseInt(expires_in);
     try {
@@ -74,40 +72,50 @@ export default class SpotifyRemote extends QueueableRemote {
     } catch (e) {
       return {
         data: null,
-        error: "Impossible to use owner Spotify account",
+        error:
+          "Failed to authenticate to Spotify using saved credentials. Try disconnecting then reconnecting your Spotify account from your account 'Integrations' page",
       };
     }
   }
 
   async getPlaybackState(): Promise<Response<PlayingJSONTrack | null>> {
     return runSpotifyCallback(async () => {
-      const spotifyPlaybackState =
-        await this.spotifyClient.player.getPlaybackState();
+      try {
+        const spotifyPlaybackState =
+          await this.spotifyClient.player.getPlaybackState();
 
-      if (!spotifyPlaybackState || spotifyPlaybackState.item.type === "episode")
-        return { data: null, error: "No track is currently playing" };
+        if (
+          !spotifyPlaybackState ||
+          spotifyPlaybackState.item.type === "episode"
+        )
+          return { data: null, error: "No track is currently playing" };
 
-      const playbackState = {
-        ...spotifyPlaybackState,
-        item: spotifyPlaybackState.item as Track,
-      };
+        const playbackState = {
+          ...spotifyPlaybackState,
+          item: spotifyPlaybackState.item as Track,
+        };
 
-      const artistsName = extractArtistsName(playbackState.item.album.artists);
+        const artistsName = extractArtistsName(
+          playbackState.item.album.artists
+        );
 
-      return {
-        data: {
-          isPlaying: playbackState.is_playing,
-          albumName: playbackState.item.album.name,
-          artistsName: artistsName,
-          currentTime: playbackState.progress_ms,
-          duration: playbackState.item.duration_ms,
-          imgUrl: playbackState.item.album.images[0].url,
-          title: playbackState.item.name,
-          url: playbackState.item.external_urls.spotify,
-          updated_at: Date.now(),
-        },
-        error: null,
-      };
+        return {
+          data: {
+            isPlaying: playbackState.is_playing,
+            albumName: playbackState.item.album.name,
+            artistsName: artistsName,
+            currentTime: playbackState.progress_ms,
+            duration: playbackState.item.duration_ms,
+            imgUrl: playbackState.item.album.images[0].url,
+            title: playbackState.item.name,
+            url: playbackState.item.external_urls.spotify,
+            updated_at: Date.now(),
+          },
+          error: null,
+        };
+      } catch (e) {
+        return { data: null, error: "Failed to fetch current Playbackstate" };
+      }
     });
   }
 

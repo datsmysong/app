@@ -26,7 +26,7 @@ const WebSocketProvider = ({
 }) => {
   const [webSocket, setWebSocket] = useState<Socket | null>(null);
 
-  const [socketError, setSockerError] = useState<Error | null>(null);
+  const [socketError, setSocketError] = useState<Error | null>(null);
   const throwError = useAsyncError();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const WebSocketProvider = ({
     console.debug("Socket connecté");
 
     socketInstance.on("connect_error", (error) => {
-      setSockerError(error);
+      setSocketError(error);
     });
 
     socketInstance.on("room:error", (error: string) => {
@@ -45,7 +45,7 @@ const WebSocketProvider = ({
     });
 
     socketInstance.on("connect", () => {
-      setSockerError(null);
+      setSocketError(null);
     });
 
     return () => {

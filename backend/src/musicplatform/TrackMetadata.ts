@@ -29,7 +29,7 @@ export default class TrackMetadata {
       if (JSONTrack) JSONTrack.votes = [];
       return JSONTrack;
     } catch (err) {
-      console.error("ERREUR BACKEND", err);
+      console.error(`Failed to fetch data for track ${this.id}`);
       return null;
     }
   }
