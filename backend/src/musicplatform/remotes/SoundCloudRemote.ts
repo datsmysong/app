@@ -1,12 +1,11 @@
-import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
-import MusicPlatform from "../MusicPlatform";
-import { Remote } from "./Remote";
+import { PlayingJSONTrack } from "commons/backend-types";
 import {
   LocalPlayerServerToClientEvents,
   Response,
 } from "commons/socket.io-types";
 import Room from "../../socketio/Room";
-import { Response } from "commons/socket.io-types";
+import MusicPlatform from "../MusicPlatform";
+import { Remote } from "./Remote";
 
 export default class SoundCloudRemote extends Remote {
   room: Room;
