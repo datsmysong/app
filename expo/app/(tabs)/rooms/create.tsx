@@ -49,13 +49,10 @@ export default function CreateRoom() {
   }, [roomName, roomCode, selectedService]);
 
   useEffect(() => {
-    console.log(error);
     if (error) {
-      setTimeout(() => {
-        setError(false);
-        setErrorMessage("");
-        router.replace("/rooms/create");
-      }, 3000);
+      setError(false);
+      setErrorMessage("");
+      router.replace("/rooms/create");
     }
   }, []);
 
