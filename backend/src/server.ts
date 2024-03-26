@@ -165,7 +165,7 @@ server.post<{
   };
 }>("/rooms/create", { schema: createRoomSchema }, RoomPOST);
 
-server.get("/room/:id", RoomIdGET);
+server.get("/roomStorage/:id", RoomIdGET);
 
 server.get("/room/:id/leave", RoomLeaveGET);
 
@@ -176,6 +176,17 @@ server.get("/rooms", RoomGET);
 server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 
 // server.get("/track/spotify/:id", SpotifyGET);
+const getRoomSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "string" },
+    },
+  },
+};
+
+server.get("/room/:id", { schema: getRoomSchema }, RoomGET);
 
 server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", onRoomWSConnection);
