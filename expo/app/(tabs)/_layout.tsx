@@ -1,4 +1,3 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect, Tabs } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import House from "phosphor-react-native/src/icons/House";
@@ -12,16 +11,6 @@ import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
 WebBrowser.maybeCompleteAuthSession();
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={32} {...props} />;
-}
-
 function TabBarLabel(props: {
   color: string;
   focused: boolean;
@@ -30,9 +19,10 @@ function TabBarLabel(props: {
   return (
     <Text
       style={{
-        color: props.color,
+        // color: props.color,
         fontWeight: props.focused ? "bold" : "normal",
         fontSize: 20,
+        fontFamily: "Outfit-Regular",
       }}
     >
       {props.children}
@@ -56,17 +46,18 @@ export default function TabLayout() {
         // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarActiveTintColor: "black",
         tabBarStyle: {
-          height: 90,
-          gap: 4,
+          height: 100,
         },
         tabBarItemStyle: {
           flexDirection: "column",
+          height: 85,
           display: "flex",
           paddingHorizontal: 4,
-          paddingVertical: 25,
+          paddingVertical: 10,
           alignItems: "center",
         },
       }}
+      backBehavior="initialRoute" //
     >
       <Tabs.Screen
         name="index"
