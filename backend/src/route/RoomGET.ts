@@ -1,17 +1,10 @@
 import { QueryData, User } from "@supabase/supabase-js";
-import {
-  Profile,
-  RoomHistory,
-  UserProfile,
-} from "commons/database-types-utils";
-import {
-  InactiveRoomMusic,
-  MusicMetadata,
-  Participant,
-  ProcessedRoom,
-} from "commons/room-types";
+import { JSONTrack, PlayedJSONTrack } from "commons/backend-types";
+import { Participant, ProcessedRoom } from "commons/room-types";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { getMusicPlatform } from "../RoomStorage";
 import createClient from "../lib/supabase";
+import MusicPlatform from "../musicplatform/MusicPlatform";
 import { adminSupabase } from "../server";
 
 export interface QueryParams {
@@ -20,64 +13,87 @@ export interface QueryParams {
 
 type ReturnedRoomData = QueryData<ReturnType<typeof query>>[0];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function isLiked(song: RoomHistory, user: User): boolean {
-  return false;
+/**
+ * TODO: Fetch actual like status from all platforms the user has connected to his account
+ * @param musicPlatform The music platform the song is from
+ * @param songId The song id
+ * @param user The user
+ * @returns true if the user has liked the song on at least one platform he has connected to his account, false otherwise
+ */
+async function isLiked(
+  musicPlatform: MusicPlatform,
+  songId: string,
+  user: User
+): Promise<boolean> {
+  // Avoid eslint warning
+  return false && musicPlatform && songId && user;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getSongMetadata(song: RoomHistory): MusicMetadata {
-  return {
-    name: "In The Name Of Love",
-    artist: "Martin Garrix, Bebe Rexha",
-    genre: "Rock",
-    duration: 361,
-    artwork: "https://unsplash.it/300/300",
-  };
+async function getSongMetadata(
+  musicPlatform: MusicPlatform,
+  songId: string
+): Promise<JSONTrack | null> {
+  const data = await musicPlatform.getJsonTrack(songId);
+  return data;
 }
 
-const usePlayedSongs = (
+/**
+ * This method returns the played songs of a room with additional information based on the user (like status)
+ * @param room
+ * @param user
+ * @returns
+ */
+const getPlayedSongsForUser = async (
   room: ReturnedRoomData,
   user: User
-): (InactiveRoomMusic | null)[] => {
-  return room.room_history.map((song) => {
-    const liked = isLiked(song, user);
-    const metadata = getSongMetadata(song);
+): Promise<Array<PlayedJSONTrack>> => {
+  if (room.streaming_services === null) return [];
+  const musicPlatform = getMusicPlatform(room.streaming_services?.service_id);
+  if (!musicPlatform) return [];
 
-    /**
-     * This is ugly as hell, but Supabase is lying about its types...
-     * song.profile and room.room_users are typed as arrays, but they can be
-     * single elements instead
-     */
-    const songProfile = song.profile as unknown as Profile & {
-      userProfile: UserProfile | null;
-    };
-    const roomUsers = Array.isArray(room.room_users)
-      ? room.room_users
-      : [room.room_users];
+  const playedSongs = await getPlayedSongs(room);
 
-    const profileId = songProfile.id;
-    const addedBy = roomUsers.find(
-      (roomUser) => roomUser.profile_id === profileId
-    );
-    if (!addedBy || !addedBy.profile) return null;
+  const promises = playedSongs.map(async (song) => {
+    const songId = song.id;
+    const liked = await isLiked(musicPlatform, songId, user);
 
     return {
-      name: metadata.name,
-      artist: metadata.artist,
-      position: song.position,
-      genre: metadata.genre,
-      duration: metadata.duration,
-      liked: liked,
-      artwork: metadata.artwork,
-      addedBy: {
-        banned: addedBy.banned,
-        joinedAt: addedBy.joined_at,
-        profile: addedBy.profile,
-        roomId: addedBy.room_id,
-      },
+      ...song,
+      liked,
     };
   });
+
+  return Promise.all(promises);
+};
+
+/**
+ * This method returns the played songs of a room
+ * @param room The room
+ * @returns The played songs of the room
+ */
+const getPlayedSongs = async (
+  room: ReturnedRoomData
+): Promise<Array<PlayedJSONTrack>> => {
+  if (room.streaming_services === null) return [];
+  const musicPlatform = getMusicPlatform(room.streaming_services?.service_id);
+  if (!musicPlatform) return [];
+
+  const promises = room.room_history
+    .map(async (song, index) => {
+      const songId = song.music_id;
+      const metadata = await getSongMetadata(musicPlatform, songId);
+      if (!metadata) return null;
+      if (!song.profile_id) return null;
+
+      return {
+        ...metadata,
+        position: index,
+        addedBy: song.profile_id,
+      };
+    })
+    .filter((song) => song !== null) as Array<Promise<PlayedJSONTrack>>;
+
+  return await Promise.all(promises);
 };
 
 function getParticipants(
@@ -115,10 +131,10 @@ function getParticipants(
     };
   });
 }
-const useProcessRoom = (
+const useProcessRoom = async (
   room: ReturnedRoomData,
   user: User
-): ProcessedRoom | null => {
+): Promise<ProcessedRoom | null> => {
   if (!room) return null;
   if (!room.streaming_services) return null;
 
@@ -139,9 +155,9 @@ const useProcessRoom = (
   }).format(roomEndingDate.getTime() - roomCreationData.getTime());
 
   const streamingService = room.streaming_services;
-  const playedSongs = usePlayedSongs(room, user).filter(
+  const playedSongs = (await getPlayedSongsForUser(room, user)).filter(
     (song) => song !== null
-  ) as InactiveRoomMusic[];
+  );
 
   let averageSongDuration = "0s";
   if (playedSongs.length >= 1) {
@@ -153,14 +169,14 @@ const useProcessRoom = (
   }
 
   const genresPlayCount = playedSongs
-    .map((song) => song.genre)
-    .reduce(
-      (acc, genre) => {
+    .map((song) => song.genres)
+    .reduce((acc, genres) => {
+      genres.forEach((genre) => {
         acc[genre] = acc[genre] ? acc[genre] + 1 : 1;
-        return acc;
-      },
-      {} as Record<string, number>
-    );
+      });
+      return acc;
+    }, {} as Record<string, number>);
+
   const mostPlayedGenre = Object.entries(genresPlayCount).reduce(
     (acc, [genre, count]) => {
       if (count > acc.count) {

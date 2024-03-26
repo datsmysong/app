@@ -58,6 +58,8 @@ export default class SoundCloud extends MusicPlatform {
       albumName: track.title,
       artistsName: artists,
       imgUrl: track.artwork_url,
+      genres: track.genre ? [track.genre] : [],
+      id: track.permalink_url,
     };
   }
 
