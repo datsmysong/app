@@ -30,7 +30,7 @@ function TabBarLabel(props: {
   );
 }
 export default function TabLayout() {
-  WebBrowser.maybeCompleteAuthSession(); // required for web only"
+  WebBrowser.maybeCompleteAuthSession(); // required for web only
 
   const colorScheme = useColorScheme();
 
@@ -43,7 +43,6 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarActiveTintColor: "black",
         tabBarStyle: {
           height: 100,
@@ -57,7 +56,7 @@ export default function TabLayout() {
           alignItems: "center",
         },
       }}
-      backBehavior="initialRoute" //
+      backBehavior="initialRoute"
     >
       <Tabs.Screen
         name="index"
