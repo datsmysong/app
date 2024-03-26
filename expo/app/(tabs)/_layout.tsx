@@ -43,21 +43,21 @@ export default function TabLayout() {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: "#ffffff", paddingBottom: -20 }}
+      style={{ flex: 1, backgroundColor: "#ffffff" }}
       edges={["right", "bottom", "left"]}
     >
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: "black",
           tabBarStyle: {
-            height: 100,
+            height: 80,
           },
           tabBarItemStyle: {
             flexDirection: "column",
             height: 85,
             display: "flex",
             paddingHorizontal: 4,
-            paddingVertical: 10,
+            paddingTop: 10,
             alignItems: "center",
           },
         }}
