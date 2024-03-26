@@ -4,7 +4,7 @@ import { SplashScreen, Stack, router } from "expo-router";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 
-import { Text } from "../components/Themed";
+import { Text, View } from "../components/Themed";
 import { supabase } from "../lib/supabase";
 
 export const unstable_settings = {
@@ -55,13 +55,30 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <MenuProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen name="ask-name" options={{ headerShown: false }} />
-      </Stack>
-    </MenuProvider>
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        backgroundColor: "gray",
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          maxWidth: 600,
+          borderRadius: 40,
+        }}
+      >
+        <MenuProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+            <Stack.Screen name="ask-name" options={{ headerShown: false }} />
+          </Stack>
+        </MenuProvider>
+      </View>
+    </View>
   );
 }

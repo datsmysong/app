@@ -1,6 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
+import X from "phosphor-react-native/src/icons/X";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
@@ -64,7 +65,7 @@ export default function TrackItem(prop: {
             <MenuOptions customStyles={optionsStyles}>
               <CustomMenuOption
                 onSelect={removeTrack}
-                icon={{ name: "close", size: 28, color: "red" }}
+                icon={<X size={28} color="red" />}
                 textStyle={optionsStyles.optionText}
               >
                 Supprimer

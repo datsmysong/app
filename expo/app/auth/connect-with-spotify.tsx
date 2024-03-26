@@ -1,3 +1,5 @@
+import MusicNote from "phosphor-react-native/src/icons/SpotifyLogo";
+
 import Button from "../../components/Button";
 import { getSpotifyScopes } from "../../constants/Api";
 import { signInWithProvider } from "../../lib/providerMethods";
@@ -8,7 +10,7 @@ export default function ConnectWithSpotify() {
   };
 
   return (
-    <Button prependIcon="music-note" onPress={handleSignUp} block>
+    <Button prependIcon={<MusicNote />} onPress={handleSignUp} block>
       Rejoindre avec Spotify
     </Button>
   );

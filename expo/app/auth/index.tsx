@@ -1,3 +1,4 @@
+import MailIcon from "phosphor-react-native/src/icons/Envelope";
 import { StyleSheet, Text, View } from "react-native";
 
 import ConnectWithGoogle from "./connect-with-google";
@@ -21,7 +22,12 @@ export default function Onboarding() {
           <Text style={{ marginHorizontal: 10 }}>ou</Text>
           <Separator />
         </View>
-        <Button prependIcon="mail" type="outline" href="/auth/login" block>
+        <Button
+          prependIcon={<MailIcon />}
+          type="outline"
+          href="/auth/login"
+          block
+        >
           Rejoindre avec une adresse email
         </Button>
       </View>

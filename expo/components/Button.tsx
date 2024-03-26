@@ -1,5 +1,5 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import React from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -30,9 +30,9 @@ export type ButtonProps = {
   href?: string;
   disabled?: boolean;
   type?: "filled" | "outline";
-  icon?: keyof typeof MaterialIcons.glyphMap;
-  prependIcon?: keyof typeof MaterialIcons.glyphMap;
-  appendIcon?: keyof typeof MaterialIcons.glyphMap;
+  icon?: React.ReactElement;
+  prependIcon?: React.ReactElement;
+  appendIcon?: React.ReactElement;
   size?: "small" | "normal";
   color?: ButtonColor;
   block?: boolean;
@@ -63,7 +63,17 @@ const Button: React.FC<ButtonProps> = ({
   const isFilled = type === "filled";
   const iconSize = isSmall ? ICON_SIZE_SMALL : ICON_SIZE_NORMAL;
   const buttonColor = COLOR_PALETTE[color];
+
   const iconColor = isFilled ? ICON_COLOR_FILLED : buttonColor;
+
+  // Styled icons
+  prependIcon =
+    prependIcon &&
+    React.cloneElement(prependIcon, { size: iconSize, color: iconColor });
+  icon = icon && React.cloneElement(icon, { size: iconSize, color: iconColor });
+  appendIcon =
+    appendIcon &&
+    React.cloneElement(appendIcon, { size: iconSize, color: iconColor });
 
   const buttonStyles = [
     styles.button,
@@ -129,12 +139,8 @@ const Button: React.FC<ButtonProps> = ({
           maxWidth: "100%",
         }}
       >
-        {prependIcon && (
-          <MaterialIcons name={prependIcon} size={iconSize} color={iconColor} />
-        )}
-        {icon && (
-          <MaterialIcons name={icon} size={iconSize} color={iconColor} />
-        )}
+        {prependIcon}
+        {icon}
         {!icon && (
           <Text
             style={{
@@ -147,9 +153,7 @@ const Button: React.FC<ButtonProps> = ({
             {children}
           </Text>
         )}
-        {appendIcon && (
-          <MaterialIcons name={appendIcon} size={iconSize} color={iconColor} />
-        )}
+        {appendIcon}
       </View>
     </Pressable>
   );

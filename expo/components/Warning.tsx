@@ -1,9 +1,11 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import CheckCircle from "phosphor-react-native/src/icons/CheckCircle";
+import WarningIcon from "phosphor-react-native/src/icons/Warning";
+import WarningCircle from "phosphor-react-native/src/icons/WarningCircle";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type Variant = {
-  icon: keyof typeof MaterialIcons.glyphMap;
-  color: string;
+  icon: React.ReactElement;
 };
 
 type Variants = {
@@ -12,36 +14,32 @@ type Variants = {
   error: Variant;
 };
 
-const variants: Variants = {
-  success: {
-    icon: "check-circle",
-    color: "green",
-  },
-  warning: {
-    icon: "warning",
-    color: "red",
-  },
-  error: {
-    icon: "error",
-    color: "red",
-  },
-};
-
-const Warning = ({
-  label,
-  children,
-  variant = "warning",
-}: {
+export type WarningProps = {
   label: string;
   children?: React.ReactNode;
   variant?: keyof typeof variants;
-}) => {
+};
+
+const variants: Variants = {
+  success: {
+    icon: <CheckCircle color="green" />,
+  },
+  warning: {
+    icon: <WarningIcon color="red" />,
+  },
+  error: {
+    icon: <WarningCircle color="red" />,
+  },
+};
+
+const Warning = ({ label, children, variant = "warning" }: WarningProps) => {
   const variantStyles = styles[variant];
-  const { icon: variantIcon, color: variantColorIcon } = variants[variant];
+  const { icon: variantIcon } = variants[variant];
+  const iconStyled = React.cloneElement(variantIcon, { size: 24 });
 
   return (
     <View style={[styles.root, variantStyles]}>
-      <MaterialIcons name={variantIcon} size={24} color={variantColorIcon} />
+      {iconStyled}
       <View
         style={{
           flex: 1,
@@ -50,7 +48,7 @@ const Warning = ({
         }}
       >
         <Text style={styles.warningText}>{label}</Text>
-        {children ?? children}
+        {children}
       </View>
     </View>
   );

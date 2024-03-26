@@ -1,11 +1,12 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import CaretRight from "phosphor-react-native/src/icons/CaretRight";
+import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 
 import { Text, View } from "../Tamed";
 
 type CommonProps = {
-  icon: React.ComponentProps<typeof MaterialIcons>["name"];
+  icon: React.ReactElement;
   title: string;
   color?: string;
 };
@@ -22,11 +23,12 @@ const SettingsOptions = ({
   href,
   onPress,
 }: SettingsOptionsProps) => {
+  icon = React.cloneElement(icon, { size: 30, color });
   const content = (
     <View style={styles.container}>
-      <MaterialIcons name={icon} size={30} color={color} />
+      {icon}
       <Text style={[styles.label, { color }]}>{title}</Text>
-      <MaterialIcons name="keyboard-arrow-right" size={30} color={color} />
+      <CaretRight size={30} color={color} />
     </View>
   );
 

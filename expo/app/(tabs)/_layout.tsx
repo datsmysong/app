@@ -1,22 +1,15 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect, Tabs } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import House from "phosphor-react-native/src/icons/House";
+import MusicNote from "phosphor-react-native/src/icons/MusicNote";
+import User from "phosphor-react-native/src/icons/User";
+import Users from "phosphor-react-native/src/icons/Users";
 import { useColorScheme } from "react-native";
 
 import { Text } from "../../components/Tamed";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
 WebBrowser.maybeCompleteAuthSession();
-
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={32} {...props} />;
-}
 
 function TabBarLabel(props: {
   color: string;
@@ -26,16 +19,16 @@ function TabBarLabel(props: {
   return (
     <Text
       style={{
-        color: props.color,
+        // color: props.color,
         fontWeight: props.focused ? "bold" : "normal",
         fontSize: 20,
+        fontFamily: "Outfit-Regular",
       }}
     >
       {props.children}
     </Text>
   );
 }
-
 export default function TabLayout() {
   WebBrowser.maybeCompleteAuthSession(); // required for web only
 
@@ -50,21 +43,20 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarActiveTintColor: "black",
         tabBarStyle: {
-          height: 88,
-          gap: 4,
+          height: 100,
         },
         tabBarItemStyle: {
-          height: 87,
+          flexDirection: "column",
+          height: 85,
           display: "flex",
           paddingHorizontal: 4,
           paddingVertical: 10,
-          gap: 10,
           alignItems: "center",
         },
       }}
+      backBehavior="initialRoute"
     >
       <Tabs.Screen
         name="index"
@@ -76,7 +68,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "home" : "sun-o"} color={color} />
+            <House size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />
@@ -91,7 +83,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "music" : "moon-o"} color={color} />
+            <MusicNote size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />
@@ -105,7 +97,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "users" : "star-o"} color={color} />
+            <Users size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />
@@ -120,7 +112,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "user" : "star-o"} color={color} />
+            <User size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />

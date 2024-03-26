@@ -1,5 +1,5 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { JSONTrack } from "commons/backend-types";
+import Plus from "phosphor-react-native/src/icons/Plus";
 import { Pressable, StyleSheet } from "react-native";
 
 import MinimalistTrackItem from "./MinimalistTrackItem";
@@ -18,7 +18,7 @@ export default function SearchedTrackItem({
         artistsName={track.artistsName}
         imgUrl={track.imgUrl}
       >
-        <MaterialIcons name="add" style={itemStyles.icon} />
+        <Plus style={itemStyles.icon} />
       </MinimalistTrackItem>
     </Pressable>
   );

@@ -1,3 +1,4 @@
+import SignOut from "phosphor-react-native/src/icons/SignOut";
 import React from "react";
 import { StyleSheet } from "react-native";
 
@@ -13,7 +14,10 @@ export default function TabsProfile() {
     <>
       {user && (
         <View style={styles.elements}>
-          <Button prependIcon="logout" onPress={() => supabase.auth.signOut()}>
+          <Button
+            prependIcon={<SignOut />}
+            onPress={() => supabase.auth.signOut()}
+          >
             Se déconnecter
           </Button>
           <Button href="/(tabs)/profile/account">Gérer mon compte</Button>

@@ -1,3 +1,9 @@
+import BellRinging from "phosphor-react-native/src/icons/BellRinging";
+import Cube from "phosphor-react-native/src/icons/Cube";
+import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
+import Home from "phosphor-react-native/src/icons/HouseLine";
+import Lifebuoy from "phosphor-react-native/src/icons/Lifebuoy";
+import Lock from "phosphor-react-native/src/icons/Lock";
 import { ScrollView } from "react-native";
 
 import Separator from "../../../../components/Separator";
@@ -8,34 +14,38 @@ export default function Account() {
   return (
     <ScrollView>
       <SettingsOptions
-        icon="home"
+        icon={<Home />}
         title="Informations personnelles"
         href="/(tabs)/profile/account/edit"
       />
       <Separator />
-      <SettingsOptions icon="lock" title="Sécurité" href="/account/security" />
+      <SettingsOptions
+        icon={<Lock />}
+        title="Sécurité"
+        href="/account/security"
+      />
       <Separator />
       <SettingsOptions
-        icon="notifications"
+        icon={<BellRinging />}
         title="Notifications"
         href="/manage-account/notifications"
       />
       <Separator />
       <SettingsOptions
-        icon="language"
+        icon={<Cube />}
         title="Intégrations"
         href="/(tabs)/profile/account/integration"
       />
       <Separator />
       <SettingsOptions
-        icon="help"
+        icon={<Lifebuoy />}
         title="Assistance"
         href="/manage-account/help"
       />
       <Separator />
       <SettingsOptions
         onPress={() => supabase.auth.signOut()}
-        icon="logout"
+        icon={<DoorOpen />}
         title="Se déconnecter"
         color="red"
       />
