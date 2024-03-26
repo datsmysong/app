@@ -3,9 +3,19 @@ import { makeRedirectUri } from "expo-auth-session";
 export const getApiUrl = () => {
   const currentUrl = makeRedirectUri();
 
-  if (process.env.NODE_ENV === "production") {
+  if (!process.env.EXPO_PUBLIC_BACKEND_API) {
+    console.warn(
+      "EXPO_PUBLIC_BACKEND_API is not defined, defaulting to development URL"
+    );
+  }
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.EXPO_PUBLIC_BACKEND_API
+  ) {
     return process.env.EXPO_PUBLIC_BACKEND_API;
   }
+
   if (!currentUrl) return "http://localhost:3000";
 
   /*
