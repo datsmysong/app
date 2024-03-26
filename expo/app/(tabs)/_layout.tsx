@@ -7,7 +7,6 @@ import User from "phosphor-react-native/src/icons/User";
 import Users from "phosphor-react-native/src/icons/Users";
 import { useColorScheme } from "react-native";
 
-import Button from "../../components/Button";
 import { Text } from "../../components/Tamed";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
@@ -57,15 +56,14 @@ export default function TabLayout() {
         // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarActiveTintColor: "black",
         tabBarStyle: {
-          height: 88,
+          height: 90,
           gap: 4,
         },
         tabBarItemStyle: {
-          height: 87,
+          flexDirection: "column",
           display: "flex",
           paddingHorizontal: 4,
-          paddingVertical: 10,
-          gap: 10,
+          paddingVertical: 25,
           alignItems: "center",
         },
       }}
