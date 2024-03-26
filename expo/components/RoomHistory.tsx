@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     alignSelf: "stretch",
-    overflowx: "scroll",
+    overflowX: "scroll",
   },
   infoCard: {
     height: "auto",
