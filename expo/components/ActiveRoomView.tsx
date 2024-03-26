@@ -2,17 +2,24 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { RoomJSON } from "commons/Backend-types";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Platform, ScrollView, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  StyleSheet,
+} from "react-native";
 
 import Alert from "./Alert";
 import Button from "./Button";
 import Confirm from "./Confirm";
 import { Text, View } from "./Themed";
+import Warning from "./Warning";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import { getApiUrl } from "../lib/apiUrl";
 import { getRoomHostedByUser } from "../lib/room-utils";
+import useNetworkStatus from "../lib/useNetworkStatus";
 import { ActiveRoom } from "../lib/useRoom";
 import { useUserProfile } from "../lib/userProfile";
 
@@ -128,38 +135,56 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     }
   };
 
-  const deleteRoom = async () => {
-    const response = await fetch(url + "/end", { credentials: "include" });
-    if (!response.ok && process.env.NODE_ENV !== "production") {
-      Alert.alert(await response.text());
-    }
-  };
+  const networkStatus = useNetworkStatus();
 
   return (
-    <>
-      <ScrollView>
-        {room && socket && (
-          <View style={[headerStyles.headerContainer, { flex: 1 }]}>
-            <View style={headerStyles.titleContainer}>
-              <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
-              {isHost ? (
-                <Link href={`/rooms/${room.id}/settings`}>
-                  <MaterialIcons
-                    name="settings"
-                    style={headerStyles.settingsIcon}
-                    size={32}
-                    color="black"
-                  />
-                </Link>
-              ) : (
+    <View
+      style={{
+        paddingVertical: 32,
+        paddingHorizontal: 12,
+        minHeight: "100%",
+      }}
+    >
+      {!networkStatus && <Warning label="Réseau déconnecté" variant="error" />}
+
+      {socket && !socket.connected && (
+        <View
+          style={{
+            gap: 12,
+            minHeight: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text>Connexion au serveur...</Text>
+          <ActivityIndicator
+            color="black"
+            animating={!!networkStatus}
+            size="large"
+          />
+        </View>
+      )}
+      {room && liveRoom && socket && socket.connected && (
+        <>
+          <View style={headerStyles.headerContainer}>
+            <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
+            {isHost ? (
+              <Link href={`/rooms/${room.id}/settings`}>
                 <MaterialIcons
-                  name="meeting-room"
-                  size={28}
+                  name="settings"
+                  style={headerStyles.settingsIcon}
+                  size={32}
                   color="black"
-                  onPress={showDialog}
                 />
-              )}
-            </View>
+              </Link>
+            ) : (
+              <MaterialIcons
+                name="meeting-room"
+                size={28}
+                color="black"
+                onPress={showDialog}
+              />
+            )}
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
                 Inviter des amis
@@ -205,16 +230,17 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               />
             )}
           </View>
-        )}
-      </ScrollView>
-      <Button
-        icon="add"
-        href={`/rooms/${room.id}/add`}
-        style={floatingStyle.container}
-      >
-        Ajouter une musique
-      </Button>
-    </>
+
+          <Button
+            icon="add"
+            href={`/rooms/${room.id}/add`}
+            style={floatingStyle.container}
+          >
+            Ajouter une musique
+          </Button>
+        </>
+      )}
+    </View>
   );
 };
 

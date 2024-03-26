@@ -1,11 +1,8 @@
 import fastifyCookie, { FastifyCookieOptions } from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
-import { createClient } from "@supabase/supabase-js";
-import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
-import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
-import BoundServicesGET from "./route/BoundServicesGET";
-import UnbindServicePOST from "./route/UnbindServicePOST";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "commons/database-types";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
@@ -14,17 +11,19 @@ import { config } from "dotenv";
 import fastify from "fastify";
 import fastifySocketIO from "fastify-socket.io";
 import { Server } from "socket.io";
-import RoomStorage from "./RoomStorage";
 import authRoutes from "./authRoutes";
+import AuthCallbackBindSpotifyGET from "./route/AuthCallbackBindSpotifyGET";
+import AuthCallbackSoundcloudGET from "./route/AuthCallbackSoundcloudGET";
+import BoundServicesGET from "./route/BoundServicesGET";
+import RoomConfigurationUpdatePOST from "./route/RoomConfigurationUpdatePOST";
+import RoomEndGET from "./route/RoomEndGET";
 import RoomGET from "./route/RoomGET";
 import RoomIdGET from "./route/RoomIdGET";
-import RoomPOST from "./route/RoomPOST";
-import RoomEndGET from "./route/RoomEndGET";
-import StreamingServicesGET from "./route/StreamingServicesGET";
-import RoomIO from "./socketio/RoomIO";
-import { Database } from "commons/database-types";
 import RoomLeaveGET from "./route/RoomLeaveGET";
-import RoomConfigurationUpdatePOST from "./route/RoomConfigurationUpdatePOST";
+import RoomPOST from "./route/RoomPOST";
+import StreamingServicesGET from "./route/StreamingServicesGET";
+import UnbindServicePOST from "./route/UnbindServicePOST";
+import onRoomWSConnection from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
 
@@ -44,7 +43,7 @@ const corsOrigin: (devValue?: string | boolean) => (string | boolean)[] = (
   return ["https://datsmysong.app", "https://api.datsmysong.app/"];
 };
 
-const server = fastify({
+export const server = fastify({
   logger: {
     transport: {
       target: "pino-pretty",
@@ -179,25 +178,8 @@ server.post("/room/configuration/:id", RoomConfigurationUpdatePOST);
 // server.get("/track/spotify/:id", SpotifyGET);
 
 server.ready().then(() => {
-  server.io.of(/^\/room\/.*$/i).on("connection", RoomIO);
+  server.io.of(/^\/room\/.*$/i).on("connection", onRoomWSConnection);
 });
-
-let ignoreCount = 1;
-
-setInterval(async () => {
-  const allRooms = await RoomStorage.getRoomStorage().getRooms();
-  allRooms.forEach(async (room) => {
-    ignoreCount++;
-    if (!room.getStreamingService().isClientSide() && ignoreCount % 5 !== 0)
-      return;
-    if (!room.getStreamingService().isClientSide()) ignoreCount = 0;
-
-    const playbackState = (await room.getRemote()?.getPlaybackState()) ?? null;
-    server.io
-      .of(`/room/${room.uuid}`)
-      .emit("player:updatePlaybackState", playbackState);
-  });
-}, 1000);
 
 server.listen({ port: 3000, host: "0.0.0.0" });
 

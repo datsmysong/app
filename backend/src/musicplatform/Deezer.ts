@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { JSONTrack } from "commons/backend-types";
 import MusicPlatform from "./MusicPlatform";
-import Remote from "./remotes/Remote";
+import { Remote } from "./remotes/Remote";
 import Room from "../socketio/Room";
 
 export default class Deezer extends MusicPlatform {

@@ -1,4 +1,5 @@
 import { PlayingJSONTrack } from "commons/backend-types";
+import { Response } from "commons/socket.io-types";
 import React, {
   forwardRef,
   useEffect,
@@ -9,11 +10,11 @@ import React, {
 import { Platform, StyleSheet } from "react-native";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 
-import { AudioRemote } from "../lib/audioRemote";
-import getSoundCloudWidgetHtml from "../lib/soundcloud-widget-html";
+import { LocalPlayerRemote } from "../../lib/audioRemote";
+import getSoundCloudWidgetHtml from "../../lib/soundcloud-widget-html";
 
 const SoundCloudPlayer = forwardRef<
-  AudioRemote,
+  LocalPlayerRemote,
   React.ComponentProps<typeof WebView>
 >((props, ref) => {
   const sendMessage = (message: object) => {
@@ -48,13 +49,13 @@ const SoundCloudPlayer = forwardRef<
     seekTo,
     getPlaybackState,
     getQueue: async () => {
-      return [];
+      return { data: [], error: null };
     },
     next,
     previous,
   }));
 
-  const playTrack = async (url: string) => {
+  async function playTrack(url: string): Promise<Response<void>> {
     const command = {
       command: "playMusic",
       data: {
@@ -67,24 +68,28 @@ const SoundCloudPlayer = forwardRef<
     };
     sendMessage(command);
 
-    return {};
-  };
+    return { error: null, data: undefined };
+  }
 
-  const play = async () => {
+  async function play(): Promise<Response<void>> {
     const command = {
       command: "play",
     };
     sendMessage(command);
-  };
 
-  const pause = async () => {
+    return { error: null, data: undefined };
+  }
+
+  async function pause(): Promise<Response<void>> {
     const command = {
       command: "pause",
     };
     sendMessage(command);
-  };
 
-  const setVolume = async (volume: number) => {
+    return { error: null, data: undefined };
+  }
+
+  async function setVolume(volume: number): Promise<Response<void>> {
     const command = {
       command: "setVolume",
       data: {
@@ -92,9 +97,11 @@ const SoundCloudPlayer = forwardRef<
       },
     };
     sendMessage(command);
-  };
 
-  const seekTo = async (position: number) => {
+    return { error: null, data: undefined };
+  }
+
+  async function seekTo(position: number): Promise<Response<void>> {
     const command = {
       command: "seekTo",
       data: {
@@ -102,21 +109,25 @@ const SoundCloudPlayer = forwardRef<
       },
     };
     sendMessage(command);
-  };
 
-  const [resolveCurrentState, setResolveCurrentState] = useState<() => void>();
+    return { error: null, data: undefined };
+  }
+
+  const [resolveCurrentState, setResolveCurrentState] =
+    useState<(data: Response<any>) => void>();
 
   const handleWebViewMessage = (event: WebViewMessageEvent) => {
     const { data } = JSON.parse(event.nativeEvent.data);
     if (data.command === "currentMusic") {
-      if (resolveCurrentState) {
-        resolveCurrentState();
+      const state = data.data as Response<PlayingJSONTrack | null>;
+      if (resolveCurrentStateRef.current) {
+        resolveCurrentStateRef.current(state);
         setResolveCurrentState(undefined);
       }
     }
   };
 
-  const resolveCurrentStateRef = useRef<(data: any) => void>();
+  const resolveCurrentStateRef = useRef<(data: Response<any>) => void>();
 
   useEffect(() => {
     resolveCurrentStateRef.current = resolveCurrentState;
@@ -128,25 +139,33 @@ const SoundCloudPlayer = forwardRef<
     const { data } = event as MessageEvent;
 
     if (data.command === "currentMusic") {
+      const state = data.data as Response<PlayingJSONTrack | null>;
       if (resolveCurrentStateRef.current) {
-        resolveCurrentStateRef.current(data.data);
+        resolveCurrentStateRef.current(state);
         setResolveCurrentState(undefined);
       }
     }
   };
 
-  const getPlaybackState = (): Promise<PlayingJSONTrack> => {
-    return new Promise((resolve) => {
+  async function getPlaybackState(): Promise<
+    Response<PlayingJSONTrack | null>
+  > {
+    return new Promise<Response<PlayingJSONTrack | null>>((resolve) => {
       setResolveCurrentState(() => resolve);
       const command = {
         command: "fetchCurrent",
       };
       sendMessage(command);
     });
-  };
-  const next = async () => {};
+  }
 
-  const previous = async () => {};
+  async function next(): Promise<Response<void>> {
+    return { error: null, data: undefined };
+  }
+
+  async function previous(): Promise<Response<void>> {
+    return { error: null, data: undefined };
+  }
 
   const html = getSoundCloudWidgetHtml();
 

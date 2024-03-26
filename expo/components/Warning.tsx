@@ -1,6 +1,32 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
+type Variant = {
+  icon: keyof typeof MaterialIcons.glyphMap;
+  color: string;
+};
+
+type Variants = {
+  success: Variant;
+  warning: Variant;
+  error: Variant;
+};
+
+const variants: Variants = {
+  success: {
+    icon: "check-circle",
+    color: "green",
+  },
+  warning: {
+    icon: "warning",
+    color: "red",
+  },
+  error: {
+    icon: "error",
+    color: "red",
+  },
+};
+
 const Warning = ({
   label,
   children,
@@ -8,17 +34,14 @@ const Warning = ({
 }: {
   label: string;
   children?: React.ReactNode;
-  variant?: "success" | "warning";
+  variant?: keyof typeof variants;
 }) => {
-  const variantStyles = variant === "success" ? styles.success : styles.warning;
+  const variantStyles = styles[variant];
+  const { icon: variantIcon, color: variantColorIcon } = variants[variant];
 
   return (
     <View style={[styles.root, variantStyles]}>
-      {variant === "success" ? (
-        <MaterialIcons name="check-circle" size={24} color="green" />
-      ) : (
-        <MaterialIcons name="warning" size={24} color="red" />
-      )}
+      <MaterialIcons name={variantIcon} size={24} color={variantColorIcon} />
       <View
         style={{
           flex: 1,
@@ -61,5 +84,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fffbe6",
     borderColor: "#ffe58f",
     color: "#faad14",
+  },
+  error: {
+    backgroundColor: "#fff1f0",
+    borderColor: "#ffa39e",
+    color: "#f5222d",
   },
 });

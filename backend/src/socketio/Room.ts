@@ -1,11 +1,17 @@
-import { JSONTrack, RoomJSON } from "commons/backend-types";
+import { JSONTrack, PlayingJSONTrack, RoomJSON } from "commons/backend-types";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "commons/socket.io-types";
 import { Socket } from "socket.io";
 import RoomStorage from "../RoomStorage";
 import MusicPlatform from "../musicplatform/MusicPlatform";
 import TrackFactory from "../musicplatform/TrackFactory";
-import Remote from "../musicplatform/remotes/Remote";
-import { RoomWithConfigDatabase } from "./RoomDatabase";
+import { QueueableRemote, Remote } from "../musicplatform/remotes/Remote";
 import { adminSupabase } from "../server";
+import { RoomWithConfigDatabase } from "./RoomDatabase";
+
+export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
 export default class Room {
   public readonly uuid: string;
@@ -14,9 +20,11 @@ export default class Room {
   private readonly streamingService: MusicPlatform;
   private readonly room: RoomWithConfigDatabase;
   private remote: Remote | null = null;
-  private hostSocket: Socket | null;
   private voteSkipActualTrack: string[] = [];
   private participants: string[] = [];
+  private hostSocket: TypedSocket | null;
+  private playbackState: PlayingJSONTrack | null = null;
+  private previousPlaybackState: typeof this.playbackState = this.playbackState;
 
   private constructor(
     uuid: string,
@@ -80,17 +88,31 @@ export default class Room {
   }
 
   async add(rawUrl: string) {
+    if (!this.remote) return;
+
     const trackMetadata = this.trackFactory.fromUrl(rawUrl);
-    if (trackMetadata !== null) {
-      const track = await trackMetadata.toJSON();
-      if (track !== null) {
-        if (!this.queue.map((value) => value.url).includes(track.url)) {
-          this.queue.push(track);
-          return true;
-        }
-      }
+    if (trackMetadata === null) return;
+
+    const track = await trackMetadata.toJSON();
+    if (track === null) return;
+
+    // If the queue is currently empty and no track is playing, we can play the track immediately
+    const { data: playbackState } = await this.remote.getPlaybackState();
+
+    if (this.queue.length === 0 && playbackState === null) {
+      const response = await this.remote.playTrack(track.url);
+      if (!response.error) await this.updatePlaybackState();
+      return;
     }
-    return false;
+
+    if (this.queue.map((value) => value.url).includes(track.url)) return;
+
+    this.queue.push(track);
+    if (this.queue.length !== 1) return;
+
+    // For remote streaming services, we should add the track to the queue of the player
+    if (!(this.remote instanceof QueueableRemote)) return;
+    (this.remote as QueueableRemote).addToQueue(track.url);
   }
 
   async removeWithLink(rawUrl: string) {
@@ -228,5 +250,33 @@ export default class Room {
       .eq("room_id", this.uuid);
     if (!data) return;
     this.participants = data.map((value) => value.profile_id);
+  }
+
+  setPlaybackState(newPlaybackState: typeof this.playbackState) {
+    this.previousPlaybackState = this.playbackState;
+    this.playbackState = newPlaybackState;
+  }
+
+  getPlaybackState(): typeof this.playbackState {
+    return this.playbackState;
+  }
+
+  getPreviousPlaybackState(): typeof this.previousPlaybackState {
+    return this.previousPlaybackState;
+  }
+
+  shiftQueue() {
+    const result = this.queue.shift();
+    this.hostSocket?.nsp.emit("queue:update", Room.toJSON(this));
+    return result;
+  }
+
+  async updatePlaybackState() {
+    if (this.remote === null) return;
+    const playbackState = await this.remote.getPlaybackState();
+    if (playbackState.data === null) return;
+
+    this.setPlaybackState(playbackState.data);
+    this.hostSocket?.nsp.emit("player:updatePlaybackState", playbackState);
   }
 }

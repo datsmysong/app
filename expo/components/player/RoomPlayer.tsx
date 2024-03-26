@@ -10,9 +10,10 @@ import { Socket } from "socket.io-client";
 import LocalPlayer from "./LocalPlayer";
 import Player from "./Player";
 import PlayerControls from "./PlayerControls";
-import buildAudioRemote, { AudioRemote } from "../../lib/audioRemote";
+import buildAudioRemote, { PlayerRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
 import Button from "../Button";
+import Warning from "../Warning";
 
 type RoomPlayerProps = {
   room: ActiveRoom;
@@ -21,69 +22,25 @@ type RoomPlayerProps = {
 
 const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
   const isHost = true;
-  const [remote, setRemote] = useState<AudioRemote>();
-  const localPlayerRemote = useRef<AudioRemote | null>(null);
+  const [remote, setRemote] = useState<PlayerRemote>();
+  const [error, setError] = useState<string>();
 
   const [playbackState, setCurrentPlaybackState] =
     useState<PlayingJSONTrack | null>(null);
-
-  /**
-   * When receiving a state request from the server, it means that the music platform in use
-   * uses a local player (eg. SoundCloud) and that the server needs to know the current playback
-   * state of the player.
-   */
-  const onStateRequest = async (socket: RoomPlayerProps["socket"]) => {
-    if (!isHost) return;
-    if (!localPlayerRemote.current) return;
-
-    const currentPlaybackState =
-      await localPlayerRemote.current.getPlaybackState();
-
-    socket.emit("player:updatePlaybackState", currentPlaybackState);
-  };
 
   useEffect(() => {
     if (!socket) return;
     setRemote(buildAudioRemote(socket));
 
-    socket.on(
-      "player:updatePlaybackState",
-      (message: PlayingJSONTrack | null) => {
-        setCurrentPlaybackState(message);
+    socket.on("player:updatePlaybackState", (playbackState) => {
+      setError(undefined);
+
+      if (playbackState.error) {
+        setError(playbackState.error);
+        return;
       }
-    );
 
-    socket.on("player:getPlaybackState", () => {
-      onStateRequest(socket);
-    });
-
-    socket.on("player:playTrack", (trackId: string) => {
-      if (localPlayerRemote.current)
-        localPlayerRemote.current.playTrack(trackId);
-    });
-
-    socket.on("player:pause", async () => {
-      if (localPlayerRemote.current) {
-        localPlayerRemote.current.pause();
-      }
-    });
-
-    socket.on("player:play", async () => {
-      if (localPlayerRemote.current) {
-        localPlayerRemote.current.play();
-      }
-    });
-
-    socket.on("player:seekTo", async (position: number) => {
-      if (localPlayerRemote.current) {
-        localPlayerRemote.current.seekTo(position);
-      }
-    });
-
-    socket.on("player:setVolume", async (volume: number) => {
-      if (localPlayerRemote.current) {
-        localPlayerRemote.current.setVolume(volume);
-      }
+      setCurrentPlaybackState(playbackState.data);
     });
   }, [socket]);
 
@@ -91,21 +48,22 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
     if (!remote) return;
 
     if (room.streaming_services?.service_name === "Spotify") {
-      await remote.playTrack("spotify:track:44yeyFTKxJR5Rd9ppeKVkp");
+      await remote.playTrack("spotify:track:6afdNrotJ1PCt9DoFiHpLj");
     } else if (room.streaming_services?.service_name === "SoundCloud") {
       await remote.playTrack(
-        "https://soundcloud.com/dukeandjones/call-me-chill-mix"
+        "https://soundcloud.com/martingarrix/martin-garrix-lloyiso-real-love"
       );
     }
   };
 
   return (
     <>
+      {error && <Warning label={error} variant="error" />}
       <View>
         {isHost && (
           <LocalPlayer
-            ref={localPlayerRemote}
             streamingService={room.streaming_services}
+            socket={socket}
           />
         )}
         <Player state={playbackState}>
@@ -116,7 +74,7 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
       </View>
 
       <Button type="outline" onPress={playCoolSong}>
-        play Duke & Jones - Call Me (Chill Mix)
+        play Martin Garrix & Lloyiso - Real Love
       </Button>
     </>
   );

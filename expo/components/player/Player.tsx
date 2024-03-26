@@ -12,12 +12,6 @@ const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 const Player: React.FC<PlayerProps> = ({ state, children }) => {
-  const formatDuration = (durationMs: number) => {
-    const minutes = Math.floor(durationMs / 60000);
-    const seconds = Math.floor((durationMs % 60000) / 1000);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
   return (
     <View style={styles.container}>
       {state && (
@@ -32,20 +26,6 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
             <Text style={styles.title}>{state.title}</Text>
             <View style={styles.artistContainer}>
               <Text>{state.artistsName}</Text>
-            </View>
-            <View style={styles.progressContainer}>
-              <Text>{formatDuration(state.currentTime)}</Text>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progress,
-                    {
-                      width: `${(state.currentTime / state.duration) * 100}%`,
-                    },
-                  ]}
-                />
-              </View>
-              <Text>{formatDuration(state.duration)}</Text>
             </View>
             {children}
           </View>
@@ -74,23 +54,6 @@ const styles = StyleSheet.create({
   artistContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  progressContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  progressBar: {
-    flex: 1,
-    height: 4,
-    backgroundColor: "#D1D5DB",
-    borderRadius: 9999,
-  },
-  progress: {
-    height: "100%",
-    backgroundColor: "#000000",
-    borderRadius: 9999,
-    transition: "all 1s linear",
   },
 });
 

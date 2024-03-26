@@ -11,6 +11,7 @@ export interface JSONTrack {
 export interface PlayingJSONTrack extends JSONTrack {
   currentTime: number;
   isPlaying: boolean;
+  updated_at: number;
 }
 
 export interface RoomJSON {

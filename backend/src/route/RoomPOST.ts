@@ -48,6 +48,4 @@ export default async function RoomPOST(
     reply,
     req
   );
-
-  return reply;
 }
