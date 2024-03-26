@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { Artist, Track } from "@spotify/web-api-ts-sdk";
 import { JSONTrack } from "commons/backend-types";
 import { spotify } from "../server";
+import Room from "../socketio/Room";
 import MusicPlatform from "./MusicPlatform";
 import { Remote } from "./remotes/Remote";
 import SpotifyRemote from "./remotes/SpotifyRemote";
-import Room from "../socketio/Room";
-import { Track } from "@spotify/web-api-ts-sdk";
 
 export default class Spotify extends MusicPlatform {
   constructor() {
@@ -35,6 +35,8 @@ export default class Spotify extends MusicPlatform {
       // Sometimes artwork is null, but we can return a track without artwork
       const imgUrl = image.url ? new URL(image.url).toString() : "";
 
+      const genres = (data.artists.at(0) as Artist).genres;
+
       return {
         url: externalUrls,
         title: data.name,
@@ -45,6 +47,8 @@ export default class Spotify extends MusicPlatform {
         ),
         albumName: data.album.name,
         imgUrl,
+        genres: genres ? genres : [],
+        id: data.uri,
       };
     } catch (e) {
       console.error("Impossible to convert Spotify track to JSONTrack ", e);

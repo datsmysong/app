@@ -1,4 +1,9 @@
-import { JSONTrack, PlayingJSONTrack, RoomJSON } from "commons/backend-types";
+import {
+  JSONTrack,
+  PlayingJSONTrack,
+  RoomJSON,
+  RoomJSONTrack,
+} from "commons/backend-types";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
@@ -15,7 +20,7 @@ export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
 export default class Room {
   public readonly uuid: string;
-  private readonly queue: JSONTrack[];
+  private readonly queue: RoomJSONTrack[];
   private readonly trackFactory: TrackFactory;
   private readonly streamingService: MusicPlatform;
   private readonly room: RoomWithConfigDatabase;
@@ -107,7 +112,11 @@ export default class Room {
 
     if (this.queue.map((value) => value.url).includes(track.url)) return;
 
-    this.queue.push(track);
+    this.queue.push({
+      ...track,
+      addedBy: "TODO", // TODO: Add the id of the user who added the track
+      votes: [],
+    });
     if (this.queue.length !== 1) return;
 
     // For remote streaming services, we should add the track to the queue of the player
