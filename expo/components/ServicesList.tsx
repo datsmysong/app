@@ -1,20 +1,51 @@
+import { StreamingService } from "commons/database-types-utils";
 import { Image } from "expo-image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
 
-import { StreamingService } from "../app/(tabs)/rooms/create";
+import Alert from "./Alert";
+import { supabase } from "../lib/supabase";
+import { useUserProfile } from "../lib/userProfile";
 
 interface ServicesListProps {
-  availableServices: StreamingService[];
   handleServiceChange: (serviceId: string) => void;
 }
 
 export default function ServicesList({
-  availableServices,
   handleServiceChange,
 }: ServicesListProps) {
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
+  const [availableServices, setAvailableServices] = useState<
+    StreamingService[]
+  >([]);
+  const user = useUserProfile();
+
+  useEffect(() => {
+    if (!user) return;
+    const userId = user.user_profile_id;
+    (async () => {
+      const { error, data } = await supabase
+        .from("bound_services")
+        .select("streaming_services(*)")
+        .eq("user_profile_id", userId);
+
+      if (error) {
+        Alert.alert("Une erreur est survenue, veuillez réessayer plus tard");
+        return;
+      }
+      if (!data) {
+        Alert.alert("Aucune salle trouvée");
+        return;
+      }
+
+      const services: StreamingService[] = [];
+      data.forEach((elem) => {
+        if (elem.streaming_services) services.push(elem.streaming_services);
+      });
+      setAvailableServices(services);
+    })();
+  }, [user]);
 
   const toggleSelect = (item: StreamingService) => {
     if (item.service_id === selectedService) {
@@ -28,10 +59,11 @@ export default function ServicesList({
 
   return (
     <FlatList
+      key={availableServices.length > 1 ? availableServices.length : 2}
       showsHorizontalScrollIndicator={Platform.OS === "web"}
       data={availableServices}
       columnWrapperStyle={styles.list}
-      numColumns={3}
+      numColumns={availableServices.length > 1 ? availableServices.length : 2}
       renderItem={({ item }) => (
         <Pressable
           onPress={() => toggleSelect(item)}
