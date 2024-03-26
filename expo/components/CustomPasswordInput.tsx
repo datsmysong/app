@@ -1,4 +1,5 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Eye from "phosphor-react-native/src/icons/Eye";
+import EyeSlash from "phosphor-react-native/src/icons/EyeSlash";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
@@ -10,14 +11,14 @@ interface CustomPasswordInputProps extends CustomTextInputProps {}
 export default function CustomPasswordInput({
   ...props
 }: CustomPasswordInputProps) {
-  const { passwordVisibility, rightIcon, handlePasswordVisibility } =
+  const { passwordVisibility, handlePasswordVisibility } =
     useTogglePasswordVisibility();
 
   return (
     <View>
       <CustomTextInput {...props} secureTextEntry={passwordVisibility} />
       <Pressable style={styles.icon} onPress={handlePasswordVisibility}>
-        <MaterialCommunityIcons name={rightIcon} size={22} color="#232323" />
+        {passwordVisibility ? <Eye /> : <EyeSlash />}
       </Pressable>
     </View>
   );

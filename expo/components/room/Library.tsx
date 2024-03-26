@@ -1,3 +1,6 @@
+import ClockCounterClockwise from "phosphor-react-native/src/icons/ClockCounterClockwise";
+import Heart from "phosphor-react-native/src/icons/Heart";
+import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import { StyleSheet, View, Text } from "react-native";
 
 import LibraryComponent from "./LibraryComponent";
@@ -9,17 +12,17 @@ const Library = () => {
       <LibraryComponent
         title="Mes titres récents"
         subtitle="Ajoute une musique à partir des titres récents que tu as écouté"
-        icon="history"
+        icon={<ClockCounterClockwise />}
       />
       <LibraryComponent
         title="Mes playlists"
         subtitle="Ajoute une musique à partir de tes playlists"
-        icon="music-note"
+        icon={<MusicNote />}
       />
       <LibraryComponent
         title="Mes titres likés"
         subtitle="Ajoute une musique à partir de tes titres likés"
-        icon="favorite"
+        icon={<Heart />}
       />
     </View>
   );

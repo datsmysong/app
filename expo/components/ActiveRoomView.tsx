@@ -1,11 +1,15 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { RoomJSON } from "commons/backend-types";
 import { Link, router } from "expo-router";
+import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
+import Gear from "phosphor-react-native/src/icons/Gear";
+import Plus from "phosphor-react-native/src/icons/Plus";
+import ThumbsDown from "phosphor-react-native/src/icons/ThumbsDown";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Platform,
+  Pressable,
   StyleSheet,
 } from "react-native";
 
@@ -170,20 +174,12 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
             <Text style={headerStyles.headerTitle}>Salle "{room.name}"</Text>
             {isHost ? (
               <Link href={`/rooms/${room.id}/settings`}>
-                <MaterialIcons
-                  name="settings"
-                  style={headerStyles.settingsIcon}
-                  size={32}
-                  color="black"
-                />
+                <Gear size={32} color="black" />
               </Link>
             ) : (
-              <MaterialIcons
-                name="meeting-room"
-                size={28}
-                color="black"
-                onPress={showDialog}
-              />
+              <Pressable onPress={showDialog} style={headerStyles.settingsIcon}>
+                <DoorOpen size={28} color="black" />
+              </Pressable>
             )}
             <View style={headerStyles.buttonContainer}>
               <Button block href={`/rooms/${room.id}/invite`}>
@@ -195,7 +191,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               onPress={() => {
                 handleDislike(-1);
               }}
-              prependIcon="thumb-down-alt"
+              prependIcon={<ThumbsDown />}
               size="small"
               type={voteSkipActualTrack ? "filled" : "outline"}
             >
@@ -232,7 +228,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           </View>
 
           <Button
-            icon="add"
+            icon={<Plus />}
             href={`/rooms/${room.id}/add`}
             style={floatingStyle.container}
           >

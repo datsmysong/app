@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import ArrowRight from "phosphor-react-native/src/icons/ArrowRight";
 import { useEffect, useState } from "react";
 import { Keyboard, StyleSheet } from "react-native";
 
@@ -72,7 +73,7 @@ export default function JoinRoom() {
         type="filled"
         block
         disabled={!isTextPresent}
-        appendIcon="arrow-forward"
+        appendIcon={<ArrowRight />}
         onPress={searchRoom}
       >
         Rejoindre

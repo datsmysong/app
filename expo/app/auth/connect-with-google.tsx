@@ -1,3 +1,5 @@
+import GoogleLogo from "phosphor-react-native/src/icons/GoogleLogo";
+
 import Button from "../../components/Button";
 import { signInWithProvider } from "../../lib/providerMethods";
 
@@ -8,7 +10,12 @@ export default function ConnectWithGoogle() {
   };
 
   return (
-    <Button type="outline" onPress={handleSignUp} block>
+    <Button
+      prependIcon={<GoogleLogo />}
+      type="outline"
+      onPress={handleSignUp}
+      block
+    >
       Rejoindre avec Google
     </Button>
   );

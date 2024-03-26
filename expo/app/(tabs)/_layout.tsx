@@ -1,8 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect, Tabs } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import House from "phosphor-react-native/src/icons/House";
+import MusicNote from "phosphor-react-native/src/icons/MusicNote";
+import User from "phosphor-react-native/src/icons/User";
+import Users from "phosphor-react-native/src/icons/Users";
 import { useColorScheme } from "react-native";
 
+import Button from "../../components/Button";
 import { Text } from "../../components/Tamed";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
@@ -35,9 +40,8 @@ function TabBarLabel(props: {
     </Text>
   );
 }
-
 export default function TabLayout() {
-  WebBrowser.maybeCompleteAuthSession(); // required for web only
+  WebBrowser.maybeCompleteAuthSession(); // required for web only"
 
   const colorScheme = useColorScheme();
 
@@ -76,7 +80,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "home" : "sun-o"} color={color} />
+            <House size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />
@@ -91,7 +95,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "music" : "moon-o"} color={color} />
+            <MusicNote size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />
@@ -105,7 +109,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "users" : "star-o"} color={color} />
+            <Users size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />
@@ -120,7 +124,7 @@ export default function TabLayout() {
             </TabBarLabel>
           ),
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "user" : "star-o"} color={color} />
+            <User size={32} weight={focused ? "fill" : "regular"} />
           ),
         }}
       />

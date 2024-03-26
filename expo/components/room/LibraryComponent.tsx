@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const LibraryComponent = ({
@@ -8,19 +8,14 @@ const LibraryComponent = ({
 }: {
   title: string;
   subtitle: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
+  icon: React.ReactElement;
 }) => {
+  icon = React.cloneElement(icon, { size: 24, color: "white" });
   return (
     <View style={styles.component}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        <MaterialIcons
-          name={icon}
-          color="white"
-          style={{
-            fontSize: 24,
-          }}
-        />
+        {icon}
       </View>
       <Text style={styles.text}>{subtitle}</Text>
     </View>
