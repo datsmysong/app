@@ -9,14 +9,14 @@ import Room from "./socketio/Room";
 import { RoomWithForeignTable } from "./socketio/RoomDatabase";
 import { Response } from "commons/socket.io-types";
 
-const STREAMING_SERVICES = {
+export const STREAMING_SERVICES = {
   Spotify: "a2d17b25-d87e-42af-9e79-fd4df6b59222",
   SoundCloud: "c99631a2-f06c-4076-80c2-13428944c3a8",
   Deezer: "4f619f5d-4028-4724-87c4-f440df4659fe",
 };
 const MUSIC_ENDING_SOON_DELAY = 10000;
 
-function getMusicPlatform(serviceId: string): MusicPlatform | null {
+export function getMusicPlatform(serviceId: string): MusicPlatform | null {
   switch (serviceId) {
     case STREAMING_SERVICES["Spotify"]:
       return new Spotify();
