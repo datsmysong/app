@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet } from "react-native";
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
 import ControlledInput from "../../../../components/ControlledInput";
+import ErrorBoundary from "../../../../components/ErrorBoundary";
 import { View } from "../../../../components/Themed";
 import Warning from "../../../../components/Warning";
 import AvatarForm from "../../../../components/profile/AvatarForm";
@@ -55,7 +56,6 @@ export default function PersonalInfo() {
   });
 
   const inputsChange = watch();
-
   useEffect(() => {
     if (user && user.email) {
       if (user.app_metadata.provider !== "email") setEmailDisabled(true);
@@ -194,12 +194,21 @@ export default function PersonalInfo() {
             rules={usernameRules}
             errorMessage={errors.username && errors.username.message}
           />
-          <AvatarForm
-            ref={avatarRef}
-            onImageLoad={() => {
-              setProfilePictureChanged(true);
-            }}
-          />
+          <ErrorBoundary
+            fallback={
+              <Warning
+                label="Impossible de charger la photo de profil"
+                variant="warning"
+              />
+            }
+          >
+            <AvatarForm
+              ref={avatarRef}
+              onImageLoad={() => {
+                setProfilePictureChanged(true);
+              }}
+            />
+          </ErrorBoundary>
           <Button
             block
             onPress={handleSubmit(onSubmit)}

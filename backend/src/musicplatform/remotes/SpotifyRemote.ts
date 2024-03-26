@@ -2,7 +2,7 @@ import { SimplifiedArtist, SpotifyApi, Track } from "@spotify/web-api-ts-sdk";
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
 import { adminSupabase } from "../../server";
 import MusicPlatform from "../MusicPlatform";
-import { QueueableRemote } from "./Remote";
+import { QueueableRemote, Remote } from "./Remote";
 import Room from "../../socketio/Room";
 import { Response } from "commons/socket.io-types";
 
@@ -22,70 +22,103 @@ export default class SpotifyRemote extends QueueableRemote {
   static async createRemote(
     room: Room,
     musicPlatform: MusicPlatform
-  ): Promise<SpotifyRemote | null> {
+  ): Promise<Response<Remote>> {
     const { data, error } = await adminSupabase
       .from("rooms")
       .select("*, user_profile(*, bound_services(*))")
       .eq("id", room.uuid)
+      .eq(
+        "user_profile.bound_services.service_id",
+        "a2d17b25-d87e-42af-9e79-fd4df6b59222"
+      )
       .single();
 
+    if (error)
+      return {
+        data: null,
+        error: "Failed to fetch host's Spotify credentials",
+      };
     if (
-      error ||
-      !data ||
-      !data.user_profile ||
-      !data.user_profile.bound_services
+      data.user_profile?.bound_services === undefined ||
+      data.user_profile?.bound_services.length === 0 ||
+      !data.user_profile.bound_services[0].access_token ||
+      !data.user_profile.bound_services[0].expires_in ||
+      !data.user_profile.bound_services[0].refresh_token
     )
-      return null;
+      return {
+        data: null,
+        error:
+          "Couldn't find Spotify credentials. Please double check that your Spotify account is linked in your account settings under 'Integrations'",
+      };
 
     const { access_token, expires_in, refresh_token } =
       data.user_profile.bound_services[0];
 
-    if (!access_token || !expires_in || !refresh_token) return null;
-
     const expiresIn = parseInt(expires_in);
-
-    // TODO: https://github.com/spotify/spotify-web-api-ts-sdk/issues/79
-    const spotifyClient = SpotifyApi.withAccessToken(
-      process.env.SPOTIFY_CLIENT_ID as string,
-      {
-        access_token,
-        refresh_token,
-        expires_in: expiresIn,
-        token_type: "Bearer",
-      }
-    );
-    return new SpotifyRemote(spotifyClient, musicPlatform);
+    try {
+      // TODO: https://github.com/spotify/spotify-web-api-ts-sdk/issues/79
+      // Seems like the tokens aren't refreshed properly, this has been fixed in the GitHub repo but we're
+      // awaiting a release of the library to update and fix the issue
+      const spotifyClient = SpotifyApi.withAccessToken(
+        process.env.SPOTIFY_CLIENT_ID as string,
+        {
+          access_token,
+          refresh_token,
+          expires_in: expiresIn,
+          token_type: "Bearer",
+        }
+      );
+      return {
+        data: new SpotifyRemote(spotifyClient, musicPlatform),
+        error: null,
+      };
+    } catch (e) {
+      return {
+        data: null,
+        error:
+          "Failed to authenticate to Spotify using saved credentials. Try disconnecting then reconnecting your Spotify account from your account 'Integrations' page",
+      };
+    }
   }
 
   async getPlaybackState(): Promise<Response<PlayingJSONTrack | null>> {
     return runSpotifyCallback(async () => {
-      const spotifyPlaybackState =
-        await this.spotifyClient.player.getPlaybackState();
+      try {
+        const spotifyPlaybackState =
+          await this.spotifyClient.player.getPlaybackState();
 
-      if (!spotifyPlaybackState || spotifyPlaybackState.item.type === "episode")
-        return { data: null, error: "No track is currently playing" };
+        if (
+          !spotifyPlaybackState ||
+          spotifyPlaybackState.item.type === "episode"
+        )
+          return { data: null, error: "No track is currently playing" };
 
-      const playbackState = {
-        ...spotifyPlaybackState,
-        item: spotifyPlaybackState.item as Track,
-      };
+        const playbackState = {
+          ...spotifyPlaybackState,
+          item: spotifyPlaybackState.item as Track,
+        };
 
-      const artistsName = extractArtistsName(playbackState.item.album.artists);
+        const artistsName = extractArtistsName(
+          playbackState.item.album.artists
+        );
 
-      return {
-        data: {
-          isPlaying: playbackState.is_playing,
-          albumName: playbackState.item.album.name,
-          artistsName: artistsName,
-          currentTime: playbackState.progress_ms,
-          duration: playbackState.item.duration_ms,
-          imgUrl: playbackState.item.album.images[0].url,
-          title: playbackState.item.name,
-          url: playbackState.item.external_urls.spotify,
-          updated_at: Date.now(),
-        },
-        error: null,
-      };
+        return {
+          data: {
+            isPlaying: playbackState.is_playing,
+            albumName: playbackState.item.album.name,
+            artistsName: artistsName,
+            currentTime: playbackState.progress_ms,
+            duration: playbackState.item.duration_ms,
+            imgUrl: playbackState.item.album.images[0].url,
+            title: playbackState.item.name,
+            url: playbackState.item.external_urls.spotify,
+            updated_at: Date.now(),
+          },
+          error: null,
+        };
+      } catch (e) {
+        return { data: null, error: "Failed to fetch current Playbackstate" };
+      }
     });
   }
 

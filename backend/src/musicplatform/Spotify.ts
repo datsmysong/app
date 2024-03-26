@@ -6,6 +6,7 @@ import { Remote } from "./remotes/Remote";
 import SpotifyRemote from "./remotes/SpotifyRemote";
 import Room from "../socketio/Room";
 import { Track } from "@spotify/web-api-ts-sdk";
+import { Response } from "commons/socket.io-types";
 
 export default class Spotify extends MusicPlatform {
   constructor() {
@@ -59,7 +60,7 @@ export default class Spotify extends MusicPlatform {
   async getRemote(
     room: Room,
     musicPlatform: MusicPlatform
-  ): Promise<Remote | null> {
+  ): Promise<Response<Remote>> {
     return await SpotifyRemote.createRemote(room, this);
   }
 
