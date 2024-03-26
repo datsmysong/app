@@ -14,6 +14,12 @@ type Variants = {
   error: Variant;
 };
 
+export type WarningProps = {
+  label: string;
+  children?: React.ReactNode;
+  variant?: keyof typeof variants;
+};
+
 const variants: Variants = {
   success: {
     icon: <CheckCircle color="green" />,
@@ -26,15 +32,7 @@ const variants: Variants = {
   },
 };
 
-const Warning = ({
-  label,
-  children,
-  variant = "warning",
-}: {
-  label: string;
-  children?: React.ReactNode;
-  variant?: keyof typeof variants;
-}) => {
+const Warning = ({ label, children, variant = "warning" }: WarningProps) => {
   const variantStyles = styles[variant];
   const { icon: variantIcon } = variants[variant];
   const iconStyled = React.cloneElement(variantIcon, { size: 24 });
@@ -50,7 +48,7 @@ const Warning = ({
         }}
       >
         <Text style={styles.warningText}>{label}</Text>
-        {children ?? children}
+        {children}
       </View>
     </View>
   );
