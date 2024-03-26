@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { RoomJSON } from "commons/Backend-types";
+import { RoomJSON } from "commons/backend-types";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {

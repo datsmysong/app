@@ -1,9 +1,9 @@
-import { JSONTrack } from "commons/Backend-types";
+import { JSONTrack } from "commons/backend-types";
 import Soundcloud, { SoundcloudTrackV2 } from "soundcloud.ts";
+import Room from "../socketio/Room";
 import MusicPlatform from "./MusicPlatform";
 import { Remote } from "./remotes/Remote";
 import SoundCloudRemote from "./remotes/SoundCloudRemote";
-import Room from "../socketio/Room";
 
 function extractFromTrack(track: SoundcloudTrackV2) {
   const artists = track.user.username;
