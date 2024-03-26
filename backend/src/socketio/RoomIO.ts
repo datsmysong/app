@@ -5,8 +5,8 @@ import Room, { TypedSocket } from "./Room";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
-const sendQueue = (socket: TypedSocket, room: Room) => {
-  socket.emit("queue:update", Room.toJSON(room));
+const sendQueue = (socket: TypedSocket, room: Room, userProfileId?: string) => {
+  socket.emit("queue:update", Room.toJSON(room), userProfileId);
 };
 
 export default function onRoomWSConnection(socket: TypedSocket) {
@@ -57,14 +57,9 @@ export default function onRoomWSConnection(socket: TypedSocket) {
      */
     sendQueue(socket, room);
 
-    socket.on("queue:add", async (params: string) => {
-      await room.add(params);
-      sendQueue(socket, room);
-    });
-
-    socket.on("queue:add", async (rawUrl: string) => {
+    socket.on("queue:add", async (rawUrl: string, userProfileId: string) => {
       await room.add(rawUrl);
-      roomSocket.emit("queue:update", Room.toJSON(room));
+      sendQueue(socket, room, userProfileId);
     });
 
     // We should check the origin of the request to prevent anyone that isn't the host from removing anything

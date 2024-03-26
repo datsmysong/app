@@ -10,9 +10,11 @@ import { Text } from "../../../../components/Themed";
 import Library from "../../../../components/room/Library";
 import SearchedTrackItem from "../../../../components/room/SearchedTrackItem";
 import { useDebounce } from "../../../../lib/useDebounce";
+import { useUserProfile } from "../../../../lib/userProfile";
 
 export default function AddTrack() {
   const { id } = useLocalSearchParams();
+  const userProfile = useUserProfile();
 
   const [searchBar, setSearchBar] = useState("");
   const [result, setResult] = useState<JSONTrack[] | null>(null);
@@ -24,18 +26,26 @@ export default function AddTrack() {
     if (debouncedSearchMusic) searchMusic();
   }, [debouncedSearchMusic]);
 
-  const addMusic = (value: string) => {
+  const addMusic = (url: string) => {
     if (!socket) return;
+    if (!userProfile)
+      return Alert.alert(
+        "Les utilisateurs anonymes ne sont pas autorisés à accéder à cette fonctionnalité. Veuillez vous connecter."
+      );
     try {
-      socket.emit("queue:add", new URL(value).toString());
+      socket.emit(
+        "queue:add",
+        new URL(url).toString(),
+        userProfile.user_profile_id
+      );
     } catch {
       setSearchBar("");
       setResult(null);
       Alert.alert("Erreur, impossible d'ajouter la musique");
     }
     if (router.canGoBack()) return router.back();
-    const url = ("/(tabs)/rooms/" + id) as any;
-    router.push(url);
+    const path = ("/(tabs)/rooms/" + id) as any;
+    router.push(path);
   };
 
   const searchMusic = () => {

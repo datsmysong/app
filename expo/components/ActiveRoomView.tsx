@@ -59,6 +59,9 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const [isHost, setIsHost] = useState<boolean>(false);
   const [voteSkipActualTrack, setVoteSkipActualTrack] =
     useState<boolean>(false);
+  const [lastAddedTrackAccountId, setLastAddedTrackAccountId] = useState<
+    string | null
+  >(null);
 
   const userProfile = useUserProfile();
 
@@ -91,8 +94,9 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       setLiveRoom(data);
     });
 
-    socket.on("queue:update", (data: RoomJSON) => {
-      setLiveRoom(data);
+    socket.on("queue:update", async (room: RoomJSON, accountId: string) => {
+      setLiveRoom(room);
+      setLastAddedTrackAccountId(accountId);
     });
   }, [socket]);
 
@@ -221,6 +225,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                         )) ||
                       false
                     }
+                    accountId={lastAddedTrackAccountId}
                   />
                 )}
               />
