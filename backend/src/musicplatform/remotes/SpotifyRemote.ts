@@ -56,6 +56,9 @@ export default class SpotifyRemote extends QueueableRemote {
 
     const expiresIn = parseInt(expires_in);
     try {
+      // TODO: https://github.com/spotify/spotify-web-api-ts-sdk/issues/79
+      // Seems like the tokens aren't refreshed properly, this has been fixed in the GitHub repo but we're
+      // awaiting a release of the library to update and fix the issue
       const spotifyClient = SpotifyApi.withAccessToken(
         process.env.SPOTIFY_CLIENT_ID as string,
         {
