@@ -2,6 +2,10 @@ import { Room } from "commons/database-types-utils";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
+import ArrowRight from "phosphor-react-native/src/icons/ArrowRight";
+import Check from "phosphor-react-native/src/icons/Check";
+import QrCode from "phosphor-react-native/src/icons/QrCode";
+import Share from "phosphor-react-native/src/icons/Share";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
 
@@ -37,7 +41,7 @@ export default function InvitationModal() {
   }, []);
 
   const handleShare = async () => {
-    if (!currentUrl || !room) {
+    if (!currentUrl || !room || !room.code) {
       Alert.alert("Aucun lien disponible");
       return;
     }
@@ -58,19 +62,19 @@ export default function InvitationModal() {
     <View style={styles.modalContent}>
       <View style={styles.shareButtonsContainer}>
         {isCopied ? (
-          <Button block prependIcon="check">
+          <Button block prependIcon={<Check />}>
             Lien copié
           </Button>
         ) : (
-          <Button block onPress={handleShare} prependIcon="share">
+          <Button block onPress={handleShare} prependIcon={<Share />}>
             Copier le lien
           </Button>
         )}
-        <Button type="outline" icon="qr-code" href={`/rooms/${id}/qrcode`}>
+        <Button type="outline" icon={<QrCode />} href={`/rooms/${id}/qrcode`}>
           Afficher le QR code
         </Button>
       </View>
-      <Button block href={`/rooms/${id}`} prependIcon="arrow-back">
+      <Button block href={`/rooms/${id}`} prependIcon={<ArrowRight />}>
         Retour à la salle d'écoute
       </Button>
     </View>
