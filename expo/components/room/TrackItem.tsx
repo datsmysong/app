@@ -15,8 +15,8 @@ export default function TrackItem(prop: {
   index: number;
   roomId: string;
   isMenuDisabled: boolean;
-  handleDislike: () => void;
-  disliked: boolean;
+  handleDislike?: () => void;
+  disliked?: boolean;
 }) {
   const {
     title,
@@ -33,6 +33,7 @@ export default function TrackItem(prop: {
   };
 
   const handleDislike = () => {
+    if (!prop.handleDislike) return;
     const disliked = !dislike;
     setDislike(disliked);
     prop.handleDislike();
