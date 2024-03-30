@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "postinstall": "npm link ../commons",
-    "lint": "eslint ."
+    "lint": "eslint app --config .eslintrc.json",
+    "tsLint": "tsc --noEmit"
   },
   "jest": {
     "preset": "jest-expo"

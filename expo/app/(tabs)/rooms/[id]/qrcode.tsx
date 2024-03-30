@@ -1,5 +1,6 @@
 import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
+import ArrowRight from "phosphor-react-native/src/icons/ArrowRight";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -24,7 +25,7 @@ export default function QRCodeModal() {
         .eq("id", id)
         .eq("is_active", true)
         .single();
-      if (roomsError) {
+      if (roomsError || !room || !room.code) {
         Alert.alert(
           "Une erreur est survenue lors de la récupération de la salle"
         );
@@ -55,7 +56,7 @@ export default function QRCodeModal() {
           backgroundColor="white"
         />
       )}
-      <Button block href={`/rooms/${id}`} prependIcon="arrow-back">
+      <Button block href={`/rooms/${id}`} prependIcon={<ArrowRight />}>
         Retour à la salle d'écoute
       </Button>
     </View>

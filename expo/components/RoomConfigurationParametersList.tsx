@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import Trash from "phosphor-react-native/src/icons/Trash";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
@@ -179,7 +180,7 @@ export default function RoomConfigurationParametersList({
       <Button type="filled" onPress={handleSave} block>
         Sauvegarder
       </Button>
-      <Button onPress={deleteRoom} color="danger" block prependIcon="delete">
+      <Button onPress={deleteRoom} color="danger" block prependIcon={<Trash />}>
         Supprimer la salle
       </Button>
     </View>

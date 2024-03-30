@@ -1,4 +1,8 @@
 import { PlayingJSONTrack } from "commons/backend-types";
+import Pause from "phosphor-react-native/src/icons/Pause";
+import Play from "phosphor-react-native/src/icons/Play";
+import SkipBack from "phosphor-react-native/src/icons/SkipBack";
+import SkipForward from "phosphor-react-native/src/icons/SkipForward";
 import React, { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 
@@ -91,14 +95,14 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
         <Button
           onPress={handlePreviousTrack}
           type="outline"
-          icon="skip-previous"
+          icon={<SkipBack weight="fill" />}
           loading={loading.previous}
         >
           Previous
         </Button>
         <Button
           onPress={handlePlayPause}
-          icon={state.isPlaying ? "pause" : "play-arrow"}
+          icon={state.isPlaying ? <Pause /> : <Play weight="fill" />}
           type={state.isPlaying ? "outline" : "filled"}
           loading={loading.playPause}
         >
@@ -107,7 +111,7 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
         <Button
           onPress={handleNextTrack}
           type="outline"
-          icon="skip-next"
+          icon={<SkipForward weight="fill" />}
           loading={loading.next}
         >
           Next
