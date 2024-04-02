@@ -1,22 +1,24 @@
-import { InactiveRoomMusic, Participant } from "commons/room-types";
+import { PlayedJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";
 
 type InactiveMusicProps = {
-  music: InactiveRoomMusic;
+  music: PlayedJSONTrack;
 };
 
 const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
   return (
     <View style={styles.musicContainer}>
-      <MusicArtwork imageUrl={music.artwork} addedBy={music.addedBy} />
-      <MusicContent
-        title={music.name}
-        artists={music.artist}
-        position={music.position}
-      />
+      <View style={styles.musicDetails}>
+        <MusicArtwork imageUrl={music.imgUrl} addedBy={music.addedBy} />
+        <MusicContent
+          title={music.title}
+          artists={music.artistsName}
+          position={music.position}
+        />
+      </View>
       <MusicActions />
     </View>
   );
@@ -24,7 +26,7 @@ const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
 
 type MusicArtworkProps = {
   imageUrl: string;
-  addedBy: Participant;
+  addedBy: string;
 };
 
 const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
@@ -52,23 +54,48 @@ const MusicContent: React.FC<MusicContentProps> = ({
 }) => {
   return (
     <View>
-      <Text>{title}</Text>
-      <Text>{artists}</Text>
-      <Text>{position}</Text>
+      <View style={{ flexDirection: "row", gap: 4 }}>
+        <Text style={styles.title}>{position}.</Text>
+        <Text style={styles.title}>{title}</Text>
+      </View>
+      <Text style={styles.artists}>{artists}</Text>
     </View>
   );
 };
 
 const MusicActions: React.FC = () => {
-  return <View />;
+  return (
+    <View
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        alignContent: "center",
+      }}
+    >
+      <Text>Like</Text>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   musicContainer: {
     gap: 10,
-    padding: 10,
+    justifyContent: "space-between",
+    flexDirection: "row",
+  },
+  musicDetails: {
+    gap: 10,
     alignItems: "center",
     flexDirection: "row",
+  },
+  title: {
+    fontFamily: "Outfit-Medium",
+    fontSize: 15,
+  },
+  artists: {
+    fontFamily: "Outfit-Medium",
+    fontSize: 15,
+    color: "#C3C3C3",
   },
   artworkContainer: {
     position: "relative",
@@ -79,7 +106,8 @@ const styles = StyleSheet.create({
   artwork: {
     width: 46,
     height: 46,
-    borderRadius: 10,
+    borderRadius: 6,
+    borderCurve: "continuous",
   },
   artworkAvatar: {
     position: "absolute",

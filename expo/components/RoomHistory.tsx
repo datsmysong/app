@@ -73,7 +73,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
               title="Participants"
             />
           </View>
-          <View>
+          <View style={{ gap: 16 }}>
             <H2>
               Historique des musiques ({processedRoom.playedSongs.length + ""})
             </H2>
