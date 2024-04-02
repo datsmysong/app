@@ -1,4 +1,4 @@
-import { JSONTrack, RoomJSONTrack } from "commons/backend-types";
+import { JSONTrack } from "commons/backend-types";
 import MusicPlatform from "./MusicPlatform";
 
 export default class TrackMetadata {
