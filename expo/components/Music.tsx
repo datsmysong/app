@@ -1,5 +1,6 @@
 import { PlayedJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
+import Heart from "phosphor-react-native/src/icons/Heart";
 import { StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";
@@ -72,7 +73,7 @@ const MusicActions: React.FC = () => {
         alignContent: "center",
       }}
     >
-      <Text>Like</Text>
+      <Heart />
     </View>
   );
 };
