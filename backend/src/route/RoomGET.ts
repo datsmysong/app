@@ -89,7 +89,7 @@ const getPlayedSongs = async (
 
       return {
         ...metadata,
-        position: index,
+        position: index + 1,
         addedBy: song.profile_id,
       };
     })
