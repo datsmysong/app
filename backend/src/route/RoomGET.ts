@@ -48,6 +48,7 @@ const getPlayedSongsForUser = async (
   user: User
 ): Promise<Array<PlayedJSONTrack>> => {
   if (room.streaming_services === null) return [];
+
   const musicPlatform = getMusicPlatform(room.streaming_services?.service_id);
   if (!musicPlatform) return [];
 
@@ -82,6 +83,7 @@ const getPlayedSongs = async (
     .map(async (song, index) => {
       const songId = song.music_id;
       const metadata = await getSongMetadata(musicPlatform, songId);
+
       if (!metadata) return null;
       if (!song.profile_id) return null;
 
@@ -188,8 +190,6 @@ const useProcessRoom = async (
     { genre: "", count: 0 }
   ).genre;
 
-  console.log(room.room_users);
-
   const roomUsers = Array.isArray(room.room_users)
     ? room.room_users
     : [room.room_users];
@@ -246,7 +246,7 @@ export default async function RoomGET(
     return;
   }
 
-  const processedRoomData = useProcessRoom(data, user);
+  const processedRoomData = await useProcessRoom(data, user);
   reply.code(200).send(processedRoomData);
 }
 

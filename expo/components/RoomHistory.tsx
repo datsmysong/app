@@ -3,13 +3,13 @@ import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
+import { getApiUrl } from "../lib/apiUrl";
 import Button from "./Button";
 import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
 import { Text, View } from "./Tamed";
 import Avatar from "./profile/Avatar";
 import H2 from "./text/H2";
-import { getApiUrl } from "../lib/apiUrl";
 
 type RoomHistoryProps = {
   roomId: string;
@@ -38,6 +38,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
 
       const processedRoomData = dataJson as ProcessedRoom;
       setProcessedRoom(processedRoomData);
+
       navigation.setOptions({
         title: processedRoomData.name,
       });
@@ -77,7 +78,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
               Historique des musiques ({processedRoom.playedSongs.length + ""})
             </H2>
             {processedRoom.playedSongs.map((song) => {
-              return <InactiveMusic key={song.name} music={song} />;
+              return <InactiveMusic key={song.id} music={song} />;
             })}
             <H2>Participants ({processedRoom.participants.length + ""})</H2>
             <FlatList

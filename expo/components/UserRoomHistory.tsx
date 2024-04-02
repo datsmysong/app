@@ -1,14 +1,12 @@
-import { Room, RoomUser } from "commons/database-types-utils";
+import { Room } from "commons/database-types-utils";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
+import { supabase } from "../lib/supabase";
+import { useUserProfile } from "../lib/userProfile";
 import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { Text, View } from "./Themed";
-import { supabase } from "../lib/supabase";
-import { useUserProfile } from "../lib/userProfile";
-
-type RoomUserAndRoom = { rooms: Room } & RoomUser;
 
 export default function UserRoomHistory() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -19,26 +17,20 @@ export default function UserRoomHistory() {
       const userId = user.user_profile_id;
 
       const { error, data } = await supabase
-        .from("room_users")
-        .select("*, rooms(*)")
-        .eq("profile_id", userId)
-        .order("rooms(created_at)", { ascending: false })
+        .from("rooms")
+        .select("*, room_users(*)")
+        .eq("room_users.profile_id", userId)
+        .eq("is_active", false)
+        .order("created_at", { ascending: false })
         .limit(5);
 
       if (error) {
-        Alert.alert("Erreur lors de la récupération des salles d'écoute");
+        return Alert.alert(
+          "Erreur lors de la récupération des salles d'écoute"
+        );
       }
 
-      const history: RoomUserAndRoom[] =
-        (data?.filter((roomUser) => {
-          return roomUser.rooms?.is_active === false;
-        }) as RoomUserAndRoom[]) ?? [];
-
-      const tmpRooms: Room[] = [];
-      history.forEach((userRoom) => {
-        tmpRooms.push(userRoom.rooms);
-      });
-      setRooms(tmpRooms);
+      setRooms(data);
     })();
   }, [user]);
 
