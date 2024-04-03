@@ -1,24 +1,27 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const LibraryComponent = ({
   title,
   subtitle,
   icon,
+  onPress,
 }: {
   title: string;
   subtitle: string;
   icon: React.ReactElement;
+  onPress: () => void;
 }) => {
   icon = React.cloneElement(icon, { size: 24, color: "white" });
   return (
-    <View style={styles.component}>
+    <Pressable style={styles.component} onPress={onPress}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
         {icon}
       </View>
       <Text style={styles.text}>{subtitle}</Text>
-    </View>
+    </Pressable>
   );
 };
 

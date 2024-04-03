@@ -1,4 +1,9 @@
-import { JSONTrack, PlayingJSONTrack, RoomJSON } from "./backend-types";
+import {
+  JSONTrack,
+  PlayingJSONTrack,
+  Playlist,
+  RoomJSON,
+} from "./backend-types";
 
 export type Response<T> =
   | { data: T; error: null }
@@ -91,6 +96,14 @@ export interface ClientToServerEvents
   "utils:search": (
     text: string,
     resultCallback: (args: JSONTrack[]) => void
+  ) => void;
+  "user:playlists": (
+    userId: string,
+    callback: (playlists: Playlist[]) => void
+  ) => void;
+  "user:playlistTrack": (
+    playlistId: string,
+    callback: (tracks: JSONTrack[]) => void
   ) => void;
 }
 
