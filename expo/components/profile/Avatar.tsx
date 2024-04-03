@@ -1,4 +1,5 @@
 import { ImageStyle } from "expo-image";
+import User from "phosphor-react-native/src/regular/User";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Image, StyleProp, StyleSheet, View } from "react-native";
 
@@ -15,7 +16,7 @@ type AvatarProps = {
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
   ({ id, tempoAvatarImage, style }, ref) => {
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState<string>();
 
     useImperativeHandle(ref, () => ({
       refresh: async () => {
@@ -34,26 +35,24 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
         .from("avatars")
         .getPublicUrl(path + "?avoidCache=" + Math.random());
 
-      if (!data) {
-        // No image for this user
-        return;
-      }
       setAvatarUrl(data.publicUrl);
     }
 
-    return (
-      <>
-        {avatarUrl ? (
-          <Image
-            source={{ uri: tempoAvatarImage ?? avatarUrl }}
-            aria-aria-label="Avatar"
-            style={[styles.avatar, styles.image, style]}
-          />
-        ) : (
-          <View style={[styles.avatar, styles.noImage, style]} />
-        )}
-      </>
-    );
+    if (avatarUrl) {
+      return (
+        <Image
+          source={{ uri: tempoAvatarImage ?? avatarUrl }}
+          aria-aria-label="Avatar"
+          style={[styles.avatar, styles.image, style]}
+        />
+      );
+    } else {
+      return (
+        <View style={[styles.avatar, styles.noImage, style]}>
+          <User />
+        </View>
+      );
+    }
   }
 );
 
@@ -68,9 +67,10 @@ const styles = StyleSheet.create({
   image: {
     objectFit: "cover",
     paddingTop: 0,
+    backgroundColor: "#CCCCCC",
   },
   noImage: {
-    backgroundColor: "#333",
+    backgroundColor: "red",
     border: "1px solid rgb(200, 200, 200)",
     borderRadius: 5,
   },
