@@ -80,7 +80,11 @@ export const ProfileHeader = () => {
         }}
       >
         <View style={{ width: 40 }}>
-          <Avatar id={userProfile ? userProfile.account_id : ""} radius={90} />
+          <Avatar
+            id={userProfile ? userProfile.user_profile_id : ""}
+            radius={90}
+            noCaches
+          />
         </View>
         <View style={profileStyles.personalityView}>
           <Text style={profileStyles.username}>
