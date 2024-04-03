@@ -2,15 +2,17 @@ import { Room } from "commons/database-types-utils";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
-import { supabase } from "../lib/supabase";
-import { useUserProfile } from "../lib/userProfile";
 import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
-import { Text, View } from "./Themed";
+import { View } from "./Themed";
+import H2 from "./text/H2";
+import { supabase } from "../lib/supabase";
+import { useUserProfile } from "../lib/userProfile";
 
-export default function UserRoomHistory() {
+export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const user = useUserProfile();
+
   useEffect(() => {
     (async () => {
       if (!user) return;
@@ -22,7 +24,7 @@ export default function UserRoomHistory() {
         .eq("room_users.profile_id", userId)
         .eq("is_active", false)
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(limit);
 
       if (error) {
         return Alert.alert(
@@ -35,8 +37,8 @@ export default function UserRoomHistory() {
   }, [user]);
 
   return (
-    <View>
-      <Text style={styles.title}>Historique</Text>
+    <View style={{ gap: 10 }}>
+      <H2>Historique</H2>
       <FlatList
         data={rooms}
         keyExtractor={(item) => item.id}

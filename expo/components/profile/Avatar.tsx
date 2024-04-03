@@ -1,5 +1,4 @@
 import { ImageStyle } from "expo-image";
-import User from "phosphor-react-native/src/regular/User";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Image, StyleProp, StyleSheet, View } from "react-native";
 
@@ -18,8 +17,6 @@ type AvatarProps = {
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
   ({ id, tempoAvatarImage, noCaches, radius = 5 }, ref) => {
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  ({ id, tempoAvatarImage, style }, ref) => {
     const [avatarUrl, setAvatarUrl] = useState<string>();
 
     useImperativeHandle(ref, () => ({

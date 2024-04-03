@@ -9,6 +9,7 @@ import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 import { useUserProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { Text } from "../Themed";
+import H1 from "../text/H1";
 
 export const ProfileHeader = () => {
   const user = useSupabaseUserHook();
@@ -40,6 +41,7 @@ export const ProfileHeader = () => {
         backgroundColor: "#E6E6E6",
         flex: 1,
         paddingVertical: 18,
+        rowGap: 18,
         paddingHorizontal: 38,
       }}
     >
@@ -51,17 +53,7 @@ export const ProfileHeader = () => {
           alignContent: "center",
         }}
       >
-        {/* //TODO using H1 component */}
-        <Text
-          style={{
-            fontSize: 32,
-            fontWeight: "bold",
-            padding: 10,
-            fontFamily: "Outfit-Regular",
-          }}
-        >
-          Profil
-        </Text>
+        <H1>Profil</H1>
         <View>
           <Button
             href="/(tabs)/profile/account"
