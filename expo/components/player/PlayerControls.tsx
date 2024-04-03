@@ -4,7 +4,7 @@ import Play from "phosphor-react-native/src/icons/Play";
 import SkipBack from "phosphor-react-native/src/icons/SkipBack";
 import SkipForward from "phosphor-react-native/src/icons/SkipForward";
 import React, { useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { PlayerRemote } from "../../lib/audioRemote";
 import Button from "../Button";
@@ -76,7 +76,6 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
 
   return (
     <View>
-      <Button onPress={skipTo90}>Aller à 90%</Button>
       <View style={styles.progressContainer}>
         <Text>{formatDuration(state.currentTime)}</Text>
         <View style={styles.progressBar}>
@@ -125,8 +124,8 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 3,
+    justifyContent: "center",
+    gap: 32,
   },
   progressContainer: {
     flexDirection: "row",

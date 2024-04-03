@@ -3,7 +3,6 @@ import { Link, router } from "expo-router";
 import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
 import Gear from "phosphor-react-native/src/icons/Gear";
 import Plus from "phosphor-react-native/src/icons/Plus";
-import ThumbsDown from "phosphor-react-native/src/icons/ThumbsDown";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -112,20 +111,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     );
   };
 
-  const leaveRoom = async () => {
-    if (!userProfile || !room) return;
-
-    const response = await fetch(url + "/leave", { credentials: "include" });
-    if (!response.ok) {
-      return Alert.alert(await response.text());
-    }
-
-    if (!socket) return Alert.alert("Impossible de trouver le socket.");
-    socket.disconnect();
-
-    router.replace("/rooms");
-  };
-
   /**
    * Handle the dislike of a track
    * @param index -1 for actual track, otherwise the index of the track in the queue
@@ -141,11 +126,25 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
     }
   };
 
+  const leaveRoom = async () => {
+    if (!userProfile || !room) return;
+
+    const response = await fetch(url + "/leave", { credentials: "include" });
+    if (!response.ok) {
+      return Alert.alert(await response.text());
+    }
+
+    if (!socket) return Alert.alert("Impossible de trouver le socket.");
+    socket.disconnect();
+
+    router.replace("/rooms");
+  };
+
   const networkStatus = useNetworkStatus();
 
   return (
     <ScrollView
-      style={{
+      contentContainerStyle={{
         paddingVertical: 32,
         paddingHorizontal: 12,
         minHeight: "100%",
@@ -189,16 +188,6 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               </Button>
             </View>
             <RoomPlayer socket={socket} room={room} />
-            <Button
-              onPress={() => {
-                handleDislike(-1);
-              }}
-              prependIcon={<ThumbsDown />}
-              size="small"
-              type={voteSkipActualTrack ? "filled" : "outline"}
-            >
-              Voter pour passer
-            </Button>
             <Text style={styles.title}>
               File d'attente ({liveRoom?.queue.length ?? 0})
             </Text>
@@ -229,6 +218,11 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
               />
             )}
           </View>
+          <View style={headerStyles.buttonContainer}>
+            <Button block href={`/rooms/${room.id}/invite`}>
+              Inviter des amis
+            </Button>
+          </View>
 
           <Button
             icon={<Plus />}
@@ -248,8 +242,9 @@ export default ActiveRoomView;
 const floatingStyle = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 24,
+    bottom: 0,
     right: 24,
+    zIndex: 1,
   },
   text: {
     color: "#FFF",
@@ -263,9 +258,14 @@ const headerStyles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 14,
     gap: 10,
+    maxHeight: 378,
   },
   buttonContainer: {
     gap: 8,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontFamily: "Outfit-Bold",
   },
   titleContainer: {
     flexDirection: "row",

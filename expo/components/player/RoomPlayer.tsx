@@ -1,9 +1,9 @@
-import { PlayingJSONTrack, RoomJSON } from "commons/backend-types";
+import { PlayingJSONTrack } from "commons/backend-types";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "commons/socket.io-types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Socket } from "socket.io-client";
 
@@ -66,11 +66,12 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
             socket={socket}
           />
         )}
-        <Player state={playbackState}>
-          {isHost && remote && (
+        <Player state={playbackState} />
+        {isHost && remote && (
+          <View style={{ paddingTop: 32 }}>
             <PlayerControls state={playbackState} remote={remote} />
-          )}
-        </Player>
+          </View>
+        )}
       </View>
 
       <Button type="outline" onPress={playCoolSong}>
