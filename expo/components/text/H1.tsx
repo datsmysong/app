@@ -2,19 +2,19 @@ import { StyleSheet } from "react-native";
 
 import { Text } from "../Themed";
 
-type H2Props = {
+type H1Props = {
   children: string | string[];
 };
 
-const H2: React.FC<H2Props> = ({ children }) => {
-  return <Text style={styles.h2}>{children}</Text>;
+const H1: React.FC<H1Props> = ({ children }) => {
+  return <Text style={styles.h1}>{children}</Text>;
 };
 
 const styles = StyleSheet.create({
-  h2: {
-    fontSize: 24,
+  h1: {
+    fontSize: 32,
     fontFamily: "Unbounded-Bold",
   },
 });
 
-export default H2;
+export default H1;
