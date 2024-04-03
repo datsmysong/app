@@ -1,11 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { StyleSheet, View, Text } from "react-native";
+import { ReactElement } from "react";
+import { StyleSheet, View, Text, StyleProp, ViewStyle } from "react-native";
 
 type InfoCardProps = {
   title: string;
   description: string;
   content: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
+  icon: ReactElement;
+  style?: StyleProp<ViewStyle>;
 };
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -13,14 +15,13 @@ const InfoCard: React.FC<InfoCardProps> = ({
   description,
   content,
   icon,
+  style,
 }) => {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, style]}>
       <View style={styles.cardTitle}>
         <Text style={styles.cardTitleText}>{title}</Text>
-        <View style={styles.cardTitleIcon}>
-          <MaterialIcons name={icon} size={24} />
-        </View>
+        <View style={styles.cardTitleIcon}>{icon}</View>
       </View>
       <View>
         <Text style={styles.cardContentText}>{content}</Text>

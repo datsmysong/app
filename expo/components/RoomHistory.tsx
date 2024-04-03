@@ -1,5 +1,11 @@
 import type { ProcessedRoom } from "commons/room-types";
 import { useNavigation } from "expo-router";
+import Alarm from "phosphor-react-native/src/regular/Alarm";
+import CalendarBlank from "phosphor-react-native/src/regular/CalendarBlank";
+import Cube from "phosphor-react-native/src/regular/Cube";
+import Heart from "phosphor-react-native/src/regular/Heart";
+import MusicNote from "phosphor-react-native/src/regular/MusicNote";
+import User from "phosphor-react-native/src/regular/User";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
@@ -48,6 +54,16 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
     fetchProcessedRoomData();
   }, [roomId]);
 
+  function formatDuration(averageSongDuration: string): string {
+    // averageSongDuration is a number corresponding to the average number of milliseconds of a song
+    // I need it formatted like so: "Mm Ss", like "3m 45s"
+    const minutes = Math.floor(parseInt(averageSongDuration, 10) / 60000);
+    const seconds = Math.floor(
+      (parseInt(averageSongDuration, 10) % 60000) / 1000
+    );
+    return `${minutes}m ${seconds}s`;
+  }
+
   return (
     <View style={styles.header}>
       {error && <Text>{error}</Text>}
@@ -57,43 +73,77 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
             <InfoCard
               content={processedRoom.createdAt}
               description="La date à laquelle s'est déroulée cette salle d'écoute"
-              icon="calendar-today"
+              icon={<CalendarBlank />}
               title="Date"
             />
             <InfoCard
               content={processedRoom.duration}
               description="La durée de cette salle d'écoute"
-              icon="timer"
+              icon={<Alarm />}
               title="Durée"
             />
             <InfoCard
               content={processedRoom.participants.length + ""}
               description="Le nombre de participants à cette salle d'écoute"
-              icon="people"
+              icon={<User />}
               title="Participants"
             />
           </View>
-          <View style={{ gap: 16 }}>
-            <H2>
-              Historique des musiques ({processedRoom.playedSongs.length + ""})
-            </H2>
-            {processedRoom.playedSongs.map((song) => {
-              return <InactiveMusic key={song.id} music={song} />;
-            })}
+          <View>
+            <View style={{ gap: 12 }}>
+              <H2>
+                Historique des musiques ({processedRoom.playedSongs.length + ""}
+                )
+              </H2>
+              {processedRoom.playedSongs.map((song) => {
+                return <InactiveMusic key={song.id} music={song} />;
+              })}
+            </View>
+          </View>
+          <View>
             <H2>Participants ({processedRoom.participants.length + ""})</H2>
             <FlatList
               data={processedRoom.participants}
               horizontal
               renderItem={({ item: participant }) => (
                 <View style={styles.avatars}>
-                  <Avatar id={participant.profile.userProfile?.account_id} />
-                  <Text style={{ fontFamily: "Outfit-Medium" }}>
+                  <Avatar
+                    style={{ width: 80, height: 80 }}
+                    id={participant.profile.userProfile?.account_id}
+                  />
+                  <Text style={{ fontFamily: "Outfit-Medium", fontSize: 16 }}>
                     {participant.profile.nickname}
                   </Text>
                 </View>
               )}
-              ItemSeparatorComponent={() => <View style={{ width: 25 }} />} // This will create a 25px gap between items
+              ItemSeparatorComponent={() => <View style={{ width: 24 }} />} // This will create a 24px gap between items
             />
+          </View>
+          <View style={{ gap: 12 }}>
+            <H2>Le saviez vous ?</H2>
+            <View style={{ gap: 12 }}>
+              <InfoCard
+                style={{ width: "100%" }}
+                content={processedRoom.mostPlayedGenre}
+                icon={<Heart />}
+                description="Le genre de musique le plus jouée lors de cette salle d'écoute"
+                title="Genre favori"
+              />
+              <InfoCard
+                style={{ width: "100%" }}
+                content={processedRoom.streamingService.service_name}
+                icon={<Cube />}
+                description={processedRoom.streamingService.description}
+                title="Intégration"
+              />
+              <InfoCard
+                style={{ width: "100%" }}
+                content={formatDuration(processedRoom.averageSongDuration)}
+                icon={<MusicNote />}
+                description="La durée moyenne d'une musique au sein de cette salle d'écoute"
+                title="Durée moyenne d'une musique"
+              />
+            </View>
           </View>
         </>
       )}
@@ -107,10 +157,11 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
 
 const styles = StyleSheet.create({
   header: {
-    padding: 16,
+    padding: 20,
     backgroundColor: "transparent",
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
+    gap: 32,
   },
   infoCards: {
     display: "flex",
@@ -136,7 +187,6 @@ const styles = StyleSheet.create({
     maxWidth: 200,
     alignItems: "center",
     gap: 4,
-    marginVertical: 20,
   },
 });
 
