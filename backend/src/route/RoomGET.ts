@@ -185,7 +185,7 @@ const useProcessRoom = async (
       }
       return acc;
     },
-    { genre: "", count: 0 }
+    { genre: "Aucune musique", count: 0 }
   ).genre;
 
   const roomUsers = Array.isArray(room.room_users)

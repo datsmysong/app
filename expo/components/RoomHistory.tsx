@@ -7,7 +7,7 @@ import Heart from "phosphor-react-native/src/regular/Heart";
 import MusicNote from "phosphor-react-native/src/regular/MusicNote";
 import User from "phosphor-react-native/src/regular/User";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, ScrollView, StyleSheet } from "react-native";
 
 import Button from "./Button";
 import InfoCard from "./InfoCard";
@@ -54,18 +54,16 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
     fetchProcessedRoomData();
   }, [roomId]);
 
-  function formatDuration(averageSongDuration: string): string {
+  function formatDuration(averageSongDuration: number): string {
     // averageSongDuration is a number corresponding to the average number of milliseconds of a song
     // I need it formatted like so: "Mm Ss", like "3m 45s"
-    const minutes = Math.floor(parseInt(averageSongDuration, 10) / 60000);
-    const seconds = Math.floor(
-      (parseInt(averageSongDuration, 10) % 60000) / 1000
-    );
+    const minutes = Math.floor(averageSongDuration / 60000);
+    const seconds = Math.floor((averageSongDuration % 60000) / 1000);
     return `${minutes}m ${seconds}s`;
   }
 
   return (
-    <View style={styles.header}>
+    <ScrollView contentContainerStyle={styles.header}>
       {error && <Text>{error}</Text>}
       {processedRoom && (
         <>
@@ -133,7 +131,10 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
                 style={{ width: "100%" }}
                 content={processedRoom.streamingService.service_name}
                 icon={<Cube />}
-                description={processedRoom.streamingService.description}
+                description={
+                  processedRoom.streamingService.description ??
+                  "Aucune description"
+                }
                 title="Intégration"
               />
               <InfoCard
@@ -151,7 +152,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
       <Button href="/rooms" block>
         Retour à l'accueil
       </Button>
-    </View>
+    </ScrollView>
   );
 };
 
