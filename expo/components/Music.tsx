@@ -1,9 +1,11 @@
 import { PlayedJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
+import DotsThree from "phosphor-react-native/src/icons/DotsThreeOutlineVertical";
 import Heart from "phosphor-react-native/src/icons/Heart";
 import { StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";
+import Avatar from "./profile/Avatar";
 
 type InactiveMusicProps = {
   music: PlayedJSONTrack;
@@ -32,12 +34,11 @@ type MusicArtworkProps = {
 
 const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
   // TODO: Use a component to load the avatar of an user
-  const avatarUrl = "https://unsplash.it/22/22";
 
   return (
     <View style={styles.artworkContainer}>
       <Image source={{ uri: imageUrl }} style={styles.artwork} />
-      <Image source={{ uri: avatarUrl }} style={styles.artworkAvatar} />
+      <Avatar id={addedBy} style={styles.artworkAvatar} />
     </View>
   );
 };
@@ -54,7 +55,7 @@ const MusicContent: React.FC<MusicContentProps> = ({
   position,
 }) => {
   return (
-    <View>
+    <View style={styles.musicContent}>
       <View style={{ flexDirection: "row", gap: 4 }}>
         <Text style={styles.title}>{position}.</Text>
         <Text style={styles.title}>{title}</Text>
@@ -71,9 +72,12 @@ const MusicActions: React.FC = () => {
         alignItems: "center",
         justifyContent: "center",
         alignContent: "center",
+        flexDirection: "row",
+        gap: 10,
       }}
     >
       <Heart />
+      <DotsThree />
     </View>
   );
 };
@@ -83,20 +87,27 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "space-between",
     flexDirection: "row",
+    width: "100%",
   },
   musicDetails: {
     gap: 10,
     alignItems: "center",
     flexDirection: "row",
+    flexShrink: 1,
+  },
+  musicContent: {
+    flexShrink: 1,
   },
   title: {
     fontFamily: "Outfit-Medium",
     fontSize: 15,
+    flexShrink: 1,
   },
   artists: {
     fontFamily: "Outfit-Medium",
     fontSize: 15,
     color: "#C3C3C3",
+    flexShrink: 1,
   },
   artworkContainer: {
     position: "relative",
@@ -116,7 +127,6 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     left: 46 - (22 / 2) * 1.33,
-    backgroundColor: "red",
     borderRadius: 22,
   },
 });

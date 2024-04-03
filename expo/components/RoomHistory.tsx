@@ -107,7 +107,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
 
 const styles = StyleSheet.create({
   header: {
-    padding: 10,
+    padding: 16,
     backgroundColor: "transparent",
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
