@@ -1,11 +1,8 @@
 import { Profile } from "commons/database-types-utils";
-import User from "phosphor-react-native/src/icons/User";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
-import Button from "../../../components/Button";
 import { Text } from "../../../components/Themed";
-import Avatar from "../../../components/profile/Avatar";
 import { supabase } from "../../../lib/supabase";
 import { useSupabaseUserHook } from "../../../lib/useSupabaseUser";
 import { useUserProfile } from "../../../lib/userProfile";

@@ -1,9 +1,8 @@
 import User from "phosphor-react-native/src/bold/User";
 import { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import Avatar from "./Avatar";
-import { usernameRules } from "../../lib/inputRestriction";
 import { supabase } from "../../lib/supabase";
 import { Profile } from "../../lib/types";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
@@ -63,13 +62,15 @@ export const ProfileHeader = () => {
         >
           Profil
         </Text>
-        <Button
-          href="/(tabs)/profile/account"
-          size="small"
-          prependIcon={<User />}
-        >
-          Gérer mon compte
-        </Button>
+        <View>
+          <Button
+            href="/(tabs)/profile/account"
+            size="small"
+            prependIcon={<User />}
+          >
+            Gérer mon compte
+          </Button>
+        </View>
       </View>
       <View
         style={{
@@ -79,7 +80,7 @@ export const ProfileHeader = () => {
         }}
       >
         <View style={{ width: 40 }}>
-          <Avatar id={userProfile ? userProfile.account_id : ""} />
+          <Avatar id={userProfile ? userProfile.account_id : ""} radius={90} />
         </View>
         <View style={profileStyles.personalityView}>
           <Text style={profileStyles.username}>

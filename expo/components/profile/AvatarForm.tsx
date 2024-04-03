@@ -6,7 +6,7 @@ import { Alert, Platform, Pressable, View } from "react-native";
 
 import Avatar, { AvatarRemote } from "./Avatar";
 import { supabase } from "../../lib/supabase";
-import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
+import { useUserProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { formStyles } from "../ControlledInput";
 import { Text } from "../Themed";
@@ -21,7 +21,7 @@ interface AvatarProps {
  */
 const AvatarForm = forwardRef((props: AvatarProps, ref) => {
   const { onImageLoad } = props;
-  const user = useSupabaseUserHook();
+  const user = useUserProfile();
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
@@ -41,7 +41,8 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
         error: "No user or avatar",
       };
     }
-    const fileName = `${user.id}.jpg`;
+
+    const fileName = `${user.user_profile_id}.jpg`;
     const image = await getBase64Image(avatarUrl);
 
     const { error } = await supabase.storage
@@ -88,11 +89,16 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
     <View style={{ width: "100%", gap: 10 }}>
       <Text style={formStyles.label}>Photo de profil</Text>
       <Pressable onPress={selectAvatar}>
-        <Avatar id={user?.id} ref={avatarRef} tempoAvatarImage={avatarUrl} />
+        <Avatar
+          id={user?.user_profile_id}
+          ref={avatarRef}
+          tempoAvatarImage={avatarUrl}
+          noCaches={false}
+        />
       </Pressable>
       <Button
         onPress={selectAvatar}
-        disabled={uploading}
+        // disabled={uploading}
         block
         type="outline"
         size="small"

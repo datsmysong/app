@@ -12,9 +12,13 @@ type AvatarProps = {
   id: string | undefined;
   tempoAvatarImage?: string; // if we want to pass an image url directly (on edit profile)
   style?: StyleProp<ImageStyle>;
+  noCaches?: boolean;
+  radius?: number;
 };
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
+  ({ id, tempoAvatarImage, noCaches, radius = 5 }, ref) => {
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   ({ id, tempoAvatarImage, style }, ref) => {
     const [avatarUrl, setAvatarUrl] = useState<string>();
 
@@ -30,35 +34,41 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
     }, [id]);
 
     async function downloadUserImage() {
-      const path = `${id}.jpg`;
-      const { data } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(path + "?avoidCache=" + Math.random());
+      let path = `${id}.jpg`;
+      if (noCaches) path += "?avoidCache=" + Math.random();
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
 
       setAvatarUrl(data.publicUrl);
     }
 
-    if (avatarUrl) {
-      return (
-        <Image
-          source={{ uri: tempoAvatarImage ?? avatarUrl }}
-          aria-aria-label="Avatar"
-          style={[styles.avatar, styles.image, style]}
-        />
-      );
-    } else {
-      return (
-        <View style={[styles.avatar, styles.noImage, style]}>
-          <User />
-        </View>
-      );
-    }
+    return (
+      <>
+        {avatarUrl ? (
+          <Image
+            source={{ uri: tempoAvatarImage ?? avatarUrl }}
+            aria-aria-label="Avatar"
+            style={[
+              { aspectRatio: 1, width: "100%", borderRadius: radius },
+              styles.avatar,
+              styles.image,
+            ]}
+          />
+        ) : (
+          <View
+            style={[
+              { aspectRatio: 1, width: "100%", borderRadius: radius },
+              styles.avatar,
+              styles.noImage,
+            ]}
+          />
+        )}
+      </>
+    );
   }
 );
 
 const styles = StyleSheet.create({
   avatar: {
-    borderRadius: 9999,
     overflow: "hidden",
     maxWidth: "100%",
     aspectRatio: 1,
@@ -72,7 +82,6 @@ const styles = StyleSheet.create({
   noImage: {
     backgroundColor: "red",
     border: "1px solid rgb(200, 200, 200)",
-    borderRadius: 5,
   },
 });
 
