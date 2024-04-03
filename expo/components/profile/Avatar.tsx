@@ -1,5 +1,7 @@
+import { ImageStyle } from "expo-image";
+import User from "phosphor-react-native/src/regular/User";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, StyleProp, StyleSheet, View } from "react-native";
 
 import { supabase } from "../../lib/supabase";
 
@@ -9,11 +11,12 @@ export type AvatarRemote = {
 type AvatarProps = {
   id: string | undefined;
   tempoAvatarImage?: string; // if we want to pass an image url directly (on edit profile)
+  style?: StyleProp<ImageStyle>;
 };
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
-  ({ id, tempoAvatarImage }, ref) => {
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  ({ id, tempoAvatarImage, style }, ref) => {
+    const [avatarUrl, setAvatarUrl] = useState<string>();
 
     useImperativeHandle(ref, () => ({
       refresh: async () => {
@@ -32,51 +35,42 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
         .from("avatars")
         .getPublicUrl(path + "?avoidCache=" + Math.random());
 
-      if (!data) {
-        // No image for this user
-        return;
-      }
       setAvatarUrl(data.publicUrl);
     }
 
-    return (
-      <>
-        {avatarUrl ? (
-          <Image
-            source={{ uri: tempoAvatarImage ?? avatarUrl }}
-            aria-aria-label="Avatar"
-            style={[
-              { aspectRatio: 1, width: "100%" },
-              styles.avatar,
-              styles.image,
-            ]}
-          />
-        ) : (
-          <View
-            style={[
-              { aspectRatio: 1, width: "100%" },
-              styles.avatar,
-              styles.noImage,
-            ]}
-          />
-        )}
-      </>
-    );
+    if (avatarUrl) {
+      return (
+        <Image
+          source={{ uri: tempoAvatarImage ?? avatarUrl }}
+          aria-aria-label="Avatar"
+          style={[styles.avatar, styles.image, style]}
+        />
+      );
+    } else {
+      return (
+        <View style={[styles.avatar, styles.noImage, style]}>
+          <User />
+        </View>
+      );
+    }
   }
 );
 
 const styles = StyleSheet.create({
   avatar: {
-    borderRadius: 5,
+    borderRadius: 9999,
     overflow: "hidden",
     maxWidth: "100%",
+    aspectRatio: 1,
+    width: "100%",
   },
   image: {
     objectFit: "cover",
     paddingTop: 0,
+    backgroundColor: "#CCCCCC",
   },
   noImage: {
-    backgroundColor: "#333",
+    backgroundColor: "red",
     border: "1px solid rgb(200, 200, 200)",
     borderRadius: 5,
   },

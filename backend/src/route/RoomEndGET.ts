@@ -1,8 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { getUserFromRequest } from "../lib/auth-utils";
+import { getUserFromRequest, unauthorizedResponse } from "../lib/auth-utils";
 import { adminSupabase } from "../server";
 import RoomStorage from "../RoomStorage";
-import { unauthorizedResponse } from "../lib/auth-utils";
 
 export default async function RoomEndGET(
   req: FastifyRequest,
@@ -34,6 +33,7 @@ export default async function RoomEndGET(
     .update({
       code: null,
       is_active: false,
+      ended_at: new Date().toISOString(),
     })
     .eq("id", roomUuid);
 

@@ -17,6 +17,18 @@ export const getUserProfile = async (id: string) => {
   return data;
 };
 
+export const getUserProfileFromUserProfileId = async (id: string) => {
+  const { data, error } = await supabase
+    .from("user_profile")
+    .select("*")
+    .eq("user_profile_id", id)
+    .single();
+  if (error) {
+    return null;
+  }
+  return data;
+};
+
 export function useUserProfile() {
   const [profile, setProfile] = useState<UserProfile | null>();
   const user = useSupabaseUserHook();
@@ -31,7 +43,6 @@ export function useUserProfile() {
 
     fetchProfile();
   }, [user]);
-
   return profile;
 }
 

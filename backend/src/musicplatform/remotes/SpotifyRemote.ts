@@ -1,10 +1,12 @@
 import { SimplifiedArtist, SpotifyApi, Track } from "@spotify/web-api-ts-sdk";
 import { JSONTrack, PlayingJSONTrack } from "commons/backend-types";
-import { adminSupabase } from "../../server";
-import MusicPlatform from "../MusicPlatform";
 import { QueueableRemote, Remote } from "./Remote";
 import Room from "../../socketio/Room";
 import { Response } from "commons/socket.io-types";
+import { STREAMING_SERVICES, getMusicPlatform } from "../../RoomStorage";
+import { adminSupabase } from "../../server";
+import MusicPlatform from "../MusicPlatform";
+import Spotify from "../Spotify";
 
 export default class SpotifyRemote extends QueueableRemote {
   spotifyClient: SpotifyApi;
@@ -113,6 +115,12 @@ export default class SpotifyRemote extends QueueableRemote {
             title: playbackState.item.name,
             url: playbackState.item.external_urls.spotify,
             updated_at: Date.now(),
+            // TODO: Add the id of the user who added the track
+            addedBy: "",
+            genres: playbackState.item.album.genres,
+            id: playbackState.item.uri,
+            // TODO: Fetch the current votes for the current track
+            votes: [],
           },
           error: null,
         };
@@ -124,21 +132,19 @@ export default class SpotifyRemote extends QueueableRemote {
 
   async getQueue(): Promise<Response<JSONTrack[]>> {
     return runSpotifyCallback(async () => {
+      const musicPlatform = getMusicPlatform(
+        STREAMING_SERVICES.Spotify
+      ) as Spotify;
+      if (!musicPlatform)
+        return { data: null, error: "Music platform not found" };
+
       const spotifyQueue = await this.spotifyClient.player.getUsersQueue();
 
       const queue = spotifyQueue.queue
         .filter((item) => item.type === "track")
         .map((item) => item as Track)
-        .map((item) => {
-          return {
-            title: item.name,
-            albumName: item.album.name,
-            artistsName: extractArtistsName(item.album.artists),
-            duration: item.duration_ms,
-            imgUrl: item.album.images[0].url,
-            url: item.external_urls.spotify,
-          };
-        });
+        .map((item) => musicPlatform.toJSON(item as never))
+        .filter((item) => item !== null) as JSONTrack[];
 
       return { data: queue, error: null };
     });

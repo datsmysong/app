@@ -25,9 +25,7 @@ export default class TrackMetadata {
 
   async toJSON(): Promise<JSONTrack | null> {
     try {
-      const JSONTrack = await this.platform.getJsonTrack(this.id);
-      if (JSONTrack) JSONTrack.votes = [];
-      return JSONTrack;
+      return await this.platform.getJsonTrack(this.id);
     } catch (err) {
       console.error(`Failed to fetch data for track ${this.id}`);
       return null;
