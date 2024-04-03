@@ -1,5 +1,4 @@
 import {
-  JSONTrack,
   PlayingJSONTrack,
   RoomJSON,
   RoomJSONTrack,
@@ -159,7 +158,7 @@ export default class Room {
     return this.hostSocket;
   }
 
-  getQueue(): JSONTrack[] {
+  getQueue(): RoomJSONTrack[] {
     return [...this.queue];
   }
 

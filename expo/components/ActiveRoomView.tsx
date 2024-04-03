@@ -20,6 +20,7 @@ import { Text, View } from "./Themed";
 import Warning from "./Warning";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
+import H1 from "./text/H1";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import { getApiUrl } from "../lib/apiUrl";
 import { getRoomHostedByUser } from "../lib/room-utils";
@@ -171,7 +172,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       {room && liveRoom && socket && socket.connected && (
         <>
           <View style={headerStyles.headerContainer}>
-            <Text style={headerStyles.headerTitle}>"{room.name}"</Text>
+            <H1>"{room.name}"</H1>
             {isHost ? (
               <Link href={`/rooms/${room.id}/settings`}>
                 <Gear size={32} color="black" />
@@ -263,11 +264,6 @@ const headerStyles = StyleSheet.create({
   },
   buttonContainer: {
     gap: 8,
-  },
-  headerTitle: {
-    fontWeight: "bold",
-    fontSize: 32,
-    fontFamily: "Unbounded-Bold",
   },
   titleContainer: {
     flexDirection: "row",

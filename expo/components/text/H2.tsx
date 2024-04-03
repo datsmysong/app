@@ -13,7 +13,7 @@ const H2: React.FC<H2Props> = ({ children }) => {
 const styles = StyleSheet.create({
   h2: {
     fontSize: 24,
-    fontFamily: "Unbounded-Bold",
+    fontFamily: "Outfit-Bold",
   },
 });
 
