@@ -8,6 +8,8 @@ export interface JSONTrack {
   /** An array of all genres of this song */
   genres: string[];
   id: string;
+  votes?: string[]; // array of user ids
+  addedBy: string;
 }
 
 export interface RoomJSONTrack extends JSONTrack {

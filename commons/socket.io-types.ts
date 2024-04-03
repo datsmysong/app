@@ -64,7 +64,7 @@ export interface ServerToClientEvents
   extends LocalPlayerServerToClientEvents,
     PlayerServerToClientEvents {
   /** Update the queue. */
-  "queue:update": (room: RoomJSON | Error, userProfileId?: string) => void;
+  "queue:update": (room: RoomJSON | Error, accountId?: string) => void;
   /** End the room. */
   "room:end": () => void;
   // error events are handled by the client in layout of rooms/[id]
@@ -80,7 +80,7 @@ export interface ClientToServerEvents
   extends LocalPlayerClientToServerEvents,
     PlayerClientToServerEvents {
   /** Add a track to the queue. */
-  "queue:add": (rawUrl: string, userProfileId: string) => void;
+  "queue:add": (rawUrl: string, accountId: string) => void;
   /** Remove a track from the queue by its index. */
   "queue:remove": (index: number) => void;
   /** Remove a track from the queue by its link. */

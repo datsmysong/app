@@ -33,11 +33,7 @@ export default function AddTrack() {
         "Les utilisateurs anonymes ne sont pas autorisés à accéder à cette fonctionnalité. Veuillez vous connecter."
       );
     try {
-      socket.emit(
-        "queue:add",
-        new URL(url).toString(),
-        userProfile.user_profile_id
-      );
+      socket.emit("queue:add", new URL(url).toString(), userProfile.account_id);
     } catch {
       setSearchBar("");
       setResult(null);
