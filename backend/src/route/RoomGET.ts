@@ -161,13 +161,11 @@ const useProcessRoom = async (
     (song) => song !== null
   );
 
-  let averageSongDuration = "0s";
+  let averageSongDuration = 0;
   if (playedSongs.length >= 1) {
-    averageSongDuration = (
-      (playedSongs.reduce((acc, song) => acc + song.duration, 0) /
-        playedSongs.length) *
-      1000
-    ).toString();
+    averageSongDuration =
+      playedSongs.reduce((acc, song) => acc + song.duration, 0) /
+      playedSongs.length;
   }
 
   const genresPlayCount = playedSongs
@@ -262,4 +260,7 @@ const query = () =>
     .from("rooms")
     .select(
       "*, room_users(*, profile(*, user_profile(*))), room_history(*, profile(*, user_profile(*))), streaming_services(*)"
-    );
+    )
+    .order("position", {
+      referencedTable: "room_history",
+    });
