@@ -18,7 +18,8 @@ export default function TrackItem(prop: {
   isMenuDisabled: boolean;
   handleDislike: () => void;
   disliked: boolean;
-  accountId: string | null;
+  addedBy: string;
+  accountId: string;
 }) {
   const {
     title,

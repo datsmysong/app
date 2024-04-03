@@ -5,8 +5,8 @@ import Room, { TypedSocket } from "./Room";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
-const sendQueue = (socket: TypedSocket, room: Room, userProfileId?: string) => {
-  socket.emit("queue:update", Room.toJSON(room), userProfileId);
+const sendQueue = (socket: TypedSocket, room: Room) => {
+  socket.emit("queue:update", Room.toJSON(room));
 };
 
 export default function onRoomWSConnection(socket: TypedSocket) {
