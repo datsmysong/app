@@ -31,6 +31,6 @@ export interface PlayedJSONTrack extends RoomJSONTrack {
 export interface RoomJSON {
   currentlyPlaying: PlayingJSONTrack | null;
   currentActiveRoom: string;
-  queue: JSONTrack[];
+  queue: RoomJSONTrack[];
   voteSkipActualTrack: string[];
 }

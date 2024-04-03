@@ -5,12 +5,13 @@ import ConnectWithGoogle from "./connect-with-google";
 import ConnectWithSpotify from "./connect-with-spotify";
 import Button from "../../components/Button";
 import Separator from "../../components/Separator";
+import H1 from "../../components/text/H1";
 
 export default function Onboarding() {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Datsmysong</Text>
+        <H1>datsmysong</H1>
       </View>
       <View
         style={[styles.container, { maxWidth: 400, alignItems: "stretch" }]}
@@ -45,10 +46,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
   },
   titleContainer: {
     marginVertical: 50,
