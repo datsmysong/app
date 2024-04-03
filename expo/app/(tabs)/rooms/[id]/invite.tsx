@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
 
 import Button from "../../../../components/Button";
+import CustomTextInput from "../../../../components/CustomTextInput";
 import { View } from "../../../../components/Themed";
 import { supabase } from "../../../../lib/supabase";
 
@@ -60,19 +61,26 @@ export default function InvitationModal() {
 
   return (
     <View style={styles.modalContent}>
-      <View style={styles.shareButtonsContainer}>
-        {isCopied ? (
-          <Button block prependIcon={<Check />}>
-            Lien copié
+      <View style={styles.shareOptions}>
+        <CustomTextInput
+          value={room?.code || "no code"}
+          style={styles.code}
+          disabled
+        />
+        <View style={styles.shareButtonsContainer}>
+          {isCopied ? (
+            <Button block prependIcon={<Check />}>
+              Lien copié
+            </Button>
+          ) : (
+            <Button block onPress={handleShare} prependIcon={<Share />}>
+              Copier le lien
+            </Button>
+          )}
+          <Button type="outline" icon={<QrCode />} href={`/rooms/${id}/qrcode`}>
+            Afficher le QR code
           </Button>
-        ) : (
-          <Button block onPress={handleShare} prependIcon={<Share />}>
-            Copier le lien
-          </Button>
-        )}
-        <Button type="outline" icon={<QrCode />} href={`/rooms/${id}/qrcode`}>
-          Afficher le QR code
-        </Button>
+        </View>
       </View>
       <Button block href={`/rooms/${id}`} prependIcon={<ArrowRight />}>
         Retour à la salle d'écoute
@@ -121,5 +129,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
     alignSelf: "stretch",
+  },
+  shareOptions: {
+    gap: 16,
+    flexDirection: "column",
+    maxWidth: 390,
+  },
+  code: {
+    textAlign: "center",
+    fontFamily: "Outfit-Bold",
+    borderRadius: 16,
+    borderWidth: 0,
   },
 });
