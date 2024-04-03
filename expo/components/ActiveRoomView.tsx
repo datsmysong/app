@@ -10,6 +10,7 @@ import {
   FlatList,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
 } from "react-native";
 
@@ -143,7 +144,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const networkStatus = useNetworkStatus();
 
   return (
-    <View
+    <ScrollView
       style={{
         paddingVertical: 32,
         paddingHorizontal: 12,
@@ -237,7 +238,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           </Button>
         </>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
