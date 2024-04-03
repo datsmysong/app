@@ -17,6 +17,6 @@ export type ProcessedRoom = {
   playedSongs: PlayedJSONTrack[];
   mostPlayedGenre: string;
   streamingService: StreamingService;
-  averageSongDuration: string;
+  averageSongDuration: number;
   createdAt: string;
 };
