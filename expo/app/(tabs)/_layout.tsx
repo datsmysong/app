@@ -59,99 +59,89 @@ export default function TabLayout() {
   if (!user) return <Redirect href="/auth/" />;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <IconContext.Provider
-        value={{
-          color: Colors.light.text,
-          size: 32,
-          weight: "regular",
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors.light.tabIconSelected,
+        tabBarInactiveTintColor: Colors.light.tabIconDefault,
+        tabBarStyle: {
+          height: 87,
+        },
+        tabBarLabelPosition: "below-icon",
+        tabBarIconStyle: {
+          minHeight: 32,
+          minWidth: 32,
+        },
+        tabBarItemStyle: {
+          flexDirection: "column",
+          height: 87,
+          display: "flex",
+          paddingHorizontal: 4,
+          paddingTop: 10,
+          gap: 10,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+      }}
+      backBehavior="initialRoute"
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Accueil",
+          tabBarLabel: (props) => <TabBarLabel {...props} />,
+          tabBarIcon: ({ color, focused }) => (
+            <HouseLine
+              color={color}
+              size={32}
+              weight={focused ? "fill" : "regular"}
+            />
+          ),
         }}
-      >
-        <Tabs
-          screenOptions={{
-            tabBarActiveTintColor: Colors.light.tabIconSelected,
-            tabBarInactiveTintColor: Colors.light.tabIconDefault,
-            tabBarStyle: {
-              height: 87,
-            },
-            tabBarLabelPosition: "below-icon",
-            tabBarIconStyle: {
-              minHeight: 32,
-              minWidth: 32,
-            },
-            tabBarItemStyle: {
-              flexDirection: "column",
-              height: 87,
-              display: "flex",
-              paddingHorizontal: 4,
-              paddingTop: 10,
-              gap: 10,
-              justifyContent: "center",
-              alignItems: "center",
-            },
-          }}
-          backBehavior="initialRoute"
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: "Accueil",
-              tabBarLabel: (props) => <TabBarLabel {...props} />,
-              tabBarIcon: ({ color, focused }) => (
-                <HouseLine
-                  color={color}
-                  size={32}
-                  weight={focused ? "fill" : "regular"}
-                />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="rooms"
-            options={{
-              title: "Salles",
-              headerShown: false,
-              tabBarLabel: (props) => <TabBarLabel {...props} />,
-              tabBarIcon: ({ color, focused }) => (
-                <MusicNote
-                  color={color}
-                  size={32}
-                  weight={focused ? "fill" : "regular"}
-                />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="Friends"
-            options={{
-              title: "Amis",
-              tabBarLabel: (props) => <TabBarLabel {...props} />,
-              tabBarIcon: ({ color, focused }) => (
-                <Users
-                  color={color}
-                  size={32}
-                  weight={focused ? "fill" : "regular"}
-                />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="profile"
-            options={{
-              title: "Profil",
-              headerShown: false,
-              tabBarLabel: (props) => <TabBarLabel {...props} />,
-              tabBarIcon: ({ color, focused }) => (
-                <User
-                  color={color}
-                  size={32}
-                  weight={focused ? "fill" : "regular"}
-                />
-              ),
-            }}
-          />
-        </Tabs>
-      </IconContext.Provider>
-    </SafeAreaView>
+      />
+      <Tabs.Screen
+        name="rooms"
+        options={{
+          title: "Salles",
+          headerShown: false,
+          tabBarLabel: (props) => <TabBarLabel {...props} />,
+          tabBarIcon: ({ color, focused }) => (
+            <MusicNote
+              color={color}
+              size={32}
+              weight={focused ? "fill" : "regular"}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Friends"
+        options={{
+          title: "Amis",
+          tabBarLabel: (props) => <TabBarLabel {...props} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Users
+              color={color}
+              size={32}
+              weight={focused ? "fill" : "regular"}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profil",
+          headerShown: false,
+          tabBarLabel: (props) => <TabBarLabel {...props} />,
+          tabBarIcon: ({ color, focused }) => (
+            <User
+              color={color}
+              size={32}
+              weight={focused ? "fill" : "regular"}
+            />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }

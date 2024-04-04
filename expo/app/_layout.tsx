@@ -1,11 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
+import { IconContext } from "phosphor-react-native/src/lib";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Text, View } from "../components/Themed";
+import Colors from "../constants/Colors";
 import { supabase } from "../lib/supabase";
 
 export const unstable_settings = {
@@ -79,16 +81,28 @@ function RootLayoutNav() {
           borderRadius: 40,
         }}
       >
-        <SafeAreaProvider>
-          <MenuProvider>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="auth" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-              <Stack.Screen name="ask-name" options={{ headerShown: false }} />
-            </Stack>
-          </MenuProvider>
-        </SafeAreaProvider>
+        <IconContext.Provider
+          value={{
+            color: Colors.light.text,
+            size: 32,
+            weight: "regular",
+          }}
+        >
+          <SafeAreaProvider
+            style={{ backgroundColor: Colors.light.background }}
+          >
+            <MenuProvider>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="auth" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="ask-name"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
+            </MenuProvider>
+          </SafeAreaProvider>
+        </IconContext.Provider>
       </View>
     </View>
   );
