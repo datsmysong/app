@@ -5,6 +5,7 @@ import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import User from "phosphor-react-native/src/icons/User";
 import Users from "phosphor-react-native/src/icons/Users";
 
+import { HomeTabHeader } from ".";
 import ApplicationLoadingScreen from "../../components/ApplicationLoadingScreen";
 import { Text } from "../../components/Tamed";
 import { View } from "../../components/Themed";
@@ -73,7 +74,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Accueil",
-          header: () => <View />,
+          header: () => <HomeTabHeader />,
           tabBarLabel: (props) => <TabBarLabel {...props} />,
           tabBarIcon: ({ color, focused }) => (
             <HouseLine
