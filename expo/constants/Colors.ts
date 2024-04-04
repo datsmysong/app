@@ -3,6 +3,8 @@ const fakeBlack = "#1A1A1A";
 
 export default {
   light: {
+    success: "#13863C",
+    danger: "#F33F33",
     text: fakeBlack,
     black: fakeBlack,
     background: "#f2f2f2",
