@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-import { ProfileHeader } from "../../../components/profile/HeaderProfil";
+import { ProfileHeader } from "../../../components/profile/HeaderProfile";
 
 export default function ProfileTabLayout() {
   return (

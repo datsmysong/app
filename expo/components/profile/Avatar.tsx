@@ -11,12 +11,12 @@ type AvatarProps = {
   id: string | undefined;
   tempoAvatarImage?: string; // if we want to pass an image url directly (on edit profile)
   style?: StyleProp<ImageStyle>;
-  noCaches?: boolean;
+  noCache?: boolean;
   radius?: number;
 };
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
-  ({ id, tempoAvatarImage, noCaches, radius = 5 }, ref) => {
+  ({ id, tempoAvatarImage, noCache, radius = 9999 }, ref) => {
     const [avatarUrl, setAvatarUrl] = useState<string>();
 
     useImperativeHandle(ref, () => ({
@@ -32,7 +32,7 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
 
     async function downloadUserImage() {
       let path = `${id}.jpg`;
-      if (noCaches) path += "?avoidCache=" + Math.random();
+      if (noCache) path += "?avoidCache=" + Math.random();
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
 
       setAvatarUrl(data.publicUrl);

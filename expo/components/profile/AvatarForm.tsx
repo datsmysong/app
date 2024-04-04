@@ -93,7 +93,7 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
           id={user?.user_profile_id}
           ref={avatarRef}
           tempoAvatarImage={avatarUrl}
-          noCaches
+          noCache
         />
       </Pressable>
       <Button

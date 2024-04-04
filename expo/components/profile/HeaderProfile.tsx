@@ -3,21 +3,20 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import Avatar from "./Avatar";
+import Colors from "../../constants/Colors";
+import Font from "../../constants/Font";
 import { supabase } from "../../lib/supabase";
 import { Profile } from "../../lib/types";
-import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 import { useUserProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { Text } from "../Themed";
 import H1 from "../text/H1";
 
 export const ProfileHeader = () => {
-  const user = useSupabaseUserHook();
   const userProfile = useUserProfile();
   const [profile, setProfile] = useState<Profile | null>();
 
   useEffect(() => {
-    if (!user) return;
     if (!userProfile) return;
 
     const fetchProfile = async () => {
@@ -32,7 +31,7 @@ export const ProfileHeader = () => {
       setProfile(data);
     };
     fetchProfile();
-  }, [user, userProfile]);
+  }, [userProfile]);
 
   return (
     <View
@@ -72,11 +71,7 @@ export const ProfileHeader = () => {
         }}
       >
         <View style={{ width: 40 }}>
-          <Avatar
-            id={userProfile ? userProfile.user_profile_id : ""}
-            radius={90}
-            noCaches
-          />
+          <Avatar id={userProfile ? userProfile.user_profile_id : ""} />
         </View>
         <View style={profileStyles.personalityView}>
           <Text style={profileStyles.username}>
@@ -96,12 +91,12 @@ const profileStyles = StyleSheet.create({
   },
   username: {
     fontSize: 16,
-    fontWeight: "bold",
-    fontFamily: "Outfit-Regular",
+    fontFamily: Font.Outfit.Medium,
+    letterSpacing: 0.32,
   },
   nickname: {
     fontSize: 14,
-    fontFamily: "Outfit-Regular",
-    color: "#B2B2B2",
+    fontFamily: Font.Outfit.Regular,
+    color: Colors.light.gray,
   },
 });

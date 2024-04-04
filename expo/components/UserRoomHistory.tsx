@@ -5,6 +5,7 @@ import { FlatList, StyleSheet } from "react-native";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { Text, View } from "./Themed";
 import H2 from "./text/H2";
+import Colors from "../constants/Colors";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
 
@@ -54,7 +55,7 @@ export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
           style={{
             fontFamily: "Outfit-Regular",
             fontSize: 16,
-            color: "#B2B2B2",
+            color: Colors.light.gray,
           }}
         >
           Vous n'avez aucune salle dans votre historique
