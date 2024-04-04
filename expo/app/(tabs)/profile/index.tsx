@@ -7,8 +7,8 @@ export default function TabsProfile() {
   return (
     <ScrollView
       contentContainerStyle={{
-        paddingVertical: 18,
-        paddingHorizontal: 32,
+        paddingVertical: 32,
+        paddingHorizontal: 18,
       }}
     >
       <UserRoomHistory limit={10} />

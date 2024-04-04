@@ -1,49 +1,82 @@
-import { Room } from "commons/database-types-utils";
+import { QueryData } from "@supabase/supabase-js/dist/module/lib/types";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
-import Alert from "./Alert";
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
-import { View } from "./Themed";
+import { Text, View } from "./Themed";
 import H2 from "./text/H2";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
 
+const historyRoom = supabase
+  .from("room_users")
+  .select("rooms!inner(created_at, name,id, host:user_profile(username))");
+
+type historyRoomType = QueryData<typeof historyRoom>;
+
 export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<historyRoomType | null>([]);
   const user = useUserProfile();
 
   useEffect(() => {
-    (async () => {
-      if (!user) return;
-      const userId = user.user_profile_id;
-
-      const { error, data } = await supabase
-        .from("rooms")
-        .select("*, room_users(*)")
-        .eq("room_users.profile_id", userId)
-        .eq("is_active", false)
-        .order("created_at", { ascending: false })
+    if (!user) return;
+    /**
+     * Fetch all rooms where user is a member and the room is not active
+     * Tips : If the filter on a referenced table's column is not satisfied, the referenced
+     * table returns [] or null but the parent table is not filtered out.
+     * If you want to filter out the parent table rows, use the !inner hint
+     */
+    const fetchRoomHistory = async () => {
+      const { data } = await supabase
+        .from("room_users")
+        .select(
+          "rooms!inner(created_at, name, id, host:user_profile(username))"
+        )
+        .eq("rooms.is_active", false)
+        .eq("profile_id", user.user_profile_id)
+        .order("rooms(created_at)", { ascending: false })
         .limit(limit);
 
-      if (error) {
-        return Alert.alert(
-          "Erreur lors de la récupération des salles d'écoute"
-        );
+      if (!data || data.length === 0) {
+        return setRooms(null);
       }
 
       setRooms(data);
-    })();
+    };
+    fetchRoomHistory();
   }, [user]);
 
   return (
     <View style={{ gap: 10 }}>
       <H2>Historique</H2>
+      {rooms == null && (
+        <Text
+          style={{
+            fontFamily: "Outfit-Regular",
+            fontSize: 16,
+            color: "#B2B2B2",
+          }}
+        >
+          Vous n'avez aucune salle dans votre historique
+        </Text>
+      )}
       <FlatList
         data={rooms}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.rooms?.id ?? ""}
         renderItem={({ item }) => {
-          return <RoomHistoryInfoCard room={item} />;
+          if (!item.rooms)
+            return <Text>Impossible de charger cette salle</Text>;
+          return (
+            <RoomHistoryInfoCard
+              createdAt={item.rooms.created_at}
+              hostUsername={
+                item.rooms.host?.username ??
+                "Impossible de récupérer le nom de l'hôte"
+              }
+              roomId={item.rooms.id}
+              roomName={item.rooms.name}
+            />
+          );
         }}
       />
     </View>
