@@ -1,5 +1,4 @@
 import { ImageStyle } from "expo-image";
-import User from "phosphor-react-native/src/regular/User";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Image, StyleProp, StyleSheet, View } from "react-native";
 
@@ -12,10 +11,12 @@ type AvatarProps = {
   id: string | undefined;
   tempoAvatarImage?: string; // if we want to pass an image url directly (on edit profile)
   style?: StyleProp<ImageStyle>;
+  noCache?: boolean;
+  radius?: number;
 };
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
-  ({ id, tempoAvatarImage, style }, ref) => {
+  ({ id, tempoAvatarImage, noCache, radius = 9999, style }, ref) => {
     const [avatarUrl, setAvatarUrl] = useState<string>();
 
     useImperativeHandle(ref, () => ({
@@ -30,35 +31,43 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
     }, [id]);
 
     async function downloadUserImage() {
-      const path = `${id}.jpg`;
-      const { data } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(path + "?avoidCache=" + Math.random());
+      let path = `${id}.jpg`;
+      if (noCache) path += "?avoidCache=" + Math.random();
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
 
       setAvatarUrl(data.publicUrl);
     }
 
-    if (avatarUrl) {
-      return (
-        <Image
-          source={{ uri: tempoAvatarImage ?? avatarUrl }}
-          aria-aria-label="Avatar"
-          style={[styles.avatar, styles.image, style]}
-        />
-      );
-    } else {
-      return (
-        <View style={[styles.avatar, styles.noImage, style]}>
-          <User />
-        </View>
-      );
-    }
+    return (
+      <>
+        {avatarUrl ? (
+          <Image
+            source={{ uri: tempoAvatarImage ?? avatarUrl }}
+            aria-aria-label="Avatar"
+            style={[
+              { borderRadius: radius },
+              styles.avatar,
+              styles.image,
+              style,
+            ]}
+          />
+        ) : (
+          <View
+            style={[
+              { borderRadius: radius },
+              styles.avatar,
+              styles.noImage,
+              style,
+            ]}
+          />
+        )}
+      </>
+    );
   }
 );
 
 const styles = StyleSheet.create({
   avatar: {
-    borderRadius: 9999,
     overflow: "hidden",
     maxWidth: "100%",
     aspectRatio: 1,

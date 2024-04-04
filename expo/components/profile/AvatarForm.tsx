@@ -6,7 +6,7 @@ import { Alert, Platform, Pressable, View } from "react-native";
 
 import Avatar, { AvatarRemote } from "./Avatar";
 import { supabase } from "../../lib/supabase";
-import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
+import { useUserProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { formStyles } from "../ControlledInput";
 import { Text } from "../Themed";
@@ -21,7 +21,7 @@ interface AvatarProps {
  */
 const AvatarForm = forwardRef((props: AvatarProps, ref) => {
   const { onImageLoad } = props;
-  const user = useSupabaseUserHook();
+  const user = useUserProfile();
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
@@ -41,7 +41,8 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
         error: "No user or avatar",
       };
     }
-    const fileName = `${user.id}.jpg`;
+
+    const fileName = `${user.user_profile_id}.jpg`;
     const image = await getBase64Image(avatarUrl);
 
     const { error } = await supabase.storage
@@ -64,7 +65,7 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
 
   async function selectAvatar() {
     if (!user) return;
-    setUploading(true);
+    // setUploading(true);
 
     const file = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -81,14 +82,19 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
       setAvatarUrl(image.uri);
       onImageLoad();
     }
-    setUploading(false);
+    // setUploading(false);
   }
 
   return (
     <View style={{ width: "100%", gap: 10 }}>
       <Text style={formStyles.label}>Photo de profil</Text>
       <Pressable onPress={selectAvatar}>
-        <Avatar id={user?.id} ref={avatarRef} tempoAvatarImage={avatarUrl} />
+        <Avatar
+          id={user?.user_profile_id}
+          ref={avatarRef}
+          tempoAvatarImage={avatarUrl}
+          noCache
+        />
       </Pressable>
       <Button
         onPress={selectAvatar}
@@ -110,12 +116,11 @@ const getBase64Image = async (uri: string) => {
     const uriWithoutMIME = uri.split(",")[1];
     const base64data = decode(uriWithoutMIME);
     return base64data;
-  } else {
-    // "uri": "file:///data/user/0/host.exp.exponent/cache/DocumentPicker/189be1eb-08a5-4bcb-8001-28aafd0febd6.jpg"}],
-    const fileUri = uri;
-    const base64Data = await FileSystem.readAsStringAsync(fileUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    return decode(base64Data);
   }
+
+  const fileUri = uri;
+  const base64Data = await FileSystem.readAsStringAsync(fileUri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  return decode(base64Data);
 };

@@ -1,34 +1,17 @@
-import SignOut from "phosphor-react-native/src/icons/SignOut";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { ScrollView } from "react-native";
 
-import Button from "../../../components/Button";
-import { View } from "../../../components/Tamed";
-import { supabase } from "../../../lib/supabase";
-import { useSupabaseUserHook } from "../../../lib/useSupabaseUser";
+import UserRoomHistory from "../../../components/UserRoomHistory";
 
 export default function TabsProfile() {
-  const user = useSupabaseUserHook();
-
   return (
-    <>
-      {user && (
-        <View style={styles.elements}>
-          <Button
-            prependIcon={<SignOut />}
-            onPress={() => supabase.auth.signOut()}
-          >
-            Se déconnecter
-          </Button>
-          <Button href="/(tabs)/profile/account">Gérer mon compte</Button>
-        </View>
-      )}
-    </>
+    <ScrollView
+      contentContainerStyle={{
+        paddingVertical: 32,
+        paddingHorizontal: 18,
+      }}
+    >
+      <UserRoomHistory limit={10} />
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  elements: {
-    gap: 10,
-  },
-});

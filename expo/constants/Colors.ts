@@ -11,5 +11,6 @@ export default {
     tint: tintColorLight,
     tabIconDefault: fakeBlack,
     tabIconSelected: fakeBlack,
+    gray: "#B2B2B2",
   },
 };
