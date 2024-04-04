@@ -2,7 +2,7 @@ import * as Linking from "expo-linking";
 import { Redirect, Stack, useRootNavigation, useRouter } from "expo-router";
 import { useEffect } from "react";
 
-import { Text, View } from "../../components/Themed";
+import ApplicationLoadingScreen from "../../components/ApplicationLoadingScreen";
 import { supabase } from "../../lib/supabase";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
@@ -40,12 +40,7 @@ export default function TabLayout() {
     })();
   }, [url]);
 
-  if (user === undefined)
-    return (
-      <View>
-        <Text>Loading..</Text>
-      </View>
-    );
+  if (user === undefined) return <ApplicationLoadingScreen />;
 
   if (user) return <Redirect href="/(tabs)/" />;
 

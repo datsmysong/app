@@ -4,8 +4,8 @@ import HouseLine from "phosphor-react-native/src/icons/HouseLine";
 import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import User from "phosphor-react-native/src/icons/User";
 import Users from "phosphor-react-native/src/icons/Users";
-import { ActivityIndicator } from "react-native";
 
+import ApplicationLoadingScreen from "../../components/ApplicationLoadingScreen";
 import { Text } from "../../components/Tamed";
 import { View } from "../../components/Themed";
 import FriendHeader from "../../components/headers/FriendHeader";
@@ -38,22 +38,7 @@ export default function TabLayout() {
 
   const user = useSupabaseUserHook();
 
-  if (user === undefined)
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 16,
-        }}
-      >
-        <ActivityIndicator size={64} color={Colors.light.text} />
-        <Text style={{ textAlign: "center" }}>
-          Chargement de l'application en cours...
-        </Text>
-      </View>
-    );
+  if (user === undefined) return <ApplicationLoadingScreen />;
 
   if (!user) return <Redirect href="/auth/" />;
 
@@ -88,6 +73,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Accueil",
+          header: () => <View />,
           tabBarLabel: (props) => <TabBarLabel {...props} />,
           tabBarIcon: ({ color, focused }) => (
             <HouseLine
