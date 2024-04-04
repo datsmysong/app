@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import Font from "../../constants/Font";
 import H1 from "../text/H1";
 
 export default function FriendHeader() {
@@ -39,7 +40,14 @@ export default function FriendHeader() {
             borderRadius: 5,
           }}
         />
-        <Text>0 amis en ligne</Text>
+        <Text
+          style={{
+            fontFamily: Font.Unbounded.Regular,
+            fontSize: 14,
+          }}
+        >
+          0 amis en ligne
+        </Text>
       </View>
     </View>
   );

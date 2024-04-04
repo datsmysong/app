@@ -13,6 +13,7 @@ export default function TabsFriends() {
         alignItems: "center",
         flexDirection: "column",
         padding: 32,
+        gap: 16,
       }}
     >
       <Hammer size={32} weight="fill" color="black" />
