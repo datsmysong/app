@@ -9,7 +9,7 @@ export default {
     black: fakeBlack,
     background: "#f2f2f2",
     tint: tintColorLight,
-    tabIconDefault: "#ccc",
-    tabIconSelected: tintColorLight,
+    tabIconDefault: fakeBlack,
+    tabIconSelected: fakeBlack,
   },
 };

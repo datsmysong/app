@@ -69,8 +69,8 @@ export default function TabLayout() {
       >
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: Colors.light.black,
-            tabBarInactiveTintColor: Colors.light.black,
+            tabBarActiveTintColor: Colors.light.tabIconSelected,
+            tabBarInactiveTintColor: Colors.light.tabIconDefault,
             tabBarStyle: {
               height: 87,
             },
@@ -96,13 +96,13 @@ export default function TabLayout() {
             name="index"
             options={{
               title: "Accueil",
-              tabBarLabel: ({ color, focused, children }) => (
-                <TabBarLabel color={color} focused={focused}>
-                  {children}
-                </TabBarLabel>
-              ),
+              tabBarLabel: (props) => <TabBarLabel {...props} />,
               tabBarIcon: ({ color, focused }) => (
-                <HouseLine size={32} weight={focused ? "fill" : "regular"} />
+                <HouseLine
+                  color={color}
+                  size={32}
+                  weight={focused ? "fill" : "regular"}
+                />
               ),
             }}
           />
@@ -111,13 +111,13 @@ export default function TabLayout() {
             options={{
               title: "Salles",
               headerShown: false,
-              tabBarLabel: ({ color, focused, children }) => (
-                <TabBarLabel color={color} focused={focused}>
-                  {children}
-                </TabBarLabel>
-              ),
+              tabBarLabel: (props) => <TabBarLabel {...props} />,
               tabBarIcon: ({ color, focused }) => (
-                <MusicNote size={32} weight={focused ? "fill" : "regular"} />
+                <MusicNote
+                  color={color}
+                  size={32}
+                  weight={focused ? "fill" : "regular"}
+                />
               ),
             }}
           />
@@ -125,13 +125,13 @@ export default function TabLayout() {
             name="Friends"
             options={{
               title: "Amis",
-              tabBarLabel: ({ color, focused, children }) => (
-                <TabBarLabel color={color} focused={focused}>
-                  {children}
-                </TabBarLabel>
-              ),
+              tabBarLabel: (props) => <TabBarLabel {...props} />,
               tabBarIcon: ({ color, focused }) => (
-                <Users size={32} weight={focused ? "fill" : "regular"} />
+                <Users
+                  color={color}
+                  size={32}
+                  weight={focused ? "fill" : "regular"}
+                />
               ),
             }}
           />
@@ -140,13 +140,13 @@ export default function TabLayout() {
             options={{
               title: "Profil",
               headerShown: false,
-              tabBarLabel: ({ color, focused, children }) => (
-                <TabBarLabel color={color} focused={focused}>
-                  {children}
-                </TabBarLabel>
-              ),
+              tabBarLabel: (props) => <TabBarLabel {...props} />,
               tabBarIcon: ({ color, focused }) => (
-                <User size={32} weight={focused ? "fill" : "regular"} />
+                <User
+                  color={color}
+                  size={32}
+                  weight={focused ? "fill" : "regular"}
+                />
               ),
             }}
           />
