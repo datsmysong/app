@@ -8,6 +8,7 @@ import { ActivityIndicator } from "react-native";
 
 import { Text } from "../../components/Tamed";
 import { View } from "../../components/Themed";
+import FriendHeader from "../../components/headers/FriendHeader";
 import Colors from "../../constants/Colors";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
 
@@ -113,10 +114,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Friends"
+        name="friends"
         options={{
           title: "Amis",
           tabBarLabel: (props) => <TabBarLabel {...props} />,
+          header: () => <FriendHeader />,
           tabBarIcon: ({ color, focused }) => (
             <Users
               color={color}
