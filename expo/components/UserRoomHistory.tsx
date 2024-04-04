@@ -3,20 +3,20 @@ import { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
-import { Text, View } from "./Themed";
+import { View } from "./Themed";
 import H2 from "./text/H2";
-import Colors from "../constants/Colors";
+import Subtitle from "./text/Subtitle";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
 
 const historyRoom = supabase
   .from("room_users")
-  .select("rooms!inner(created_at, name,id, host:user_profile(username))");
+  .select("rooms!inner(created_at, name, id, host:user_profile(username))");
 
-type historyRoomType = QueryData<typeof historyRoom>;
+type HistoryRoomType = QueryData<typeof historyRoom>;
 
 export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
-  const [rooms, setRooms] = useState<historyRoomType | null>([]);
+  const [rooms, setRooms] = useState<HistoryRoomType | null>([]);
   const user = useUserProfile();
 
   useEffect(() => {
@@ -47,26 +47,25 @@ export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
     fetchRoomHistory();
   }, [user]);
 
+  if (rooms) {
+    const everyoneHaveRoom = rooms.every((room) => room.rooms);
+    const everyoneHaveId = rooms.every((room) => room.rooms?.name);
+    if (!everyoneHaveId || !everyoneHaveRoom)
+      return <Subtitle>Impossible de charger l'historique des salles</Subtitle>;
+  }
+
   return (
     <View style={{ gap: 10 }}>
       <H2>Historique</H2>
       {rooms == null && (
-        <Text
-          style={{
-            fontFamily: "Outfit-Regular",
-            fontSize: 16,
-            color: Colors.light.gray,
-          }}
-        >
-          Vous n'avez aucune salle dans votre historique
-        </Text>
+        <Subtitle>Vous n'avez aucune salle dans votre historique</Subtitle>
       )}
       <FlatList
         data={rooms}
-        keyExtractor={(item) => item.rooms?.id ?? ""}
+        keyExtractor={(item) => item.rooms!.id}
         renderItem={({ item }) => {
           if (!item.rooms)
-            return <Text>Impossible de charger cette salle</Text>;
+            return <Subtitle>Impossible de charger cette salle</Subtitle>;
           return (
             <RoomHistoryInfoCard
               createdAt={item.rooms.created_at}
@@ -83,11 +82,3 @@ export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    fontFamily: "Outfit-Bold",
-    fontSize: 24,
-    marginBottom: 10,
-  },
-});

@@ -16,7 +16,7 @@ type AvatarProps = {
 };
 
 const Avatar = forwardRef<AvatarRemote, AvatarProps>(
-  ({ id, tempoAvatarImage, noCache, radius = 9999 }, ref) => {
+  ({ id, tempoAvatarImage, noCache, radius = 9999, style }, ref) => {
     const [avatarUrl, setAvatarUrl] = useState<string>();
 
     useImperativeHandle(ref, () => ({
@@ -45,17 +45,19 @@ const Avatar = forwardRef<AvatarRemote, AvatarProps>(
             source={{ uri: tempoAvatarImage ?? avatarUrl }}
             aria-aria-label="Avatar"
             style={[
-              { aspectRatio: 1, width: "100%", borderRadius: radius },
+              { borderRadius: radius },
               styles.avatar,
               styles.image,
+              style,
             ]}
           />
         ) : (
           <View
             style={[
-              { aspectRatio: 1, width: "100%", borderRadius: radius },
+              { borderRadius: radius },
               styles.avatar,
               styles.noImage,
+              style,
             ]}
           />
         )}
@@ -79,6 +81,7 @@ const styles = StyleSheet.create({
   noImage: {
     backgroundColor: "red",
     border: "1px solid rgb(200, 200, 200)",
+    borderRadius: 5,
   },
 });
 

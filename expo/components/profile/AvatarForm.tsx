@@ -65,7 +65,7 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
 
   async function selectAvatar() {
     if (!user) return;
-    setUploading(true);
+    // setUploading(true);
 
     const file = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -82,7 +82,7 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
       setAvatarUrl(image.uri);
       onImageLoad();
     }
-    setUploading(false);
+    // setUploading(false);
   }
 
   return (
@@ -98,7 +98,7 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
       </Pressable>
       <Button
         onPress={selectAvatar}
-        // disabled={uploading}
+        disabled={uploading}
         block
         type="outline"
         size="small"
@@ -116,12 +116,11 @@ const getBase64Image = async (uri: string) => {
     const uriWithoutMIME = uri.split(",")[1];
     const base64data = decode(uriWithoutMIME);
     return base64data;
-  } else {
-    // "uri": "file:///data/user/0/host.exp.exponent/cache/DocumentPicker/189be1eb-08a5-4bcb-8001-28aafd0febd6.jpg"}],
-    const fileUri = uri;
-    const base64Data = await FileSystem.readAsStringAsync(fileUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    return decode(base64Data);
   }
+
+  const fileUri = uri;
+  const base64Data = await FileSystem.readAsStringAsync(fileUri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  return decode(base64Data);
 };
