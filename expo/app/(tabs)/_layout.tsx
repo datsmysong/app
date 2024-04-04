@@ -4,9 +4,7 @@ import HouseLine from "phosphor-react-native/src/icons/HouseLine";
 import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import User from "phosphor-react-native/src/icons/User";
 import Users from "phosphor-react-native/src/icons/Users";
-import { IconContext } from "phosphor-react-native/src/lib";
 import { ActivityIndicator } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Text } from "../../components/Tamed";
 import { View } from "../../components/Themed";
@@ -65,6 +63,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors.light.tabIconDefault,
         tabBarStyle: {
           height: 87,
+          overflow: "hidden",
         },
         tabBarLabelPosition: "below-icon",
         tabBarIconStyle: {
