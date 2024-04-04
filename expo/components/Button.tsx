@@ -11,15 +11,16 @@ import {
 } from "react-native";
 
 import { Text } from "./Tamed";
+import Colors from "../constants/Colors";
 
 const BUTTON_COLORS = ["primary", "success", "danger"] as const;
 
 type ButtonColor = (typeof BUTTON_COLORS)[number];
 
 const COLOR_PALETTE: Record<ButtonColor, string> = {
-  primary: "#1A1A1A",
-  success: "#13863C",
-  danger: "#F33F33",
+  primary: Colors.light.text,
+  success: Colors.light.success,
+  danger: Colors.light.danger,
 };
 
 export type ButtonProps = {
