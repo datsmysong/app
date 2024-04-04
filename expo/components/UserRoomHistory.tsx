@@ -15,7 +15,11 @@ const historyRoom = supabase
 
 type HistoryRoomType = QueryData<typeof historyRoom>;
 
-export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
+type RoomHistoryListProps = {
+  limit?: number;
+};
+
+export function RoomHistoryList({ limit = 5 }: RoomHistoryListProps) {
   const [rooms, setRooms] = useState<HistoryRoomType | null>([]);
   const user = useUserProfile();
 
@@ -47,7 +51,9 @@ export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
     fetchRoomHistory();
   }, [user]);
 
-  if (rooms) {
+  if (rooms == null) {
+    return <Subtitle>Vous n'avez aucune salle dans votre historique</Subtitle>;
+  } else {
     const everyoneHaveRoom = rooms.every((room) => room.rooms);
     const everyoneHaveId = rooms.every((room) => room.rooms?.name);
     if (!everyoneHaveId || !everyoneHaveRoom)
@@ -55,30 +61,33 @@ export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
   }
 
   return (
+    <FlatList
+      data={rooms}
+      keyExtractor={(item) => item.rooms!.id}
+      renderItem={({ item }) => {
+        if (!item.rooms)
+          return <Subtitle>Impossible de charger cette salle</Subtitle>;
+        return (
+          <RoomHistoryInfoCard
+            createdAt={item.rooms.created_at}
+            hostUsername={
+              item.rooms.host?.username ??
+              "Impossible de récupérer le nom de l'hôte"
+            }
+            roomId={item.rooms.id}
+            roomName={item.rooms.name}
+          />
+        );
+      }}
+    />
+  );
+}
+
+export default function UserRoomHistory({ limit = 5 }: { limit?: number }) {
+  return (
     <View style={{ gap: 10 }}>
       <H2>Historique</H2>
-      {rooms == null && (
-        <Subtitle>Vous n'avez aucune salle dans votre historique</Subtitle>
-      )}
-      <FlatList
-        data={rooms}
-        keyExtractor={(item) => item.rooms!.id}
-        renderItem={({ item }) => {
-          if (!item.rooms)
-            return <Subtitle>Impossible de charger cette salle</Subtitle>;
-          return (
-            <RoomHistoryInfoCard
-              createdAt={item.rooms.created_at}
-              hostUsername={
-                item.rooms.host?.username ??
-                "Impossible de récupérer le nom de l'hôte"
-              }
-              roomId={item.rooms.id}
-              roomName={item.rooms.name}
-            />
-          );
-        }}
-      />
+      <RoomHistoryList limit={limit} />
     </View>
   );
 }

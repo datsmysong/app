@@ -5,7 +5,7 @@ import { View as NativeView, ScrollView } from "react-native";
 
 import Button from "../../components/Button";
 import { View } from "../../components/Themed";
-import UserRoomHistory from "../../components/UserRoomHistory";
+import { RoomHistoryList } from "../../components/UserRoomHistory";
 import H1 from "../../components/text/H1";
 import H2 from "../../components/text/H2";
 import { useUserProfile } from "../../lib/userProfile";
@@ -34,7 +34,9 @@ export default function HomeTab() {
           <ClockCounterClockwise />
           <H2>Votre dernière salle</H2>
         </View>
-        <UserRoomHistory />
+        <View style={{ width: "100%" }}>
+          <RoomHistoryList limit={1} />
+        </View>
       </View>
     </ScrollView>
   );
