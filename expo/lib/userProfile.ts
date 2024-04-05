@@ -1,14 +1,20 @@
-import { PostgrestError, User } from "@supabase/supabase-js";
-import { UserProfile } from "commons/database-types-utils";
+import { PostgrestError, QueryData, User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 import { supabase } from "./supabase";
 import { useSupabaseUserHook } from "./useSupabaseUser";
 
+const userProfileQuery = supabase
+  .from("user_profile")
+  .select("*, profile(*)")
+  .single();
+
+type UserProfileQueryResponse = QueryData<typeof userProfileQuery>;
+
 export const getUserProfile = async (id: string) => {
   const { data, error } = await supabase
     .from("user_profile")
-    .select("*")
+    .select("*, profile(*)")
     .eq("account_id", id)
     .single();
   if (error) {
@@ -30,7 +36,7 @@ export const getUserProfileFromUserProfileId = async (id: string) => {
 };
 
 export function useUserProfile() {
-  const [profile, setProfile] = useState<UserProfile | null>();
+  const [profile, setProfile] = useState<UserProfileQueryResponse | null>();
   const user = useSupabaseUserHook();
 
   useEffect(() => {
