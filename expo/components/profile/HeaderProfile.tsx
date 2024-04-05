@@ -1,13 +1,10 @@
 import User from "phosphor-react-native/src/bold/User";
-import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import Avatar from "./Avatar";
 import Colors from "../../constants/Colors";
 import Font from "../../constants/Font";
-import { supabase } from "../../lib/supabase";
-import { Profile } from "../../lib/types";
-import { useUserFullProfile, useUserProfile } from "../../lib/userProfile";
+import { useUserFullProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { Text } from "../Themed";
 import H1 from "../text/H1";
@@ -41,7 +38,7 @@ export const ProfileHeader = () => {
             size="small"
             prependIcon={<User />}
           >
-            Gérer mon compte
+            Mon compte
           </Button>
         </View>
       </View>
@@ -57,11 +54,9 @@ export const ProfileHeader = () => {
         </View>
         <View style={profileStyles.personalityView}>
           <Text style={profileStyles.username}>
-            {profile ? profile.username : "chargement"}
+            {profile?.profile ? profile.profile?.nickname : "chargement"}
           </Text>
-          <Text style={profileStyles.nickname}>
-            @{profile?.profile?.nickname}
-          </Text>
+          <Text style={profileStyles.nickname}>@{profile?.username}</Text>
         </View>
       </View>
     </View>
