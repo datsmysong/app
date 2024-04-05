@@ -7,7 +7,7 @@ import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Text, View } from "../components/Themed";
-import { HeaderAccount } from "../components/headers/HeaderAccount";
+import { AccountHeader } from "../components/headers/AccountHeader";
 import Colors from "../constants/Colors";
 import { supabase } from "../lib/supabase";
 
@@ -98,7 +98,7 @@ function RootLayoutNav() {
                 <Stack.Screen name="auth" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="ask-name"
-                  options={{ header: () => <HeaderAccount /> }}
+                  options={{ header: () => <AccountHeader /> }}
                 />
               </Stack>
             </MenuProvider>
