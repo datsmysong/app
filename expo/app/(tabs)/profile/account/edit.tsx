@@ -13,14 +13,19 @@ import {
   AuthErrorMessage,
   SupabaseErrorCode,
 } from "../../../../constants/SupabaseErrorCode";
-import { emailRules, usernameRules } from "../../../../lib/inputRestriction";
+import {
+  displayNameRules,
+  emailRules,
+  usernameRules,
+} from "../../../../lib/inputRestriction";
 import { supabase } from "../../../../lib/supabase";
 import { useSupabaseUserHook } from "../../../../lib/useSupabaseUser";
-import { getUserProfile } from "../../../../lib/userProfile";
+import { useUserFullProfile } from "../../../../lib/userProfile";
 
 type EditForm = {
   email: string;
   username: string;
+  displayName: string;
 };
 
 export default function PersonalInfo() {
@@ -34,11 +39,16 @@ export default function PersonalInfo() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const [initialUsername, setInitialUsername] = useState<string | null>(null);
+  const [initialDisplayName, setInitialDisplayname] = useState<string | null>(
+    null
+  );
   const [profilePictureChanged, setProfilePictureChanged] =
     useState<boolean>(false);
   const [submittable, setSubmittable] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [emailDisabled, setEmailDisabled] = useState<boolean>(false);
+
+  const profile = useUserFullProfile();
 
   const {
     control,
@@ -51,28 +61,43 @@ export default function PersonalInfo() {
     defaultValues: {
       email: "",
       username: "",
+      displayName: "",
     },
     shouldFocusError: true,
   });
 
   const inputsChange = watch();
+
   useEffect(() => {
     if (user && user.email) {
       if (user.app_metadata.provider !== "email") setEmailDisabled(true);
       setValue("email", user.email);
-      getUserProfile(user.id).then((profile) => {
-        if (profile && profile.username) {
-          setValue("username", profile.username);
-          setInitialUsername(profile.username);
-        }
-      });
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    if (!profile.profile || !profile.username) {
+      return setError("root", {
+        message: "Impossible de récupérer vos données",
+      });
+    }
+    const displayName: string = profile.profile.nickname;
+    setValue("displayName", displayName);
+    setInitialDisplayname(displayName);
+
+    const username: string = profile.username;
+    setValue("username", username);
+    setInitialUsername(username);
+  }, [profile]);
 
   useEffect(() => {
     if (inputsChange.email !== user?.email) return setSubmittable(true);
     if (inputsChange.username !== initialUsername) return setSubmittable(true);
     if (profilePictureChanged) return setSubmittable(true);
+    if (inputsChange.displayName !== initialDisplayName)
+      return setSubmittable(true);
 
     setSubmittable(false);
   }, [inputsChange]);
@@ -130,7 +155,40 @@ export default function PersonalInfo() {
     return "Pseudo mis à jour";
   };
 
-  const onSubmit = async ({ email, username }: EditForm) => {
+  /**
+   * Update display name
+   * @param displayName
+   * @returns string if success, undefined if error
+   */
+  const updateDisplayName = async (
+    displayName: string
+  ): Promise<string | undefined> => {
+    if (!profile || !profile.profile?.id) return;
+    const { error } = await supabase
+      .from("profile")
+      .update({
+        nickname: inputsChange.displayName,
+      })
+      .eq("id", profile.profile?.id);
+
+    if (error) {
+      setError("displayName", {
+        message: "Impossible de mettre à jour le nom d'affichage",
+      });
+      return;
+    }
+    setInitialDisplayname(displayName);
+    setValue("displayName", displayName);
+
+    return "Pseudo mis à jour";
+  };
+
+  /**
+   * Possible to upgrade with parallel requests
+   * @param inputs
+   * @returns
+   */
+  const onSubmit = async ({ email, username, displayName }: EditForm) => {
     const validationResum: string[] = [];
 
     if (inputsChange.email !== user?.email) {
@@ -140,6 +198,11 @@ export default function PersonalInfo() {
 
     if (inputsChange.username !== initialUsername) {
       const res = await updateUsername(username);
+      if (res) validationResum.push(res);
+    }
+
+    if (inputsChange.displayName !== initialDisplayName) {
+      const res = await updateDisplayName(displayName);
       if (res) validationResum.push(res);
     }
 
@@ -193,6 +256,15 @@ export default function PersonalInfo() {
             placeholder="@nouveau_nom"
             rules={usernameRules}
             errorMessage={errors.username && errors.username.message}
+            info="Le nom d'utilisateur doit être unique"
+          />
+          <ControlledInput
+            control={control}
+            label="Nom public"
+            name="displayName"
+            placeholder="maxouxax"
+            rules={displayNameRules}
+            errorMessage={errors.displayName && errors.displayName.message}
           />
           <ErrorBoundary
             fallback={

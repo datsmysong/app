@@ -7,31 +7,13 @@ import Colors from "../../constants/Colors";
 import Font from "../../constants/Font";
 import { supabase } from "../../lib/supabase";
 import { Profile } from "../../lib/types";
-import { useUserProfile } from "../../lib/userProfile";
+import { useUserFullProfile, useUserProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { Text } from "../Themed";
 import H1 from "../text/H1";
 
 export const ProfileHeader = () => {
-  const userProfile = useUserProfile();
-  const [profile, setProfile] = useState<Profile | null>();
-
-  useEffect(() => {
-    if (!userProfile) return;
-
-    const fetchProfile = async () => {
-      const { data, error } = await supabase
-        .from("profile")
-        .select("*")
-        .eq("id", userProfile.user_profile_id)
-        .single();
-      if (error) {
-        return setProfile(null);
-      }
-      setProfile(data);
-    };
-    fetchProfile();
-  }, [userProfile]);
+  const profile = useUserFullProfile();
 
   return (
     <View
@@ -71,13 +53,15 @@ export const ProfileHeader = () => {
         }}
       >
         <View style={{ width: 40 }}>
-          <Avatar id={userProfile ? userProfile.user_profile_id : ""} />
+          <Avatar id={profile ? profile.user_profile_id : ""} />
         </View>
         <View style={profileStyles.personalityView}>
           <Text style={profileStyles.username}>
-            {userProfile ? userProfile.username : "chargement"}
+            {profile ? profile.username : "chargement"}
           </Text>
-          <Text style={profileStyles.nickname}>@{profile?.nickname}</Text>
+          <Text style={profileStyles.nickname}>
+            @{profile?.profile?.nickname}
+          </Text>
         </View>
       </View>
     </View>
