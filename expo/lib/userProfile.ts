@@ -52,6 +52,40 @@ export function useUserProfile() {
   return profile;
 }
 
+const fullProfileRequest = supabase
+  .from("user_profile")
+  .select("*, profile(*)")
+  .single();
+
+type FullProfile = QueryData<typeof fullProfileRequest>;
+
+export function useUserFullProfile() {
+  const [profile, setProfile] = useState<FullProfile | null>();
+  const user = useSupabaseUserHook();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return setProfile(null);
+
+      const { data, error } = await supabase
+        .from("user_profile")
+        .select("*, profile(*)")
+        .eq("account_id", user.id)
+        .single();
+
+      if (error) {
+        return setProfile(null);
+      }
+
+      setProfile(data);
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  return profile;
+}
+
 export const getUsernameFromUser = async (
   user: User
 ): Promise<{
