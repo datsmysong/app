@@ -10,14 +10,14 @@ import { View } from "../../../../components/Themed";
 import Warning from "../../../../components/Warning";
 import AvatarForm from "../../../../components/profile/AvatarForm";
 import {
-  AuthErrorMessage,
-  SupabaseErrorCode,
-} from "../../../../constants/SupabaseErrorCode";
-import {
   displayNameRules,
   emailRules,
   usernameRules,
-} from "../../../../lib/inputRestriction";
+} from "../../../../constants/InputRules";
+import {
+  AuthErrorMessage,
+  SupabaseErrorCode,
+} from "../../../../constants/SupabaseErrorCode";
 import { supabase } from "../../../../lib/supabase";
 import { useSupabaseUserHook } from "../../../../lib/useSupabaseUser";
 import { useUserFullProfile } from "../../../../lib/userProfile";
@@ -180,7 +180,7 @@ export default function PersonalInfo() {
     setInitialDisplayname(displayName);
     setValue("displayName", displayName);
 
-    return "Pseudo mis à jour";
+    return "Nom public";
   };
 
   /**

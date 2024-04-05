@@ -46,7 +46,6 @@ export default SettingsOptions;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
     gap: 24,
     paddingVertical: 16,
     paddingHorizontal: 20,

@@ -5,12 +5,12 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Alert from "../../components/Alert";
 import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
-import { getApiUrl } from "../../lib/apiUrl";
 import {
   emailRules,
   passwordRules,
   usernameRules,
-} from "../../lib/inputRestriction";
+} from "../../constants/InputRules";
+import { getApiUrl } from "../../lib/apiUrl";
 
 type FormData = {
   username: string;

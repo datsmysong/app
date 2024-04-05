@@ -6,8 +6,8 @@ import { StyleSheet, View } from "react-native";
 import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
 import Alert from "../../components/Warning";
+import { emailRules } from "../../constants/InputRules";
 import { AuthErrorMessage } from "../../constants/SupabaseErrorCode";
-import { emailRules } from "../../lib/inputRestriction";
 import { supabase } from "../../lib/supabase";
 
 type LoginForm = {

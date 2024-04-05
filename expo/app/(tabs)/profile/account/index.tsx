@@ -49,6 +49,7 @@ export default function Account() {
         title="Se déconnecter"
         color="red"
       />
+      <Separator />
     </ScrollView>
   );
 }

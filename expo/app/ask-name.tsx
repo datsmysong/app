@@ -6,8 +6,8 @@ import Button from "../components/Button";
 import ControlledInput from "../components/ControlledInput";
 import { Text } from "../components/Themed";
 import Font from "../constants/Font";
+import { usernameRules } from "../constants/InputRules";
 import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
-import { usernameRules } from "../lib/inputRestriction";
 import { supabase } from "../lib/supabase";
 import { useSupabaseUserHook } from "../lib/useSupabaseUser";
 
