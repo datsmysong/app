@@ -23,6 +23,7 @@ import RoomLeaveGET from "./route/RoomLeaveGET";
 import RoomPOST from "./route/RoomPOST";
 import StreamingServicesGET from "./route/StreamingServicesGET";
 import UnbindServicePOST from "./route/UnbindServicePOST";
+import RecentMusicsGET from "./route/RecentMusicsGET";
 import onRoomWSConnection from "./socketio/RoomIO";
 
 config({ path: ".env.local" });
@@ -44,6 +45,8 @@ const corsOrigin: (devValue?: string | boolean) => (string | boolean)[] = (
 };
 
 export const server = fastify({
+  ignoreTrailingSlash: true,
+  ignoreDuplicateSlashes: true,
   logger: {
     transport: {
       target: "pino-pretty",
@@ -187,6 +190,8 @@ const getRoomSchema = {
 };
 
 server.get("/room/:id", { schema: getRoomSchema }, RoomGET);
+
+server.get("/recent-musics", RecentMusicsGET);
 
 server.ready().then(() => {
   server.io.of(/^\/room\/.*$/i).on("connection", onRoomWSConnection);
