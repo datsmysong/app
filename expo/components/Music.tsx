@@ -1,4 +1,4 @@
-import { PlayedJSONTrack } from "commons/backend-types";
+import { JSONTrack, PlayedJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import DotsThree from "phosphor-react-native/src/icons/DotsThreeOutlineVertical";
 import Heart from "phosphor-react-native/src/icons/Heart";
@@ -9,6 +9,21 @@ import Avatar from "./profile/Avatar";
 
 type InactiveMusicProps = {
   music: PlayedJSONTrack;
+};
+
+type TrackCardProps = {
+  music: JSONTrack;
+};
+
+export const TrackCard: React.FC<TrackCardProps> = ({ music }) => {
+  return (
+    <View style={styles.musicContainer}>
+      <View style={styles.musicDetails}>
+        <MusicArtwork imageUrl={music.imgUrl} />
+        <MusicContent title={music.title} artists={music.artistsName} />
+      </View>
+    </View>
+  );
 };
 
 const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
@@ -29,7 +44,7 @@ const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
 
 type MusicArtworkProps = {
   imageUrl: string;
-  addedBy: string;
+  addedBy?: string;
 };
 
 const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
@@ -38,7 +53,7 @@ const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
   return (
     <View style={styles.artworkContainer}>
       <Image source={{ uri: imageUrl }} style={styles.artwork} />
-      <Avatar id={addedBy} style={styles.artworkAvatar} />
+      {addedBy && <Avatar id={addedBy} style={styles.artworkAvatar} />}
     </View>
   );
 };
@@ -46,7 +61,7 @@ const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
 type MusicContentProps = {
   title: string;
   artists: string;
-  position: number;
+  position?: number;
 };
 
 const MusicContent: React.FC<MusicContentProps> = ({
@@ -57,7 +72,7 @@ const MusicContent: React.FC<MusicContentProps> = ({
   return (
     <View style={styles.musicContent}>
       <View style={{ flexDirection: "row", gap: 4 }}>
-        <Text style={styles.title}>{position}.</Text>
+        {position && <Text style={styles.title}>{position}.</Text>}
         <Text style={styles.title}>{title}</Text>
       </View>
       <Text style={styles.artists}>{artists}</Text>
