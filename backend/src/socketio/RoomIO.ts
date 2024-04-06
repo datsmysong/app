@@ -194,7 +194,11 @@ export default function onRoomWSConnection(socket: TypedSocket) {
       const playlists = await spotify.playlists.getUsersPlaylists(userId);
 
       const result = playlists.items.map((playlist) => {
-        return { name: playlist.name, playlistId: playlist.id };
+        return {
+          name: playlist.name,
+          playlistId: playlist.id,
+          imageUrl: playlist.images[0].url ?? "",
+        };
       });
 
       callback(result);

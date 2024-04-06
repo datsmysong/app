@@ -1,13 +1,18 @@
-import { router } from "expo-router";
 import ClockCounterClockwise from "phosphor-react-native/src/icons/ClockCounterClockwise";
 import Heart from "phosphor-react-native/src/icons/Heart";
 import MusicNote from "phosphor-react-native/src/icons/MusicNote";
-import { StyleSheet, View, Text } from "react-native";
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 import LibraryComponent from "./LibraryComponent";
+import PlaylistsLibrary from "./PlaylistsLibrary";
 
 const Library = () => {
-  return (
+  const [library, setLibrary] = useState<React.JSX.Element | null>(null);
+
+  return library !== null ? (
+    library
+  ) : (
     <View style={styles.container}>
       <Text style={styles.title}>Bibliothèque</Text>
       <LibraryComponent
@@ -20,7 +25,8 @@ const Library = () => {
         title="Mes playlists"
         subtitle="Ajoute une musique à partir de tes playlists"
         icon={<MusicNote />}
-        onPress={() => router.push("./library")}
+        //onPress={() => router.push("./library")}
+        onPress={() => setLibrary(<PlaylistsLibrary />)}
       />
       <LibraryComponent
         title="Mes titres likés"

@@ -38,4 +38,5 @@ export interface RoomJSON {
 export interface Playlist {
   name: string;
   playlistId: string;
+  imageUrl: string;
 }
