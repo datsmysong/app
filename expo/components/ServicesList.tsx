@@ -3,9 +3,9 @@ import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
 
-import Alert from "./Alert";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
+import Alert from "./Alert";
 
 interface ServicesListProps {
   handleServiceChange: (serviceId: string) => void;
@@ -28,7 +28,9 @@ export default function ServicesList({
       const { error, data } = await supabase
         .from("bound_services")
         .select("streaming_services(*)")
-        .eq("user_profile_id", userId);
+        .eq("user_profile_id", userId)
+        // temporary disabled soundcloud service (always available)
+        .neq("service_id", "c99631a2-f06c-4076-80c2-13428944c3a8");
 
       if (error) {
         Alert.alert("Une erreur est survenue, veuillez réessayer plus tard");
@@ -39,10 +41,18 @@ export default function ServicesList({
         return;
       }
 
+      const { data: servicesWithoutAccount } = await supabase
+        .from("streaming_services")
+        .select("*")
+        .eq("need_account", false);
+
       const services: StreamingService[] = [];
       data.forEach((elem) => {
         if (elem.streaming_services) services.push(elem.streaming_services);
       });
+
+      if (servicesWithoutAccount) services.push(...servicesWithoutAccount);
+
       setAvailableServices(services);
     })();
   }, [user]);
