@@ -107,7 +107,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
                 <View style={styles.avatars}>
                   <Avatar
                     style={{ width: 80, height: 80 }}
-                    id={participant.profile.userProfile?.account_id}
+                    id={participant.profile.userProfile?.user_profile_id}
                   />
                   <Text style={{ fontFamily: "Outfit-Medium", fontSize: 16 }}>
                     {participant.profile.nickname}
