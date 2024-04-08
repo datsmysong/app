@@ -1,8 +1,15 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import Alert from "../../../components/Alert";
+import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 import ParametersList from "../../../components/ParametersList";
 import ServiceList from "../../../components/ServicesList";
@@ -171,13 +178,26 @@ export default function CreateRoom() {
         create
       />
       {error && <Warning label={errorMessage || ""} variant="warning" />}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[styles.button, !isFormValid && styles.buttonDisabled]}
         onPress={onSubmit}
         disabled={!isFormValid}
       >
         <Text style={styles.buttonText}>Créer une salle d'écoute</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <View
+        style={{
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        <Button onPress={onSubmit} disabled={!isFormValid} block>
+          Créer une salle d'écoute
+        </Button>
+        <Button href="/rooms" type="outline" block>
+          Abandonner
+        </Button>
+      </View>
     </ScrollView>
   );
 }
@@ -215,10 +235,18 @@ const styles = StyleSheet.create({
   },
   page: {
     paddingTop: 20,
-    paddingLeft: 10,
+    // paddingLeft: 10,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
+    // paddingTop: 20,
+    paddingBottom: 20,
+    // justifyContent: "center",
+    // alignItems: "center",
+    // // flex: 1,
+    // flexDirection: "column",
+    alignSelf: "stretch",
+    // gap: 8,
   },
   labelText: {
     fontSize: 20,

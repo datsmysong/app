@@ -57,6 +57,7 @@ export default function ParametersList({
           />
         </View>
         <CustomCheckbox
+          disabled
           value={canBeAnonymous}
           setValue={setCanBeAnonymous}
           label="Autoriser les utilisateurs anonymes"
