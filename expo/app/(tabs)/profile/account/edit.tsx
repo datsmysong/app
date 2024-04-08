@@ -296,6 +296,7 @@ export default function PersonalInfo() {
             size="small"
             block
             onPress={() => Alert.alert("Not implemented")}
+            disabled
           >
             Supprimer mon compte
           </Button>

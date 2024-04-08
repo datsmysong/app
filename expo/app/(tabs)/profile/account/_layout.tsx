@@ -29,6 +29,27 @@ export default function AccountLayout() {
             title: "Lier ses comptes de streaming",
           }}
         />
+        <Stack.Screen
+          name="security"
+          options={{
+            presentation: "modal",
+            title: "Securité de mon compte",
+          }}
+        />
+        <Stack.Screen
+          name="notifications"
+          options={{
+            presentation: "modal",
+            title: "Paramètres de notification",
+          }}
+        />
+        <Stack.Screen
+          name="help"
+          options={{
+            presentation: "modal",
+            title: "Assistance",
+          }}
+        />
       </Stack>
     </ErrorBoundary>
   );

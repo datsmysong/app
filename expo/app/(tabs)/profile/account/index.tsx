@@ -22,13 +22,13 @@ export default function Account() {
       <SettingsOptions
         icon={<Lock />}
         title="Sécurité"
-        href="/account/security"
+        href="/(tabs)/profile/account/security"
       />
       <Separator />
       <SettingsOptions
         icon={<BellRinging />}
         title="Notifications"
-        href="/manage-account/notifications"
+        href="/(tabs)/profile/account/notifications"
       />
       <Separator />
       <SettingsOptions
@@ -40,7 +40,7 @@ export default function Account() {
       <SettingsOptions
         icon={<Lifebuoy />}
         title="Assistance"
-        href="/manage-account/help"
+        href="/(tabs)/profile/account/help"
       />
       <Separator />
       <SettingsOptions
