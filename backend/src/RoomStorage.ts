@@ -64,7 +64,18 @@ export default class RoomStorage {
         const newPlaybackState = newPlaybackStateResponse.data;
         room.setPlaybackState(newPlaybackState);
 
-        if (!newPlaybackState) return console.debug("No music is playing");
+        if (!newPlaybackState) {
+          if (
+            room.getQueue().length > 0 &&
+            room.getStreamingService().isClientSide()
+          ) {
+            const nextTrack = room.shiftQueue();
+            if (!nextTrack) return console.debug("No more tracks in the queue");
+            return remote.playTrack(nextTrack.url);
+          }
+
+          return console.debug("No music is playing");
+        }
 
         const remainingTime =
           newPlaybackState.duration - newPlaybackState.currentTime;

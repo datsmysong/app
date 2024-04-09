@@ -41,7 +41,6 @@ export default function MinimalistTrackItem({
 const itemStyles = StyleSheet.create({
   container: {
     marginVertical: 12,
-    paddingVertical: 9,
     paddingHorizontal: 10,
     gap: 10,
     alignItems: "center",

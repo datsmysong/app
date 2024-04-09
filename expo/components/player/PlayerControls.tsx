@@ -4,7 +4,7 @@ import Play from "phosphor-react-native/src/icons/Play";
 import SkipBack from "phosphor-react-native/src/icons/SkipBack";
 import SkipForward from "phosphor-react-native/src/icons/SkipForward";
 import React, { useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 import { PlayerRemote } from "../../lib/audioRemote";
 import Button from "../Button";
@@ -75,47 +75,60 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
   }
 
   return (
-    <View>
-      <Button onPress={skipTo90}>Aller à 90%</Button>
+    <View
+      style={{
+        flexDirection: "column",
+        gap: 16,
+      }}
+    >
       <View style={styles.progressContainer}>
-        <Text>{formatDuration(state.currentTime)}</Text>
-        <View style={styles.progressBar}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "column",
+            rowGap: 2,
+          }}
+        >
+          <View style={[styles.progressBar]}>
+            <View
+              style={[
+                styles.progress,
+                {
+                  width: `${(state.currentTime / state.duration) * 100}%`,
+                  height: 7,
+                },
+              ]}
+            />
+          </View>
           <View
-            style={[
-              styles.progress,
-              {
-                width: `${(state.currentTime / state.duration) * 100}%`,
-              },
-            ]}
-          />
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.progressDuration}>
+              {formatDuration(state.currentTime)}
+            </Text>
+            <Text style={styles.progressDuration}>
+              {formatDuration(state.duration)}
+            </Text>
+          </View>
         </View>
-        <Text>{formatDuration(state.duration)}</Text>
       </View>
       <View style={styles.controls}>
-        <Button
-          onPress={handlePreviousTrack}
-          type="outline"
-          icon={<SkipBack weight="fill" />}
-          loading={loading.previous}
-        >
-          Previous
-        </Button>
+        <TouchableOpacity onPress={handlePreviousTrack}>
+          <SkipBack weight="fill" size={42} />
+        </TouchableOpacity>
         <Button
           onPress={handlePlayPause}
           icon={state.isPlaying ? <Pause /> : <Play weight="fill" />}
-          type={state.isPlaying ? "outline" : "filled"}
           loading={loading.playPause}
         >
           {state.isPlaying ? "Pause" : "Play"}
         </Button>
-        <Button
-          onPress={handleNextTrack}
-          type="outline"
-          icon={<SkipForward weight="fill" />}
-          loading={loading.next}
-        >
-          Next
-        </Button>
+        <TouchableOpacity onPress={handleNextTrack}>
+          <SkipForward weight="fill" size={42} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -125,17 +138,22 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 3,
+    justifyContent: "center",
+    gap: 32,
+  },
+  progressDuration: {
+    fontFamily: "Outfit-Medium",
+    fontSize: 14,
   },
   progressContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    rowGap: 7,
   },
   progressBar: {
     flex: 1,
-    height: 4,
+    height: 7,
     backgroundColor: "#D1D5DB",
     borderRadius: 9999,
   },

@@ -17,5 +17,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     marginVertical: 21,
     gap: 36,
+    maxHeight: 270,
+  },
+  buttonContainer: {
+    gap: 8,
+  },
+  title: {
+    fontSize: 32,
+    fontFamily: "Outfit-Bold",
+    maxWidth: 354,
   },
 });

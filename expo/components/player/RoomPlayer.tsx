@@ -1,9 +1,9 @@
-import { PlayingJSONTrack, RoomJSON } from "commons/backend-types";
+import { PlayingJSONTrack } from "commons/backend-types";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "commons/socket.io-types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Socket } from "socket.io-client";
 
@@ -18,10 +18,10 @@ import Warning from "../Warning";
 type RoomPlayerProps = {
   room: ActiveRoom;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  isHost: boolean;
 };
 
-const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
-  const isHost = true;
+const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket, isHost }) => {
   const [remote, setRemote] = useState<PlayerRemote>();
   const [error, setError] = useState<string>();
 
@@ -44,17 +44,17 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
     });
   }, [socket]);
 
-  const playCoolSong = async () => {
-    if (!remote) return;
+  // const playCoolSong = async () => {
+  //   if (!remote) return;
 
-    if (room.streaming_services?.service_name === "Spotify") {
-      await remote.playTrack("spotify:track:6afdNrotJ1PCt9DoFiHpLj");
-    } else if (room.streaming_services?.service_name === "SoundCloud") {
-      await remote.playTrack(
-        "https://soundcloud.com/martingarrix/martin-garrix-lloyiso-real-love"
-      );
-    }
-  };
+  //   if (room.streaming_services?.service_name === "Spotify") {
+  //     await remote.playTrack("spotify:track:6afdNrotJ1PCt9DoFiHpLj");
+  //   } else if (room.streaming_services?.service_name === "SoundCloud") {
+  //     await remote.playTrack(
+  //       "https://soundcloud.com/martingarrix/martin-garrix-lloyiso-real-love"
+  //     );
+  //   }
+  // };
 
   return (
     <>
@@ -66,16 +66,15 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
             socket={socket}
           />
         )}
-        <Player state={playbackState}>
-          {isHost && remote && (
-            <PlayerControls state={playbackState} remote={remote} />
-          )}
-        </Player>
-      </View>
+        <Player state={playbackState} isHost={isHost} />
 
-      <Button type="outline" onPress={playCoolSong}>
-        play Martin Garrix & Lloyiso - Real Love
-      </Button>
+        {isHost && remote && (
+          <View style={{ paddingTop: 32 }}>
+            <PlayerControls state={playbackState} remote={remote} />
+          </View>
+        )}
+      </View>
+      {/* <Button onPress={playCoolSong}>Play song</Button> */}
     </>
   );
 };

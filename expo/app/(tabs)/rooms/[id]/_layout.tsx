@@ -12,6 +12,7 @@ import Alert from "../../../../components/Alert";
 import ErrorBoundary from "../../../../components/ErrorBoundary";
 import RoomErrorBoundary from "../../../../components/ErrorComponent/RoomError";
 import WebsocketError from "../../../../components/ErrorComponent/WebsocketError";
+import HeaderBack from "../../../../components/HeaderBack";
 import { useAsyncError } from "../../../../lib/AsyncError";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import SocketIo from "../../../../lib/socketio";
@@ -94,7 +95,10 @@ export default function RoomTabLayout() {
     <ErrorBoundary fallback={<RoomErrorBoundary />}>
       <WebSocketProvider roomId={id}>
         <Stack>
-          <Stack.Screen name="index" options={{ title: "Nom de la salle" }} />
+          <Stack.Screen
+            name="index"
+            options={{ header: () => <HeaderBack /> }}
+          />
           <Stack.Screen
             name="invite"
             options={{ presentation: "modal", title: "Menu d'invitation" }}
