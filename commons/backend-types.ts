@@ -15,7 +15,10 @@ export interface RoomJSONTrack extends JSONTrack {
    * The user id of the user who added the track to the queue
    */
   addedBy: string;
-  votes: string[]; // array of user ids
+  /**
+   * An array of user ids of users who have voted to skip this track
+   */
+  votes: string[];
 }
 
 export interface PlayingJSONTrack extends RoomJSONTrack {

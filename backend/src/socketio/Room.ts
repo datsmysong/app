@@ -99,9 +99,8 @@ export default class Room {
     }
   }
 
-  async add(rawUrl: string) {
+  async add(rawUrl: string, accountId: string) {
     if (!this.remote) return;
-
     const trackMetadata = this.trackFactory.fromUrl(rawUrl);
     if (trackMetadata === null) return;
 
@@ -121,7 +120,7 @@ export default class Room {
 
     this.queue.push({
       ...track,
-      addedBy: "TODO", // TODO: Add the id of the user who added the track
+      addedBy: accountId,
       votes: [],
     });
     if (this.queue.length !== 1) return;

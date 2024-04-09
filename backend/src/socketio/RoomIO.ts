@@ -57,14 +57,9 @@ export default function onRoomWSConnection(socket: TypedSocket) {
      */
     sendQueue(socket, room);
 
-    socket.on("queue:add", async (params: string) => {
-      await room.add(params);
+    socket.on("queue:add", async (rawUrl: string, accountId: string) => {
+      await room.add(rawUrl, accountId);
       sendQueue(socket, room);
-    });
-
-    socket.on("queue:add", async (rawUrl: string) => {
-      await room.add(rawUrl);
-      roomSocket.emit("queue:update", Room.toJSON(room));
     });
 
     // We should check the origin of the request to prevent anyone that isn't the host from removing anything

@@ -93,8 +93,8 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       setLiveRoom(data);
     });
 
-    socket.on("queue:update", (data: RoomJSON) => {
-      setLiveRoom(data);
+    socket.on("queue:update", async (room: RoomJSON) => {
+      setLiveRoom(room);
     });
   }, [socket]);
 
@@ -223,6 +223,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                         )) ||
                       false
                     }
+                    addedBy={item.addedBy}
                   />
                 )}
               />

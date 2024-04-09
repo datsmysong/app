@@ -9,14 +9,16 @@ import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import MinimalistTrackItem from "./MinimalistTrackItem";
 import SocketIo from "../../lib/socketio";
 import CustomMenuOption from "../CustomMenuOption";
+import Avatar from "../profile/Avatar";
 
 export default function TrackItem(prop: {
   track: JSONTrack;
   index: number;
   roomId: string;
   isMenuDisabled: boolean;
-  handleDislike?: () => void;
-  disliked?: boolean;
+  handleDislike: () => void;
+  disliked: boolean;
+  addedBy: string;
 }) {
   const {
     title,
@@ -45,10 +47,14 @@ export default function TrackItem(prop: {
       artistsName={artists}
       imgUrl={rawImageUrl}
       profilePictureImage={
-        <Image
-          source={require("../../assets/images/album-cover.jpg")}
-          style={itemStyles.profileImage}
-        />
+        prop.addedBy ? (
+          <Avatar id={prop.addedBy} style={itemStyles.profileImage} />
+        ) : (
+          <Image
+            source={require("../../assets/images/album-cover.jpg")}
+            style={itemStyles.profileImage}
+          />
+        )
       }
     >
       <Pressable onPress={handleDislike}>
