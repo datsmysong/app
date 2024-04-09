@@ -88,12 +88,21 @@ const AvatarForm = forwardRef((props: AvatarProps, ref) => {
   return (
     <View style={{ width: "100%", gap: 10 }}>
       <Text style={formStyles.label}>Photo de profil</Text>
-      <Pressable onPress={selectAvatar}>
+      <Pressable
+        onPress={selectAvatar}
+        style={{
+          width: "100%",
+          overflow: "hidden",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Avatar
           id={user?.user_profile_id}
           ref={avatarRef}
           tempoAvatarImage={avatarUrl}
           noCache
+          style={{ width: "60%" }}
         />
       </Pressable>
       <Button

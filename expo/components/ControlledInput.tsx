@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInputProps, View } from "react-native";
 
 import CustomPasswordInput from "./CustomPasswordInput";
 import CustomTextInput, { CustomTextInputProps } from "./CustomTextInput";
+import Subtitle from "./text/Subtitle";
 
 interface ControlledInputProps extends CustomTextInputProps {
   control: any;
@@ -14,6 +15,7 @@ interface ControlledInputProps extends CustomTextInputProps {
   secureTextEntry?: boolean;
   errorMessage?: string | undefined;
   onSubmitEditing?: () => void;
+  info?: string;
 }
 
 export default function ControlledInput({
@@ -23,6 +25,7 @@ export default function ControlledInput({
   rules,
   secureTextEntry,
   errorMessage,
+  info,
   ...props
 }: ControlledInputProps) {
   return (
@@ -57,6 +60,7 @@ export default function ControlledInput({
         }
         name={name}
       />
+      {info && <Subtitle>{info}</Subtitle>}
       {errorMessage && (
         <Text style={formStyles.text}>
           {errorMessage ?? "Le champ est invalide"}

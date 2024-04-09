@@ -1,6 +1,6 @@
 import { QueryData } from "@supabase/supabase-js/dist/module/lib/types";
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList } from "react-native";
 
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { View } from "./Themed";

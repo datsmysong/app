@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import {
   ReactNode,
   createContext,
@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Socket } from "socket.io-client";
 
+import Alert from "../../../../components/Alert";
 import ErrorBoundary from "../../../../components/ErrorBoundary";
 import RoomErrorBoundary from "../../../../components/ErrorComponent/RoomError";
 import WebsocketError from "../../../../components/ErrorComponent/WebsocketError";
@@ -52,6 +53,13 @@ const WebSocketProvider = ({
 
     socketInstance.on("connect", () => {
       setSocketError(null);
+    });
+
+    socketInstance.on("room:end", () => {
+      Alert.alert(
+        "Fermeture de la salle, redirection vers la liste des salles"
+      );
+      router.push("/rooms");
     });
 
     return () => {

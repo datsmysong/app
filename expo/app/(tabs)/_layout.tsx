@@ -1,17 +1,19 @@
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, Tabs, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import HouseLine from "phosphor-react-native/src/icons/HouseLine";
 import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import User from "phosphor-react-native/src/icons/User";
 import Users from "phosphor-react-native/src/icons/Users";
+import { useEffect, useState } from "react";
 
 import { HomeTabHeader } from ".";
 import ApplicationLoadingScreen from "../../components/ApplicationLoadingScreen";
 import { Text } from "../../components/Tamed";
-import { View } from "../../components/Themed";
 import FriendHeader from "../../components/headers/FriendHeader";
 import Colors from "../../constants/Colors";
+import { supabase } from "../../lib/supabase";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
+import { useUserFullProfile } from "../../lib/userProfile";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -38,6 +40,37 @@ export default function TabLayout() {
   WebBrowser.maybeCompleteAuthSession();
 
   const user = useSupabaseUserHook();
+  const router = useRouter();
+
+  const profile = useUserFullProfile();
+
+  const [usernameIsFine, setUsernameIsFine] = useState(true);
+
+  useEffect(() => {
+    if (!profile) return;
+    setUsernameIsFine(!!profile?.username);
+  }, [profile]);
+
+  /**
+   * If the user is logged in, we check if the user has a username
+   * If the user not have a username, we re-fetch the user profile to check if he not comming from the ask-name page
+   */
+  useEffect(() => {
+    if (!user) return;
+    if (usernameIsFine) return;
+
+    supabase
+      .from("user_profile")
+      .select("username")
+      .eq("account_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.username) {
+          return setUsernameIsFine(true);
+        }
+        router.push("/ask-name/");
+      });
+  }, [usernameIsFine]);
 
   if (user === undefined) return <ApplicationLoadingScreen />;
 
