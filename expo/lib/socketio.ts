@@ -27,8 +27,13 @@ export default class SocketIo {
   }
 
   getSocket(
-    namespace: string
+    namespace: string,
+    host = false
   ): Socket<ServerToClientEvents, ClientToServerEvents> {
-    return this.iomanager.socket(namespace);
+    return this.iomanager.socket(namespace, {
+      auth: {
+        host,
+      },
+    });
   }
 }

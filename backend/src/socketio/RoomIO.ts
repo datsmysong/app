@@ -29,8 +29,9 @@ export default function onRoomWSConnection(socket: TypedSocket) {
   }
 
   const activeRoomId = rawUrlMatchGroups.slice(1)[0];
-  // TODO: Actually check if the connecting socket is the host
-  const isHostSocket = true;
+
+  //! Host can tell the server that he is the host (not secure)
+  const isHostSocket = socket.handshake.auth;
 
   async function registerHandlers() {
     const hostSocket = isHostSocket ? socket : null;
