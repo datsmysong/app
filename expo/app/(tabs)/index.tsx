@@ -42,9 +42,18 @@ function RecentMusics({ loading }: RecentMusicsProps) {
         credentials: "include",
       });
       if (!query.ok)
-        return Alert.alert(
-          "Erreur serveur, revenez plus tard ou contactez un administrateur"
-        );
+        return setRecentMusics([
+          {
+            id: "error",
+            title: "Impossible de charger les musiques récentes",
+            artistsName: "Erreur",
+            duration: 0,
+            imgUrl: "https://unsplash.it/300/300",
+            albumName: "Erreur",
+            genres: ["Erreur"],
+            url: "https://unsplash.it/300/300",
+          },
+        ]);
       const data = await query.json();
       setRecentMusics(data);
     };
