@@ -120,7 +120,7 @@ export default class Room {
 
     this.queue.push({
       ...track,
-      addedBy: "TODO", // TODO: Add the id of the user who added the track
+      addedBy: accountId,
       votes: [],
     });
     if (this.queue.length !== 1) return;

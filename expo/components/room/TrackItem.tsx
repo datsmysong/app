@@ -19,7 +19,6 @@ export default function TrackItem(prop: {
   handleDislike: () => void;
   disliked: boolean;
   addedBy: string;
-  accountId: string;
 }) {
   const {
     title,
@@ -48,8 +47,8 @@ export default function TrackItem(prop: {
       artistsName={artists}
       imgUrl={rawImageUrl}
       profilePictureImage={
-        prop.accountId ? (
-          <Avatar id={prop.accountId} style={itemStyles.profileImage} />
+        prop.addedBy ? (
+          <Avatar id={prop.addedBy} style={itemStyles.profileImage} />
         ) : (
           <Image
             source={require("../../assets/images/album-cover.jpg")}
