@@ -15,9 +15,23 @@ import H2 from "../../components/text/H2";
 import { getApiUrl } from "../../lib/apiUrl";
 import { useUserProfile } from "../../lib/userProfile";
 
-function RecentMusics() {
+function RecentMusicsSkeletonLoader() {
+  return (
+    <FlatList
+      data={[{}, {}, {}, {}, {}]}
+      renderItem={() => <TrackCard.Skeleton />}
+      ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+    />
+  );
+}
+
+type RecentMusicsProps = {
+  loading?: React.ReactElement;
+};
+
+function RecentMusics({ loading }: RecentMusicsProps) {
   const userProfile = useUserProfile();
-  const [recentMusics, setRecentMusics] = useState<JSONTrack[]>([]);
+  const [recentMusics, setRecentMusics] = useState<JSONTrack[]>();
   const apiUrl = getApiUrl();
 
   useEffect(() => {
@@ -37,6 +51,10 @@ function RecentMusics() {
 
     fetchRecentMusics();
   }, [userProfile]);
+
+  if (recentMusics === undefined) {
+    return loading ?? <View />;
+  }
 
   return (
     <FlatList
@@ -80,7 +98,7 @@ export default function HomeTab() {
           icon={<MusicNote />}
         />
         <View style={{ width: "100%" }}>
-          <RecentMusics />
+          <RecentMusics loading={<RecentMusicsSkeletonLoader />} />
         </View>
       </View>
     </ScrollView>

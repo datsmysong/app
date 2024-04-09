@@ -15,7 +15,13 @@ type TrackCardProps = {
   music: JSONTrack;
 };
 
-export const TrackCard: React.FC<TrackCardProps> = ({ music }) => {
+type TrackCardSubComponents = {
+  Skeleton: typeof TrackCardSkeleton;
+};
+
+export const TrackCard: React.FC<TrackCardProps> & TrackCardSubComponents = ({
+  music,
+}) => {
   return (
     <View style={styles.musicContainer}>
       <View style={styles.musicDetails}>
@@ -25,6 +31,19 @@ export const TrackCard: React.FC<TrackCardProps> = ({ music }) => {
     </View>
   );
 };
+
+const TrackCardSkeleton: React.FC = () => {
+  return (
+    <View style={styles.musicContainer}>
+      <View style={styles.musicDetails}>
+        <MusicArtwork.Skeleton />
+        <MusicContent.Skeleton />
+      </View>
+    </View>
+  );
+};
+
+TrackCard.Skeleton = TrackCardSkeleton;
 
 const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
   return (
@@ -47,9 +66,14 @@ type MusicArtworkProps = {
   addedBy?: string;
 };
 
-const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
-  // TODO: Use a component to load the avatar of an user
+type MusicArtworkSubComponents = {
+  Skeleton: typeof MusicArtworkSkeleton;
+};
 
+const MusicArtwork: React.FC<MusicArtworkProps> & MusicArtworkSubComponents = ({
+  imageUrl,
+  addedBy,
+}) => {
   return (
     <View style={styles.artworkContainer}>
       <Image source={{ uri: imageUrl }} style={styles.artwork} />
@@ -58,13 +82,32 @@ const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
   );
 };
 
+const MusicArtworkSkeleton: React.FC = () => {
+  return (
+    <View style={styles.artworkContainer}>
+      <View
+        style={{
+          backgroundColor: "#E6E6E6",
+          ...styles.artwork,
+        }}
+      />
+    </View>
+  );
+};
+
+MusicArtwork.Skeleton = MusicArtworkSkeleton;
+
 type MusicContentProps = {
   title: string;
   artists: string;
   position?: number;
 };
 
-const MusicContent: React.FC<MusicContentProps> = ({
+type MusicContentSubComponents = {
+  Skeleton: typeof MusicContentSkeleton;
+};
+
+const MusicContent: React.FC<MusicContentProps> & MusicContentSubComponents = ({
   title,
   artists,
   position,
@@ -79,6 +122,33 @@ const MusicContent: React.FC<MusicContentProps> = ({
     </View>
   );
 };
+
+const MusicContentSkeleton: React.FC = () => {
+  return (
+    <View style={styles.musicContent}>
+      <View style={{ flexDirection: "row", gap: 4 }}>
+        <View
+          style={{
+            width: 256 + Math.random() * 100,
+            height: 19,
+            backgroundColor: "#E6E6E6",
+            ...styles.title,
+          }}
+        />
+      </View>
+      <View
+        style={{
+          width: 128 + Math.random() * 70,
+          height: 19,
+          backgroundColor: "#E6E6E6",
+          ...styles.artists,
+        }}
+      />
+    </View>
+  );
+};
+
+MusicContent.Skeleton = MusicContentSkeleton;
 
 const MusicActions: React.FC = () => {
   return (
