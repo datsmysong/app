@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useWebSocket } from "../../app/(tabs)/rooms/[id]/_layout";
+import Font from "../../constants/Font";
 import { useUserProfile } from "../../lib/userProfile";
 import Button from "../Button";
 
@@ -115,7 +116,16 @@ const Player: React.FC<PlayerProps> = ({ state, isHost, children }) => {
           </View>
         </>
       )}
-      {!state && <Text>Nothing is playing, start a song</Text>}
+      {!state && (
+        <Text
+          style={{
+            fontFamily: Font.Outfit.ExtraLight,
+            fontSize: 16,
+          }}
+        >
+          Aucune musique n'est en cours de lecture, commencez une musique
+        </Text>
+      )}
     </View>
   );
 };

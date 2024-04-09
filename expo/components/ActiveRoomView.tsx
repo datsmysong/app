@@ -1,5 +1,6 @@
 import { RoomJSON } from "commons/backend-types";
 import { Link, router } from "expo-router";
+import Share from "phosphor-react-native/src/bold/Share";
 import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
 import Gear from "phosphor-react-native/src/icons/Gear";
 import Plus from "phosphor-react-native/src/icons/Plus";
@@ -235,6 +236,14 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                   )}
                 />
               )}
+              <Button
+                href={`/rooms/${room.id}/invite`}
+                block
+                type="outline"
+                prependIcon={<Share />}
+              >
+                Inviter des amis
+              </Button>
             </View>
           </ScrollView>
           <Button
