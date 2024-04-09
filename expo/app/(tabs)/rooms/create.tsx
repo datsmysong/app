@@ -9,9 +9,11 @@ import {
 } from "react-native";
 
 import Alert from "../../../components/Alert";
+import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 import ParametersList from "../../../components/ParametersList";
 import ServiceList from "../../../components/ServicesList";
+import Warning from "../../../components/Warning";
 import { getApiUrl } from "../../../lib/apiUrl";
 
 type CreateRoomFormBody = {
@@ -33,41 +35,17 @@ export type StreamingService = {
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState("");
   const [roomCode, setRoomCode] = useState("");
-  const [percentageVoteToSkipAMusic, setPercentageVote] = useState("70");
+  const [percentageVoteToSkipAMusic, setPercentageVote] = useState(70);
   const [maxMusicPerUser, setMaxMusicPerUser] = useState("3");
   const [maxMusicDuration, setMaxMusicDuration] = useState("300");
   const [canVote, setCanVote] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [services, setServices] = useState<StreamingService[]>([]);
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
-  const [isPressed, setIsPressed] = useState(false);
+  const [error, setError] = useState<boolean>();
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   const baseUrl = getApiUrl();
-
-  const TriangleRight = () => {
-    return <View style={[styles.triangle, styles.triangleRight]} />;
-  };
-
-  const TriangleDown = () => {
-    return <View style={[styles.triangle, styles.triangleDown]} />;
-  };
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      const response = await fetch(baseUrl + "/streaming-services");
-      const data = await response.json();
-
-      const services: StreamingService[] = [];
-
-      data.forEach((service: StreamingService) => {
-        services.push(service);
-      });
-      setServices(services);
-    };
-
-    fetchServices();
-  }, []);
 
   useEffect(() => {
     if (roomName && roomCode && selectedService) {
@@ -77,23 +55,31 @@ export default function CreateRoom() {
     }
   }, [roomName, roomCode, selectedService]);
 
+  useEffect(() => {
+    if (error) {
+      setError(false);
+      setErrorMessage("");
+      router.replace("/rooms/create");
+    }
+  }, []);
+
   function checkConstraints(body: CreateRoomFormBody): { error: true | null } {
     if (body.voteSkippingNeeded > 100 || body.voteSkippingNeeded < 0) {
-      Alert.alert(
+      setErrorMessage(
         "Mauvais pourcentage : Le pourcentage doit être entre 0 et 100"
       );
       return { error: true };
     }
 
     if (body.maxMusicPerUser <= 0) {
-      Alert.alert(
+      setErrorMessage(
         "Mauvais nombre de musique : Le nombre maximum de musique par utilisateur doit être positif ou au moins supérieur à 1"
       );
       return { error: true };
     }
 
     if (body.maxMusicDuration <= 0) {
-      Alert.alert(
+      setErrorMessage(
         "Mauvaise durée de musique : La durée maximale d'une musique doit être positive ou au moins supérieur à 1 seconde"
       );
       return { error: true };
@@ -109,13 +95,16 @@ export default function CreateRoom() {
       code: roomCode,
       service: selectedService,
       voteSkipping: canVote,
-      voteSkippingNeeded: parseInt(percentageVoteToSkipAMusic, 10),
+      voteSkippingNeeded: percentageVoteToSkipAMusic,
       maxMusicPerUser: parseInt(maxMusicPerUser, 10),
       maxMusicDuration: parseInt(maxMusicDuration, 10),
     };
 
     const { error } = checkConstraints(body);
-    if (error !== null) return;
+    if (error !== null) {
+      setError(true);
+      return;
+    }
 
     if (!body.voteSkipping) body.voteSkippingNeeded = 0;
 
@@ -130,10 +119,13 @@ export default function CreateRoom() {
       });
 
       if (!response.ok) {
-        if (response.status === 409)
-          return Alert.alert("Ce code de salle est déjà utilisé");
-
-        return Alert.alert(response.statusText);
+        if (response.status === 409) {
+          setError(true);
+          setErrorMessage("Ce code de salle est déjà utilisé");
+          return;
+        }
+        Alert.alert("Une erreur est survenue lors de la création de la salle");
+        return;
       }
 
       const jsonResponse = await response.json();
@@ -142,86 +134,75 @@ export default function CreateRoom() {
       router.push(`/rooms/${roomId}`);
     } catch (error) {
       console.error(error);
-      Alert.alert("Une erreur est survenue lors de la création de la salle");
+      setError(true);
+      setErrorMessage(
+        "Une erreur est survenue lors de la création de la salle"
+      );
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.page}>
-      <Text style={styles.labelText}>Nom de la salle</Text>
+      <Text style={styles.labelText}>
+        Nom de la salle
+        <Text style={[{ color: "red" }, styles.labelText]}>*</Text>
+      </Text>
       <CustomTextInput
         placeholder="Ma salle"
         value={roomName}
         onChangeText={setRoomName}
       />
-      <Text style={styles.labelText}>Code de la salle</Text>
+      <Text style={styles.labelText}>
+        Code de la salle{" "}
+        <Text style={[{ color: "red" }, styles.labelText]}>*</Text>{" "}
+      </Text>
       <CustomTextInput
         placeholder="ABC123"
         value={roomCode}
         onChangeText={setRoomCode}
       />
-      <Text style={styles.labelText}>Plateforme de streaming à utiliser</Text>
-      <ServiceList
-        availableServices={services}
-        handleServiceChange={setSelectedService}
+      <Text style={styles.labelText}>
+        Platform de streaming à utiliser{" "}
+        <Text style={[{ color: "red" }, styles.labelText]}>*</Text>
+      </Text>
+      <ServiceList handleServiceChange={setSelectedService} />
+      <ParametersList
+        percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
+        setPercentageVote={setPercentageVote}
+        maxMusicDuration={maxMusicDuration}
+        setMaxMusicDuration={setMaxMusicDuration}
+        maxMusicPerUser={maxMusicPerUser}
+        setMaxMusicPerUser={setMaxMusicPerUser}
+        canSkip={canVote}
+        setCanSkip={setCanVote}
+        create
       />
-
-      <TouchableOpacity
-        onPress={() => {
-          setIsPressed(!isPressed);
-        }}
-      >
-        <View style={styles.items}>
-          {isPressed ? <TriangleDown /> : <TriangleRight />}
-          <Text style={styles.item}>Paramètres supplémentaires</Text>
-        </View>
-      </TouchableOpacity>
-
-      {isPressed && (
-        <ParametersList
-          percentageVoteToSkipAMusic={percentageVoteToSkipAMusic}
-          setPercentageVote={setPercentageVote}
-          maxMusicDuration={maxMusicDuration}
-          setMaxMusicDuration={setMaxMusicDuration}
-          maxMusicPerUser={maxMusicPerUser}
-          setMaxMusicPerUser={setMaxMusicPerUser}
-          canVote={canVote}
-          setCanVote={setCanVote}
-        />
-      )}
-      <TouchableOpacity
+      {error && <Warning label={errorMessage || ""} variant="warning" />}
+      {/* <TouchableOpacity
         style={[styles.button, !isFormValid && styles.buttonDisabled]}
         onPress={onSubmit}
         disabled={!isFormValid}
       >
         <Text style={styles.buttonText}>Créer une salle d'écoute</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <View
+        style={{
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        <Button onPress={onSubmit} disabled={!isFormValid} block>
+          Créer une salle d'écoute
+        </Button>
+        <Button href="/rooms" type="outline" block>
+          Abandonner
+        </Button>
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  triangle: {
-    width: 0,
-    height: 0,
-    backgroundColor: "transparent",
-    borderStyle: "solid",
-    borderLeftWidth: 7,
-    borderRightWidth: 7,
-    borderBottomWidth: 14,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderBottomColor: "black",
-  },
-
-  triangleRight: {
-    transform: "rotateZ(90deg)",
-  },
-
-  triangleDown: {
-    transform: "rotateX(180deg)",
-  },
-
   items: {
     flexDirection: "row",
     alignItems: "center",
@@ -254,15 +235,23 @@ const styles = StyleSheet.create({
   },
   page: {
     paddingTop: 20,
-    paddingLeft: 10,
+    // paddingLeft: 10,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
+    // paddingTop: 20,
+    paddingBottom: 20,
+    // justifyContent: "center",
+    // alignItems: "center",
+    // // flex: 1,
+    // flexDirection: "column",
+    alignSelf: "stretch",
+    // gap: 8,
   },
   labelText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 5,
+    fontSize: 20,
+    fontFamily: "Outfit-Bold",
+    marginVertical: 10,
   },
   buttonDisabled: {
     backgroundColor: "#7f7f7f",

@@ -24,7 +24,9 @@ export default function CustomCheckbox({
         disabled={disabled}
         color="black"
       />
-      <Text style={styles.checkboxText}>{label}</Text>
+      <Text style={[styles.checkboxText, disabled ? styles.strikethrough : {}]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -51,5 +53,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#1A1A1A",
     backgroundColor: "#FFF",
+  },
+  strikethrough: {
+    textDecorationLine: "line-through",
+    textDecorationColor: "#7f7f7f",
   },
 });
