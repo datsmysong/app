@@ -54,7 +54,14 @@ const Player: React.FC<PlayerProps> = ({ state, isHost, children }) => {
             alt={state.title}
             style={styles.image}
           />
-          <View style={styles.trackInfo}>
+          <View
+            style={{
+              justifyContent: isHost ? "flex-start" : "space-between",
+              flex: 1,
+              flexDirection: "column",
+              gap: isHost ? 16 : 0,
+            }}
+          >
             <View>
               <Text style={styles.title}>{state.title}</Text>
               <View>
@@ -72,31 +79,36 @@ const Player: React.FC<PlayerProps> = ({ state, isHost, children }) => {
             >
               Voter pour passer
             </Button>
-            {isHost && (
-              <View style={{ gap: 2 }}>
+            {!isHost && (
+              <View
+                style={{
+                  flexDirection: "column",
+                  rowGap: 2,
+                }}
+              >
                 <View
-                  style={[
-                    { flexDirection: "row", justifyContent: "space-between" },
-                  ]}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  <Text style={styles.progressBarText}>
+                  <Text style={styles.progressDuration}>
                     {formatDuration(state.currentTime)}
                   </Text>
-                  <Text style={styles.progressBarText}>
+                  <Text style={styles.progressDuration}>
                     {formatDuration(state.duration)}
                   </Text>
                 </View>
-                <View style={styles.progressContainer}>
-                  <View style={styles.progressBar}>
-                    <View
-                      style={[
-                        styles.progress,
-                        {
-                          width: `${(state.currentTime / state.duration) * 100}%`,
-                        },
-                      ]}
-                    />
-                  </View>
+                <View style={styles.progressBar}>
+                  <View
+                    style={[
+                      styles.progress,
+                      {
+                        width: `${(state.currentTime / state.duration) * 100}%`,
+                        height: 7,
+                      },
+                    ]}
+                  />
                 </View>
               </View>
             )}
@@ -111,9 +123,12 @@ const Player: React.FC<PlayerProps> = ({ state, isHost, children }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "flex-start",
     gap: 10,
-    maxWidth: 500,
+    flex: 1,
+  },
+  progressDuration: {
+    fontFamily: "Outfit-Medium",
+    fontSize: 14,
   },
   image: {
     width: 128,
@@ -144,7 +159,6 @@ const styles = StyleSheet.create({
     width: 234,
   },
   progressBar: {
-    flex: 1,
     height: 7,
     backgroundColor: "#D1D5DB",
     borderRadius: 9999,

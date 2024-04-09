@@ -3,7 +3,6 @@ import { Link, router } from "expo-router";
 import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
 import Gear from "phosphor-react-native/src/icons/Gear";
 import Plus from "phosphor-react-native/src/icons/Plus";
-import Share from "phosphor-react-native/src/icons/Share";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -24,7 +23,6 @@ import TrackItem from "./room/TrackItem";
 import H1 from "./text/H1";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import { getApiUrl } from "../lib/apiUrl";
-import { getRoomHostedByUser } from "../lib/room-utils";
 import useNetworkStatus from "../lib/useNetworkStatus";
 import { ActiveRoom } from "../lib/useRoom";
 import { useUserProfile } from "../lib/userProfile";
@@ -70,13 +68,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
 
   useEffect(() => {
     if (!userProfile || !room) return;
-
-    const fetchHost = async () => {
-      const { data } = await getRoomHostedByUser(room.id, userProfile, true);
-      setIsHost((data?.length ?? 0) > 0);
-    };
-
-    fetchHost();
+    setIsHost(room.host_user_profile_id === userProfile.user_profile_id);
   }, [userProfile, room]);
 
   useEffect(() => {
@@ -146,9 +138,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   return (
     <View
       style={{
-        paddingVertical: 32,
-        paddingHorizontal: 12,
-        minHeight: "100%",
+        flex: 1,
       }}
     >
       {!networkStatus && <Warning label="Réseau déconnecté" variant="error" />}
@@ -172,17 +162,23 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       )}
       {room && liveRoom && socket && socket.connected && (
         <>
-          <ScrollView contentContainerStyle={headerStyles.headerContainer}>
-            <View
-              style={[
-                { flexDirection: "row", justifyContent: "space-between" },
-              ]}
-            >
-              <H1>{room.name}</H1>
-              <View style={{ flexDirection: "row" }}>
-                <Link href={`/rooms/${room.id}/invite`}>
-                  <Share size={32} color="black" />
-                </Link>
+          <ScrollView
+            contentContainerStyle={{
+              paddingVertical: 32,
+              paddingHorizontal: 12,
+            }}
+          >
+            <View style={headerStyles.headerContainer}>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 20,
+                }}
+              >
+                <H1>{room.name}</H1>
                 {isHost ? (
                   <Link href={`/rooms/${room.id}/settings`}>
                     <Gear size={32} color="black" />
@@ -196,39 +192,37 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                   </Pressable>
                 )}
               </View>
+              <RoomPlayer socket={socket} room={room} isHost={isHost} />
+              <Text style={styles.title}>
+                File d'attente ({liveRoom?.queue.length ?? 0})
+              </Text>
+              {liveRoom === undefined ? (
+                <Text>Chargement...</Text>
+              ) : (
+                <FlatList
+                  style={styles.list}
+                  data={liveRoom.queue}
+                  keyExtractor={(item) => item.url}
+                  renderItem={({ item, index }) => (
+                    <TrackItem
+                      track={item}
+                      index={index}
+                      roomId={room.id}
+                      isMenuDisabled={!isHost}
+                      handleDislike={() => handleDislike(index)}
+                      disliked={
+                        (item.votes &&
+                          item.votes.includes(
+                            userProfile?.user_profile_id ?? ""
+                          )) ||
+                        false
+                      }
+                    />
+                  )}
+                />
+              )}
             </View>
-            <RoomPlayer socket={socket} room={room} />
-            <Text style={styles.title}>
-              File d'attente ({liveRoom?.queue.length ?? 0})
-            </Text>
-            {liveRoom === undefined ? (
-              <Text>Chargement...</Text>
-            ) : (
-              <FlatList
-                style={styles.list}
-                data={liveRoom.queue}
-                keyExtractor={(item) => item.url}
-                renderItem={({ item, index }) => (
-                  <TrackItem
-                    track={item}
-                    index={index}
-                    roomId={room.id}
-                    isMenuDisabled={!isHost}
-                    handleDislike={() => handleDislike(index)}
-                    disliked={
-                      (item.votes &&
-                        item.votes.includes(
-                          userProfile?.user_profile_id ?? ""
-                        )) ||
-                      false
-                    }
-                    addedBy={item.addedBy}
-                  />
-                )}
-              />
-            )}
           </ScrollView>
-
           <Button
             icon={<Plus />}
             href={`/rooms/${room.id}/add`}
@@ -247,7 +241,7 @@ export default ActiveRoomView;
 const floatingStyle = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 0,
+    bottom: 24,
     right: 24,
     zIndex: 1,
   },
@@ -263,7 +257,7 @@ const headerStyles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 14,
     gap: 10,
-    maxHeight: 378,
+    flexDirection: "column",
   },
   buttonContainer: {
     gap: 8,

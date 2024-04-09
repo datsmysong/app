@@ -68,21 +68,52 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
   };
 
   if (!state) return <></>;
+
+  function skipTo90() {
+    if (!state) return;
+    remote.seekTo(0.9 * state.duration);
+  }
+
   return (
-    <View>
+    <View
+      style={{
+        flexDirection: "column",
+        gap: 16,
+      }}
+    >
       <View style={styles.progressContainer}>
-        <Text>{formatDuration(state.currentTime)}</Text>
-        <View style={styles.progressBar}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "column",
+            rowGap: 2,
+          }}
+        >
+          <View style={[styles.progressBar]}>
+            <View
+              style={[
+                styles.progress,
+                {
+                  width: `${(state.currentTime / state.duration) * 100}%`,
+                  height: 7,
+                },
+              ]}
+            />
+          </View>
           <View
-            style={[
-              styles.progress,
-              {
-                width: `${(state.currentTime / state.duration) * 100}%`,
-              },
-            ]}
-          />
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.progressDuration}>
+              {formatDuration(state.currentTime)}
+            </Text>
+            <Text style={styles.progressDuration}>
+              {formatDuration(state.duration)}
+            </Text>
+          </View>
         </View>
-        <Text>{formatDuration(state.duration)}</Text>
       </View>
       <View style={styles.controls}>
         <TouchableOpacity onPress={handlePreviousTrack}>
@@ -91,7 +122,6 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
         <Button
           onPress={handlePlayPause}
           icon={state.isPlaying ? <Pause /> : <Play weight="fill" />}
-          type={state.isPlaying ? "outline" : "filled"}
           loading={loading.playPause}
         >
           {state.isPlaying ? "Pause" : "Play"}
@@ -111,10 +141,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 32,
   },
+  progressDuration: {
+    fontFamily: "Outfit-Medium",
+    fontSize: 14,
+  },
   progressContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    rowGap: 7,
   },
   progressBar: {
     flex: 1,
