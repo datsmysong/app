@@ -10,13 +10,14 @@ import Button from "../Button";
 
 type PlayerProps = {
   state: PlayingJSONTrack | null;
+  isHost: boolean;
   children?: React.ReactNode;
 };
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-const Player: React.FC<PlayerProps> = ({ state, children }) => {
+const Player: React.FC<PlayerProps> = ({ state, isHost, children }) => {
   const [voteSkipActualTrack, setVoteSkipActualTrack] =
     useState<boolean>(false);
   const socket = useWebSocket();
@@ -37,6 +38,12 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
     }
   };
 
+  const formatDuration = (durationMs: number) => {
+    const minutes = Math.floor(durationMs / 60000);
+    const seconds = Math.floor((durationMs % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   return (
     <View style={styles.container}>
       {state && (
@@ -47,7 +54,7 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
             alt={state.title}
             style={styles.image}
           />
-          <View style={{ gap: 16 }}>
+          <View style={styles.trackInfo}>
             <View>
               <Text style={styles.title}>{state.title}</Text>
               <View>
@@ -61,9 +68,38 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
               prependIcon={<ThumbsDown />}
               size="small"
               type={voteSkipActualTrack ? "filled" : "outline"}
+              style={{ gap: 8 }}
             >
               Voter pour passer
             </Button>
+            {isHost && (
+              <View style={{ gap: 2 }}>
+                <View
+                  style={[
+                    { flexDirection: "row", justifyContent: "space-between" },
+                  ]}
+                >
+                  <Text style={styles.progressBarText}>
+                    {formatDuration(state.currentTime)}
+                  </Text>
+                  <Text style={styles.progressBarText}>
+                    {formatDuration(state.duration)}
+                  </Text>
+                </View>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View
+                      style={[
+                        styles.progress,
+                        {
+                          width: `${(state.currentTime / state.duration) * 100}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
           </View>
         </>
       )}
@@ -75,7 +111,7 @@ const Player: React.FC<PlayerProps> = ({ state, children }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 10,
     maxWidth: 500,
   },
@@ -91,6 +127,31 @@ const styles = StyleSheet.create({
   artistName: {
     color: "#C3C3C3",
     fontFamily: "Outfit-Medium",
+  },
+  trackInfo: {
+    gap: 16,
+  },
+  progress: {
+    height: "100%",
+    backgroundColor: "#000000",
+    borderRadius: 9999,
+    transition: "all 1s linear",
+  },
+  progressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: 234,
+  },
+  progressBar: {
+    flex: 1,
+    height: 7,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 9999,
+  },
+  progressBarText: {
+    fontFamily: "Outfit-Medium",
+    fontSize: 15,
   },
 });
 

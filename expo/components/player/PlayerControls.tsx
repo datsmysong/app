@@ -4,7 +4,7 @@ import Play from "phosphor-react-native/src/icons/Play";
 import SkipBack from "phosphor-react-native/src/icons/SkipBack";
 import SkipForward from "phosphor-react-native/src/icons/SkipForward";
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 import { PlayerRemote } from "../../lib/audioRemote";
 import Button from "../Button";
@@ -68,12 +68,6 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
   };
 
   if (!state) return <></>;
-
-  function skipTo90() {
-    if (!state) return;
-    remote.seekTo(0.9 * state.duration);
-  }
-
   return (
     <View>
       <View style={styles.progressContainer}>
@@ -91,14 +85,9 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
         <Text>{formatDuration(state.duration)}</Text>
       </View>
       <View style={styles.controls}>
-        <Button
-          onPress={handlePreviousTrack}
-          type="outline"
-          icon={<SkipBack weight="fill" />}
-          loading={loading.previous}
-        >
-          Previous
-        </Button>
+        <TouchableOpacity onPress={handlePreviousTrack}>
+          <SkipBack weight="fill" size={42} />
+        </TouchableOpacity>
         <Button
           onPress={handlePlayPause}
           icon={state.isPlaying ? <Pause /> : <Play weight="fill" />}
@@ -107,14 +96,9 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({ state, remote }) => {
         >
           {state.isPlaying ? "Pause" : "Play"}
         </Button>
-        <Button
-          onPress={handleNextTrack}
-          type="outline"
-          icon={<SkipForward weight="fill" />}
-          loading={loading.next}
-        >
-          Next
-        </Button>
+        <TouchableOpacity onPress={handleNextTrack}>
+          <SkipForward weight="fill" size={42} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -134,7 +118,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 4,
+    height: 7,
     backgroundColor: "#D1D5DB",
     borderRadius: 9999,
   },

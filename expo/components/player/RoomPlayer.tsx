@@ -12,7 +12,6 @@ import Player from "./Player";
 import PlayerControls from "./PlayerControls";
 import buildAudioRemote, { PlayerRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
-import Button from "../Button";
 import Warning from "../Warning";
 
 type RoomPlayerProps = {
@@ -44,18 +43,6 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
     });
   }, [socket]);
 
-  const playCoolSong = async () => {
-    if (!remote) return;
-
-    if (room.streaming_services?.service_name === "Spotify") {
-      await remote.playTrack("spotify:track:6afdNrotJ1PCt9DoFiHpLj");
-    } else if (room.streaming_services?.service_name === "SoundCloud") {
-      await remote.playTrack(
-        "https://soundcloud.com/martingarrix/martin-garrix-lloyiso-real-love"
-      );
-    }
-  };
-
   return (
     <>
       {error && <Warning label={error} variant="error" />}
@@ -73,10 +60,6 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
           </View>
         )}
       </View>
-
-      <Button type="outline" onPress={playCoolSong}>
-        play Martin Garrix & Lloyiso - Real Love
-      </Button>
     </>
   );
 };

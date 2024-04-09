@@ -3,6 +3,7 @@ import { Link, router } from "expo-router";
 import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
 import Gear from "phosphor-react-native/src/icons/Gear";
 import Plus from "phosphor-react-native/src/icons/Plus";
+import Share from "phosphor-react-native/src/icons/Share";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -143,8 +144,8 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
   const networkStatus = useNetworkStatus();
 
   return (
-    <ScrollView
-      contentContainerStyle={{
+    <View
+      style={{
         paddingVertical: 32,
         paddingHorizontal: 12,
         minHeight: "100%",
@@ -171,21 +172,30 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       )}
       {room && liveRoom && socket && socket.connected && (
         <>
-          <View style={headerStyles.headerContainer}>
-            <H1>"{room.name}"</H1>
-            {isHost ? (
-              <Link href={`/rooms/${room.id}/settings`}>
-                <Gear size={32} color="black" />
-              </Link>
-            ) : (
-              <Pressable onPress={showDialog} style={headerStyles.settingsIcon}>
-                <DoorOpen size={28} color="black" />
-              </Pressable>
-            )}
-            <View style={headerStyles.buttonContainer}>
-              <Button block href={`/rooms/${room.id}/invite`}>
-                Inviter des amis
-              </Button>
+          <ScrollView contentContainerStyle={headerStyles.headerContainer}>
+            <View
+              style={[
+                { flexDirection: "row", justifyContent: "space-between" },
+              ]}
+            >
+              <H1>{room.name}</H1>
+              <View style={{ flexDirection: "row" }}>
+                <Link href={`/rooms/${room.id}/invite`}>
+                  <Share size={32} color="black" />
+                </Link>
+                {isHost ? (
+                  <Link href={`/rooms/${room.id}/settings`}>
+                    <Gear size={32} color="black" />
+                  </Link>
+                ) : (
+                  <Pressable
+                    onPress={showDialog}
+                    style={headerStyles.settingsIcon}
+                  >
+                    <DoorOpen size={28} color="black" />
+                  </Pressable>
+                )}
+              </View>
             </View>
             <RoomPlayer socket={socket} room={room} />
             <Text style={styles.title}>
@@ -217,12 +227,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 )}
               />
             )}
-          </View>
-          <View style={headerStyles.buttonContainer}>
-            <Button block href={`/rooms/${room.id}/invite`}>
-              Inviter des amis
-            </Button>
-          </View>
+          </ScrollView>
 
           <Button
             icon={<Plus />}
@@ -233,7 +238,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
           </Button>
         </>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -307,6 +312,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "700",
     letterSpacing: 0.48,
+    marginTop: 32,
   },
   list: {
     marginVertical: 12,
