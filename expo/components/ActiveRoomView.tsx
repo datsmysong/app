@@ -11,17 +11,18 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
 } from "react-native";
 
 import Alert from "./Alert";
 import Button from "./Button";
 import Confirm from "./Confirm";
-import { Text, View } from "./Themed";
+import { View } from "./Themed";
 import Warning from "./Warning";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
-import H1 from "./text/H1";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
+import Colors from "../constants/Colors";
 import { getApiUrl } from "../lib/apiUrl";
 import useNetworkStatus from "../lib/useNetworkStatus";
 import { ActiveRoom } from "../lib/useRoom";
@@ -162,12 +163,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
       )}
       {room && liveRoom && socket && socket.connected && (
         <>
-          <ScrollView
-            contentContainerStyle={{
-              paddingVertical: 32,
-              paddingHorizontal: 12,
-            }}
-          >
+          <ScrollView contentContainerStyle={{}}>
             <View style={headerStyles.headerContainer}>
               <View
                 style={{
@@ -176,9 +172,17 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginBottom: 20,
+                  backgroundColor: Colors.light.lightGray,
                 }}
               >
-                <H1>{room.name}</H1>
+                <Text
+                  style={{
+                    fontSize: 32,
+                    fontFamily: "Unbounded-Bold",
+                  }}
+                >
+                  {room.name}
+                </Text>
                 {isHost ? (
                   <Link href={`/rooms/${room.id}/settings`}>
                     <Gear size={32} color="black" />
@@ -193,6 +197,15 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                 )}
               </View>
               <RoomPlayer socket={socket} room={room} isHost={isHost} />
+            </View>
+            <View
+              style={{
+                paddingHorizontal: 24,
+                paddingVertical: 14,
+                gap: 10,
+                flexDirection: "column",
+              }}
+            >
               <Text style={styles.title}>
                 File d'attente ({liveRoom?.queue.length ?? 0})
               </Text>
@@ -217,6 +230,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                           )) ||
                         false
                       }
+                      addedBy={item.addedBy}
                     />
                   )}
                 />
@@ -258,6 +272,7 @@ const headerStyles = StyleSheet.create({
     paddingVertical: 14,
     gap: 10,
     flexDirection: "column",
+    backgroundColor: Colors.light.lightGray,
   },
   buttonContainer: {
     gap: 8,
