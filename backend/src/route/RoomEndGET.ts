@@ -26,6 +26,22 @@ export default async function RoomEndGET(
       .send("error during test if user is allowed to archive room");
   }
 
+  const room = RoomStorage.getRoomStorage().getRoom(roomUuid);
+  if (!room) return reply.code(404).send("room not found");
+
+  const inserts = await Promise.all(
+    room.getHistory().map(async (track, position) => {
+      return {
+        room_id: roomUuid,
+        music_id: track.url,
+        profile_id: track.addedBy,
+        position: position + 1,
+      };
+    })
+  );
+
+  await adminSupabase.from("room_history").insert(inserts);
+
   RoomStorage.getRoomStorage().removeRoomByUuid(queryRoom.id);
 
   const { error: updatedValueError } = await adminSupabase

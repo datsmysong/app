@@ -54,15 +54,19 @@ const getPlayedSongsForUser = async (
 
   const playedSongs = await getPlayedSongs(room);
 
-  const promises = playedSongs.map(async (song) => {
-    const songId = song.id;
-    const liked = await isLiked(musicPlatform, songId, user);
+  const promises = playedSongs
+    .map(async (song) => {
+      if (!song) return null;
 
-    return {
-      ...song,
-      liked,
-    };
-  });
+      const songId = song.id;
+      const liked = await isLiked(musicPlatform, songId, user);
+
+      return {
+        ...song,
+        liked,
+      };
+    })
+    .filter((song) => song !== null) as Array<Promise<PlayedJSONTrack>>;
 
   return Promise.all(promises);
 };

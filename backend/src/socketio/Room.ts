@@ -20,6 +20,8 @@ import { Response } from "commons/socket.io-types";
 
 export default class Room {
   public readonly uuid: string;
+
+  private readonly history: RoomJSONTrack[];
   private readonly queue: RoomJSONTrack[];
   private readonly trackFactory: TrackFactory;
   private readonly streamingService: MusicPlatform;
@@ -38,6 +40,7 @@ export default class Room {
     roomWithConfig: RoomWithConfigDatabase
   ) {
     this.uuid = uuid;
+    this.history = [];
     this.queue = [];
     this.streamingService = streamingService;
     this.room = roomWithConfig;
@@ -181,6 +184,14 @@ export default class Room {
     if (this.remote !== null) {
       this.remote.next();
     }
+  }
+
+  addToHistory(track: RoomJSONTrack) {
+    this.history.push(track);
+  }
+
+  getHistory(): RoomJSONTrack[] {
+    return this.history;
   }
 
   /**
