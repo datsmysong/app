@@ -15,6 +15,7 @@ import { useAsyncError } from "../../../../lib/AsyncError";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import SocketIo from "../../../../lib/socketio";
 import useRoom from "../../../../lib/useRoom";
+import { useUserProfile } from "../../../../lib/userProfile";
 
 const WebSocketContext = createContext<Socket | null>(null);
 
@@ -30,15 +31,22 @@ const WebSocketProvider = ({
   const [socketError, setSocketError] = useState<Error | null>(null);
   const throwError = useAsyncError();
 
+  const user = useUserProfile();
+
   const room = useRoom(roomId);
 
   useEffect(() => {
     if (!room) return;
     if (!room.is_active) return;
+    if (!user) return;
 
     const url: URL = new URL("/room/" + roomId, getApiUrl());
 
-    const socketInstance = SocketIo.getInstance().getSocket(url.pathname);
+    const socketInstance = SocketIo.getInstance().getSocket(
+      url.pathname,
+      user.user_profile_id === room.host_user_profile_id
+    );
+
     setWebSocket(socketInstance);
     console.debug("Socket connecté");
 
@@ -57,7 +65,7 @@ const WebSocketProvider = ({
     return () => {
       socketInstance.disconnect();
     };
-  }, [roomId, room]);
+  }, [roomId, room, user]);
 
   return (
     <WebSocketContext.Provider value={webSocket}>
