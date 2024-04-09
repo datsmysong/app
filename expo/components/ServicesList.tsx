@@ -3,9 +3,11 @@ import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
 
+import Alert from "./Alert";
+import { View } from "./Themed";
+import Colors from "../constants/Colors";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
-import Alert from "./Alert";
 
 interface ServicesListProps {
   handleServiceChange: (serviceId: string) => void;
@@ -16,9 +18,8 @@ export default function ServicesList({
 }: ServicesListProps) {
   const [selectedService, setSelectedService] =
     useState<StreamingService["service_id"]>();
-  const [availableServices, setAvailableServices] = useState<
-    StreamingService[]
-  >([]);
+  const [availableServices, setAvailableServices] =
+    useState<StreamingService[]>();
   const user = useUserProfile();
 
   useEffect(() => {
@@ -66,6 +67,21 @@ export default function ServicesList({
       handleServiceChange(item.service_id);
     }
   };
+
+  if (availableServices === undefined)
+    return (
+      <FlatList
+        data={[{}, {}]}
+        key={2}
+        columnWrapperStyle={styles.list}
+        numColumns={2}
+        renderItem={({ item }) => (
+          <View
+            style={{ ...styles.items, backgroundColor: Colors.light.gray }}
+          />
+        )}
+      />
+    );
 
   return (
     <FlatList
