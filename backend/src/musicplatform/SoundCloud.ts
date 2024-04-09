@@ -7,6 +7,8 @@ import SoundCloudRemote from "./remotes/SoundCloudRemote";
 import { Response } from "commons/socket.io-types";
 
 function extractFromTrack(track: SoundcloudTrackV2) {
+  if (track.user == null) return { title: "", artists: "" };
+
   const artists = track.user.username;
 
   return {

@@ -3,14 +3,21 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import createClient from "./supabase";
 
 export async function getUserProfileIdFromAccountId(accId: string) {
-  const { data, error } = await adminSupabase
-    .from("user_profile")
-    .select("user_profile_id")
-    .eq("account_id", accId)
-    .single();
+  const { data, error } = await getUserProfileFromRequest(accId);
 
   if (error) return { data: null, error };
   return { data: data.user_profile_id, error: null };
+}
+
+export async function getUserProfileFromRequest(accountId: string) {
+  const { data, error } = await adminSupabase
+    .from("user_profile")
+    .select("*")
+    .eq("account_id", accountId)
+    .single();
+
+  if (error) return { data: null, error };
+  return { data, error: null };
 }
 
 export async function getStreamingServiceIdByName(serviceName: string) {

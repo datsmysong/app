@@ -161,18 +161,21 @@ export type Database = {
       }
       room_history: {
         Row: {
+          added_at: string
           music_id: string
           position: number
           profile_id: string | null
           room_id: string
         }
         Insert: {
+          added_at?: string
           music_id: string
           position: number
           profile_id?: string | null
           room_id: string
         }
         Update: {
+          added_at?: string
           music_id?: string
           position?: number
           profile_id?: string | null
@@ -294,27 +297,30 @@ export type Database = {
       }
       streaming_services: {
         Row: {
-          description: string | null
+          description: string
           image_url: string
           likes_available: boolean
+          need_account: boolean
           playback_available: boolean
           playlists_available: boolean
           service_id: string
           service_name: string
         }
         Insert: {
-          description?: string | null
+          description: string
           image_url: string
           likes_available?: boolean
+          need_account?: boolean
           playback_available?: boolean
           playlists_available?: boolean
           service_id?: string
           service_name: string
         }
         Update: {
-          description?: string | null
+          description?: string
           image_url?: string
           likes_available?: boolean
+          need_account?: boolean
           playback_available?: boolean
           playlists_available?: boolean
           service_id?: string

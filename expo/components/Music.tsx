@@ -1,4 +1,4 @@
-import { PlayedJSONTrack } from "commons/backend-types";
+import { JSONTrack, PlayedJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
 import DotsThree from "phosphor-react-native/src/icons/DotsThreeOutlineVertical";
 import Heart from "phosphor-react-native/src/icons/Heart";
@@ -10,6 +10,40 @@ import Avatar from "./profile/Avatar";
 type InactiveMusicProps = {
   music: PlayedJSONTrack;
 };
+
+type TrackCardProps = {
+  music: JSONTrack;
+};
+
+type TrackCardSubComponents = {
+  Skeleton: typeof TrackCardSkeleton;
+};
+
+export const TrackCard: React.FC<TrackCardProps> & TrackCardSubComponents = ({
+  music,
+}) => {
+  return (
+    <View style={styles.musicContainer}>
+      <View style={styles.musicDetails}>
+        <MusicArtwork imageUrl={music.imgUrl} />
+        <MusicContent title={music.title} artists={music.artistsName} />
+      </View>
+    </View>
+  );
+};
+
+const TrackCardSkeleton: React.FC = () => {
+  return (
+    <View style={styles.musicContainer}>
+      <View style={styles.musicDetails}>
+        <MusicArtwork.Skeleton />
+        <MusicContent.Skeleton />
+      </View>
+    </View>
+  );
+};
+
+TrackCard.Skeleton = TrackCardSkeleton;
 
 const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
   return (
@@ -29,27 +63,51 @@ const InactiveMusic: React.FC<InactiveMusicProps> = ({ music }) => {
 
 type MusicArtworkProps = {
   imageUrl: string;
-  addedBy: string;
+  addedBy?: string;
 };
 
-const MusicArtwork: React.FC<MusicArtworkProps> = ({ imageUrl, addedBy }) => {
-  // TODO: Use a component to load the avatar of an user
+type MusicArtworkSubComponents = {
+  Skeleton: typeof MusicArtworkSkeleton;
+};
 
+const MusicArtwork: React.FC<MusicArtworkProps> & MusicArtworkSubComponents = ({
+  imageUrl,
+  addedBy,
+}) => {
   return (
     <View style={styles.artworkContainer}>
       <Image source={{ uri: imageUrl }} style={styles.artwork} />
-      <Avatar id={addedBy} style={styles.artworkAvatar} />
+      {addedBy && <Avatar id={addedBy} style={styles.artworkAvatar} />}
     </View>
   );
 };
 
+const MusicArtworkSkeleton: React.FC = () => {
+  return (
+    <View style={styles.artworkContainer}>
+      <View
+        style={{
+          backgroundColor: "#E6E6E6",
+          ...styles.artwork,
+        }}
+      />
+    </View>
+  );
+};
+
+MusicArtwork.Skeleton = MusicArtworkSkeleton;
+
 type MusicContentProps = {
   title: string;
   artists: string;
-  position: number;
+  position?: number;
 };
 
-const MusicContent: React.FC<MusicContentProps> = ({
+type MusicContentSubComponents = {
+  Skeleton: typeof MusicContentSkeleton;
+};
+
+const MusicContent: React.FC<MusicContentProps> & MusicContentSubComponents = ({
   title,
   artists,
   position,
@@ -57,13 +115,40 @@ const MusicContent: React.FC<MusicContentProps> = ({
   return (
     <View style={styles.musicContent}>
       <View style={{ flexDirection: "row", gap: 4 }}>
-        <Text style={styles.title}>{position}.</Text>
+        {position && <Text style={styles.title}>{position}.</Text>}
         <Text style={styles.title}>{title}</Text>
       </View>
       <Text style={styles.artists}>{artists}</Text>
     </View>
   );
 };
+
+const MusicContentSkeleton: React.FC = () => {
+  return (
+    <View style={styles.musicContent}>
+      <View style={{ flexDirection: "row", gap: 4 }}>
+        <View
+          style={{
+            width: 256 + Math.random() * 100,
+            height: 19,
+            backgroundColor: "#E6E6E6",
+            ...styles.title,
+          }}
+        />
+      </View>
+      <View
+        style={{
+          width: 128 + Math.random() * 70,
+          height: 19,
+          backgroundColor: "#E6E6E6",
+          ...styles.artists,
+        }}
+      />
+    </View>
+  );
+};
+
+MusicContent.Skeleton = MusicContentSkeleton;
 
 const MusicActions: React.FC = () => {
   return (
