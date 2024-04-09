@@ -12,15 +12,16 @@ import Player from "./Player";
 import PlayerControls from "./PlayerControls";
 import buildAudioRemote, { PlayerRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
+import Button from "../Button";
 import Warning from "../Warning";
 
 type RoomPlayerProps = {
   room: ActiveRoom;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  isHost: boolean;
 };
 
-const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
-  const isHost = true;
+const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket, isHost }) => {
   const [remote, setRemote] = useState<PlayerRemote>();
   const [error, setError] = useState<string>();
 
@@ -43,6 +44,18 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
     });
   }, [socket]);
 
+  // const playCoolSong = async () => {
+  //   if (!remote) return;
+
+  //   if (room.streaming_services?.service_name === "Spotify") {
+  //     await remote.playTrack("spotify:track:6afdNrotJ1PCt9DoFiHpLj");
+  //   } else if (room.streaming_services?.service_name === "SoundCloud") {
+  //     await remote.playTrack(
+  //       "https://soundcloud.com/martingarrix/martin-garrix-lloyiso-real-love"
+  //     );
+  //   }
+  // };
+
   return (
     <>
       {error && <Warning label={error} variant="error" />}
@@ -53,13 +66,15 @@ const RoomPlayer: React.FC<RoomPlayerProps> = ({ room, socket }) => {
             socket={socket}
           />
         )}
-        <Player state={playbackState} />
+        <Player state={playbackState} isHost={isHost} />
+
         {isHost && remote && (
           <View style={{ paddingTop: 32 }}>
             <PlayerControls state={playbackState} remote={remote} />
           </View>
         )}
       </View>
+      {/* <Button onPress={playCoolSong}>Play song</Button> */}
     </>
   );
 };

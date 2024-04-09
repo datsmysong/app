@@ -54,21 +54,3 @@ export async function getRoomId(
   if (roomsError) return { data: null, error: roomsError };
   return { data: room.id, error: null };
 }
-
-export async function getRoomHostedByUser(
-  roomId: string,
-  userProfile: UserProfile | null,
-  isActive: boolean
-): Promise<{ data: Room[] | null }> {
-  if (!userProfile) return { data: null };
-
-  const { data: room } = await supabase
-    .from("rooms")
-    .select("*")
-    .eq("id", roomId)
-    .eq("host_user_profile_id", userProfile.user_profile_id)
-    .eq("is_active", isActive);
-
-  if (!room) return { data: null };
-  return { data: room };
-}
