@@ -12,5 +12,6 @@ export default {
     tabIconDefault: fakeBlack,
     tabIconSelected: fakeBlack,
     gray: "#B2B2B2",
+    headerBackground: "#E6E6E6",
   },
 };

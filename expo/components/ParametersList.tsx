@@ -1,118 +1,148 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import CustomCheckbox from "./CustomCheckbox";
 import CustomSlider from "./CustomSlider";
 import CustomTextInput from "./CustomTextInput";
+import H2 from "./text/H2";
+
+export type RoomParameters = {
+  maxParticipants: number;
+  allowGuests: boolean;
+
+  allowVoteSkip: boolean;
+  voteSkipPercentage: number;
+
+  maxMusicDuration: number;
+  maxMusicPerUser: number;
+};
 
 interface ParametersListProps {
-  percentageVoteToSkipAMusic: number;
-  setPercentageVote: (text: number) => void;
-  maxMusicPerUser: string;
-  setMaxMusicPerUser: (text: string) => void;
-  maxMusicDuration: string;
-  setMaxMusicDuration: (text: string) => void;
-  canSkip: boolean;
-  setCanSkip: (value: boolean) => void;
-  create: boolean;
+  handleSettingsChange: (settings: RoomParameters) => void;
 }
 
 export default function ParametersList({
-  percentageVoteToSkipAMusic,
-  setPercentageVote,
-  maxMusicPerUser,
-  setMaxMusicPerUser,
-  maxMusicDuration,
-  setMaxMusicDuration,
-  canSkip,
-  setCanSkip,
-  create,
+  handleSettingsChange,
 }: ParametersListProps) {
-  const [canBeAnonymous, setCanBeAnonymous] = useState(false);
-  const [sliderParticipantValue, setSliderParticipantValue] = useState(10);
+  const [parameters, setParameters] = useState<RoomParameters>({
+    maxParticipants: 10,
+    allowGuests: false,
+    allowVoteSkip: false,
+    voteSkipPercentage: 50,
+    maxMusicDuration: 180,
+    maxMusicPerUser: 10,
+  });
+
   return (
-    <View style={{ marginVertical: 10 }}>
-      <View
-        style={{
-          gap: 16,
-        }}
-      >
-        <View style={styles.slider}>
-          <Text style={styles.labelText}>
-            Limite de participants{" "}
-            {!create && <Text style={{ color: "red" }}>*</Text>}
-          </Text>
-          <CustomSlider
-            maximumValue={20}
-            minimumValue={2}
-            maximumTrackTintColor="#CCCCCC"
-            minimumTrackTintColor="#1A1A1A"
-            // Doesn't change anything, don't really understand why, but I'll need to find a
-            // solution to this later
-            value={sliderParticipantValue}
-            setValue={(value) => setSliderParticipantValue(value)}
-            // The column is not on the table room_configuration
-            // onSlidingComplete={handleSave}
-            step={1}
-          />
-        </View>
+    <View
+      style={{
+        gap: 12,
+      }}
+    >
+      <ParameterCard title="Participants">
+        <CustomSlider
+          maximumValue={20}
+          minimumValue={2}
+          maximumTrackTintColor="#CCCCCC"
+          minimumTrackTintColor="#1A1A1A"
+          // Doesn't change anything, don't really understand why, but I'll need to find a
+          // solution to this later
+          value={parameters.maxParticipants}
+          setValue={(value) =>
+            setParameters((prev) => ({ ...prev, maxParticipants: value }))
+          }
+          // The column is not on the table room_configuration
+          // onSlidingComplete={handleSave}
+          step={1}
+        />
         <CustomCheckbox
           disabled
-          value={canBeAnonymous}
-          setValue={setCanBeAnonymous}
+          value={parameters.allowGuests}
+          setValue={(value) =>
+            setParameters((prev) => ({ ...prev, allowGuests: value }))
+          }
           label="Autoriser les utilisateurs anonymes"
         />
-        <View style={styles.separator} />
+      </ParameterCard>
+
+      <ParameterCard title="Votes">
         <CustomCheckbox
-          value={canSkip}
-          setValue={setCanSkip}
+          value={parameters.allowVoteSkip}
+          setValue={(value) =>
+            setParameters((prev) => ({ ...prev, allowVoteSkip: value }))
+          }
           label="Activer le vote skipping"
         />
-        <View style={styles.slider}>
-          <Text style={styles.labelText}>
-            Pourcentage nécessaire{" "}
-            {!create && <Text style={{ color: "red" }}>*</Text>}
-          </Text>
-          <CustomSlider
-            maximumValue={100}
-            minimumValue={1}
-            maximumTrackTintColor="#CCCCCC"
-            minimumTrackTintColor={canSkip ? "#1A1A1A" : "grey"}
-            value={percentageVoteToSkipAMusic}
-            setValue={(value) => setPercentageVote(value)}
-            step={5}
-            disabled={!canSkip}
-          />
-        </View>
-        <View style={styles.separator} />
-        <View style={styles.inputLayout}>
-          <Text style={styles.labelText}>
-            Durée maximale d'une musique{" "}
-            {!create && <Text style={{ color: "red" }}>*</Text>}
-          </Text>
-          <CustomTextInput
-            value={maxMusicDuration}
-            onChangeText={setMaxMusicDuration}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.inputLayout}>
-          <Text style={styles.labelText}>
-            Nombre de musiques maximal par participant{" "}
-            {!create && <Text style={{ color: "red" }}>*</Text>}
-          </Text>
-          <CustomTextInput
-            value={maxMusicPerUser}
-            onChangeText={setMaxMusicPerUser}
-            style={styles.input}
-          />
-        </View>
-      </View>
+        <CustomSlider
+          maximumValue={100}
+          minimumValue={1}
+          maximumTrackTintColor="#CCCCCC"
+          minimumTrackTintColor={parameters.allowVoteSkip ? "#1A1A1A" : "grey"}
+          value={parameters.voteSkipPercentage}
+          setValue={(value) => {
+            setParameters((prev) => ({ ...prev, voteSkipPercentage: value }));
+          }}
+          step={5}
+          disabled={!parameters.allowVoteSkip}
+        />
+      </ParameterCard>
+
+      <ParameterCard title="Musiques">
+        <CustomTextInput
+          value={parameters.maxMusicDuration + ""}
+          onChangeText={(value) =>
+            setParameters((prev) => ({
+              ...prev,
+              maxMusicDuration: parseInt(value, 10),
+            }))
+          }
+          style={styles.input}
+        />
+        <CustomTextInput
+          value={parameters.maxMusicPerUser + ""}
+          onChangeText={(value) =>
+            setParameters((prev) => ({
+              ...prev,
+              maxMusicPerUser: parseInt(value, 10),
+            }))
+          }
+          style={styles.input}
+        />
+      </ParameterCard>
     </View>
   );
+
+  function ParameterCard({
+    title = "Titre à définir",
+    children,
+  }: {
+    title: string;
+    children: React.ReactNode;
+  }) {
+    return (
+      <View style={styles.card}>
+        <H2>{title}</H2>
+        <ParameterCardOptions>{children}</ParameterCardOptions>
+      </View>
+    );
+  }
+
+  function ParameterCardOptions({ children }: { children: React.ReactNode }) {
+    return <View style={styles.cardOptions}>{children}</View>;
+  }
 }
 
 const styles = StyleSheet.create({
+  card: {
+    gap: 16,
+    padding: 24,
+    justifyContent: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+  },
+  cardOptions: {
+    gap: 8,
+  },
   title: {
     color: "#000",
     fontFamily: "Outfit-Regular",
@@ -148,14 +178,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontStyle: "normal",
   },
-  separator: {
-    height: 2,
-    width: "80%",
-    backgroundColor: "grey",
-    marginLeft: "10%",
-    marginRight: "10%",
-  },
-
   inputLayout: {
     display: "flex",
     flexDirection: "column",

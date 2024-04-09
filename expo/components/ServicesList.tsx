@@ -3,9 +3,9 @@ import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { FlatList, Platform, Pressable, StyleSheet, Text } from "react-native";
 
+import Alert from "./Alert";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
-import Alert from "./Alert";
 
 interface ServicesListProps {
   handleServiceChange: (serviceId: string) => void;

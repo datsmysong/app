@@ -1,9 +1,10 @@
 import Slider from "@react-native-community/slider";
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import { ImageURISource, StyleSheet } from "react-native";
+import { ImageURISource, StyleSheet, View } from "react-native";
 
-import { Text, View } from "./Themed";
+import { Text } from "./Themed";
+import Colors from "../constants/Colors";
 
 interface ParametersListProps {
   value: number;
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: 34,
     height: 19,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: Colors.light.black,
     color: "#FFF",
     textAlign: "center",
     marginBottom: 2,

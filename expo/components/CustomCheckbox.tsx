@@ -1,7 +1,7 @@
 import CheckBox from "expo-checkbox";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { Text, View } from "./Themed";
+import { Text } from "./Themed";
 
 interface CustomCheckboxProps {
   value: boolean;
