@@ -2,6 +2,8 @@ import { JSONTrack } from "commons/backend-types";
 import { Response } from "commons/socket.io-types";
 import RoomStorage from "../RoomStorage";
 import Room, { TypedSocket } from "./Room";
+import { spotify } from "../server";
+import Spotify from "../musicplatform/Spotify";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
@@ -183,6 +185,47 @@ export default function onRoomWSConnection(socket: TypedSocket) {
         resultCallback(data);
       }
     );
+
+    socket.on("user:playlists", async (userId, callback) => {
+      const playlists = await spotify.playlists.getUsersPlaylists(userId);
+
+      const result = playlists.items.map((playlist) => {
+        return {
+          name: playlist.name,
+          playlistId: playlist.id,
+          imageUrl: playlist.images[0].url ?? "",
+        };
+      });
+
+      callback(result);
+
+      // const result = playlists.items.forEach((rawPlaylist) => {
+      //   const tracks: JSONTrack[] = [];
+      //
+      //   const playlist = await spotify.playlists.getPlaylist(rawPlaylist.id);
+      //   playlist.tracks.items.forEach((audioElement) => {
+      //     const data = audioElement.track;
+      //     if (data as Track) {
+      //       const track = new Spotify().toJSON(data as Track);
+      //       if (track !== null) tracks.push(track);
+      //     }
+      //   });
+      //
+      //   const result = {
+      //     name: playlist.name,
+      //     tracks: tracks,
+      //   };
+      // });
+      // const newVar = result.;
+    });
+
+    socket.on("user:playlistTrack", async (playlistId, callback) => {
+      const playlist = await spotify.playlists.getPlaylist(playlistId);
+      const result = playlist.tracks.items
+        .map((playlistTrack) => new Spotify().toJSON(playlistTrack.track))
+        .filter((value) => value !== null) as JSONTrack[];
+      callback(result);
+    });
   }
 
   registerHandlers();

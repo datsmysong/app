@@ -37,3 +37,9 @@ export interface RoomJSON {
   queue: RoomJSONTrack[];
   voteSkipActualTrack: string[];
 }
+
+export interface Playlist {
+  name: string;
+  playlistId: string;
+  imageUrl: string;
+}
