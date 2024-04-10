@@ -71,8 +71,10 @@ export default class Room {
       }
       room.setRemote(remote);
       roomStorage.addRoom(room);
-    } else {
-      if (hostSocket) room.setHostSocket(hostSocket);
+    }
+
+    if (hostSocket) {
+      room.setHostSocket(hostSocket);
     }
 
     return { data: room, error: null };

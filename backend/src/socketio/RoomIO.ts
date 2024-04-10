@@ -2,11 +2,13 @@ import { JSONTrack } from "commons/backend-types";
 import { Response } from "commons/socket.io-types";
 import RoomStorage from "../RoomStorage";
 import Room, { TypedSocket } from "./Room";
+import { server } from "../server";
 
 const roomStorage = RoomStorage.getRoomStorage();
 
-const sendQueue = (socket: TypedSocket, room: Room) => {
-  socket.emit("queue:update", Room.toJSON(room));
+const sendQueue = (room: Room) => {
+  const socketWithRoomId = server.io.of(`/room/${room.uuid}`);
+  socketWithRoomId.emit("queue:update", Room.toJSON(room));
 };
 
 export default function onRoomWSConnection(socket: TypedSocket) {
@@ -31,10 +33,11 @@ export default function onRoomWSConnection(socket: TypedSocket) {
   const activeRoomId = rawUrlMatchGroups.slice(1)[0];
 
   //! Host can tell the server that he is the host (not secure)
-  const isHostSocket = socket.handshake.auth;
+  const isHostSocket = socket.handshake.auth.host;
 
   async function registerHandlers() {
     const hostSocket = isHostSocket ? socket : null;
+
     const { data: room, error } = await roomStorage.roomFromUuid(
       activeRoomId,
       hostSocket
@@ -56,11 +59,11 @@ export default function onRoomWSConnection(socket: TypedSocket) {
      * Instead of sending the whole state, we should only send the actions taken by other users
      * so that the client can update its state accordingly
      */
-    sendQueue(socket, room);
+    sendQueue(room);
 
     socket.on("queue:add", async (rawUrl: string, accountId: string) => {
       await room.add(rawUrl, accountId);
-      sendQueue(socket, room);
+      sendQueue(room);
     });
 
     // We should check the origin of the request to prevent anyone that isn't the host from removing anything
@@ -70,12 +73,12 @@ export default function onRoomWSConnection(socket: TypedSocket) {
           await room.removeWithIndex(index);
         }
       }
-      sendQueue(socket, room);
+      sendQueue(room);
     });
 
     socket.on("queue:removeLink", async (link) => {
       await room.removeWithLink(link);
-      sendQueue(socket, room);
+      sendQueue(room);
     });
 
     socket.on("queue:voteSkip", async (index, userId) => {
@@ -83,7 +86,7 @@ export default function onRoomWSConnection(socket: TypedSocket) {
       if (!addedVote) return;
 
       const skipped = await room.verifyVoteSkip(index);
-      if (skipped === "queueTrackSkiped") sendQueue(socket, room);
+      if (skipped === "queueTrackSkiped") sendQueue(room);
       if (skipped === "actualTrackSkiped") {
         const remote = room.getRemote();
         if (!remote) return;
