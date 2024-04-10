@@ -99,8 +99,6 @@ export default class RoomStorage {
         if (newPlaybackState.url != previousPlaybackState?.url) {
           console.debug(`The track of room ${room.uuid} has changed`);
 
-          room.addToHistory(newPlaybackState);
-
           if (remote instanceof QueueableRemote) {
             let nextTrack = room.getQueue().at(0);
 
