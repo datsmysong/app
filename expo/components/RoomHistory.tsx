@@ -94,7 +94,7 @@ const RoomHistory: React.FC<RoomHistoryProps> = ({ roomId }) => {
                 )
               </H2>
               {processedRoom.playedSongs.map((song) => {
-                return <InactiveMusic key={song.id} music={song} />;
+                return <InactiveMusic key={song.position} music={song} />;
               })}
             </View>
           </View>

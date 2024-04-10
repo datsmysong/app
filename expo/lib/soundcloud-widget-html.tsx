@@ -65,13 +65,15 @@ export default function getSoundCloudWidgetHtml() {
                 albumName = currentSound.title;
               }
       
+              const artworkUrl = currentSound.artwork_url ?? "https://unsplash.it/128/128";
+
               const playingMusic = {
                 url: currentSound.permalink_url,
                 title,
                 duration: currentSound.duration,
                 artistsName,
                 albumName,
-                imgUrl: currentSound.artwork_url.replace("large", "t500x500"),
+                imgUrl: artworkUrl.replace("large", "t500x500"),
                 currentTime: position,
                 isPlaying: isCurrentlyPlaying,
               };

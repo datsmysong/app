@@ -20,6 +20,8 @@ import { Response } from "commons/socket.io-types";
 
 export default class Room {
   public readonly uuid: string;
+
+  private readonly history: RoomJSONTrack[];
   private readonly queue: RoomJSONTrack[];
   private readonly trackFactory: TrackFactory;
   private readonly streamingService: MusicPlatform;
@@ -38,6 +40,7 @@ export default class Room {
     roomWithConfig: RoomWithConfigDatabase
   ) {
     this.uuid = uuid;
+    this.history = [];
     this.queue = [];
     this.streamingService = streamingService;
     this.room = roomWithConfig;
@@ -110,12 +113,6 @@ export default class Room {
     // If the queue is currently empty and no track is playing, we can play the track immediately
     const { data: playbackState } = await this.remote.getPlaybackState();
 
-    if (this.queue.length === 0 && playbackState === null) {
-      const response = await this.remote.playTrack(track.url);
-      if (!response.error) await this.updatePlaybackState();
-      return;
-    }
-
     if (this.queue.map((value) => value.url).includes(track.url)) return;
 
     this.queue.push({
@@ -123,7 +120,17 @@ export default class Room {
       addedBy: accountId,
       votes: [],
     });
-    if (this.queue.length !== 1) return;
+
+    if (this.queue.length === 1 && playbackState === null) {
+      const shiftedTrack = this.shiftQueue();
+      if (!shiftedTrack) return;
+
+      const response = await this.remote.playTrack(shiftedTrack.url);
+      if (!response.error) await this.updatePlaybackState();
+      return;
+    }
+
+    if (this.queue.length < 1) return;
 
     // For remote streaming services, we should add the track to the queue of the player
     if (!(this.remote instanceof QueueableRemote)) return;
@@ -181,6 +188,14 @@ export default class Room {
     if (this.remote !== null) {
       this.remote.next();
     }
+  }
+
+  addToHistory(track: RoomJSONTrack) {
+    this.history.push(track);
+  }
+
+  getHistory(): RoomJSONTrack[] {
+    return this.history;
   }
 
   /**
@@ -283,6 +298,9 @@ export default class Room {
   shiftQueue() {
     const result = this.queue.shift();
     this.hostSocket?.nsp.emit("queue:update", Room.toJSON(this));
+
+    if (result) this.addToHistory(result);
+
     return result;
   }
 
