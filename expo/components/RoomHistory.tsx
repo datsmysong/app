@@ -14,7 +14,7 @@ import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
 import { Text, View } from "./Tamed";
 import Avatar from "./profile/Avatar";
-import H2 from "./text/H2";
+import { H2 } from "./typography/Titles";
 import { getApiUrl } from "../lib/apiUrl";
 
 type RoomHistoryProps = {

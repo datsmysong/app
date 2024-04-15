@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 
 import Font from "../../constants/Font";
-import H1 from "../text/H1";
+import H1 from "../typography/Titles";
 
 export default function FriendHeader() {
   return (

@@ -4,8 +4,8 @@ import { FlatList } from "react-native";
 
 import RoomHistoryInfoCard from "./RoomHistoryInfoCard";
 import { View } from "./Themed";
-import H2 from "./text/H2";
-import Subtitle from "./text/Subtitle";
+import { Subtitle } from "./typography/Paragraphs";
+import { H2 } from "./typography/Titles";
 import { supabase } from "../lib/supabase";
 import { useUserProfile } from "../lib/userProfile";
 
