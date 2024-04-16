@@ -10,8 +10,8 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { Text } from "./Tamed";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
+import { Text } from "../Tamed";
 
 const BUTTON_COLORS = ["primary", "success", "danger"] as const;
 

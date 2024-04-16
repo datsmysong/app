@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { H1 } from "../typography/Titles";
+import { H1 } from "../ui/typography/Titles";
 
 export const AccountHeader = () => {
   return (

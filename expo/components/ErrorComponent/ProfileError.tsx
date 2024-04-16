@@ -1,9 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
-import Button from "../Button";
 import { View } from "../Themed";
-import { H1, H2 } from "../typography/Titles";
+import Button from "../ui/Button";
+import { H1, H2 } from "../ui/typography/Titles";
 
 export default function ProfileErrorBoundary(): JSX.Element {
   return (

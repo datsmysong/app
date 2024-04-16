@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import CaretLeft from "phosphor-react-native/src/icons/CaretLeft";
 
-import { Subtitle } from "./typography/Paragraphs";
+import { Subtitle } from "./ui/typography/Paragraphs";
 import Colors from "../constants/Colors";
 import Font from "../constants/Font";
 

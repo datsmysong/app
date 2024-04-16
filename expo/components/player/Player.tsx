@@ -7,7 +7,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { useWebSocket } from "../../app/(tabs)/rooms/[id]/_layout";
 import Font from "../../constants/Font";
 import { useUserProfile } from "../../lib/userProfile";
-import Button from "../Button";
+import Button from "../ui/Button";
 
 type PlayerProps = {
   state: PlayingJSONTrack | null;

@@ -7,6 +7,9 @@ import { ScrollView, StyleSheet } from "react-native";
 import Alert from "../../../../components/Alert";
 import Button from "../../../../components/Button";
 import { Text, View } from "../../../../components/Tamed";
+import Button from "../../../../components/ui/Button";
+import { Subtitle } from "../../../../components/ui/typography/Paragraphs";
+import { H2 } from "../../../../components/ui/typography/Titles";
 import { useAsyncError } from "../../../../lib/AsyncError";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import { bindServiceToAccount } from "../../../../lib/providerMethods";
@@ -104,8 +107,8 @@ export default function ProfileIntegration() {
                   style={styles.image}
                 />
                 <View style={styles.details}>
-                  <Text style={styles.title}>{service.service_name}</Text>
-                  <Text style={styles.description}>{service.description}</Text>
+                  <H2>{service.service_name}</H2>
+                  <Subtitle>{service.description}</Subtitle>
                 </View>
               </View>
               <View style={styles.tags}>
@@ -218,33 +221,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 
-  title: {
-    color: "#000",
-    textAlign: "center",
-    fontFamily: "Outfit-Regular",
-    fontSize: 18,
-    fontStyle: "normal",
-    fontWeight: "700",
-  },
-
-  description: {
-    color: "#808080",
-    fontFamily: "Outfit-Regular",
-    fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "400",
-  },
-
   tag: {
-    width: "45%",
     borderRadius: 16,
     textAlign: "center",
-    fontFamily: "Outfit-Regular",
-    margin: 4,
+    fontFamily: "Outfit-Medium",
     fontSize: 16,
-    padding: 2,
-    fontStyle: "normal",
-    fontWeight: "500",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
 
   trueTag: {
@@ -261,5 +244,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     backgroundColor: "#fff",
+    gap: 8,
   },
 });

@@ -1,7 +1,7 @@
 import { StyleProp, StyleSheet, TextStyle } from "react-native";
 
-import Font from "../../constants/Font";
-import { Text } from "../Themed";
+import Font from "../../../constants/Font";
+import { Text } from "../../Themed";
 
 export type TypographyComponentProps = {
   children: string | string[];

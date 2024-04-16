@@ -2,9 +2,12 @@ import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Screen } from "react-native-screens";
 
-import Button from "../components/Button";
 import ControlledInput from "../components/ControlledInput";
-import { MediumSubtitle, Subtitle } from "../components/typography/Paragraphs";
+import Button from "../components/ui/Button";
+import {
+  MediumSubtitle,
+  Subtitle,
+} from "../components/ui/typography/Paragraphs";
 import Font from "../constants/Font";
 import { usernameRules } from "../constants/InputRules";
 import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
