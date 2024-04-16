@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { SquircleView } from "react-native-figma-squircle";
 
 import { Text } from "./Tamed";
 import Colors from "../constants/Colors";
@@ -67,7 +68,6 @@ const Button: React.FC<ButtonProps> = ({
 
   const iconColor = isFilled ? ICON_COLOR_FILLED : buttonColor;
 
-  // Styled icons
   prependIcon =
     prependIcon &&
     React.cloneElement(prependIcon, { size: iconSize, color: iconColor });
@@ -95,9 +95,6 @@ const Button: React.FC<ButtonProps> = ({
     !appendIcon &&
       !icon &&
       (isSmall ? styles.smallPadding : styles.normalPadding),
-    isFilled
-      ? { backgroundColor: buttonColor }
-      : { ...styles.outline, borderColor: buttonColor },
     disabled && styles.disabled,
     block && styles.block,
   ];
@@ -111,52 +108,62 @@ const Button: React.FC<ButtonProps> = ({
   const handlePress = href ? () => router.push(href as any) : onPress;
 
   return (
-    <Pressable
-      style={pressableStyle}
-      onPress={handlePress}
-      onLongPress={onLongPress}
-      disabled={disabled || loading}
-      accessibilityLabel={children as string}
+    <SquircleView
+      squircleParams={{
+        cornerSmoothing: 1,
+        cornerRadius: isSmall ? 8 : 16,
+        fillColor: isFilled ? buttonColor : "transparent",
+        strokeColor: !isFilled ? buttonColor : "transparent",
+        strokeWidth: 2,
+      }}
     >
-      {loading && (
-        <View
-          style={{
-            width: iconSize,
-            height: iconSize,
-            justifyContent: "center",
-            position: "absolute",
-          }}
-        >
-          <ActivityIndicator
-            size="small"
-            color={isFilled ? "white" : buttonColor}
-          />
-        </View>
-      )}
-      <View
-        style={{
-          ...styles.button,
-          opacity: loading ? 0 : 1,
-          maxWidth: "100%",
-        }}
+      <Pressable
+        style={pressableStyle}
+        onPress={handlePress}
+        onLongPress={onLongPress}
+        disabled={disabled || loading}
+        aria-label={children as string}
       >
-        {prependIcon}
-        {icon}
-        {!icon && (
-          <Text
+        {loading && (
+          <View
             style={{
-              ...styles.buttonText,
-              fontSize: isSmall ? 16 : 24,
-              color: iconColor,
-              fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
+              width: iconSize,
+              height: iconSize,
+              justifyContent: "center",
+              position: "absolute",
             }}
           >
-            {children}
-          </Text>
+            <ActivityIndicator
+              size="small"
+              color={isFilled ? "white" : buttonColor}
+            />
+          </View>
         )}
-        {appendIcon}
-      </View>
-    </Pressable>
+        <View
+          style={{
+            ...styles.button,
+            opacity: loading ? 0 : 1,
+            maxWidth: "100%",
+          }}
+        >
+          {prependIcon}
+          {icon}
+          {!icon && (
+            <Text
+              style={{
+                ...styles.buttonText,
+                fontSize: isSmall ? 16 : 24,
+                color: iconColor,
+                fontFamily: isSmall ? "Outfit-Regular" : "Outfit-Bold",
+              }}
+            >
+              {children}
+            </Text>
+          )}
+          {appendIcon}
+        </View>
+      </Pressable>
+    </SquircleView>
   );
 };
 

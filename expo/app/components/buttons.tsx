@@ -12,6 +12,7 @@ const propOptions: Partial<Record<keyof ButtonProps, any[]>> = {
   appendIcon: ["home", null],
   color: ["primary", "success", "danger"],
   loading: [false, true],
+  disabled: [false, true],
 };
 
 function generateCombinations(
