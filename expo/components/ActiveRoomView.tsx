@@ -22,7 +22,7 @@ import Warning from "./Warning";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
 import Button from "./ui/Button";
-import H1 from "./ui/typography/Titles";
+import { H1 } from "./ui/typography/Titles";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import Colors from "../constants/Colors";
 import { getApiUrl } from "../lib/apiUrl";
