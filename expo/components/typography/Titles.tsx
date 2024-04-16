@@ -32,6 +32,28 @@ export const H2: React.FC<TypographyComponentProps> = ({ children, style }) => {
   return <Text style={[styles.h2, style]}>{children}</Text>;
 };
 
+/**
+ * H3 component for displaying level 3 headings. (Outfit Bold, 20px)
+ *
+ * @param children - The content to be displayed within the H3 component.
+ * @param style - Additional styles to be applied to the H3 component.
+ * @returns The rendered H3 component.
+ */
+export const H3: React.FC<TypographyComponentProps> = ({ children, style }) => {
+  return <Text style={[styles.h3, style]}>{children}</Text>;
+};
+
+/**
+ * H4 component for displaying level 4 headings. (Outfit Bold, 18px)
+ *
+ * @param children - The content to be displayed within the H4 component.
+ * @param style - Additional styles to be applied to the H4 component.
+ * @returns The rendered H4 component.
+ */
+export const H4: React.FC<TypographyComponentProps> = ({ children, style }) => {
+  return <Text style={[styles.h4, style]}>{children}</Text>;
+};
+
 const styles = StyleSheet.create({
   h1: {
     fontSize: 32,
@@ -39,6 +61,14 @@ const styles = StyleSheet.create({
   },
   h2: {
     fontSize: 24,
+    fontFamily: Font.Outfit.Bold,
+  },
+  h3: {
+    fontSize: 20,
+    fontFamily: Font.Outfit.Bold,
+  },
+  h4: {
+    fontSize: 18,
     fontFamily: Font.Outfit.Bold,
   },
 });
