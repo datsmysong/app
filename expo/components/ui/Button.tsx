@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import Colors from "../../constants/Colors";
-import { Text } from "../Tamed";
+import { Text } from "../Themed";
 
 const BUTTON_COLORS = ["primary", "success", "danger"] as const;
 
