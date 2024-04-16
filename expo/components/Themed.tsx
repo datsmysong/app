@@ -5,7 +5,6 @@
 
 import {
   Text as DefaultText,
-  useColorScheme,
   View as DefaultView,
   PressableProps,
 } from "react-native";
