@@ -113,6 +113,10 @@ export default class RoomStorage {
           if (remote instanceof QueueableRemote) {
             let nextTrack = room.getQueue().at(0);
 
+            /* If the track that just started playing is the next track in the queue,
+             * that means the streaming service has started playing it, most likely because
+             * the previous track ended so we can remove it from the queue
+             */
             if (nextTrack?.url === newPlaybackState.url) {
               room.shiftQueue();
               nextTrack = room.getQueue().at(0);

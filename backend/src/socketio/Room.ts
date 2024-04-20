@@ -136,7 +136,13 @@ export default class Room {
 
     // For remote streaming services, we should add the track to the queue of the player
     if (!(this.remote instanceof QueueableRemote)) return;
-    (this.remote as QueueableRemote).addToQueue(track.url);
+
+    // Only add the track to the queue if it's the first track added to the queue
+    // On QueuableRemotes, we only want the very next track to be in the queue, so that other tracks in the queue can be downvoted, without needing to remove the downvoted tracks from the QueuableRemote queue
+    if (this.queue.length > 1) return;
+
+    const queuableRemote = this.remote as QueueableRemote;
+    queuableRemote.addToQueue(track.url);
   }
 
   async removeWithLink(rawUrl: string) {
