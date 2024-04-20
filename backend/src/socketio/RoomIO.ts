@@ -61,6 +61,14 @@ export default function onRoomWSConnection(socket: TypedSocket) {
      */
     sendQueue(room);
 
+    // When a client connects to a room, we send the currently known playback state
+    if (room.getPlaybackState() !== null) {
+      socket.emit("player:updatePlaybackState", {
+        data: room.getPlaybackState(),
+        error: null,
+      });
+    }
+
     socket.on("queue:add", async (rawUrl: string, accountId: string) => {
       await room.add(rawUrl, accountId);
       sendQueue(room);
