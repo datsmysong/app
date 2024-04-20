@@ -155,7 +155,14 @@ export default function onRoomWSConnection(socket: TypedSocket) {
       }
 
       socket.emit("player:skip", response);
-      if (!response.error) await room.updatePlaybackState();
+
+      // If the skip action was successful, we update the playback state
+      // This is done after a timeout to ensure that the track has been skipped on the remote
+      if (!response.error) {
+        setTimeout(() => {
+          room.updatePlaybackState();
+        }, 1000);
+      }
     });
 
     socket.on("player:previous", async () => {
@@ -165,7 +172,13 @@ export default function onRoomWSConnection(socket: TypedSocket) {
       const response = await remote.previous();
       socket.emit("player:previous", response);
 
-      if (!response.error) await room.updatePlaybackState();
+      // If the previous action was successful, we update the playback state
+      // This is done after a timeout to ensure that the track has been skipped on the remote
+      if (!response.error) {
+        setTimeout(() => {
+          room.updatePlaybackState();
+        }, 1000);
+      }
     });
 
     socket.on("player:setVolume", async (volume) => {
