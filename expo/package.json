@@ -22,6 +22,7 @@
     "@react-native-community/netinfo": "11.1.0",
     "@react-native-community/slider": "4.4.2",
     "@react-navigation/native": "^6.0.2",
+    "@sentry/react-native": "~5.22.0",
     "@spotify/web-api-ts-sdk": "^1.1.2",
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.39.2",

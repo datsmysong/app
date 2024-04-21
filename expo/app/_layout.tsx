@@ -1,6 +1,12 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
+import {
+  SplashScreen,
+  Stack,
+  router,
+  useNavigationContainerRef,
+} from "expo-router";
 import { IconContext } from "phosphor-react-native/src/lib";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
@@ -16,9 +22,40 @@ export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
 
+// Construct a new instrumentation instance. This is needed to communicate between the integration and React
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+  dsn: "https://7085409d423f186cbaf15178a350408f@o4507124937064448.ingest.de.sentry.io/4507124939620432",
+  debug: process.env.NODE_ENV === "development",
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+  _experiments: {
+    // profilesSampleRate is relative to tracesSampleRate.
+    // Here, we'll capture profiles for 100% of transactions.
+    profilesSampleRate: 1.0,
+  },
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      routingInstrumentation,
+    }),
+  ],
+});
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-export default function RootLayout() {
+
+function RootLayout() {
+  // Capture the NavigationContainer ref and register it with the instrumentation.
+  const ref = useNavigationContainerRef();
+
+  useEffect(() => {
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
+    }
+  }, [ref]);
+
   const [loaded, error] = useFonts({
     "Outfit-Thin": require("../assets/fonts/outfit/Outfit-Thin.ttf"),
     "Outfit-ExtraLight": require("../assets/fonts/outfit/Outfit-ExtraLight.ttf"),
@@ -108,3 +145,5 @@ function RootLayoutNav() {
     </View>
   );
 }
+
+export default Sentry.wrap(RootLayout);
