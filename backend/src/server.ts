@@ -51,6 +51,8 @@ Sentry.init({
   // Add Performance Monitoring by setting tracesSampleRate
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
+  environment: process.env.NODE_ENV,
+  debug: process.env.NODE_ENV === "development",
 });
 
 // (!) This import should be done after the Sentry.init call
