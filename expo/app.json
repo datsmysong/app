@@ -35,6 +35,7 @@
       [
         "@sentry/react-native/expo",
         {
+          "url": "https://sentry.io/",
           "organization": "datsmysong",
           "project": "app"
         }

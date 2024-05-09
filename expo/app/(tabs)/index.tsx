@@ -5,7 +5,6 @@ import MusicNote from "phosphor-react-native/src/icons/MusicNote";
 import React, { useEffect, useState } from "react";
 import { FlatList, View as NativeView, ScrollView } from "react-native";
 
-import Alert from "../../components/Alert";
 import Button from "../../components/Button";
 import { TrackCard } from "../../components/Music";
 import { View } from "../../components/Themed";
