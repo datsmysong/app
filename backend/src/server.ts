@@ -8,7 +8,6 @@ import {
   ServerToClientEvents,
 } from "commons/socket.io-types";
 import { config } from "dotenv";
-import fastify from "fastify";
 import fastifySocketIO from "fastify-socket.io";
 import { Server } from "socket.io";
 import authRoutes from "./authRoutes";
@@ -25,6 +24,7 @@ import StreamingServicesGET from "./route/StreamingServicesGET";
 import UnbindServicePOST from "./route/UnbindServicePOST";
 import RecentMusicsGET from "./route/RecentMusicsGET";
 import onRoomWSConnection from "./socketio/RoomIO";
+import * as Sentry from "@sentry/node";
 
 config({ path: ".env.local" });
 
@@ -44,6 +44,20 @@ const corsOrigin: (devValue?: string | boolean) => (string | boolean)[] = (
   return ["https://datsmysong.app", "https://api.datsmysong.app/"];
 };
 
+// Ensure to call this before requiring any other modules!
+Sentry.init({
+  dsn: "https://349dd8dd31222fcee73479d237a589dd@o4507124937064448.ingest.de.sentry.io/4507226372636752",
+
+  // Add Performance Monitoring by setting tracesSampleRate
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  environment: process.env.NODE_ENV,
+  debug: process.env.NODE_ENV === "development",
+});
+
+// (!) This import should be done after the Sentry.init call
+import fastify from "fastify";
+
 export const server = fastify({
   ignoreTrailingSlash: true,
   ignoreDuplicateSlashes: true,
@@ -53,6 +67,8 @@ export const server = fastify({
     },
   },
 });
+
+Sentry.setupFastifyErrorHandler(server);
 
 if (!process.env.SUPABASE_URL || !process.env.SERVICE_ROLE) {
   throw new Error(
