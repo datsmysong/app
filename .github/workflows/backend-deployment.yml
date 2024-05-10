@@ -29,7 +29,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: SENTRY_AUTH_TOKEN
           script: |
-            export SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+            echo Using Sentry token: $SENTRY_AUTH_TOKEN
+            echo $SENTRY_AUTH_TOKEN | cut -c -10
             cd /home/ubuntu/.docker/datsmysong
             git pull
             docker-compose down
