@@ -215,10 +215,6 @@ server.ready().then(() => {
 
 server.listen({ port: 3000, host: "0.0.0.0" });
 
-server.get("/debug-sentry", function mainHandler() {
-  throw new Error("My first Sentry error!");
-});
-
 declare module "fastify" {
   interface FastifyInstance {
     io: Server<ClientToServerEvents, ServerToClientEvents>;
