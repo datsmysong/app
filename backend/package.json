@@ -7,7 +7,8 @@
     "dev": "cross-env NODE_ENV=development nodemon --watch src src/server.ts",
     "build": "tsc -p tsconfig.json && npm run sentry:sourcemaps",
     "postinstall": "npm link ../commons",
-    "sentry:sourcemaps": "echo $SENTRY_AUTH_TOKEN | cut -c 1-15 && sentry-cli sourcemaps inject --org datsmysong --project backend ./build && sentry-cli sourcemaps upload --org datsmysong --project backend ./build"
+    "sentry:sourcemaps": "echo WIP && exit 0",
+    "sentry:sourcemaps2": "echo $SENTRY_AUTH_TOKEN | cut -c 1-15 && sentry-cli sourcemaps inject --org datsmysong --project backend ./build && sentry-cli sourcemaps upload --org datsmysong --project backend ./build"
   },
   "author": "",
   "license": "ISC",
