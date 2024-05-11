@@ -5,7 +5,6 @@ WORKDIR /
 COPY . ./
 WORKDIR /backend
 RUN npm install
-RUN echo $SENTRY_AUTH_TOKEN
 RUN npm run build
 ENV NODE_ENV=production
 CMD ["node", "build/server.js"]
