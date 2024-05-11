@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -28,5 +29,5 @@ jobs:
           script: |
             cd /home/ubuntu/.docker/datsmysong
             git pull
-            docker-compose down
-            docker-compose up -d --force-recreate --build
+            docker compose down
+            docker compose up -d --force-recreate --build
