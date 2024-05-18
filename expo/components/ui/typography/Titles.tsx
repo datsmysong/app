@@ -9,7 +9,7 @@ export type TypographyComponentProps = {
 };
 
 /**
- * Represents a level 1 heading component. (Unbounded Bold, 32px)
+ * H1 component for displaying level 1 headings. (Unbounded Bold, 32px)
  *
  * @component
  * @param {TypographyComponentProps} props - The component props.
