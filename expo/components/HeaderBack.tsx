@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import CaretLeft from "phosphor-react-native/src/icons/CaretLeft";
 
-import { Text } from "./Themed";
+import { Subtitle } from "./ui/typography/Paragraphs";
 import Colors from "../constants/Colors";
 import Font from "../constants/Font";
 
@@ -21,15 +21,7 @@ export default function HeaderBack() {
       href="/(tabs)/rooms"
     >
       <CaretLeft size={24} color={Colors.light.gray} />
-      <Text
-        style={{
-          fontFamily: Font.Unbounded.Regular,
-          fontSize: 16,
-          color: Colors.light.gray,
-        }}
-      >
-        Retour
-      </Text>
+      <Subtitle>Retour</Subtitle>
     </Link>
   );
 }

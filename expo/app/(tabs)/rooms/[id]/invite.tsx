@@ -9,9 +9,9 @@ import Share from "phosphor-react-native/src/icons/Share";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
 
-import Button from "../../../../components/Button";
 import CustomTextInput from "../../../../components/CustomTextInput";
 import { View } from "../../../../components/Themed";
+import Button from "../../../../components/ui/Button";
 import { supabase } from "../../../../lib/supabase";
 
 export default function InvitationModal() {

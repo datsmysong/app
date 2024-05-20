@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 
 import { HomeTabHeader } from ".";
 import ApplicationLoadingScreen from "../../components/ApplicationLoadingScreen";
-import { Text } from "../../components/Tamed";
 import FriendHeader from "../../components/headers/FriendHeader";
+import { BigSubtitle } from "../../components/ui/typography/Paragraphs";
 import Colors from "../../constants/Colors";
 import { supabase } from "../../lib/supabase";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";
@@ -20,18 +20,17 @@ WebBrowser.maybeCompleteAuthSession();
 function TabBarLabel(props: {
   color: string;
   focused: boolean;
-  children: React.ReactNode;
+  children: string | string[];
 }) {
   return (
-    <Text
+    <BigSubtitle
       style={{
         color: props.color,
-        fontSize: 20,
         fontFamily: props.focused ? "Outfit-Bold" : "Outfit-Medium",
       }}
     >
       {props.children}
-    </Text>
+    </BigSubtitle>
   );
 }
 export default function TabLayout() {

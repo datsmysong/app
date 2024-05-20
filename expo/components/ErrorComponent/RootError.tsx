@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
-import Button from "../Button";
 import { View, Text } from "../Themed";
+import Button from "../ui/Button";
 
 export const RootErrorBoundary = () => {
   return (

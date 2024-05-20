@@ -10,8 +10,8 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { Text } from "./Tamed";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
+import { Text } from "../Themed";
 
 const BUTTON_COLORS = ["primary", "success", "danger"] as const;
 
@@ -116,7 +116,7 @@ const Button: React.FC<ButtonProps> = ({
       onPress={handlePress}
       onLongPress={onLongPress}
       disabled={disabled || loading}
-      accessibilityLabel={children as string}
+      aria-label={children as string}
     >
       {loading && (
         <View

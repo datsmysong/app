@@ -3,9 +3,9 @@ import { StyleSheet, Text, View } from "react-native";
 
 import ConnectWithGoogle from "./connect-with-google";
 import ConnectWithSpotify from "./connect-with-spotify";
-import Button from "../../components/Button";
 import Separator from "../../components/Separator";
-import H1 from "../../components/text/H1";
+import Button from "../../components/ui/Button";
+import { H1 } from "../../components/ui/typography/Titles";
 
 export default function Onboarding() {
   return (

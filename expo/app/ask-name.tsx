@@ -2,9 +2,12 @@ import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { Screen } from "react-native-screens";
 
-import Button from "../components/Button";
 import ControlledInput from "../components/ControlledInput";
-import { Text } from "../components/Themed";
+import Button from "../components/ui/Button";
+import {
+  MediumSubtitle,
+  Subtitle,
+} from "../components/ui/typography/Paragraphs";
 import Font from "../constants/Font";
 import { usernameRules } from "../constants/InputRules";
 import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
@@ -67,17 +70,10 @@ export default function AskName() {
         padding: 16,
       }}
     >
-      <Text
-        style={{
-          // textAlign: "center",
-          marginVertical: 16,
-          fontFamily: Font.Outfit.Medium,
-          fontSize: 16,
-        }}
-      >
+      <MediumSubtitle>
         Ici, tu peux choisir un nom d'utilisateur pour que tes amis puissent te
         trouver plus facilement. Ce nom est unique sur DATSMYSONG !
-      </Text>
+      </MediumSubtitle>
       <ControlledInput
         autofocus
         control={control}

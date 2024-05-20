@@ -9,12 +9,12 @@ import User from "phosphor-react-native/src/regular/User";
 import { useEffect, useState } from "react";
 import { FlatList, ScrollView, StyleSheet } from "react-native";
 
-import Button from "./Button";
 import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
-import { Text, View } from "./Tamed";
+import { Text, View } from "./Themed";
 import Avatar from "./profile/Avatar";
-import H2 from "./text/H2";
+import Button from "./ui/Button";
+import { H2 } from "./ui/typography/Titles";
 import { getApiUrl } from "../lib/apiUrl";
 
 type RoomHistoryProps = {

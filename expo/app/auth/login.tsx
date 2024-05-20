@@ -3,9 +3,9 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 
-import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
 import Alert from "../../components/Warning";
+import Button from "../../components/ui/Button";
 import { emailRules } from "../../constants/InputRules";
 import { AuthErrorMessage } from "../../constants/SupabaseErrorCode";
 import { supabase } from "../../lib/supabase";
