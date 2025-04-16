@@ -1,11 +1,6 @@
 import type { ProcessedRoom } from "commons/room-types";
 import { useNavigation } from "expo-router";
-import Alarm from "phosphor-react-native/src/regular/Alarm";
-import CalendarBlank from "phosphor-react-native/src/regular/CalendarBlank";
-import Cube from "phosphor-react-native/src/regular/Cube";
-import Heart from "phosphor-react-native/src/regular/Heart";
-import MusicNote from "phosphor-react-native/src/regular/MusicNote";
-import User from "phosphor-react-native/src/regular/User";
+import { Alarm, CalendarBlank, Cube, Heart, MusicNote, User } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { FlatList, ScrollView, StyleSheet } from "react-native";
 
@@ -170,7 +165,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     alignSelf: "stretch",
-    overflowX: "scroll",
+    overflow: "scroll",
   },
   infoCard: {
     height: "auto",

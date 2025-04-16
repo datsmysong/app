@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import ArrowRight from "phosphor-react-native/src/icons/ArrowRight";
+import { ArrowRight } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { Keyboard, StyleSheet } from "react-native";
 

@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import CaretRight from "phosphor-react-native/src/icons/CaretRight";
+import { CaretRight } from "phosphor-react-native";
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 

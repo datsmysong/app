@@ -1,8 +1,5 @@
 import { PlayingJSONTrack } from "commons/backend-types";
-import Pause from "phosphor-react-native/src/icons/Pause";
-import Play from "phosphor-react-native/src/icons/Play";
-import SkipBack from "phosphor-react-native/src/icons/SkipBack";
-import SkipForward from "phosphor-react-native/src/icons/SkipForward";
+import { Pause, Play, SkipBack, SkipForward } from "phosphor-react-native";
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
@@ -161,7 +158,6 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#000000",
     borderRadius: 9999,
-    transition: "all 1s linear",
   },
 });
 

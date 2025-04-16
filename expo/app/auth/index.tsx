@@ -1,4 +1,4 @@
-import MailIcon from "phosphor-react-native/src/icons/Envelope";
+import { Envelope } from "phosphor-react-native";
 import { StyleSheet, Text, View } from "react-native";
 
 import ConnectWithGoogle from "./connect-with-google";
@@ -24,7 +24,7 @@ export default function Onboarding() {
           <Separator />
         </View>
         <Button
-          prependIcon={<MailIcon />}
+          prependIcon={<Envelope />}
           type="outline"
           href="/auth/login"
           block

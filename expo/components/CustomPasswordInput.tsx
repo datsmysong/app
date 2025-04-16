@@ -1,5 +1,4 @@
-import Eye from "phosphor-react-native/src/icons/Eye";
-import EyeSlash from "phosphor-react-native/src/icons/EyeSlash";
+import { Eye, EyeSlash } from "phosphor-react-native";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 

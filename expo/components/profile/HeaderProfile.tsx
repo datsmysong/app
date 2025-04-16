@@ -1,4 +1,4 @@
-import User from "phosphor-react-native/src/bold/User";
+import { User } from "phosphor-react-native";
 import { StyleSheet, View } from "react-native";
 
 import Avatar from "./Avatar";

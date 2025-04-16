@@ -1,4 +1,4 @@
-import MusicNote from "phosphor-react-native/src/icons/SpotifyLogo";
+import { MusicNote } from "phosphor-react-native";
 
 import Button from "../../components/Button";
 import { getSpotifyScopes } from "../../constants/Api";

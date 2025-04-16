@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
-import X from "phosphor-react-native/src/icons/X";
+import { X } from "phosphor-react-native";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";

@@ -1,9 +1,6 @@
 import { Redirect, Tabs, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import HouseLine from "phosphor-react-native/src/icons/HouseLine";
-import MusicNote from "phosphor-react-native/src/icons/MusicNote";
-import User from "phosphor-react-native/src/icons/User";
-import Users from "phosphor-react-native/src/icons/Users";
+import { HouseLine, MusicNote, User, Users } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 
 import { HomeTabHeader } from ".";

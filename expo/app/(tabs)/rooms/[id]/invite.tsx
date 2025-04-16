@@ -2,10 +2,7 @@ import { Room } from "commons/database-types-utils";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
-import ArrowRight from "phosphor-react-native/src/icons/ArrowRight";
-import Check from "phosphor-react-native/src/icons/Check";
-import QrCode from "phosphor-react-native/src/icons/QrCode";
-import Share from "phosphor-react-native/src/icons/Share";
+import { ArrowRight, Check, QrCode, Share } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
 
@@ -26,7 +23,7 @@ export default function InvitationModal() {
       const { data: room, error: roomsError } = await supabase
         .from("rooms")
         .select("*")
-        .eq("id", id)
+        .eq("id", id as string)
         .eq("is_active", true)
         .single();
       if (roomsError) {

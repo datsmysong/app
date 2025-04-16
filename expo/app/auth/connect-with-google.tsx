@@ -1,4 +1,4 @@
-import GoogleLogo from "phosphor-react-native/src/icons/GoogleLogo";
+import { GoogleLogo } from "phosphor-react-native";
 
 import Button from "../../components/Button";
 import { signInWithProvider } from "../../lib/providerMethods";

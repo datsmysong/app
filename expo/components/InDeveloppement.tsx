@@ -1,4 +1,4 @@
-import Hammer from "phosphor-react-native/src/icons/Hammer";
+import { Hammer } from "phosphor-react-native";
 import React from "react";
 import { View } from "react-native";
 

@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import CaretLeft from "phosphor-react-native/src/icons/CaretLeft";
+import { CaretLeft } from "phosphor-react-native";
 
 import { Text } from "./Themed";
 import Colors from "../constants/Colors";

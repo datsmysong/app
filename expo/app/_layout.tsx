@@ -7,7 +7,7 @@ import {
   router,
   useNavigationContainerRef,
 } from "expo-router";
-import { IconContext } from "phosphor-react-native/src/lib";
+import { IconContext } from "phosphor-react-native";
 import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";

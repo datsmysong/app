@@ -1,6 +1,6 @@
 import { PlayingJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
-import ThumbsDown from "phosphor-react-native/src/icons/ThumbsDown";
+import { ThumbsDown } from "phosphor-react-native";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#000000",
     borderRadius: 9999,
-    transition: "all 1s linear",
   },
   progressContainer: {
     flexDirection: "row",

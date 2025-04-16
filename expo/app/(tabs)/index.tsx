@@ -1,7 +1,6 @@
 // import * as WebBrowser from "expo-web-browser";
 import { JSONTrack } from "commons/backend-types";
-import ClockCounterClockwise from "phosphor-react-native/src/icons/ClockCounterClockwise";
-import MusicNote from "phosphor-react-native/src/icons/MusicNote";
+import { ClockCounterClockwise, MusicNote } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList, View as NativeView, ScrollView } from "react-native";
 

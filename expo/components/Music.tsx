@@ -1,7 +1,6 @@
 import { JSONTrack, PlayedJSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
-import DotsThree from "phosphor-react-native/src/icons/DotsThreeOutlineVertical";
-import Heart from "phosphor-react-native/src/icons/Heart";
+import { DotsThree, Heart } from "phosphor-react-native";
 import { StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";

@@ -1,5 +1,5 @@
 import { JSONTrack } from "commons/backend-types";
-import Plus from "phosphor-react-native/src/icons/Plus";
+import { Plus } from "phosphor-react-native";
 import { Pressable, StyleSheet } from "react-native";
 
 import MinimalistTrackItem from "./MinimalistTrackItem";

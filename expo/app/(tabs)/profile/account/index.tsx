@@ -1,9 +1,4 @@
-import BellRinging from "phosphor-react-native/src/icons/BellRinging";
-import Cube from "phosphor-react-native/src/icons/Cube";
-import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
-import Home from "phosphor-react-native/src/icons/HouseLine";
-import Lifebuoy from "phosphor-react-native/src/icons/Lifebuoy";
-import Lock from "phosphor-react-native/src/icons/Lock";
+import { BellRinging, Cube, DoorOpen, HouseLine, Lifebuoy, Lock } from "phosphor-react-native";
 import { ScrollView } from "react-native";
 
 import Separator from "../../../../components/Separator";
@@ -14,7 +9,7 @@ export default function Account() {
   return (
     <ScrollView>
       <SettingsOptions
-        icon={<Home />}
+        icon={<HouseLine />}
         title="Informations personnelles"
         href="/(tabs)/profile/account/edit"
       />

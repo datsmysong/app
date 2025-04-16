@@ -1,6 +1,4 @@
-import ClockCounterClockwise from "phosphor-react-native/src/icons/ClockCounterClockwise";
-import Heart from "phosphor-react-native/src/icons/Heart";
-import MusicNote from "phosphor-react-native/src/icons/MusicNote";
+import { ClockCounterClockwise, Heart, MusicNote } from "phosphor-react-native";
 import { StyleSheet, View, Text } from "react-native";
 
 import LibraryComponent from "./LibraryComponent";

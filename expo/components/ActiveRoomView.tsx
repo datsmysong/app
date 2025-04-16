@@ -1,9 +1,6 @@
 import { RoomJSON } from "commons/backend-types";
 import { Link, router } from "expo-router";
-import Share from "phosphor-react-native/src/bold/Share";
-import DoorOpen from "phosphor-react-native/src/icons/DoorOpen";
-import Gear from "phosphor-react-native/src/icons/Gear";
-import Plus from "phosphor-react-native/src/icons/Plus";
+import { Share, DoorOpen, Gear, Plus } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,

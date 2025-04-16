@@ -1,6 +1,4 @@
-import CheckCircle from "phosphor-react-native/src/icons/CheckCircle";
-import WarningIcon from "phosphor-react-native/src/icons/Warning";
-import WarningCircle from "phosphor-react-native/src/icons/WarningCircle";
+import { CheckCircle, Warning as WarningIcon, WarningCircle } from "phosphor-react-native";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 

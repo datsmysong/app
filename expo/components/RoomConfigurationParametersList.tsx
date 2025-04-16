@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import Trash from "phosphor-react-native/src/icons/Trash";
+import { Trash } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 

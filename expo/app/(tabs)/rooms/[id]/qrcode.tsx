@@ -1,6 +1,6 @@
 import * as Linking from "expo-linking";
 import { useLocalSearchParams } from "expo-router";
-import ArrowRight from "phosphor-react-native/src/icons/ArrowRight";
+import { ArrowRight } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -22,7 +22,7 @@ export default function QRCodeModal() {
       const { data: room, error: roomsError } = await supabase
         .from("rooms")
         .select("*")
-        .eq("id", id)
+        .eq("id", id as string)
         .eq("is_active", true)
         .single();
       if (roomsError || !room || !room.code) {
