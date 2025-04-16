@@ -1,0 +1,13 @@
+{
+  "name": "commons",
+  "version": "1.0.0",
+  "description": "Shared package across all datsmysong projects",
+  "author": "datsmysong",
+  "license": "MIT",
+  "scripts": {
+    "generate-types": "echo \"[!] > If this fails, try running `npx supabase login` then run the command below manually\" && supabase gen types typescript --project-id 'ckalsdcwrofxvgxslwiv' --schema public > database-types.ts"
+  },
+  "devDependencies": {
+    "supabase": "^1.136.2"
+  }
+}

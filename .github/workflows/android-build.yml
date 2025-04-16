@@ -1,0 +1,44 @@
+name: Android Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./expo
+    environment: preview
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - run: npm install --omit=dev
+
+      - run: npx expo prebuild
+
+      - name: Build with Gradle
+        run: ./gradlew assembleRelease
+        working-directory: ./expo/android
+        env:
+          EXPO_PUBLIC_BACKEND_API: ${{ vars.EXPO_PUBLIC_BACKEND_API }}
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID }}
+          EXPO_PUBLIC_SPOTIFY_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_SPOTIFY_CLIENT_ID }}
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: ./expo/android/app/build/outputs/apk/release/app-release.apk
