@@ -9,6 +9,6 @@
   "arrowParens": "always",
   "rangeStart": 0,
   "proseWrap": "preserve",
-  "endOfLine": "lf",
+  "endOfLine": "auto",
   "singleAttributePerLine": false
 }
