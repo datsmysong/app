@@ -1,6 +1,6 @@
 import { GoogleLogo } from "phosphor-react-native";
 
-import Button from "../../components/Button";
+import Button from "../../components/ui/Button";
 import { signInWithProvider } from "../../lib/providerMethods";
 
 export default function ConnectWithGoogle() {

@@ -1,6 +1,6 @@
 import { MusicNote } from "phosphor-react-native";
 
-import Button from "../../components/Button";
+import Button from "../../components/ui/Button";
 import { getSpotifyScopes } from "../../constants/Api";
 import { signInWithProvider } from "../../lib/providerMethods";
 

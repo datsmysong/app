@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 import { PlayerRemote } from "../../lib/audioRemote";
-import Button from "../Button";
+import Button from "../ui/Button";
 
 type PlayerControlsProps = {
   state: PlayingJSONTrack | null;

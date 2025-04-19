@@ -1,5 +1,5 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import { ArrowRight, CaretRight } from "phosphor-react-native";
 import { StyleSheet } from "react-native";
 
 import { Text, View } from "./Themed";
@@ -31,7 +31,7 @@ export default function RoomHistoryInfoCard({
             par {hostUsername} le {formattedDate}
           </Text>
         </View>
-        <MaterialIcons name="keyboard-arrow-right" size={32} color="black" />
+        <CaretRight size={32} color="black" />
       </View>
     </Link>
   );

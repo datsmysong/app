@@ -11,7 +11,8 @@ import { useEffect } from "react";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { Text, View } from "../components/Themed";
+import ApplicationLoadingScreen from "../components/ApplicationLoadingScreen";
+import { View } from "../components/Themed";
 import { AccountHeader } from "../components/headers/AccountHeader";
 import Colors from "../constants/Colors";
 import { supabase } from "../lib/supabase";
@@ -56,23 +57,11 @@ function RootLayout() {
   }, [ref]);
 
   const [loaded, error] = useFonts({
-    "Outfit-Thin": require("../assets/fonts/outfit/Outfit-Thin.ttf"),
-    "Outfit-ExtraLight": require("../assets/fonts/outfit/Outfit-ExtraLight.ttf"),
-    "Outfit-Light": require("../assets/fonts/outfit/Outfit-Light.ttf"),
     "Outfit-Medium": require("../assets/fonts/outfit/Outfit-Medium.ttf"),
     "Outfit-Regular": require("../assets/fonts/outfit/Outfit-Regular.ttf"),
-    "Outfit-SemiBold": require("../assets/fonts/outfit/Outfit-SemiBold.ttf"),
     "Outfit-Bold": require("../assets/fonts/outfit/Outfit-Bold.ttf"),
-    "Outfit-ExtraBold": require("../assets/fonts/outfit/Outfit-ExtraBold.ttf"),
-    "Outfit-Black": require("../assets/fonts/outfit/Outfit-Black.ttf"),
-    "Unbounded-Black": require("../assets/fonts/unbounded/Unbounded-Black.ttf"),
     "Unbounded-Bold": require("../assets/fonts/unbounded/Unbounded-Bold.ttf"),
-    "Unbounded-ExtraBold": require("../assets/fonts/unbounded/Unbounded-ExtraBold.ttf"),
-    "Unbounded-ExtraLight": require("../assets/fonts/unbounded/Unbounded-ExtraLight.ttf"),
-    "Unbounded-Light": require("../assets/fonts/unbounded/Unbounded-Light.ttf"),
-    "Unbounded-Medium": require("../assets/fonts/unbounded/Unbounded-Medium.ttf"),
     "Unbounded-Regular": require("../assets/fonts/unbounded/Unbounded-Regular.ttf"),
-    "Unbounded-SemiBold": require("../assets/fonts/unbounded/Unbounded-SemiBold.ttf"),
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
@@ -94,7 +83,7 @@ function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return <Text>Loading..</Text>;
+    return <ApplicationLoadingScreen />;
   }
 
   return <RootLayoutNav />;

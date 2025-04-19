@@ -3,8 +3,8 @@ import { useForm, useWatch } from "react-hook-form";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import Alert from "../../components/Alert";
-import Button from "../../components/Button";
 import ControlledInput from "../../components/ControlledInput";
+import Button from "../../components/ui/Button";
 import {
   emailRules,
   passwordRules,

@@ -6,9 +6,9 @@ import { ArrowRight, Check, QrCode, Share } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { Alert, Platform, StyleSheet } from "react-native";
 
-import Button from "../../../../components/Button";
 import CustomTextInput from "../../../../components/CustomTextInput";
 import { View } from "../../../../components/Themed";
+import Button from "../../../../components/ui/Button";
 import { supabase } from "../../../../lib/supabase";
 
 export default function InvitationModal() {
