@@ -5,7 +5,7 @@ import { Keyboard, StyleSheet } from "react-native";
 
 import Alert from "../../../components/Alert";
 import CustomTextInput from "../../../components/CustomTextInput";
-import { View } from "../../../components/Tamed";
+import { View } from "../../../components/Themed";
 import Warning from "../../../components/Warning";
 import Button from "../../../components/ui/Button";
 import { getParticipant, getRoomId, joinRoom } from "../../../lib/room-utils";

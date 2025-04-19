@@ -13,7 +13,7 @@ import { FlatList, ScrollView, StyleSheet } from "react-native";
 
 import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
-import { Text, View } from "./Tamed";
+import { Text, View } from "./Themed";
 import Avatar from "./profile/Avatar";
 import Button from "./ui/Button";
 import { H2 } from "./ui/typography/Titles";

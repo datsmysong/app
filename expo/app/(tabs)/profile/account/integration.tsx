@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
 import Alert from "../../../../components/Alert";
-import { Text, View } from "../../../../components/Tamed";
+import { Text, View } from "../../../../components/Themed";
 import Button from "../../../../components/ui/Button";
 import { Subtitle } from "../../../../components/ui/typography/Paragraphs";
 import { H2 } from "../../../../components/ui/typography/Titles";
