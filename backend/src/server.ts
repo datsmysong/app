@@ -141,6 +141,10 @@ server.register(import("@fastify/rate-limit"), {
   timeWindow: "1 minute",
 });
 
+server.get("/health", (req, res) => {
+  res.code(200).send({ status: "ok" });
+});
+
 // Auth
 
 // This route that handles SoundCloud auth is on the root route because we are awaiting SoundCloud to change the redirection URL
