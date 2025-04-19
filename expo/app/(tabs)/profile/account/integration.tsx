@@ -7,11 +7,37 @@ import { ScrollView, StyleSheet } from "react-native";
 import Alert from "../../../../components/Alert";
 import { Text, View } from "../../../../components/Themed";
 import Button from "../../../../components/ui/Button";
+import Chip from "../../../../components/ui/Chip";
 import { Subtitle } from "../../../../components/ui/typography/Paragraphs";
 import { H2 } from "../../../../components/ui/typography/Titles";
 import { useAsyncError } from "../../../../lib/AsyncError";
 import { getApiUrl } from "../../../../lib/apiUrl";
 import { bindServiceToAccount } from "../../../../lib/providerMethods";
+
+const StreamingServiceChips = ({ service }: { service: StreamingService }) => {
+  return (
+    <View style={styles.tags}>
+      <Chip
+        backgroundColor={service.playback_available ? "#D2F9E0" : "#F9D2D2"}
+        textColor={service.playback_available ? "#13863C" : "#D71E1E"}
+      >
+        Lecture des musiques
+      </Chip>
+      <Chip
+        backgroundColor={service.playlists_available ? "#D2F9E0" : "#F9D2D2"}
+        textColor={service.playlists_available ? "#13863C" : "#D71E1E"}
+      >
+        Gestion des playlists
+      </Chip>
+      <Chip
+        backgroundColor={service.likes_available ? "#D2F9E0" : "#F9D2D2"}
+        textColor={service.likes_available ? "#13863C" : "#D71E1E"}
+      >
+        Gestion des titres aimés
+      </Chip>
+    </View>
+  );
+};
 
 export default function ProfileIntegration() {
   const [servicesData, setServicesData] = useState([] as StreamingService[]);
@@ -98,48 +124,21 @@ export default function ProfileIntegration() {
         servicesData.map((service: StreamingService) => {
           return (
             <View key={service.service_id} style={styles.layout}>
-              <View style={styles.info}>
-                <Image
-                  contentFit="contain"
-                  source={service.image_url}
-                  alt={service.service_name}
-                  style={styles.image}
-                />
-                <View style={styles.details}>
-                  <H2>{service.service_name}</H2>
-                  <Subtitle>{service.description}</Subtitle>
+              <View style={{ gap: 10 }}>
+                <View style={styles.info}>
+                  <Image
+                    contentFit="contain"
+                    source={service.image_url}
+                    alt={service.service_name}
+                    style={styles.image}
+                  />
+                  <View style={styles.details}>
+                    <H2>{service.service_name}</H2>
+                    <Subtitle>{service.description}</Subtitle>
+                  </View>
                 </View>
               </View>
-              <View style={styles.tags}>
-                <Text
-                  style={[
-                    styles.tag,
-                    service.playback_available
-                      ? styles.trueTag
-                      : styles.falseTag,
-                  ]}
-                >
-                  Lecture des musiques
-                </Text>
-                <Text
-                  style={[
-                    styles.tag,
-                    service.playlists_available
-                      ? styles.trueTag
-                      : styles.falseTag,
-                  ]}
-                >
-                  Gestion des playlists
-                </Text>
-                <Text
-                  style={[
-                    styles.tag,
-                    service.likes_available ? styles.trueTag : styles.falseTag,
-                  ]}
-                >
-                  Gestion des titres aimés
-                </Text>
-              </View>
+              <StreamingServiceChips service={service} />
               {isBound(service.service_id) ? (
                 <Button
                   onPress={() => unbindService(service.service_id)}
@@ -190,7 +189,6 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     padding: 20,
     flexDirection: "column",
-    alignItems: "center",
     gap: 24,
     borderRadius: 24,
     backgroundColor: "#fff",
@@ -203,7 +201,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     alignSelf: "stretch",
-    backgroundColor: "#fff",
   },
 
   details: {
@@ -217,7 +214,6 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     flexBasis: 0,
     alignSelf: "stretch",
-    backgroundColor: "#fff",
   },
 
   tag: {
@@ -243,6 +239,5 @@ const styles = StyleSheet.create({
   tags: {
     flexDirection: "row",
     flexWrap: "wrap",
-    backgroundColor: "#fff",
   },
 });
