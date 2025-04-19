@@ -1,0 +1,25 @@
+name: datsmysong
+
+services:
+  backend:
+    container_name: datsmysong-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: datsmysong-backend:latest
+    ports:
+      - "8182:3000"
+    env_file:
+      - .backend.production.env
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  default:
+    name: datsmysong
+    external: true
