@@ -5,9 +5,9 @@ import Avatar from "./Avatar";
 import Colors from "../../constants/Colors";
 import Font from "../../constants/Font";
 import { useUserFullProfile } from "../../lib/userProfile";
-import Button from "../Button";
 import { Text } from "../Themed";
-import { H1 } from "../typography/Titles";
+import Button from "../ui/Button";
+import { H1 } from "../ui/typography/Titles";
 
 export const ProfileHeader = () => {
   const profile = useUserFullProfile();

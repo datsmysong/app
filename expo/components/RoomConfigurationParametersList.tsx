@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Alert from "./Alert";
-import Button from "./Button";
 import ParametersList from "./ParametersList";
 import { View } from "./Themed";
+import Button from "./ui/Button";
 import { getApiUrl } from "../lib/apiUrl";
 import { supabase } from "../lib/supabase";
 

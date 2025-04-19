@@ -11,12 +11,12 @@ import {
 import { useEffect, useState } from "react";
 import { FlatList, ScrollView, StyleSheet } from "react-native";
 
-import Button from "./Button";
 import InfoCard from "./InfoCard";
 import InactiveMusic from "./Music";
 import { Text, View } from "./Tamed";
 import Avatar from "./profile/Avatar";
-import { H2 } from "./typography/Titles";
+import Button from "./ui/Button";
+import { H2 } from "./ui/typography/Titles";
 import { getApiUrl } from "../lib/apiUrl";
 
 type RoomHistoryProps = {

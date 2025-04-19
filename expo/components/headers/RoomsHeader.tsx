@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
-import Button from "../Button";
-import { H1 } from "../typography/Titles";
+import Button from "../ui/Button";
+import { H1 } from "../ui/typography/Titles";
 
 export default function RoomsHeader() {
   return (

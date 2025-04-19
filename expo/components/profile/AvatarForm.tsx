@@ -7,9 +7,9 @@ import { Alert, Platform, Pressable, View } from "react-native";
 import Avatar, { AvatarRemote } from "./Avatar";
 import { supabase } from "../../lib/supabase";
 import { useUserProfile } from "../../lib/userProfile";
-import Button from "../Button";
 import { formStyles } from "../ControlledInput";
 import { Text } from "../Themed";
+import Button from "../ui/Button";
 
 interface AvatarProps {
   onImageLoad: () => void;

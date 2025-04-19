@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native";
 
 import { TypographyComponentProps } from "./Titles";
-import Colors from "../../constants/Colors";
-import Font from "../../constants/Font";
-import { Text } from "../Themed";
+import Colors from "../../../constants/Colors";
+import Font from "../../../constants/Font";
+import { Text } from "../../Themed";
 
 /**
  * Subtitle component (Outfit Regular, 16px)

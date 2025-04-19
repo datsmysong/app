@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { HomeTabHeader } from ".";
 import ApplicationLoadingScreen from "../../components/ApplicationLoadingScreen";
 import FriendHeader from "../../components/headers/FriendHeader";
-import { BigSubtitle } from "../../components/typography/Paragraphs";
+import { BigSubtitle } from "../../components/ui/typography/Paragraphs";
 import Colors from "../../constants/Colors";
 import { supabase } from "../../lib/supabase";
 import { useSupabaseUserHook } from "../../lib/useSupabaseUser";

@@ -1,7 +1,7 @@
 import { View } from "react-native";
 
-import { Subtitle } from "../typography/Paragraphs";
-import { H1 } from "../typography/Titles";
+import { Subtitle } from "../ui/typography/Paragraphs";
+import { H1 } from "../ui/typography/Titles";
 
 export default function FriendHeader() {
   return (

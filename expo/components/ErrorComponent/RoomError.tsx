@@ -1,8 +1,8 @@
 import { NetworkSlash } from "phosphor-react-native";
 import { StyleSheet } from "react-native";
 
-import Button from "../Button";
 import { View, Text } from "../Themed";
+import Button from "../ui/Button";
 
 export default function RoomErrorBoundary(): JSX.Element {
   return (
