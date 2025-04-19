@@ -1,4 +1,3 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import {
@@ -74,7 +73,6 @@ function RootLayout() {
     "Unbounded-Medium": require("../assets/fonts/unbounded/Unbounded-Medium.ttf"),
     "Unbounded-Regular": require("../assets/fonts/unbounded/Unbounded-Regular.ttf"),
     "Unbounded-SemiBold": require("../assets/fonts/unbounded/Unbounded-SemiBold.ttf"),
-    ...FontAwesome.font,
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.

@@ -1,7 +1,6 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { JSONTrack } from "commons/backend-types";
 import { Image } from "expo-image";
-import { X } from "phosphor-react-native";
+import { DotsThreeOutlineVertical, ThumbsDown, X } from "phosphor-react-native";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
@@ -58,16 +57,13 @@ export default function TrackItem(prop: {
       }
     >
       <Pressable onPress={handleDislike}>
-        <FontAwesome
-          name={`thumbs-${!dislike ? "o-" : ""}down`}
-          style={itemStyles.icon}
-        />
+        <ThumbsDown weight={dislike ? "fill" : "regular"} />
       </Pressable>
       {!prop.isMenuDisabled && (
         <>
           <Menu>
             <MenuTrigger>
-              <FontAwesome name="ellipsis-v" style={itemStyles.icon} />
+              <DotsThreeOutlineVertical />
             </MenuTrigger>
             <MenuOptions customStyles={optionsStyles}>
               <CustomMenuOption
@@ -127,12 +123,6 @@ const itemStyles = StyleSheet.create({
   },
   textBottom: {
     color: "#C3C3C3",
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    fontSize: 24,
-    textAlign: "center",
   },
 });
 
