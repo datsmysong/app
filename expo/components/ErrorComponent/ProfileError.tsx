@@ -2,21 +2,16 @@ import { CellSignalX } from "phosphor-react-native";
 import { StyleSheet } from "react-native";
 
 import Button from "../Button";
-import { View, Text } from "../Themed";
+import { View } from "../Themed";
+import { H1, H2 } from "../typography/Titles";
 
 export default function ProfileErrorBoundary(): JSX.Element {
   return (
     <View style={errorStyle.page}>
       <View style={errorStyle.title}>
         <CellSignalX size={60} color="red" />
-        <Text
-          style={{
-            fontSize: 30,
-            fontFamily: "Outfit-Regular",
-          }}
-        >
-          Impossible de charger les données de votre compte
-        </Text>
+        <H1>Erreur</H1>
+        <H2>Impossible de charger les données de votre compte</H2>
       </View>
 
       <Button href="/profile">Retourner à votre page de profil</Button>

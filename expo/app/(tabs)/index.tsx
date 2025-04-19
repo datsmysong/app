@@ -8,8 +8,7 @@ import Button from "../../components/Button";
 import { TrackCard } from "../../components/Music";
 import { View } from "../../components/Themed";
 import { RoomHistoryList } from "../../components/UserRoomHistory";
-import H1 from "../../components/text/H1";
-import H2 from "../../components/text/H2";
+import { H1, H2 } from "../../components/typography/Titles";
 import { getApiUrl } from "../../lib/apiUrl";
 import { useUserProfile } from "../../lib/userProfile";
 

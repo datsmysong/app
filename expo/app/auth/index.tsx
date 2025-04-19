@@ -5,7 +5,7 @@ import ConnectWithGoogle from "./connect-with-google";
 import ConnectWithSpotify from "./connect-with-spotify";
 import Button from "../../components/Button";
 import Separator from "../../components/Separator";
-import H1 from "../../components/text/H1";
+import { H1 } from "../../components/typography/Titles";
 
 export default function Onboarding() {
   return (

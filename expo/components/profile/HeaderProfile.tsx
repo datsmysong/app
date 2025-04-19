@@ -7,7 +7,7 @@ import Font from "../../constants/Font";
 import { useUserFullProfile } from "../../lib/userProfile";
 import Button from "../Button";
 import { Text } from "../Themed";
-import H1 from "../text/H1";
+import { H1 } from "../typography/Titles";
 
 export const ProfileHeader = () => {
   const profile = useUserFullProfile();

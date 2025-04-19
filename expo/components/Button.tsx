@@ -116,7 +116,7 @@ const Button: React.FC<ButtonProps> = ({
       onPress={handlePress}
       onLongPress={onLongPress}
       disabled={disabled || loading}
-      accessibilityLabel={children as string}
+      aria-label={children as string}
     >
       {loading && (
         <View

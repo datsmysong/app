@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInputProps, View } from "react-native";
 
 import CustomPasswordInput from "./CustomPasswordInput";
 import CustomTextInput, { CustomTextInputProps } from "./CustomTextInput";
-import Subtitle from "./text/Subtitle";
+import { Subtitle } from "./typography/Paragraphs";
 
 interface ControlledInputProps extends CustomTextInputProps {
   control: any;

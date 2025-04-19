@@ -4,8 +4,7 @@ import { Screen } from "react-native-screens";
 
 import Button from "../components/Button";
 import ControlledInput from "../components/ControlledInput";
-import { Text } from "../components/Themed";
-import Font from "../constants/Font";
+import { MediumSubtitle } from "../components/typography/Paragraphs";
 import { usernameRules } from "../constants/InputRules";
 import { SupabaseErrorCode } from "../constants/SupabaseErrorCode";
 import { supabase } from "../lib/supabase";
@@ -67,17 +66,10 @@ export default function AskName() {
         padding: 16,
       }}
     >
-      <Text
-        style={{
-          // textAlign: "center",
-          marginVertical: 16,
-          fontFamily: Font.Outfit.Medium,
-          fontSize: 16,
-        }}
-      >
+      <MediumSubtitle>
         Ici, tu peux choisir un nom d'utilisateur pour que tes amis puissent te
         trouver plus facilement. Ce nom est unique sur datsmysong !
-      </Text>
+      </MediumSubtitle>
       <ControlledInput
         autofocus
         control={control}
