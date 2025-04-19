@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { CellSignalX } from "phosphor-react-native";
 import { StyleSheet } from "react-native";
 
 import Button from "../Button";
@@ -8,7 +8,7 @@ export default function ProfileErrorBoundary(): JSX.Element {
   return (
     <View style={errorStyle.page}>
       <View style={errorStyle.title}>
-        <MaterialIcons name="network-check" size={60} color="red" />
+        <CellSignalX size={60} color="red" />
         <Text
           style={{
             fontSize: 30,
