@@ -27,6 +27,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd /home/ubuntu/.docker/datsmysong
             git pull
             docker compose build --pull
