@@ -29,5 +29,6 @@ jobs:
           script: |
             cd /home/ubuntu/.docker/datsmysong
             git pull
+            docker compose build --pull
             docker compose down
-            docker compose up -d --force-recreate --build
+            docker compose up -d --force-recreate
