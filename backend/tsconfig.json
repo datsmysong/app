@@ -14,6 +14,7 @@
 
     /* Language and Environment */
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "lib": ["es2023", "dom", "dom.iterable"] /* Runtime APIs available on Node 24 LTS, plus the DOM types the default lib used to include. Emitted code is unchanged since target stays es2016. */,
 
     // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
