@@ -9,11 +9,11 @@ import {
 } from "react-native";
 
 import Alert from "../../../components/Alert";
-import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
 import ParametersList from "../../../components/ParametersList";
 import ServiceList from "../../../components/ServicesList";
 import Warning from "../../../components/Warning";
+import Button from "../../../components/ui/Button";
 import { getApiUrl } from "../../../lib/apiUrl";
 
 type CreateRoomFormBody = {

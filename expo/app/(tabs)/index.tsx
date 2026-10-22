@@ -4,12 +4,11 @@ import { ClockCounterClockwise, MusicNote } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList, View as NativeView, ScrollView } from "react-native";
 
-import Button from "../../components/Button";
 import { TrackCard } from "../../components/Music";
 import { View } from "../../components/Themed";
 import { RoomHistoryList } from "../../components/UserRoomHistory";
-import H1 from "../../components/text/H1";
-import H2 from "../../components/text/H2";
+import Button from "../../components/ui/Button";
+import { H1, H2 } from "../../components/ui/typography/Titles";
 import { getApiUrl } from "../../lib/apiUrl";
 import { useUserProfile } from "../../lib/userProfile";
 

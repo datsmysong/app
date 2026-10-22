@@ -5,7 +5,6 @@
 
 import {
   Text as DefaultText,
-  useColorScheme,
   View as DefaultView,
   PressableProps,
 } from "react-native";
@@ -45,11 +44,7 @@ export function Text(props: TextProps) {
 }
 
 export function View(props: ViewProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const backgroundColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    "background"
-  );
+  const { style, ...otherProps } = props;
 
-  return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+  return <DefaultView style={style} {...otherProps} />;
 }

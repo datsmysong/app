@@ -3,7 +3,7 @@ import { CaretRight } from "phosphor-react-native";
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 
-import { Text, View } from "../Tamed";
+import { Text, View } from "../Themed";
 
 type CommonProps = {
   icon: React.ReactElement;

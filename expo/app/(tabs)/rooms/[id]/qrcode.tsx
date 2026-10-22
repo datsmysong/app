@@ -7,8 +7,8 @@ import QRCode from "react-native-qrcode-svg";
 
 import { generatedInvitationLink } from "./invite";
 import Alert from "../../../../components/Alert";
-import Button from "../../../../components/Button";
 import { View } from "../../../../components/Themed";
+import Button from "../../../../components/ui/Button";
 import { supabase } from "../../../../lib/supabase";
 
 export default function QRCodeModal() {
