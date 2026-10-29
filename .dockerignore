@@ -1,0 +1,16 @@
+# The image only needs the backend and the shared types it builds against.
+# Everything else stays out of the build context, starting with secrets.
+*
+!backend/
+!commons/
+
+# Never send env files, even from an allowed folder.
+**/.env*
+**/*.env
+**/.backend.*.env
+**/.sentryclirc
+
+# Local installs and build output are rebuilt inside the image.
+**/node_modules
+backend/build
+**/.DS_Store
