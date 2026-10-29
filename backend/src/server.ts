@@ -102,6 +102,20 @@ if (!process.env.BACKEND_URL && process.env.NODE_ENV === "production") {
     "Missing BACKEND_URL environment variable, check .env.local.example file"
   );
 }
+
+// Signs cookies. Only local development may fall back to a fixed, public value.
+const cookieSecret =
+  process.env.FASTIFY_COOKIE_SECRET ||
+  (process.env.NODE_ENV === "development"
+    ? "datsmysong-dev-cookie-secret"
+    : "");
+
+if (!cookieSecret) {
+  throw new Error(
+    "Missing FASTIFY_COOKIE_SECRET environment variable, check .env.local.example file"
+  );
+}
+
 export const adminSupabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SERVICE_ROLE
@@ -123,7 +137,7 @@ server.register(fastifySocketIO, {
   },
 });
 server.register(fastifyCookie, {
-  secret: process.env.FASTIFY_COOKIE_SECRET ?? "",
+  secret: cookieSecret,
   hook: "onRequest",
   parseOptions: {},
 } as FastifyCookieOptions);
