@@ -53,7 +53,7 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=sha,format=long
-            type=raw,value=latest
+            type=raw,value=latest,enable={{is_default_branch}}
 
       # No context: the action builds from the Git context of this commit, so the image holds
       # neither a .git folder nor any file the runner adds.
