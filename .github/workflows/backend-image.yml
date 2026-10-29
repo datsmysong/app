@@ -27,6 +27,11 @@ jobs:
     name: Build, push and sign
     # The server is linux/arm64. Public repositories get the GitHub-hosted arm64 runners for free.
     runs-on: ubuntu-24.04-arm
+    # The cosign key lives in the release environment, which only main and release/* can use, so a
+    # run dispatched from another ref stops here. Signing is not a deployment: the job records none.
+    environment:
+      name: release
+      deployment: false
     permissions:
       contents: read
       packages: write
