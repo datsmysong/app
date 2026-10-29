@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
 import Alert from "../../components/Alert";
-import Button from "../../components/Button";
+import Button from "../../components/ui/Button";
 import { getParticipant, getRoomId, joinRoom } from "../../lib/room-utils";
 import { useUserProfile } from "../../lib/userProfile";
 

@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Warning } from "phosphor-react-native";
 
 import { View, Text } from "../Themed";
 
@@ -19,7 +19,7 @@ export default function WebsocketError() {
           alignItems: "center",
         }}
       >
-        <MaterialIcons name="warning" size={24} color="red" />
+        <Warning color="red" />
         <Text
           style={{
             fontFamily: "Outfit-Regular",

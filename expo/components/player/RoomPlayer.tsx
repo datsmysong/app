@@ -12,8 +12,8 @@ import Player from "./Player";
 import PlayerControls from "./PlayerControls";
 import buildAudioRemote, { PlayerRemote } from "../../lib/audioRemote";
 import { ActiveRoom } from "../../lib/useRoom";
-import Button from "../Button";
 import Warning from "../Warning";
+import Button from "../ui/Button";
 
 type RoomPlayerProps = {
   room: ActiveRoom;

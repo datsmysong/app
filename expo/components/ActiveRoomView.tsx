@@ -13,12 +13,13 @@ import {
 } from "react-native";
 
 import Alert from "./Alert";
-import Button from "./Button";
 import Confirm from "./Confirm";
 import { View } from "./Themed";
 import Warning from "./Warning";
 import RoomPlayer from "./player/RoomPlayer";
 import TrackItem from "./room/TrackItem";
+import Button from "./ui/Button";
+import { H1 } from "./ui/typography/Titles";
 import { useWebSocket } from "../app/(tabs)/rooms/[id]/_layout";
 import Colors from "../constants/Colors";
 import { getApiUrl } from "../lib/apiUrl";
@@ -173,14 +174,7 @@ const ActiveRoomView: React.FC<ActiveRoomViewProps> = ({ room }) => {
                   backgroundColor: Colors.light.lightGray,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 32,
-                    fontFamily: "Unbounded-Bold",
-                  }}
-                >
-                  {room.name}
-                </Text>
+                <H1>{room.name}</H1>
                 {isHost ? (
                   <Link href={`/rooms/${room.id}/settings`}>
                     <Gear size={32} color="black" />

@@ -1,7 +1,7 @@
 import { ScrollView } from "react-native";
 
-import Button, { ButtonProps } from "../../components/Button";
 import { Text } from "../../components/Themed";
+import Button, { ButtonProps } from "../../components/ui/Button";
 
 const propOptions: Partial<Record<keyof ButtonProps, any[]>> = {
   type: ["filled", "outline"],

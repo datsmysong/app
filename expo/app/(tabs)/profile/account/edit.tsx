@@ -3,12 +3,12 @@ import { useForm } from "react-hook-form";
 import { ScrollView, StyleSheet } from "react-native";
 
 import Alert from "../../../../components/Alert";
-import Button from "../../../../components/Button";
 import ControlledInput from "../../../../components/ControlledInput";
 import ErrorBoundary from "../../../../components/ErrorBoundary";
 import { View } from "../../../../components/Themed";
 import Warning from "../../../../components/Warning";
 import AvatarForm from "../../../../components/profile/AvatarForm";
+import Button from "../../../../components/ui/Button";
 import {
   displayNameRules,
   emailRules,

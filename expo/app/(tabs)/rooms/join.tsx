@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { Keyboard, StyleSheet } from "react-native";
 
 import Alert from "../../../components/Alert";
-import Button from "../../../components/Button";
 import CustomTextInput from "../../../components/CustomTextInput";
-import { View } from "../../../components/Tamed";
+import { View } from "../../../components/Themed";
 import Warning from "../../../components/Warning";
+import Button from "../../../components/ui/Button";
 import { getParticipant, getRoomId, joinRoom } from "../../../lib/room-utils";
 import { useUserProfile } from "../../../lib/userProfile";
 
