@@ -25,6 +25,7 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.27.0",
     "fastify-socket.io": "^5.0.0",
+    "pino-pretty": "^11.0.0",
     "socket.io": "^4.7.5",
     "soundcloud.ts": "^0.5.2",
     "supabase": "^1.165.0"
@@ -41,7 +42,6 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^3.1.0",
-    "pino-pretty": "^11.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
