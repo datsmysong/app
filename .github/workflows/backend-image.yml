@@ -1,7 +1,7 @@
 name: Backend Image
 
 # Builds the backend image that api.datsmysong.app runs, pushes it to GHCR and signs it with the
-# repository's cosign key. Backend Deployment still deploys over SSH; this only publishes the image.
+# repository's cosign key. The server is updated to a new image by hand.
 on:
   push:
     branches:
